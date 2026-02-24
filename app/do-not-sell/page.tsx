@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { Shield, MapPin, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
@@ -23,7 +23,7 @@ export default function DoNotSellPage() {
   const [californiaResident, setCaliforniaResident] = useState<boolean | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
 
   useEffect(() => {
     if (user) {

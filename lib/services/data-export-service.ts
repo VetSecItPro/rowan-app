@@ -25,6 +25,11 @@ import { logger } from '@/lib/logger';
  * - Metadata: Export date, user ID, format version
  *
  * Users can export their data at any time from Settings → Privacy & Security
+ *
+ * NOTE ON select('*'):
+ * This service intentionally uses select('*') throughout. GDPR data portability
+ * requires exporting ALL user data — restricting columns would violate Article 20.
+ * Do NOT replace with specific column lists.
  */
 
 type ExportRecord = Record<string, unknown>;

@@ -8,7 +8,7 @@ import {
   NudgeSettings,
   CreateNudgeSettingsInput
 } from '@/lib/services/smart-nudges-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Modal } from '@/components/ui/Modal';
@@ -27,7 +27,7 @@ export function NudgeSettingsModal({
   currentSettings,
   onSettingsUpdate
 }: NudgeSettingsModalProps) {
-  const { user, currentSpace } = useAuth();
+  const { user, currentSpace } = useAuthWithSpaces();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState<CreateNudgeSettingsInput>({
     space_id: currentSpace?.id || '',

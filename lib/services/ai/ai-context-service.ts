@@ -160,7 +160,8 @@ class AIContextService {
     const cached = summaryCache.get(spaceId);
     if (cached) return cached;
 
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
+    const todayDateOnly = now.split('T')[0];
     const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
     const [
@@ -176,8 +177,8 @@ class AIContextService {
     ] = await Promise.all([
       supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('space_id', spaceId),
       supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']),
-      supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']).lt('due_date', today),
-      supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']).eq('due_date', today),
+      supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']).lt('due_date', now),
+      supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']).gte('due_date', todayDateOnly).lt('due_date', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()),
       supabase.from('goals').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['active', 'in_progress']),
       supabase.from('chores').select('id', { count: 'exact', head: true }).eq('space_id', spaceId),
       supabase.from('chores').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']),

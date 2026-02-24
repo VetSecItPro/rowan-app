@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   getPrivacyPreferences,
   updatePrivacyPreferences,
@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 
 export default function PrivacyCompliancePage() {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
 
   const [preferences, setPreferences] = useState<PrivacyPreferences | null>(null);
   const [ccpaPreference, setCCPAPreference] = useState<CCPAPreference | null>(null);
@@ -200,18 +200,6 @@ export default function PrivacyCompliancePage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-white">Marketing SMS</p>
-                    <p className="text-xs text-gray-400 mt-1">Receive promotional messages via SMS</p>
-                  </div>
-                  <Toggle
-                    id="marketing-sms"
-                    checked={preferences?.marketing_sms_enabled || false}
-                    onChange={(checked) => handlePreferenceChange('marketing_sms_enabled', checked)}
-                    disabled={saving}
-                  />
-                </div>
               </div>
             </div>
 
@@ -230,31 +218,6 @@ export default function PrivacyCompliancePage() {
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-white">Share Data with Partners</p>
-                    <p className="text-xs text-gray-400 mt-1">Allow trusted partners to enhance your experience</p>
-                  </div>
-                  <Toggle
-                    id="share-data-with-partners"
-                    checked={preferences?.share_data_with_partners || false}
-                    onChange={(checked) => handlePreferenceChange('share_data_with_partners', checked)}
-                    disabled={saving}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-white">Third-Party Analytics</p>
-                    <p className="text-xs text-gray-400 mt-1">Share anonymized data with analytics providers</p>
-                  </div>
-                  <Toggle
-                    id="allow-third-party-analytics"
-                    checked={preferences?.third_party_analytics_enabled || false}
-                    onChange={(checked) => handlePreferenceChange('third_party_analytics_enabled', checked)}
-                    disabled={saving}
-                  />
-                </div>
               </div>
             </div>
 

@@ -20,7 +20,7 @@ import {
   BarChart3,
   Link as LinkIcon
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   BudgetProgress,
   SavingsGoalProgress,
@@ -37,7 +37,7 @@ interface BudgetGoalsDashboardProps {
 
 /** Displays a dashboard combining budget progress with linked goal tracking. */
 export function BudgetGoalsDashboard({ className }: BudgetGoalsDashboardProps) {
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
   const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoalProgress[]>([]);
   const [loading, setLoading] = useState(true);

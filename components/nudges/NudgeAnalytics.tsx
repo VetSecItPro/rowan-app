@@ -4,7 +4,7 @@ import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { X, BarChart3, TrendingUp, Eye, MousePointer, CheckCircle } from 'lucide-react';
 import { smartNudgesService } from '@/lib/services/smart-nudges-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -27,7 +27,7 @@ interface AnalyticsData {
 
 /** Displays analytics on nudge engagement and effectiveness. */
 export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
-  const { user, currentSpace } = useAuth();
+  const { user, currentSpace } = useAuthWithSpaces();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState(30); // days

@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, Link as LinkIcon, X, Loader2 } from 'lucide-react';
 import { reminderAttachmentsService } from '@/lib/services/reminder-attachments-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import { showError, showWarning } from '@/lib/utils/toast';
 
@@ -16,7 +16,7 @@ interface AttachmentUploaderProps {
 
 /** Provides file upload controls for attaching files to a reminder. */
 export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentUploaderProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);

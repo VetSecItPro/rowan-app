@@ -21,7 +21,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import Image from 'next/image';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { receiptScanningService, ReceiptData, ExtractedReceiptData } from '@/lib/services/receipt-scanning-service';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +39,7 @@ export function ReceiptLibrary({
   onCreateExpense,
   className
 }: ReceiptLibraryProps) {
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
   const [receipts, setReceipts] = useState<ReceiptData[]>([]);
   const [filteredReceipts, setFilteredReceipts] = useState<ReceiptData[]>([]);
   const [loading, setLoading] = useState(true);

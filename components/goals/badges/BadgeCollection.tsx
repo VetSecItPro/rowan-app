@@ -131,7 +131,7 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
 
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <div className="text-2xl font-bold text-indigo-400">
-            {Math.round((stats.totalBadges / allBadges.length) * 100)}%
+            {allBadges.length > 0 ? Math.round((stats.totalBadges / allBadges.length) * 100) : 0}%
           </div>
           <div className="text-sm text-gray-400">Collection Progress</div>
         </div>

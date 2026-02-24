@@ -35,7 +35,15 @@ const priorityColors = {
 const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails, onSaveAsTemplate, linkedShoppingList }: TaskCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
+  // Parse due_date as local time to avoid UTC midnight issues
+  const isOverdue = (() => {
+    if (!task.due_date || task.status === 'completed') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const [y, m, d] = task.due_date.split('T')[0].split('-').map(Number);
+    const dueDate = new Date(y, m - 1, d);
+    return dueDate < today;
+  })();
   const priorityColor = priorityColors[task.priority as keyof typeof priorityColors] || 'bg-gray-500';
 
   // Handle status rotation: pending → in_progress → completed → pending

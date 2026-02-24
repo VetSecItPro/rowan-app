@@ -392,8 +392,8 @@ export function getCookieConsentTimestamp(): Date | null {
 export function privacyToCookiePreferences(privacy: UserPrivacyPreferences): CookiePreferences {
   return {
     necessary: true,
-    analytics: !!privacy.third_party_analytics_enabled,
-    marketing: !!(privacy.share_data_with_partners && !privacy.ccpa_do_not_sell),
+    analytics: !!privacy.analytics_cookies_enabled,
+    marketing: !privacy.ccpa_do_not_sell,
     functional: true, // Always enabled for core functionality
     preferences: true, // Always enabled for user experience
   };
@@ -402,8 +402,7 @@ export function privacyToCookiePreferences(privacy: UserPrivacyPreferences): Coo
 // Convert cookie preferences to privacy updates
 export function cookieToPrivacyUpdates(cookies: CookiePreferences): Partial<UserPrivacyPreferences> {
   return {
-    third_party_analytics_enabled: cookies.analytics,
-    share_data_with_partners: cookies.marketing,
+    analytics_cookies_enabled: cookies.analytics,
     ccpa_do_not_sell: !cookies.marketing,
   };
 }

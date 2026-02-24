@@ -7,14 +7,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { RefreshCw, CheckCircle, Calendar, AlertTriangle, Loader2, Home } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Footer } from '@/components/layout/Footer';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 
 export default function RestoreAccountPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthWithSpaces();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [deletionInfo, setDeletionInfo] = useState<{

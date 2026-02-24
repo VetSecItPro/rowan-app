@@ -5,7 +5,7 @@ import { ShoppingCart, Calendar, Check, Plus, ListTodo } from 'lucide-react';
 import { simplifyIngredients, SimplifiedIngredient } from '@/lib/utils/ingredient-simplifier';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { tasksService } from '@/lib/services/tasks-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from 'sonner';
 
@@ -27,7 +27,7 @@ export function ShoppingListPreviewModal({
   spaceId,
   onSuccess,
 }: ShoppingListPreviewModalProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [simplifiedItems, setSimplifiedItems] = useState<SimplifiedIngredient[]>([]);
   const [listName, setListName] = useState('');
   const [scheduledDate, setScheduledDate] = useState('');

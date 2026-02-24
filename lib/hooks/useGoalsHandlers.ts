@@ -147,8 +147,9 @@ export function useGoalsHandlers(deps: UseGoalsHandlersDeps): UseGoalsHandlersRe
         setGoals(prev => [optimisticGoal, ...prev]);
 
         try {
-          await goalsService.createGoal(goalData);
-          // Real-time subscription will replace the optimistic goal with the real one
+          const newGoal = await goalsService.createGoal(goalData);
+          // Replace optimistic goal with the real DB goal (has proper UUID)
+          setGoals(prev => prev.map(g => g.id === optimisticGoal.id ? newGoal : g));
         } catch (error) {
           // Revert optimistic update on error
           setGoals(prev => prev.filter(goal => goal.id !== optimisticGoal.id));

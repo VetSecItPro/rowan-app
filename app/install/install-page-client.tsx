@@ -216,10 +216,13 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function InstallPageClient() {
-  // Detect platform via lazy initializer (avoids setState in effect)
-  const [detectedPlatform] = useState<Platform>(() =>
-    typeof navigator !== 'undefined' ? detectPlatform(navigator.userAgent) : 'other'
-  );
+  // Start with 'other' to match server render, then detect on client to avoid hydration mismatch
+  const [detectedPlatform] = useState<Platform>(() => {
+    if (typeof navigator !== 'undefined') {
+      return detectPlatform(navigator.userAgent);
+    }
+    return 'other';
+  });
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(
     null
   );

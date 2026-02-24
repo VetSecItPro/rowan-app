@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 import { logger } from '@/lib/logger';
@@ -33,7 +33,7 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
   const [intent, setIntent] = useState<UserIntent>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>();
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const { refreshSpaces } = useSpaces();
   const router = useRouter();
 

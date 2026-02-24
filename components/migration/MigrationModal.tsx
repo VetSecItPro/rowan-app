@@ -6,7 +6,7 @@ import { CheckCircle, AlertTriangle, ArrowRight, Database, Calendar, CheckSquare
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 import type { Space } from '@/lib/types';
@@ -97,7 +97,7 @@ export function MigrationModal({ isOpen, onClose, targetSpaces }: MigrationModal
     current: string;
   }>({ total: 0, completed: 0, current: '' });
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const { refreshSpaces } = useSpaces();
   const router = useRouter();
 

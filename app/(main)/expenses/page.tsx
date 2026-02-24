@@ -3,12 +3,14 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
-// Using native HTML elements and existing components
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { projectsService, type Expense } from '@/lib/services/budgets-service';
+import { getReceipts } from '@/lib/services/receipts-service';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,41 +35,102 @@ interface ExpenseSummary {
   lastMonth: number;
   changePercent: number;
   categories: Record<string, number>;
+  receiptCount: number;
 }
 
 export default function ExpensesPage() {
   // SECURITY: Check feature access FIRST
   const { hasAccess: _hasAccess, isLoading: _gateLoading } = useFeatureGate('household');
+  const { currentSpace } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
 
   const [activeTab, setActiveTab] = useState('scanner');
-  const [recentExpenses] = useState<ExpenseSummary>({
-    total: 2847.32,
-    thisMonth: 1205.49,
-    lastMonth: 1641.83,
-    changePercent: -26.6,
-    categories: {
-      'Groceries': 485.20,
-      'Dining': 320.15,
-      'Transportation': 180.50,
-      'Healthcare': 125.30,
-      'Shopping': 94.34
+  const [summary, setSummary] = useState<ExpenseSummary | null>(null);
+  const [recentExpensesList, setRecentExpensesList] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadExpenseData() {
+      if (!spaceId) return;
+
+      try {
+        setLoading(true);
+
+        const [expenses, receipts] = await Promise.all([
+          projectsService.getExpenses(spaceId),
+          getReceipts(spaceId).catch(() => []),
+        ]);
+
+        // Compute summary from real data
+        const now = new Date();
+        const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+        let total = 0;
+        let thisMonth = 0;
+        let lastMonth = 0;
+        const categories: Record<string, number> = {};
+
+        for (const expense of expenses) {
+          total += expense.amount;
+          const expenseDate = expense.due_date ? new Date(expense.due_date) : new Date(expense.created_at);
+
+          if (expenseDate >= thisMonthStart) {
+            thisMonth += expense.amount;
+            if (expense.category) {
+              categories[expense.category] = (categories[expense.category] || 0) + expense.amount;
+            }
+          } else if (expenseDate >= lastMonthStart && expenseDate < thisMonthStart) {
+            lastMonth += expense.amount;
+          }
+        }
+
+        const changePercent = lastMonth > 0
+          ? ((thisMonth - lastMonth) / lastMonth) * 100
+          : 0;
+
+        // This month's receipts
+        const monthlyReceipts = receipts.filter((r) => {
+          const rDate = new Date(r.created_at);
+          return rDate >= thisMonthStart;
+        });
+
+        setSummary({
+          total,
+          thisMonth,
+          lastMonth,
+          changePercent,
+          categories,
+          receiptCount: monthlyReceipts.length,
+        });
+
+        // Recent expenses (latest 4)
+        const sorted = [...expenses].sort((a, b) => {
+          const dateA = a.due_date || a.created_at;
+          const dateB = b.due_date || b.created_at;
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
+        setRecentExpensesList(sorted.slice(0, 4));
+      } catch (err) {
+        logger.error('Failed to load expense data:', err, { component: 'page', action: 'execution' });
+      } finally {
+        setLoading(false);
+      }
     }
-  });
+
+    loadExpenseData();
+  }, [spaceId]);
 
   const handleExpenseCreated = (expenseData: ExpenseSuggestion) => {
     logger.info('Expense created:', { component: 'page', data: expenseData });
-    // TODO: Integrate with actual expense creation
-    // This would typically call the expense service to create the expense
   };
 
   const handleReceiptProcessed = (receiptId: string, extractedData: ExtractedReceiptData) => {
     logger.info('Receipt processed:', { component: 'page', data: receiptId, extractedData });
-    // Could show success message, refresh data, etc.
   };
 
   const handleCreateExpenseFromReceipt = (extractedData: ExtractedReceiptData) => {
     logger.info('Creating expense from receipt data:', { component: 'page', data: extractedData });
-    // Switch to scanner tab and pre-fill with data
     setActiveTab('scanner');
   };
 
@@ -79,8 +142,8 @@ export default function ExpensesPage() {
   };
 
   const getChangeColor = (change: number) => {
-    if (change > 0) return 'text-green-600';
-    if (change < 0) return 'text-red-600';
+    if (change > 0) return 'text-red-600';
+    if (change < 0) return 'text-green-600';
     return 'text-gray-600';
   };
 
@@ -89,6 +152,8 @@ export default function ExpensesPage() {
     if (change < 0) return '↘';
     return '→';
   };
+
+  const hasData = summary && summary.total > 0;
 
   return (
     <FeatureGateWrapper
@@ -118,95 +183,121 @@ export default function ExpensesPage() {
       </div>
 
       {/* Expense Summary Cards */}
-      <CollapsibleStatsGrid
-        icon={DollarSign}
-        title="Expense Stats"
-        summary={`${formatCurrency(recentExpenses.thisMonth)} this month • 23 receipts`}
-        iconGradient="bg-gradient-to-br from-amber-500 to-amber-600"
-        gridClassName="grid stats-grid-mobile gap-4"
-      >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(recentExpenses.total)}</div>
-            <p className="text-xs text-muted-foreground">All time</p>
-          </CardContent>
-        </Card>
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full" />
+          <span className="ml-3 text-gray-400">Loading expenses...</span>
+        </div>
+      ) : (
+        <CollapsibleStatsGrid
+          icon={DollarSign}
+          title="Expense Stats"
+          summary={`${formatCurrency(summary?.thisMonth ?? 0)} this month${summary && summary.receiptCount > 0 ? ` • ${summary.receiptCount} receipts` : ''}`}
+          iconGradient="bg-gradient-to-br from-amber-500 to-amber-600"
+          gridClassName="grid stats-grid-mobile gap-4"
+        >
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(summary?.total ?? 0)}</div>
+              <p className="text-xs text-muted-foreground">All time</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(recentExpenses.thisMonth)}</div>
-            <p className={`text-xs flex items-center ${getChangeColor(recentExpenses.changePercent)}`}>
-              {getChangeIcon(recentExpenses.changePercent)} {Math.abs(recentExpenses.changePercent)}% from last month
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Month</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(summary?.thisMonth ?? 0)}</div>
+              {summary && summary.lastMonth > 0 ? (
+                <p className={`text-xs flex items-center ${getChangeColor(summary.changePercent)}`}>
+                  {getChangeIcon(summary.changePercent)} {Math.abs(summary.changePercent).toFixed(1)}% from last month
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">This month&apos;s spending</p>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Top Category</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Groceries</div>
-            <p className="text-xs text-muted-foreground">
-              {formatCurrency(recentExpenses.categories['Groceries'])} this month
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Top Category</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {summary && Object.keys(summary.categories).length > 0 ? (
+                <>
+                  <div className="text-2xl font-bold">
+                    {Object.entries(summary.categories).sort((a, b) => b[1] - a[1])[0][0]}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {formatCurrency(Object.entries(summary.categories).sort((a, b) => b[1] - a[1])[0][1])} this month
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">—</div>
+                  <p className="text-xs text-muted-foreground">No categories yet</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receipts Scanned</CardTitle>
-            <Receipt className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
-      </CollapsibleStatsGrid>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Receipts Scanned</CardTitle>
+              <Receipt className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary?.receiptCount ?? 0}</div>
+              <p className="text-xs text-muted-foreground">This month</p>
+            </CardContent>
+          </Card>
+        </CollapsibleStatsGrid>
+      )}
 
       {/* Category Breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Spending by Category</CardTitle>
-          <CardDescription>Your top spending categories this month</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {Object.entries(recentExpenses.categories).map(([category, amount]) => {
-              const percentage = (amount / recentExpenses.thisMonth) * 100;
-              return (
-                <div key={category} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{category}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">{formatCurrency(amount)}</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {percentage.toFixed(1)}%
-                      </Badge>
+      {hasData && Object.keys(summary.categories).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Spending by Category</CardTitle>
+            <CardDescription>Your top spending categories this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Object.entries(summary.categories)
+                .sort((a, b) => b[1] - a[1])
+                .map(([category, amount]) => {
+                  const percentage = summary.thisMonth > 0 ? (amount / summary.thisMonth) * 100 : 0;
+                  return (
+                    <div key={category} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{category}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{formatCurrency(amount)}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {percentage.toFixed(1)}%
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                  );
+                })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -251,7 +342,7 @@ export default function ExpensesPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="h-20 flex-col">
+            <Button variant="outline" className="h-20 flex-col" onClick={() => setActiveTab('scanner')}>
               <Receipt className="h-6 w-6 mb-2" />
               Scan Receipt
             </Button>
@@ -274,43 +365,53 @@ export default function ExpensesPage() {
           <CardDescription>Your latest expense transactions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {[
-              { merchant: 'Whole Foods Market', amount: 87.32, category: 'Groceries', date: '2024-10-18', method: 'receipt_scan' },
-              { merchant: 'Shell Gas Station', amount: 45.20, category: 'Transportation', date: '2024-10-17', method: 'manual' },
-              { merchant: 'Starbucks Coffee', amount: 12.95, category: 'Dining', date: '2024-10-17', method: 'receipt_scan' },
-              { merchant: 'CVS Pharmacy', amount: 23.45, category: 'Healthcare', date: '2024-10-16', method: 'receipt_scan' },
-            ].map((expense, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-full">
-                    {expense.method === 'receipt_scan' ? (
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-700 rounded-lg h-16"></div>
+                </div>
+              ))}
+            </div>
+          ) : recentExpensesList.length > 0 ? (
+            <div className="space-y-4">
+              {recentExpensesList.map((expense) => (
+                <div key={expense.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-full">
                       <Receipt className="h-4 w-4 text-primary" />
-                    ) : (
-                      <PlusCircle className="h-4 w-4 text-primary" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium">{expense.merchant}</p>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>{expense.category}</span>
-                      <span>•</span>
-                      <span>{expense.date}</span>
-                      {expense.method === 'receipt_scan' && (
-                        <>
-                          <span>•</span>
-                          <Badge variant="secondary" className="text-xs">Scanned</Badge>
-                        </>
-                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{expense.title}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        {expense.category && <span>{expense.category}</span>}
+                        {expense.category && expense.due_date && <span>•</span>}
+                        {expense.due_date && <span>{expense.due_date}</span>}
+                        {expense.status && (
+                          <>
+                            <span>•</span>
+                            <Badge variant="secondary" className="text-xs capitalize">
+                              {expense.status}
+                            </Badge>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
+                  <div className="text-right">
+                    <p className="font-semibold">{formatCurrency(expense.amount)}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">{formatCurrency(expense.amount)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Receipt className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+              <p className="text-sm text-muted-foreground">
+                No expenses yet. Add your first expense or scan a receipt to get started.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

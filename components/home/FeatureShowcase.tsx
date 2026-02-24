@@ -200,6 +200,8 @@ export function FeatureShowcase() {
                     controls={false}
                     showVolumeControls={false}
                     clickToPlay={false}
+                    numberOfSharedAudioTags={0}
+                    acknowledgeRemotionLicense
                   />
                 </div>
               </div>

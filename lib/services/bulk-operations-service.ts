@@ -14,6 +14,10 @@ import { logger } from '@/lib/logger';
  * PURPOSE:
  * --------
  * Provides efficient bulk operations for managing large amounts of user data
+ *
+ * NOTE ON select('*'):
+ * Export operations intentionally use select('*') for GDPR data portability
+ * (Article 20). Do NOT replace with specific column lists in export functions.
  */
 
 export interface BulkDeleteResult {

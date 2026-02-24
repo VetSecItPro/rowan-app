@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -26,7 +26,7 @@ const COLOR_THEMES = {
 
 /** Displays a compact indicator showing active space member count and avatars. */
 export function SpaceMembersIndicator() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [members, setMembers] = useState<SpaceMember[]>([]);
 
   useEffect(() => {

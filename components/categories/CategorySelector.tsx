@@ -16,7 +16,7 @@ import {
   X,
   Tag
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   CustomCategory,
   Tag as TagType,
@@ -61,7 +61,7 @@ export function CategorySelector({
   showIcon = true,
   className
 }: CategorySelectorProps) {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [categories, setCategories] = useState<CustomCategory[]>([]);
   const [open, setOpen] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -285,7 +285,7 @@ export function TagSelector({
   maxTags = 10,
   className
 }: TagSelectorProps) {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [tags, setTags] = useState<TagType[]>([]);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');

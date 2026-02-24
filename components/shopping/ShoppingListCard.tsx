@@ -8,7 +8,7 @@ import { getCategoryIcon, getCategoryLabel } from '@/lib/constants/shopping-cate
 import type { ShoppingCategory } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { CircularProgress } from '@/components/ui/CircularProgress';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 
 interface ShoppingListCardProps {
   list: ShoppingList;
@@ -27,7 +27,7 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
-  const { user: _user } = useAuth();
+  const { user: _user } = useAuthWithSpaces();
 
   const totalItems = list.items?.length || 0;
   const checkedItems = list.items?.filter(item => item.checked).length || 0;
@@ -157,7 +157,7 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
                         <Tooltip content={item.checked ? 'Mark as not purchased' : 'Mark as purchased'} delay={0}>
                           <button
                             onClick={() => onToggleItem?.(item.id, !item.checked)}
-                            aria-label={`Toggle item: ${item.name}`}
+                            aria-label={`Toggle item: ${item.name || 'unnamed item'}`}
                             className={`flex-shrink-0 w-5 h-5 sm:w-4 sm:h-4 rounded border-2 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
                               item.checked
                                 ? 'bg-green-500 border-green-500'

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
 
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus } from 'lucide-react';
 import { useAdminStatus } from '@/lib/hooks/useAdminStatus';
@@ -26,7 +26,7 @@ const COLOR_THEMES = {
 
 /** Renders the main app header with navigation, notifications, and user menu. */
 export function Header() {
-  const { user, signOut, loading: authLoading } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuthWithSpaces();
   const { currentSpace } = useSpaces();
   const { data: isAdmin } = useAdminStatus(user?.id);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -260,7 +260,8 @@ export function useTasksData(): TasksDataReturn {
       const tasksData = realtimeTasks;
 
       try {
-        const taskIds = tasksData.map(task => task.id);
+        // Filter out optimistic temp IDs that haven't been persisted yet
+        const taskIds = tasksData.map(task => task.id).filter(id => !id.startsWith('temp-'));
         const linkedListsMap = await shoppingIntegrationService.getShoppingListsForTasks(taskIds);
         setLinkedShoppingLists(linkedListsMap);
       } catch (error) {

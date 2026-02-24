@@ -80,11 +80,50 @@ export function useTasksHandlers(deps: TasksHandlersDeps): TasksHandlersReturn {
   const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput): Promise<void | { id: string }> => {
     try {
       if (editingItem) {
-        // Update existing item
+        // Update existing item with optimistic update
         if (editingItem.type === 'task') {
-          await tasksService.updateTask(editingItem.id, itemData as UpdateTaskInput);
+          const taskUpdate = itemData as UpdateTaskInput;
+          setTasks(prev => prev.map(task =>
+            task.id === editingItem.id
+              ? {
+                  ...task,
+                  ...Object.fromEntries(
+                    Object.entries(taskUpdate).filter(([, v]) => v !== undefined)
+                  ),
+                  // Coerce null → undefined for optional string fields
+                  description: taskUpdate.description ?? task.description,
+                  updated_at: new Date().toISOString(),
+                }
+              : task
+          ));
+          try {
+            await tasksService.updateTask(editingItem.id, itemData as UpdateTaskInput);
+          } catch (error) {
+            refreshTasks();
+            throw error;
+          }
         } else {
-          await choresService.updateChore(editingItem.id, itemData as CreateChoreInput);
+          const choreUpdate = itemData as CreateChoreInput;
+          setChores(prev => prev.map(chore =>
+            chore.id === editingItem.id
+              ? {
+                  ...chore,
+                  title: choreUpdate.title ?? chore.title,
+                  description: choreUpdate.description ?? chore.description,
+                  status: choreUpdate.status ?? chore.status,
+                  frequency: choreUpdate.frequency ?? chore.frequency,
+                  assigned_to: choreUpdate.assigned_to ?? chore.assigned_to,
+                  due_date: choreUpdate.due_date ?? chore.due_date,
+                  updated_at: new Date().toISOString(),
+                }
+              : chore
+          ));
+          try {
+            await choresService.updateChore(editingItem.id, itemData as CreateChoreInput);
+          } catch (error) {
+            refreshChores();
+            throw error;
+          }
         }
         closeUnifiedModal();
         return;

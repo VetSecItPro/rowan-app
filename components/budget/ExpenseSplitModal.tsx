@@ -14,7 +14,7 @@ import {
   type OwnershipType,
   type PartnershipBalance,
 } from '@/lib/services/expense-splitting-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { Modal } from '@/components/ui/Modal';
 
 interface ExpenseSplitModalProps {
@@ -43,7 +43,7 @@ export function ExpenseSplitModal({
   expense,
   onSave,
 }: ExpenseSplitModalProps) {
-  const { user, currentSpace } = useAuth();
+  const { user, currentSpace } = useAuthWithSpaces();
   const [ownership, setOwnership] = useState<OwnershipType>(expense.ownership || 'shared');
   const [splitType, setSplitType] = useState<SplitType>(expense.split_type || 'equal');
   const [splitPercentageUser1, setSplitPercentageUser1] = useState(expense.split_percentage_user1 || 50);

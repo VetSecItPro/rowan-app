@@ -95,7 +95,15 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const isOverdue = item.due_date && new Date(item.due_date) < new Date() && item.status !== 'completed';
+  // Parse due_date as local time to avoid UTC midnight issues
+  const isOverdue = (() => {
+    if (!item.due_date || item.status === 'completed') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const [y, m, d] = item.due_date.split('T')[0].split('-').map(Number);
+    const dueDate = new Date(y, m - 1, d);
+    return dueDate < today;
+  })();
 
   // Handle status rotation - 4-step cycle
   const handleStatusClick = () => {

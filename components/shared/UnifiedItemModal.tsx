@@ -243,11 +243,18 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
     }
 
     try {
-      // Validate due date
-      if (formData.due_date && new Date(formData.due_date) < new Date()) {
-        logger.info('❌ FAILED: Due date in past', { component: 'UnifiedItemModal' });
-        setDateError('Due date cannot be in the past');
-        return;
+      // Validate due date (compare date-only to avoid UTC vs local timezone issues)
+      if (formData.due_date) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        // Parse as local date parts to avoid UTC midnight shift
+        const [year, month, day] = formData.due_date.split('T')[0].split('-').map(Number);
+        const dueDate = new Date(year, month - 1, day);
+        if (dueDate < today) {
+          logger.info('❌ FAILED: Due date in past', { component: 'UnifiedItemModal' });
+          setDateError('Due date cannot be in the past');
+          return;
+        }
       }
 
       logger.info('✅ Date validation passed', { component: 'UnifiedItemModal' });

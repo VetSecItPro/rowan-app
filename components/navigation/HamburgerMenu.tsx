@@ -9,7 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NAVIGATION_ITEMS } from '@/lib/navigation';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
 import { useDevice } from '@/lib/contexts/DeviceContext';
@@ -27,7 +27,7 @@ export function HamburgerMenu() {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user: _user, signOut } = useAuth();
+  const { user: _user, signOut } = useAuthWithSpaces();
   const { currentSpace } = useSpaces();
   const { isDesktop } = useDevice();
 

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Plus, ChefHat, Clock, Users, Trash2, ExternalLink, Filter, X } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ import { sanitizeUrl } from '@/lib/sanitize';
 import { showError } from '@/lib/utils/toast';
 
 export default function RecipesPage() {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);

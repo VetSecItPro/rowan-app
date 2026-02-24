@@ -151,7 +151,7 @@ const SpaceInvitationEmail = ({
               This invitation was sent to {recipientEmail}. If you didn't expect this invitation, you can safely ignore this email.
             </Text>
             <Text style={footerText}>
-              © 2025 Rowan. Made with ❤️ for better relationships.
+              © 2026 Rowan. Made with ❤️ for better relationships.
             </Text>
           </Section>
         </Container>

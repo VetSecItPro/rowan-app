@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { MessageCircle, Send, Reply, Edit2, Trash2, User } from 'lucide-react';
 import Image from 'next/image';
 import { eventCommentsService, EventComment } from '@/lib/services/event-comments-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { formatDistance } from 'date-fns';
 import { logger } from '@/lib/logger';
@@ -17,7 +17,7 @@ interface EventCommentThreadProps {
 
 /** Displays a threaded comment section for a calendar event. */
 export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentThreadProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [comments, setComments] = useState<EventComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState('');

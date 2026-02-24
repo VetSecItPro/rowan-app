@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle, X } from 'lucide-react';
 import { eventProposalsService, EventProposal, ProposalVote, CreateProposalInput } from '@/lib/services/event-proposals-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Modal } from '@/components/ui/Modal';
 import { formatDistance, format } from 'date-fns';
@@ -38,7 +38,7 @@ export function EventProposalModal({
   existingProposal,
   onProposalCreated
 }: EventProposalModalProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [mode, setMode] = useState<'create' | 'vote'>('create');
   const [loading, setLoading] = useState(false);
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);

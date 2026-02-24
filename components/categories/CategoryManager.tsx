@@ -22,7 +22,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   CustomCategory,
   Tag as TagType,
@@ -76,7 +76,7 @@ const PRESET_ICONS = [
 
 /** Provides full category and tag management with create, edit, and delete operations. */
 export function CategoryManager({ domain, showTags = true, showBudgets = true, className }: CategoryManagerProps) {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [categories, setCategories] = useState<CustomCategory[]>([]);
   const [tags, setTags] = useState<TagType[]>([]);
   const [loading, setLoading] = useState(true);

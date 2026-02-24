@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Toggle } from '@/components/ui/Toggle';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
@@ -25,7 +25,7 @@ import type {
 
 /** Provides privacy and data management controls including GDPR compliance. */
 export function PrivacyDataManager() {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [preferences, setPreferences] = useState<UserPrivacyPreferences | null>(null);
   const [deletionStatus, setDeletionStatus] = useState<DeletionWorkflowStatus | null>(null);
   const [exportStatus, setExportStatus] = useState<ExportWorkflowStatus | null>(null);

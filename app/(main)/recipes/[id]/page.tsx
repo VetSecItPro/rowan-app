@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Clock, Users, ChefHat, ExternalLink, Trash2, Loader2, Calendar, ShoppingCart } from 'lucide-react';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
 import { shoppingService } from '@/lib/services/shopping-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ export default function RecipeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const recipeId = params?.id as string;
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);

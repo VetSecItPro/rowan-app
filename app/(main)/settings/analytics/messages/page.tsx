@@ -2,48 +2,53 @@
 
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCircle, Send, Clock, TrendingUp } from 'lucide-react';
-import { useState } from 'react';
-import { format } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { messagesService } from '@/lib/services/messages-service';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { logger } from '@/lib/logger';
+import Link from 'next/link';
 
-type TimeRange = '1m' | '3m' | '6m' | '12m';
+interface MessageStatsData {
+  thisWeek: number;
+  unread: number;
+  today: number;
+  total: number;
+  conversations: number;
+}
 
 export default function MessagesAnalyticsPage() {
-  const [timeRange, setTimeRange] = useState<TimeRange>('3m');
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
+  const [stats, setStats] = useState<MessageStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const stats = [
-    {
-      label: 'Total Messages',
-      value: '1,245',
-      change: '+187',
-      trend: 'up',
-      icon: MessageCircle,
-      gradient: 'from-green-500 to-green-600',
-    },
-    {
-      label: 'Avg. Response Time',
-      value: '12 min',
-      change: '-3 min',
-      trend: 'up',
-      icon: Clock,
-      gradient: 'from-blue-500 to-blue-600',
-    },
-    {
-      label: 'Messages Sent',
-      value: '623',
-      change: '+94',
-      trend: 'up',
-      icon: Send,
-      gradient: 'from-purple-500 to-purple-600',
-    },
-    {
-      label: 'Activity Trend',
-      value: 'Rising',
-      change: '+22%',
-      trend: 'up',
-      icon: TrendingUp,
-      gradient: 'from-indigo-500 to-indigo-600',
-    },
-  ];
+  useEffect(() => {
+    async function loadStats() {
+      if (!spaceId || !user?.id) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await messagesService.getMessageStats(spaceId, user.id);
+        setStats(data);
+      } catch (err) {
+        logger.error('Failed to load message stats:', err, { component: 'page', action: 'execution' });
+        setError('Failed to load analytics data');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadStats();
+  }, [spaceId, user?.id]);
+
+  if (!spaceId) {
+    return <SpacesLoadingState />;
+  }
+
+  const hasData = stats && stats.total > 0;
 
   return (
     <FeatureLayout
@@ -54,7 +59,7 @@ export default function MessagesAnalyticsPage() {
       ]}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with Time Range Toggle */}
+        {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-green-400 mb-2">
@@ -64,130 +69,111 @@ export default function MessagesAnalyticsPage() {
               Review messaging activity and communication trends
             </p>
           </div>
-
-          {/* Time Range Toggle */}
-          <div className="inline-flex items-center bg-green-900/20 rounded-lg p-1 border border-green-800">
-            {[
-              { value: '1m', label: 'Last Month' },
-              { value: '3m', label: 'Last 3 Months' },
-              { value: '6m', label: 'Last 6 Months' },
-              { value: '12m', label: 'Last 12 Months' },
-            ].map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setTimeRange(option.value as TimeRange)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                  timeRange === option.value
-                    ? 'bg-green-500 text-white shadow-sm'
-                    : 'text-green-300 hover:text-green-100'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={index}
-                className="bg-gray-800 border border-gray-700 rounded-xl p-6"
-              >
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full" />
+            <span className="ml-3 text-gray-400">Loading analytics...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <div className="text-red-400 mb-2">{error}</div>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : !hasData ? (
+          <div className="text-center py-16">
+            <MessageCircle className="mx-auto h-16 w-16 text-green-400/40 mb-4" />
+            <h2 className="text-xl font-semibold text-white mb-2">No data yet</h2>
+            <p className="text-gray-400 mb-6">
+              Start using Messages to see analytics here
+            </p>
+            <Link
+              href="/messages"
+              className="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Go to Messages
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-lg bg-gradient-to-br ${stat.gradient} shadow-lg`}>
-                    <Icon className="w-6 h-6 text-white" />
+                  <div className="p-3 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
+                    <MessageCircle className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-400">
-                    {stat.change}
-                  </span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-1">
-                  {stat.value}
-                </h3>
-                <p className="text-sm text-gray-400">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-white mb-1">{stats.total}</h3>
+                <p className="text-sm text-gray-400">Total Messages</p>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Metrics Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Message Volume */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-white">
-                Message Volume
-              </h3>
-              <span className="px-3 py-1 bg-green-900/30 border border-green-700 text-green-300 text-sm font-medium rounded-full">
-                {format(new Date(), 'MMM yyyy')}
-              </span>
-            </div>
-            <div className="space-y-4">
-              {[
-                { label: 'Direct Messages', value: 60, color: 'bg-green-500' },
-                { label: 'Group Threads', value: 25, color: 'bg-blue-500' },
-                { label: 'Announcements', value: 15, color: 'bg-purple-500' },
-              ].map((item, index) => (
-                <div key={index}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-300">
-                      {item.label}
-                    </span>
-                    <span className="text-sm font-semibold text-white">
-                      {item.value}%
-                    </span>
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
+                    <Clock className="w-6 h-6 text-white" />
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div
-                      className={`${item.color} h-2 rounded-full transition-all duration-300`}
-                      style={{ width: `${item.value}%` }}
-                    />
+                  {stats.unread > 0 && (
+                    <span className="text-sm font-medium text-amber-400">
+                      {stats.unread} unread
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-1">{stats.today}</h3>
+                <p className="text-sm text-gray-400">Today</p>
+              </div>
+
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
+                    <Send className="w-6 h-6 text-white" />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+                <h3 className="text-2xl font-bold text-white mb-1">{stats.thisWeek}</h3>
+                <p className="text-sm text-gray-400">This Week</p>
+              </div>
 
-          {/* Peak Activity Hours */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-white">
-                Peak Activity Hours
-              </h3>
-              <span className="px-3 py-1 bg-green-900/30 border border-green-700 text-green-300 text-sm font-medium rounded-full">
-                {format(new Date(), 'MMM yyyy')}
-              </span>
-            </div>
-            <div className="space-y-4">
-              {[
-                { label: 'Morning (6am-12pm)', value: 35, color: 'bg-amber-500' },
-                { label: 'Afternoon (12pm-6pm)', value: 45, color: 'bg-orange-500' },
-                { label: 'Evening (6pm-12am)', value: 75, color: 'bg-indigo-500' },
-              ].map((item, index) => (
-                <div key={index}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-300">
-                      {item.label}
-                    </span>
-                    <span className="text-sm font-semibold text-white">
-                      {item.value}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div
-                      className={`${item.color} h-2 rounded-full transition-all duration-300`}
-                      style={{ width: `${item.value}%` }}
-                    />
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg">
+                    <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                 </div>
-              ))}
+                <h3 className="text-2xl font-bold text-white mb-1">{stats.conversations}</h3>
+                <p className="text-sm text-gray-400">Conversations</p>
+              </div>
             </div>
-          </div>
-        </div>
+
+            {/* Summary */}
+            <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-800 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-green-100 mb-4">Activity Summary</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-400">{stats.total}</p>
+                  <p className="text-sm text-green-300">Total Messages</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-400">{stats.today}</p>
+                  <p className="text-sm text-blue-300">Today</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-purple-400">{stats.thisWeek}</p>
+                  <p className="text-sm text-purple-300">This Week</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-amber-400">{stats.unread}</p>
+                  <p className="text-sm text-amber-300">Unread</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </FeatureLayout>
   );

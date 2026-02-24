@@ -129,6 +129,8 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
                   controls={false}
                   showVolumeControls={false}
                   clickToPlay={false}
+                  numberOfSharedAudioTags={0}
+                  acknowledgeRemotionLicense
                 />
               </div>
             </motion.div>

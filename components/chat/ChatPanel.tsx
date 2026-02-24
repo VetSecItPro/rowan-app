@@ -14,7 +14,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCcw, Bot } from 'lucide-react';
 import { useChat } from '@/lib/hooks/useChat';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import EmptyState from './EmptyState';
@@ -57,7 +57,7 @@ export default function ChatPanel({
     clearError,
   } = useChat(spaceId);
 
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const { suggestions, dismiss: dismissSuggestion } = useAISuggestions(spaceId);
   const { briefing, dismiss: dismissBriefing } = useAIBriefing(spaceId);
 
