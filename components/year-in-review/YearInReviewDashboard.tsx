@@ -31,7 +31,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { YearInReviewData } from '@/lib/services/year-in-review-service';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { cn } from '@/lib/utils';
@@ -52,7 +52,7 @@ interface YearInReviewDashboardProps {
 
 /** Renders an annual review dashboard with yearly statistics and highlights. */
 export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year, className }: YearInReviewDashboardProps) {
-  const { currentSpace, spaces, switchSpace, user } = useAuth();
+  const { currentSpace, spaces, switchSpace, user } = useAuthWithSpaces();
   const [data, setData] = useState<YearInReviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

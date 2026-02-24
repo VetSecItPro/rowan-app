@@ -7,7 +7,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { UserPlus, Mail, Lock, User, Home, Eye, EyeOff, ChevronDown, Check, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -29,7 +29,7 @@ const itemVariants = {
 };
 
 export default function SignUpPage() {
-  const { signUp, signOut } = useAuth();
+  const { signUp, signOut } = useAuthWithSpaces();
   const router = useRouter();
   const searchParams = useSearchParams();
 

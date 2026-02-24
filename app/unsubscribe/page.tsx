@@ -260,7 +260,7 @@ function UnsubscribeContent() {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-400">
-            © 2024 Rowan. All rights reserved.
+            © 2026 Rowan. All rights reserved.
           </p>
           <div className="flex justify-center gap-4 mt-2">
             <Link href="/privacy" className="text-sm text-blue-400 hover:underline">

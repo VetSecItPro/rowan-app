@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { getUserAuditLog, getUserAuditStats, AuditLogEntry, ActionCategory } from '@/lib/services/audit-log-service';
 import { SkeletonLoader } from '@/components/shared/SkeletonLoader';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -52,7 +52,7 @@ const CATEGORY_COLORS: Record<ActionCategory, string> = {
 };
 
 export default function AuditLogPage() {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);

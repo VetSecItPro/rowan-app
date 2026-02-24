@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { AlertTriangle, Trash2, Download, Calendar, Check } from 'lucide-react';
 import { accountDeletionService } from '@/lib/services/account-deletion-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
@@ -19,7 +19,7 @@ interface AccountDeletionModalProps {
 export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasExported, setHasExported] = useState(false);
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const router = useRouter();
 
   const handleExportData = async () => {

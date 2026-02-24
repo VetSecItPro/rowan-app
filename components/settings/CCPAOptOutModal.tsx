@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Shield, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
@@ -26,7 +26,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
   const [ccpaStatus, setCcpaStatus] = useState<CCPAStatus | null>(null);
   const [californiaResident, setCaliforniaResident] = useState<boolean | null>(null);
   const [error, setError] = useState('');
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
 
   useEffect(() => {
     if (isOpen && user) {

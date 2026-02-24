@@ -13,7 +13,7 @@ import {
   Plus,
   Tag
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   Tag as TagType,
   getTags,
@@ -45,7 +45,7 @@ interface TagInputProps {
 }
 
 function TagInput({ onTagAdd, existingTagIds, placeholder = "Add tags...", className }: TagInputProps) {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [allTags, setAllTags] = useState<TagType[]>([]);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');

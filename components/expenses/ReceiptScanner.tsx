@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Camera, Upload, X, Check, FileText, DollarSign, Calendar, Store } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { receiptScanningService, ExtractedReceiptData, ExpenseSuggestion } from '@/lib/services/receipt-scanning-service';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +34,7 @@ export function ReceiptScanner({
   categoryHint,
   className
 }: ReceiptScannerProps) {
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
   const [processingState, setProcessingState] = useState<ProcessingState>({
     status: 'idle',
     progress: 0,

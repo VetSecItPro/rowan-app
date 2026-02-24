@@ -7,6 +7,9 @@ import { logger } from '@/lib/logger';
 // =============================================
 // This is completely separate from profile-wide exports
 // Only exports data from a specific space when user deletes that space
+//
+// NOTE ON select('*'): Intentional — GDPR data portability (Article 20)
+// requires exporting ALL columns. Do NOT replace with specific column lists.
 
 // =============================================
 // VALIDATION SCHEMAS

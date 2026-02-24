@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Star, CheckCircle2, XCircle, MessageSquare, Clock, Users } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { EventProposal, ProposalVote, eventProposalsService } from '@/lib/services/event-proposals-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 
 interface ProposalCardProps {
@@ -16,7 +16,7 @@ interface ProposalCardProps {
 
 /** Displays a single event proposal with voting and approval controls. */
 export function ProposalCard({ proposal, onVote, onApprove, onReject }: ProposalCardProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [voting, setVoting] = useState(false);
   const [expandedSlot, setExpandedSlot] = useState<number | null>(null);
 

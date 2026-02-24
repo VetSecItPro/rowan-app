@@ -21,7 +21,7 @@ import {
   type Settlement,
   type CreateSettlementInput,
 } from '@/lib/services/expense-splitting-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 
 interface SettlementTrackerProps {
   expenseId: string;
@@ -30,7 +30,7 @@ interface SettlementTrackerProps {
 
 /** Tracks and displays expense settlement history between space members. */
 export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [splits, setSplits] = useState<ExpenseSplit[]>([]);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);

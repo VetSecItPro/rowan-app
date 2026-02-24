@@ -110,7 +110,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
               ? 'bg-green-500 border-green-500'
               : 'border-2 border-gray-600 hover:border-emerald-400 hover:bg-gray-700'
           }`}
-          aria-label={`Toggle item: ${item.name}`}
+          aria-label={`Toggle item: ${item.name || 'unnamed item'}`}
         >
           {item.checked && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
         </button>

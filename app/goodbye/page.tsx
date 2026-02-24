@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect } from 'react';
 import { CheckCircle, Clock, Mail, Heart } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { createClient } from '@/lib/supabase/client';
 import { Footer } from '@/components/layout/Footer';
 import { PublicHeader } from '@/components/layout/PublicHeader';
@@ -13,7 +13,7 @@ import { PublicHeader } from '@/components/layout/PublicHeader';
 const deletionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
 
 export default function GoodbyePage() {
-  const { signOut } = useAuth();
+  const { signOut } = useAuthWithSpaces();
 
   useEffect(() => {
     // Sign out the user when they reach this page

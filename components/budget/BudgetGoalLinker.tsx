@@ -18,7 +18,7 @@ import {
   Info,
   Sparkles
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   BUDGET_GOAL_TEMPLATES,
   createGoalFromBudgetTemplate,
@@ -38,7 +38,7 @@ type CreationMode = 'template' | 'custom';
 
 /** Provides controls to link budget categories with savings goals. */
 export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProps) {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [mode, setMode] = useState<CreationMode>('template');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');

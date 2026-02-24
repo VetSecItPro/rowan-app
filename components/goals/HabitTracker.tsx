@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { format, addDays, startOfWeek, isToday } from 'date-fns';
 import { recurringGoalsService, RecurringGoalTemplate, HabitEntry, HabitStreak } from '@/lib/services/recurring-goals-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { toast } from 'sonner';
 
 interface HabitTrackerProps {
@@ -48,7 +48,7 @@ const HABIT_CATEGORIES = [
 
 /** Renders a habit tracking interface with daily completion toggles. */
 export function HabitTracker({ spaceId }: HabitTrackerProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [habits, setHabits] = useState<HabitWithData[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('today');

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Upload, Image as ImageIcon, FileText, Download, Trash2, X, Loader2, Paperclip } from 'lucide-react';
 import Image from 'next/image';
 import { eventAttachmentsService, EventAttachment } from '@/lib/services/event-attachments-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
 import { showError } from '@/lib/utils/toast';
@@ -18,7 +18,7 @@ interface AttachmentGalleryProps {
 
 /** Renders a gallery of file attachments for a calendar event. */
 export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelete = true }: AttachmentGalleryProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [attachments, setAttachments] = useState<EventAttachment[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);

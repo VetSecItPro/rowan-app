@@ -109,14 +109,20 @@ export const goalService = {
    */
   async createGoal(input: CreateGoalInput, supabaseClient?: SupabaseClient): Promise<Goal> {
     const supabase = getSupabaseClient(supabaseClient);
+    // Get current user for created_by (required by RLS policy)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+    // Destructure out fields that don't belong in the goals table
+    const { depends_on_goal_id: _dep, ...goalFields } = input;
     const { data, error } = await supabase
       .from('goals')
       .insert([{
-        ...input,
+        ...goalFields,
+        created_by: user.id,
         status: input.status || 'active',
         progress: input.progress || 0,
       }])
-      .select()
+      .select('id, space_id, title, description, category, status, progress, visibility, template_id, priority, priority_order, is_pinned, target_date, assigned_to, created_by, created_at, updated_at, completed_at')
       .single();
 
     if (error) throw error;

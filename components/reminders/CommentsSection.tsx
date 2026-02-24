@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { MessageCircle, Send, Edit, Trash2 } from 'lucide-react';
 import { reminderCommentsService, ReminderComment } from '@/lib/services/reminder-comments-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { MentionInput } from './MentionInput';
@@ -19,7 +19,7 @@ interface CommentsSectionProps {
 
 /** Displays a comment section for discussing a reminder. */
 export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [comments, setComments] = useState<ReminderComment[]>([]);
   const [newCommentContent, setNewCommentContent] = useState('');
   const [loading, setLoading] = useState(true);

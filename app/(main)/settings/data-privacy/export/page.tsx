@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ExportDataModal } from '@/components/settings/ExportDataModal';
 import { logger } from '@/lib/logger';
 import { showError, showWarning } from '@/lib/utils/toast';
@@ -20,7 +20,7 @@ type DataType = 'expenses' | 'tasks' | 'calendar_events' | 'messages' | 'reminde
 type ExportFormat = 'json' | 'csv' | 'pdf';
 
 export default function DataExportPage() {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
 
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportFormat, setExportFormat] = useState<ExportFormat>('json');

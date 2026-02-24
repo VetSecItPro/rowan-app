@@ -7,7 +7,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { createClient } from '@/lib/supabase/client';
 import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useValidatedSearchParams, LoginParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
@@ -43,7 +43,7 @@ export default function LoginPage() {
   const [useMagicLink, setUseMagicLink] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [isProcessingCallback, setIsProcessingCallback] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn } = useAuthWithSpaces();
   const router = useRouter();
   const { params } = useValidatedSearchParams(LoginParamsSchema);
 

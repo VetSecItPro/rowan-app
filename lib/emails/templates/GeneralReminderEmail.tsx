@@ -223,7 +223,7 @@ const GeneralReminderEmail = ({
               </Link>
             </Text>
             <Text style={footerText}>
-              © 2025 Rowan. Made with ❤️ for better relationships.
+              © 2026 Rowan. Made with ❤️ for better relationships.
             </Text>
           </Section>
         </Container>

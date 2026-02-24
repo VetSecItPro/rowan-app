@@ -263,7 +263,11 @@ export function useGoalsData(): UseGoalsDataReturn {
 
           if (payload.eventType === 'INSERT') {
             const newGoal = payload.new as unknown as Goal;
-            setGoals(prev => [...prev, newGoal]);
+            setGoals(prev => {
+              // Skip if already present (e.g. from optimistic update replacement)
+              if (prev.some(g => g.id === newGoal.id)) return prev;
+              return [...prev, newGoal];
+            });
             if (!isUserAction) {
               toast.info(`New goal added: ${newGoal.title}`);
             }

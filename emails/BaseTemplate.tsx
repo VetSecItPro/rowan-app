@@ -101,7 +101,7 @@ export const BaseTemplate = ({
             )}
 
             <Text style={footerCopyright}>
-              © 2024 Rowan. All rights reserved.
+              © 2026 Rowan. All rights reserved.
             </Text>
           </Section>
         </Container>

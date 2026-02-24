@@ -11,7 +11,7 @@ import {
   SmartNudge,
   NudgeSettings
 } from '@/lib/services/smart-nudges-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -33,7 +33,7 @@ export function NudgeCenter({
   showAnalytics = true,
   onGoalClick
 }: NudgeCenterProps) {
-  const { user, currentSpace } = useAuth();
+  const { user, currentSpace } = useAuthWithSpaces();
   const [nudges, setNudges] = useState<SmartNudge[]>([]);
   const [settings, setSettings] = useState<NudgeSettings | null>(null);
   const [loading, setLoading] = useState(true);

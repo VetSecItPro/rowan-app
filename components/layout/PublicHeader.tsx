@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 
 interface PublicHeaderProps {
   /** Enable slide-down animation (homepage only) */
@@ -22,7 +22,7 @@ const NAV_LINKS = [
 
 /** Renders the public-facing header with logo and navigation links. */
 export function PublicHeader({ animated = false }: PublicHeaderProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

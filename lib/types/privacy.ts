@@ -11,11 +11,9 @@ export interface UserPrivacyPreferences {
   // Legal Compliance
   ccpa_do_not_sell: boolean;
   marketing_emails_enabled: boolean;
-  marketing_sms_enabled?: boolean;
 
-  // Third-party sharing
-  share_data_with_partners?: boolean;
-  third_party_analytics_enabled?: boolean;
+  // Cookie preferences
+  analytics_cookies_enabled: boolean;
 
   created_at: string;
   updated_at: string;
@@ -25,9 +23,7 @@ export interface PrivacyPreferenceUpdate {
   share_anonymous_analytics?: boolean;
   ccpa_do_not_sell?: boolean;
   marketing_emails_enabled?: boolean;
-  marketing_sms_enabled?: boolean;
-  share_data_with_partners?: boolean;
-  third_party_analytics_enabled?: boolean;
+  analytics_cookies_enabled?: boolean;
 }
 
 export interface AccountDeletionRequest {

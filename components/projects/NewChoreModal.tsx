@@ -81,11 +81,12 @@ function ChoreForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate due date is not in the past
+    // Validate due date is not in the past (parse as local time to avoid UTC midnight issues)
     if (formData.due_date) {
-      const dueDate = new Date(formData.due_date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      const [year, month, day] = formData.due_date.split('T')[0].split('-').map(Number);
+      const dueDate = new Date(year, month - 1, day);
 
       if (dueDate < today) {
         setDateError('Due date is in the past');
@@ -363,11 +364,12 @@ function ChoreForm({
               onChange={(e) => {
                   setFormData({ ...formData, due_date: e.target.value });
 
-                  // Validate on change
+                  // Validate on change (parse as local time to avoid UTC midnight issues)
                   if (e.target.value) {
-                    const dueDate = new Date(e.target.value);
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
+                    const [y, m, d] = e.target.value.split('T')[0].split('-').map(Number);
+                    const dueDate = new Date(y, m - 1, d);
 
                     if (dueDate < today) {
                       setDateError('Due date is in the past');

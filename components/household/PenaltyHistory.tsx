@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import type { LatePenalty } from '@/lib/services/rewards/late-penalty-service';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 
@@ -43,7 +43,7 @@ interface PenaltyHistoryProps {
 /** Displays a history of late penalties applied to household members. */
 export function PenaltyHistory({ className, userId, limit = 20 }: PenaltyHistoryProps) {
   const { currentSpace } = useSpaces();
-  const { user: _currentUser } = useAuth();
+  const { user: _currentUser } = useAuthWithSpaces();
   const [penalties, setPenalties] = useState<LatePenalty[]>([]);
   const [members, setMembers] = useState<SpaceMember[]>([]);
   const [loading, setLoading] = useState(true);

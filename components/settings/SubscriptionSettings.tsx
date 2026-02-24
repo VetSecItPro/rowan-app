@@ -415,7 +415,7 @@ export function SubscriptionSettings() {
           <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-900/20 to-indigo-900/20 border border-blue-800">
             <CheckSquare className="h-6 w-6 text-blue-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
-              {limits.maxActiveTasks === Infinity ? '∞' : limits.maxActiveTasks}
+              {limits.maxActiveTasks === Infinity || limits.maxActiveTasks === -1 ? '∞' : limits.maxActiveTasks}
             </p>
             <p className="text-xs text-gray-400 mt-1">Active Tasks</p>
           </div>
@@ -429,14 +429,14 @@ export function SubscriptionSettings() {
           <div className="text-center p-4 rounded-xl bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-800">
             <Users className="h-6 w-6 text-emerald-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
-              {limits.maxSpaces}
+              {limits.maxSpaces === -1 ? '∞' : limits.maxSpaces}
             </p>
             <p className="text-xs text-gray-400 mt-1">Spaces</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-gradient-to-br from-amber-900/20 to-orange-900/20 border border-amber-800">
             <Users className="h-6 w-6 text-amber-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
-              {limits.maxUsers}
+              {limits.maxUsers === -1 ? '∞' : limits.maxUsers}
             </p>
             <p className="text-xs text-gray-400 mt-1">Users</p>
           </div>
@@ -447,28 +447,28 @@ export function SubscriptionSettings() {
           <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
             <MessageSquare className="h-5 w-5 text-green-400 mx-auto mb-2" />
             <p className="text-lg font-bold text-white">
-              {limits.dailyMessages === Infinity ? '∞' : limits.dailyMessages}
+              {limits.dailyMessages === Infinity || limits.dailyMessages === -1 ? '∞' : limits.dailyMessages}
             </p>
             <p className="text-xs text-gray-400 mt-1">Messages/Day</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
             <ShoppingCart className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
             <p className="text-lg font-bold text-white">
-              {limits.maxShoppingLists === Infinity ? '∞' : limits.maxShoppingLists}
+              {limits.maxShoppingLists === Infinity || limits.maxShoppingLists === -1 ? '∞' : limits.maxShoppingLists}
             </p>
             <p className="text-xs text-gray-400 mt-1">Shopping Lists</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
             <Camera className="h-5 w-5 text-pink-400 mx-auto mb-2" />
             <p className="text-lg font-bold text-white">
-              {limits.canUploadPhotos ? (limits.storageGB ? `${limits.storageGB}GB` : '∞') : '—'}
+              {limits.canUploadPhotos ? (limits.storageGB === -1 ? '∞' : limits.storageGB ? `${limits.storageGB}GB` : '∞') : '—'}
             </p>
             <p className="text-xs text-gray-400 mt-1">Photo Storage</p>
           </div>
           <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
             <Zap className="h-5 w-5 text-amber-400 mx-auto mb-2" />
             <p className="text-lg font-bold text-white">
-              {limits.dailyQuickActions === Infinity ? '∞' : limits.dailyQuickActions}
+              {limits.dailyQuickActions === Infinity || limits.dailyQuickActions === -1 ? '∞' : limits.dailyQuickActions}
             </p>
             <p className="text-xs text-gray-400 mt-1">Quick Actions/Day</p>
           </div>

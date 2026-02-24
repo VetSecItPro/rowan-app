@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Download, Trash2, ExternalLink } from 'lucide-react';
 import { reminderAttachmentsService, ReminderAttachment } from '@/lib/services/reminder-attachments-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
 import { showError } from '@/lib/utils/toast';
@@ -16,7 +16,7 @@ interface AttachmentListProps {
 
 /** Renders a list of file attachments for a reminder. */
 export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListProps) {
-  const { user } = useAuth();
+  const { user } = useAuthWithSpaces();
   const [attachments, setAttachments] = useState<ReminderAttachment[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);

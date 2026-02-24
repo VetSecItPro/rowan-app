@@ -53,7 +53,22 @@ const NavItemComponent = memo(function NavItemComponent({
 }) {
   const Icon = item.icon;
   const [isHovered, setIsHovered] = useState(false);
+  const [labelCollapsed, setLabelCollapsed] = useState(!isExpanded);
   const glowColor = useMemo(() => getGlowColor(item.gradient), [item.gradient]);
+
+  // Track when the label width transition finishes so tooltip doesn't overlap
+  useEffect(() => {
+    if (!isExpanded) {
+      // Wait for the 300ms CSS transition to complete before allowing tooltip
+      const timer = setTimeout(() => setLabelCollapsed(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isExpanded]);
+
+  // Sync labelCollapsed when expanding (no cascading render concern - just tracking prop)
+  if (isExpanded && labelCollapsed) {
+    setLabelCollapsed(false);
+  }
 
   // Prefetch on mouse enter for instant navigation
   const handleMouseEnter = useCallback(() => {
@@ -136,8 +151,8 @@ const NavItemComponent = memo(function NavItemComponent({
           </p>
         </div>
 
-        {/* Tooltip - only show when collapsed and hovered (not on touch) */}
-        {!isExpanded && isHovered && (
+        {/* Tooltip - only show when fully collapsed and hovered (not during transition) */}
+        {labelCollapsed && !isExpanded && isHovered && (
           <div className="pointer-events-none absolute left-full ml-3 px-3 py-2 bg-gray-800/95 backdrop-blur-sm text-white text-sm rounded-xl whitespace-nowrap z-50 shadow-xl border border-white/10 animate-in fade-in duration-150">
             <p className="font-semibold">{item.name}</p>
             <p className="text-[11px] text-gray-400">{item.description}</p>
