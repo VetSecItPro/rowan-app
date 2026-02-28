@@ -145,35 +145,37 @@ export async function GET(req: NextRequest) {
         }
 
         // Fetch data in parallel
+        // DAU/WAU/MAU derived from feature_events (distinct user_ids in time windows)
+        // Cohort data from profiles table
         const [
-          dauResult,
-          wauResult,
-          mauResult,
-          allUsersResult,
+          dauEventsResult,
+          wauEventsResult,
+          mauEventsResult,
+          allProfilesResult,
           featureEventsResult,
         ] = await Promise.allSettled([
-          // DAU - users active in last 24 hours
+          // DAU - distinct users with feature_events in last 24 hours
           supabaseAdmin
-            .from('users')
-            .select('id', { count: 'exact', head: true })
-            .gte('last_seen', oneDayAgo.toISOString()),
+            .from('feature_events')
+            .select('user_id')
+            .gte('created_at', oneDayAgo.toISOString()),
 
-          // WAU - users active in last 7 days
+          // WAU - distinct users with feature_events in last 7 days
           supabaseAdmin
-            .from('users')
-            .select('id', { count: 'exact', head: true })
-            .gte('last_seen', oneWeekAgo.toISOString()),
+            .from('feature_events')
+            .select('user_id')
+            .gte('created_at', oneWeekAgo.toISOString()),
 
-          // MAU - users active in last 30 days
+          // MAU - distinct users with feature_events in last 30 days
           supabaseAdmin
-            .from('users')
-            .select('id', { count: 'exact', head: true })
-            .gte('last_seen', oneMonthAgo.toISOString()),
+            .from('feature_events')
+            .select('user_id')
+            .gte('created_at', oneMonthAgo.toISOString()),
 
-          // All users for cohort analysis
+          // All users for cohort analysis (profiles table, updated_at as activity proxy)
           supabaseAdmin
-            .from('users')
-            .select('id, created_at, last_seen')
+            .from('profiles')
+            .select('id, created_at, updated_at')
             .order('created_at', { ascending: true })
             .limit(50000),
 
@@ -186,11 +188,16 @@ export async function GET(req: NextRequest) {
             .limit(50000),
         ]);
 
-        // Extract results
-        const dau = dauResult.status === 'fulfilled' ? (dauResult.value.count || 0) : 0;
-        const wau = wauResult.status === 'fulfilled' ? (wauResult.value.count || 0) : 0;
-        const mau = mauResult.status === 'fulfilled' ? (mauResult.value.count || 0) : 0;
-        const allUsers = allUsersResult.status === 'fulfilled' ? (allUsersResult.value.data || []) : [];
+        // Extract DAU/WAU/MAU by counting distinct user_ids
+        const dauEvents = dauEventsResult.status === 'fulfilled' ? (dauEventsResult.value.data || []) : [];
+        const wauEvents = wauEventsResult.status === 'fulfilled' ? (wauEventsResult.value.data || []) : [];
+        const mauEvents = mauEventsResult.status === 'fulfilled' ? (mauEventsResult.value.data || []) : [];
+
+        const dau = new Set(dauEvents.map((e: { user_id: string | null }) => e.user_id).filter(Boolean)).size;
+        const wau = new Set(wauEvents.map((e: { user_id: string | null }) => e.user_id).filter(Boolean)).size;
+        const mau = new Set(mauEvents.map((e: { user_id: string | null }) => e.user_id).filter(Boolean)).size;
+
+        const allUsers = allProfilesResult.status === 'fulfilled' ? (allProfilesResult.value.data || []) : [];
         const featureEvents = featureEventsResult.status === 'fulfilled' ? (featureEventsResult.value.data || []) : [];
 
         // Calculate stickiness (DAU/MAU ratio)
@@ -254,10 +261,10 @@ export async function GET(req: NextRequest) {
             // If the week hasn't happened yet, return null
             if (weekStart > now) return -1;
 
-            const activeInWeek = cohortUsers.filter((user: { last_seen: string | null }) => {
-              if (!user.last_seen) return false;
-              const lastSeen = new Date(user.last_seen);
-              return lastSeen >= weekStart && lastSeen <= (weekEnd > now ? now : weekEnd);
+            const activeInWeek = cohortUsers.filter((user: { updated_at: string | null }) => {
+              if (!user.updated_at) return false;
+              const lastActive = new Date(user.updated_at);
+              return lastActive >= weekStart && lastActive <= (weekEnd > now ? now : weekEnd);
             });
 
             return Math.round((activeInWeek.length / cohortUsers.length) * 100);
@@ -280,12 +287,12 @@ export async function GET(req: NextRequest) {
         const activeThreshold = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
         const totalUsersEver = allUsers.length;
-        const churned = allUsers.filter((user: { last_seen: string | null; created_at: string }) => {
-          if (!user.last_seen) return false;
-          const lastSeen = new Date(user.last_seen);
+        const churned = allUsers.filter((user: { updated_at: string | null; created_at: string }) => {
+          if (!user.updated_at) return false;
+          const lastActive = new Date(user.updated_at);
           const createdAt = new Date(user.created_at);
           // User was active (created before 30 days ago) but hasn't been seen in 30 days
-          return createdAt < activeThreshold && lastSeen < inactiveThreshold;
+          return createdAt < activeThreshold && lastActive < inactiveThreshold;
         }).length;
 
         const retained = totalUsersEver - churned;
@@ -300,22 +307,22 @@ export async function GET(req: NextRequest) {
           const prevOneWeekAgo = new Date(startDate.getTime() - 7 * 24 * 60 * 60 * 1000);
           const prevOneMonthAgo = new Date(startDate.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-          const [prevDauResult, prevWauResult, prevMauResult, prevEventsResult] = await Promise.allSettled([
+          const [prevDauEventsResult, prevWauEventsResult, prevMauEventsResult, prevEventsResult] = await Promise.allSettled([
             supabaseAdmin
-              .from('users')
-              .select('id', { count: 'exact', head: true })
-              .gte('last_seen', prevOneDayAgo.toISOString())
-              .lt('last_seen', startDate.toISOString()),
+              .from('feature_events')
+              .select('user_id')
+              .gte('created_at', prevOneDayAgo.toISOString())
+              .lt('created_at', startDate.toISOString()),
             supabaseAdmin
-              .from('users')
-              .select('id', { count: 'exact', head: true })
-              .gte('last_seen', prevOneWeekAgo.toISOString())
-              .lt('last_seen', startDate.toISOString()),
+              .from('feature_events')
+              .select('user_id')
+              .gte('created_at', prevOneWeekAgo.toISOString())
+              .lt('created_at', startDate.toISOString()),
             supabaseAdmin
-              .from('users')
-              .select('id', { count: 'exact', head: true })
-              .gte('last_seen', prevOneMonthAgo.toISOString())
-              .lt('last_seen', startDate.toISOString()),
+              .from('feature_events')
+              .select('user_id')
+              .gte('created_at', prevOneMonthAgo.toISOString())
+              .lt('created_at', startDate.toISOString()),
             supabaseAdmin
               .from('feature_events')
               .select('user_id, created_at')
@@ -324,9 +331,12 @@ export async function GET(req: NextRequest) {
               .limit(50000),
           ]);
 
-          const prevDau = prevDauResult.status === 'fulfilled' ? (prevDauResult.value.count || 0) : 0;
-          const prevWau = prevWauResult.status === 'fulfilled' ? (prevWauResult.value.count || 0) : 0;
-          const prevMau = prevMauResult.status === 'fulfilled' ? (prevMauResult.value.count || 0) : 0;
+          const prevDauData = prevDauEventsResult.status === 'fulfilled' ? (prevDauEventsResult.value.data || []) : [];
+          const prevWauData = prevWauEventsResult.status === 'fulfilled' ? (prevWauEventsResult.value.data || []) : [];
+          const prevMauData = prevMauEventsResult.status === 'fulfilled' ? (prevMauEventsResult.value.data || []) : [];
+          const prevDau = new Set(prevDauData.map((e: { user_id: string | null }) => e.user_id).filter(Boolean)).size;
+          const prevWau = new Set(prevWauData.map((e: { user_id: string | null }) => e.user_id).filter(Boolean)).size;
+          const prevMau = new Set(prevMauData.map((e: { user_id: string | null }) => e.user_id).filter(Boolean)).size;
           const prevEvents = prevEventsResult.status === 'fulfilled' ? (prevEventsResult.value.data || []) : [];
 
           // Build previous period DAU trend

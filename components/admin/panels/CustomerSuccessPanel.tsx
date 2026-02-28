@@ -1,18 +1,19 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   HeartHandshake,
   ThumbsUp,
-  ThumbsDown,
   AlertTriangle,
   MessageSquare,
   TrendingUp,
   Users,
   RefreshCw,
 } from 'lucide-react';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 type SubTab = 'feedback' | 'health' | 'requests';
 
@@ -53,6 +54,45 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
     refetchOnWindowFocus: false,
   });
 
+  const totalUsers = data?.totalUsers || 0;
+  const excellent = data?.distribution?.excellent || 0;
+  const good = data?.distribution?.good || 0;
+  const average = data?.distribution?.average || 0;
+  const low = data?.distribution?.low || 0;
+  const inactive = data?.distribution?.inactive || 0;
+
+  // Map engagement scores to engagement health categories
+  const highlyEngaged = excellent + good;
+  const moderateEngaged = average;
+  const atRiskEngaged = low + inactive;
+
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'engagement') {
+      const chartData: DrillDownDataPoint[] = [
+        { date: 'Highly Engaged', value: highlyEngaged },
+        { date: 'Moderate', value: moderateEngaged },
+        { date: 'At Risk', value: atRiskEngaged },
+      ];
+      setDrillDown({
+        isOpen: true,
+        title: 'Engagement Distribution',
+        metric: 'Users',
+        data: chartData,
+        color: '#f43f5e',
+        chartType: 'bar',
+      });
+    }
+  }, [highlyEngaged, moderateEngaged, atRiskEngaged]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -61,31 +101,19 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
       </div>
     );
   }
-
-  const totalUsers = data?.totalUsers || 0;
-  const excellent = data?.distribution?.excellent || 0;
-  const good = data?.distribution?.good || 0;
-  const average = data?.distribution?.average || 0;
-  const low = data?.distribution?.low || 0;
-  const inactive = data?.distribution?.inactive || 0;
-
-  // Use engagement scores as a proxy for positive/negative sentiment
-  const positiveCount = excellent + good;
-  const neutralCount = average;
-  const negativeCount = low + inactive;
-  const totalCounted = positiveCount + neutralCount + negativeCount;
-  const positivePct = totalCounted > 0 ? Math.round((positiveCount / totalCounted) * 100) : 0;
-  const neutralPct = totalCounted > 0 ? Math.round((neutralCount / totalCounted) * 100) : 0;
-  const negativePct = totalCounted > 0 ? 100 - positivePct - neutralPct : 0;
+  const totalCounted = highlyEngaged + moderateEngaged + atRiskEngaged;
+  const highPct = totalCounted > 0 ? Math.round((highlyEngaged / totalCounted) * 100) : 0;
+  const moderatePct = totalCounted > 0 ? Math.round((moderateEngaged / totalCounted) * 100) : 0;
+  const atRiskPct = totalCounted > 0 ? 100 - highPct - moderatePct : 0;
 
   return (
     <div className="space-y-6">
-      {/* Sentiment Ratio Bar */}
+      {/* Engagement Health Distribution */}
       <div className="bg-gray-800 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <ThumbsUp className="w-5 h-5 text-rose-400" />
-            <h3 className="text-sm font-semibold text-white">Engagement Sentiment Ratio</h3>
+            <TrendingUp className="w-5 h-5 text-rose-400" />
+            <h3 className="text-sm font-semibold text-white">Engagement Health Distribution</h3>
           </div>
           <button
             onClick={() => refetch()}
@@ -97,27 +125,36 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="text-center">
+          <button
+            onClick={() => openDrillDown('engagement')}
+            className="text-center hover:bg-gray-750 hover:ring-1 hover:ring-rose-500/30 rounded-lg p-2 transition-all cursor-pointer"
+          >
             <div className="flex items-center justify-center gap-1 mb-1">
-              <ThumbsUp className="w-4 h-4 text-green-400" />
-              <span className="text-2xl font-bold text-green-400">{positiveCount}</span>
+              <TrendingUp className="w-4 h-4 text-green-400" />
+              <span className="text-2xl font-bold text-green-400">{highlyEngaged}</span>
             </div>
-            <p className="text-xs text-gray-400">Positive ({positivePct}%)</p>
-          </div>
-          <div className="text-center">
+            <p className="text-xs text-gray-400">Highly Engaged ({highPct}%)</p>
+          </button>
+          <button
+            onClick={() => openDrillDown('engagement')}
+            className="text-center hover:bg-gray-750 hover:ring-1 hover:ring-rose-500/30 rounded-lg p-2 transition-all cursor-pointer"
+          >
             <div className="flex items-center justify-center gap-1 mb-1">
               <HeartHandshake className="w-4 h-4 text-yellow-400" />
-              <span className="text-2xl font-bold text-yellow-400">{neutralCount}</span>
+              <span className="text-2xl font-bold text-yellow-400">{moderateEngaged}</span>
             </div>
-            <p className="text-xs text-gray-400">Neutral ({neutralPct}%)</p>
-          </div>
-          <div className="text-center">
+            <p className="text-xs text-gray-400">Moderate ({moderatePct}%)</p>
+          </button>
+          <button
+            onClick={() => openDrillDown('engagement')}
+            className="text-center hover:bg-gray-750 hover:ring-1 hover:ring-rose-500/30 rounded-lg p-2 transition-all cursor-pointer"
+          >
             <div className="flex items-center justify-center gap-1 mb-1">
-              <ThumbsDown className="w-4 h-4 text-red-400" />
-              <span className="text-2xl font-bold text-red-400">{negativeCount}</span>
+              <AlertTriangle className="w-4 h-4 text-red-400" />
+              <span className="text-2xl font-bold text-red-400">{atRiskEngaged}</span>
             </div>
-            <p className="text-xs text-gray-400">Negative ({negativePct}%)</p>
-          </div>
+            <p className="text-xs text-gray-400">At Risk ({atRiskPct}%)</p>
+          </button>
         </div>
 
         {/* Horizontal ratio bar */}
@@ -125,15 +162,15 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
           <div className="h-4 bg-gray-700 rounded-full overflow-hidden flex">
             <div
               className="bg-green-500 transition-all duration-500"
-              style={{ width: `${positivePct}%` }}
+              style={{ width: `${highPct}%` }}
             />
             <div
               className="bg-yellow-500 transition-all duration-500"
-              style={{ width: `${neutralPct}%` }}
+              style={{ width: `${moderatePct}%` }}
             />
             <div
               className="bg-red-500 transition-all duration-500"
-              style={{ width: `${negativePct}%` }}
+              style={{ width: `${atRiskPct}%` }}
             />
           </div>
         ) : (
@@ -146,14 +183,17 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
       </div>
 
       {/* Total Feedback Count */}
-      <div className="bg-gray-800 rounded-lg p-5">
+      <button
+        onClick={() => openDrillDown('engagement')}
+        className="w-full bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-rose-500/30 transition-all cursor-pointer"
+      >
         <div className="flex items-center gap-2 mb-2">
           <Users className="w-4 h-4 text-rose-400" />
           <span className="text-sm font-medium text-gray-400">Total Users Assessed</span>
         </div>
         <p className="text-3xl font-bold text-white">{totalUsers}</p>
-        <p className="text-xs text-gray-400 mt-1">Users with engagement scores</p>
-      </div>
+        <p className="text-xs text-gray-400 mt-1">Users with engagement scores &middot; Click to drill down</p>
+      </button>
 
       {/* Feedback Coming Soon */}
       <div className="bg-gray-800 rounded-lg p-5">
@@ -163,11 +203,25 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
             <h4 className="text-sm font-medium text-rose-300">Feedback Data Aggregation Coming Soon</h4>
           </div>
           <p className="text-xs text-rose-400">
-            Direct AI feedback (thumbs up/down) will be aggregated from the <code className="bg-gray-700 px-1 py-0.5 rounded text-rose-300">ai_messages.feedback</code> column.
-            Currently using engagement score distribution as a sentiment proxy.
+            AI feedback sentiment (thumbs up/down) will be added when sufficient feedback data is collected
+            from the <code className="bg-gray-700 px-1 py-0.5 rounded text-rose-300">ai_messages.feedback</code> column.
+            The above chart shows actual engagement score distribution.
           </p>
         </div>
       </div>
+
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });
@@ -209,6 +263,40 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
 
   const isLoading = engagementLoading || lifecycleLoading;
 
+  const distribution = engagementData?.distribution || { excellent: 0, good: 0, average: 0, low: 0, inactive: 0 };
+  const averageScore = engagementData?.averageScore || 0;
+  const totalUsers = engagementData?.totalUsers || 0;
+  const atRiskUsers = lifecycleData?.atRisk || 0;
+
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    switch (metric) {
+      case 'scoreDistribution': {
+        const chartData = SCORE_SEGMENTS.map(seg => ({
+          date: seg.label,
+          value: distribution[seg.key] || 0,
+        }));
+        setDrillDown({
+          isOpen: true,
+          title: 'Engagement Score Distribution',
+          metric: 'Users',
+          data: chartData,
+          color: '#f43f5e',
+          chartType: 'bar',
+        });
+        break;
+      }
+    }
+  }, [distribution]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -217,11 +305,6 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
       </div>
     );
   }
-
-  const distribution = engagementData?.distribution || { excellent: 0, good: 0, average: 0, low: 0, inactive: 0 };
-  const averageScore = engagementData?.averageScore || 0;
-  const totalUsers = engagementData?.totalUsers || 0;
-  const atRiskUsers = lifecycleData?.atRisk || 0;
 
   const maxSegment = Math.max(
     distribution.excellent,
@@ -236,7 +319,10 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
     <div className="space-y-6">
       {/* Key Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('scoreDistribution')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-rose-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-rose-400" />
             <span className="text-sm font-medium text-gray-400">Average Engagement Score</span>
@@ -246,19 +332,25 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
           }`}>
             {averageScore}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Out of 100</p>
-        </div>
+          <p className="text-xs text-gray-400 mt-1">Out of 100 &middot; Click to drill down</p>
+        </button>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('scoreDistribution')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-rose-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-blue-400" />
             <span className="text-sm font-medium text-gray-400">Total Users Scored</span>
           </div>
           <p className="text-4xl font-bold text-white">{totalUsers}</p>
-          <p className="text-xs text-gray-400 mt-1">With engagement data</p>
-        </div>
+          <p className="text-xs text-gray-400 mt-1">With engagement data &middot; Click to drill down</p>
+        </button>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('scoreDistribution')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-orange-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-4 h-4 text-orange-400" />
             <span className="text-sm font-medium text-gray-400">At-Risk Users</span>
@@ -266,8 +358,8 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
           <p className={`text-4xl font-bold ${atRiskUsers > 0 ? 'text-orange-400' : 'text-green-400'}`}>
             {atRiskUsers}
           </p>
-          <p className="text-xs text-gray-400 mt-1">May need re-engagement</p>
-        </div>
+          <p className="text-xs text-gray-400 mt-1">May need re-engagement &middot; Click to drill down</p>
+        </button>
       </div>
 
       {/* Score Distribution */}
@@ -332,6 +424,19 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
           </div>
         </div>
       </div>
+
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });

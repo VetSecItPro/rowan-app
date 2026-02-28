@@ -79,8 +79,11 @@ export interface DailyRevenueData {
   mrr: number;
   newMrr: number;
   churnedMrr: number;
-  subscriptions: number;
+  newSubscriptions: number;
   cancellations: number;
+  upgrades: number;
+  downgrades: number;
+  reactivations: number;
 }
 
 // Database row types from Supabase
@@ -328,7 +331,14 @@ export async function getSubscriptionEvents(options: {
 }
 
 /**
- * Get daily revenue data for charts
+ * Get daily revenue data for charts via event replay.
+ *
+ * Algorithm:
+ * 1. Calculate current MRR from active subscriptions.
+ * 2. Fetch all events in the requested period.
+ * 3. Work backward from today's known MRR to calculate the MRR at the start
+ *    of the period by reversing every event's MRR impact.
+ * 4. Then replay events forward day-by-day, building actual daily MRR.
  */
 export async function getDailyRevenueData(days: number = 30): Promise<DailyRevenueData[]> {
   const now = new Date();
@@ -341,52 +351,119 @@ export async function getDailyRevenueData(days: number = 30): Promise<DailyReven
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
-  // Fetch current subscriptions for MRR calculation
+  // Fetch current subscriptions to know each user's billing period
   const { data: subscriptions } = await supabaseAdmin
     .from('subscriptions')
-    .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
+    .select('user_id, tier, status, period')
     .in('status', ['active', 'past_due']);
 
-  // Calculate current MRR as baseline
-  const currentSubscriptions: SubscriptionRow[] = subscriptions || [];
+  // Build a lookup of user → period (default to 'monthly' if unknown)
+  const userPeriod: Record<string, string> = {};
+  const currentSubscriptions = subscriptions || [];
+  currentSubscriptions.forEach((sub) => {
+    userPeriod[sub.user_id] = sub.period || 'monthly';
+  });
+
+  // Calculate current MRR as our known anchor point
   let currentMRR = 0;
-  currentSubscriptions.forEach((sub: SubscriptionRow) => {
+  currentSubscriptions.forEach((sub) => {
     currentMRR += calculateMRR(sub.tier, sub.period);
   });
 
-  // Generate daily data points
-  const dailyData: DailyRevenueData[] = [];
   const eventsList: SubscriptionEventRow[] = events || [];
+
+  // Helper: get the MRR delta for an event (positive = MRR increased)
+  const getEventMrrDelta = (event: SubscriptionEventRow): number => {
+    const period = userPeriod[event.user_id] || 'monthly';
+    switch (event.event_type) {
+      case 'subscription_created':
+        return calculateMRR(event.to_tier || 'free', period);
+      case 'subscription_cancelled':
+        return -calculateMRR(event.from_tier || 'free', period);
+      case 'subscription_upgraded':
+      case 'subscription_downgraded': {
+        const oldMrr = calculateMRR(event.from_tier || 'free', period);
+        const newMrr = calculateMRR(event.to_tier || 'free', period);
+        return newMrr - oldMrr;
+      }
+      case 'subscription_reactivated':
+        return calculateMRR(event.to_tier || 'free', period);
+      default:
+        return 0;
+    }
+  };
+
+  // Work backward from currentMRR: reverse all events to find MRR at startDate
+  let startMRR = currentMRR;
+  for (let i = eventsList.length - 1; i >= 0; i--) {
+    startMRR -= getEventMrrDelta(eventsList[i]);
+  }
+  // Ensure non-negative (rounding errors or missing events)
+  startMRR = Math.max(0, startMRR);
+
+  // Replay events forward day-by-day
+  const dailyData: DailyRevenueData[] = [];
+  let runningMRR = startMRR;
 
   for (let i = 0; i < days; i++) {
     const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
     const dateStr = date.toISOString().split('T')[0];
 
-    // Count events for this day
-    const dayEvents = eventsList.filter((e: SubscriptionEventRow) =>
-      e.created_at.startsWith(dateStr)
-    );
+    // Get events for this day
+    const dayEvents = eventsList.filter((e) => e.created_at.startsWith(dateStr));
 
-    const newSubs = dayEvents.filter((e: SubscriptionEventRow) =>
-      e.event_type === 'subscription_created'
-    ).length;
+    let dayNewMrr = 0;
+    let dayChurnedMrr = 0;
+    let newSubscriptions = 0;
+    let cancellations = 0;
+    let upgrades = 0;
+    let downgrades = 0;
+    let reactivations = 0;
 
-    const cancellations = dayEvents.filter((e: SubscriptionEventRow) =>
-      e.event_type === 'subscription_cancelled'
-    ).length;
+    for (const event of dayEvents) {
+      const delta = getEventMrrDelta(event);
 
-    // Estimate MRR changes (simplified - assumes average plan price)
-    const avgMRR = currentMRR / (subscriptions?.length || 1);
-    const newMrr = newSubs * avgMRR;
-    const churnedMrr = cancellations * avgMRR;
+      switch (event.event_type) {
+        case 'subscription_created':
+          newSubscriptions++;
+          if (delta > 0) dayNewMrr += delta;
+          break;
+        case 'subscription_cancelled':
+          cancellations++;
+          if (delta < 0) dayChurnedMrr += Math.abs(delta);
+          break;
+        case 'subscription_upgraded':
+          upgrades++;
+          if (delta > 0) dayNewMrr += delta;
+          else if (delta < 0) dayChurnedMrr += Math.abs(delta);
+          break;
+        case 'subscription_downgraded':
+          downgrades++;
+          if (delta < 0) dayChurnedMrr += Math.abs(delta);
+          else if (delta > 0) dayNewMrr += delta;
+          break;
+        case 'subscription_reactivated':
+          reactivations++;
+          if (delta > 0) dayNewMrr += delta;
+          break;
+      }
+
+      runningMRR += delta;
+    }
+
+    // Ensure non-negative
+    runningMRR = Math.max(0, runningMRR);
 
     dailyData.push({
       date: dateStr,
-      mrr: Math.round((currentMRR - (days - i - 1) * (newMrr - churnedMrr) / days) * 100) / 100,
-      newMrr: Math.round(newMrr * 100) / 100,
-      churnedMrr: Math.round(churnedMrr * 100) / 100,
-      subscriptions: newSubs,
+      mrr: Math.round(runningMRR * 100) / 100,
+      newMrr: Math.round(dayNewMrr * 100) / 100,
+      churnedMrr: Math.round(dayChurnedMrr * 100) / 100,
+      newSubscriptions,
       cancellations,
+      upgrades,
+      downgrades,
+      reactivations,
     });
   }
 

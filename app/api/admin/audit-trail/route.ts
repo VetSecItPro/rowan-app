@@ -22,6 +22,11 @@ import * as Sentry from '@sentry/nextjs';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+/** Escape SQL LIKE wildcards (% and _) in user input for safe use in .ilike() filters. */
+function escapeLikeInput(input: string): string {
+  return input.replace(/[%_\\]/g, '\\$&');
+}
+
 interface AuditEntry {
   id: string;
   timestamp: string;
@@ -93,11 +98,14 @@ export async function GET(request: NextRequest) {
           auditQuery = auditQuery.lte('created_at', dateTo);
         }
         if (actionFilter) {
-          auditQuery = auditQuery.ilike('action', `%${actionFilter}%`);
+          const safeAction = escapeLikeInput(actionFilter);
+          auditQuery = auditQuery.ilike('action', `%${safeAction}%`);
         }
         if (search) {
+          const safeSearch = escapeLikeInput(search);
+          // Use filter() to scope the OR within existing AND conditions
           auditQuery = auditQuery.or(
-            `action.ilike.%${search}%,target_resource.ilike.%${search}%`
+            `action.ilike.%${safeSearch}%,target_resource.ilike.%${safeSearch}%`
           );
         }
 
@@ -122,11 +130,13 @@ export async function GET(request: NextRequest) {
           subQuery = subQuery.lte('created_at', dateTo);
         }
         if (actionFilter) {
-          subQuery = subQuery.ilike('event_type', `%${actionFilter}%`);
+          const safeAction = escapeLikeInput(actionFilter);
+          subQuery = subQuery.ilike('event_type', `%${safeAction}%`);
         }
         if (search) {
+          const safeSearch = escapeLikeInput(search);
           subQuery = subQuery.or(
-            `event_type.ilike.%${search}%,from_tier.ilike.%${search}%,to_tier.ilike.%${search}%`
+            `event_type.ilike.%${safeSearch}%,from_tier.ilike.%${safeSearch}%,to_tier.ilike.%${safeSearch}%`
           );
         }
 
@@ -142,38 +152,33 @@ export async function GET(request: NextRequest) {
 
         let signupEntries: AuditEntry[] = [];
 
-        // Only fetch signups if no action filter or if filter matches "signup"
-        const shouldFetchSignups = !actionFilter || 'signup'.includes(actionFilter.toLowerCase());
+        // Only fetch signups if no action filter or if filter is relevant to signups
+        const shouldFetchSignups = !actionFilter || 'user_signup'.includes(actionFilter.toLowerCase());
 
         if (shouldFetchSignups) {
           try {
-            const { data: authData } = await supabaseAdmin.auth.admin.listUsers({
-              page: 1,
-              perPage: 200,
-            });
+            // Build profiles query with optional filters
+            let query = supabaseAdmin
+              .from('profiles')
+              .select('id, email, full_name, created_at')
+              .order('created_at', { ascending: false })
+              .limit(200);
 
-            if (authData?.users) {
-              let signupUsers = authData.users;
+            if (dateFrom) {
+              query = query.gte('created_at', new Date(dateFrom).toISOString());
+            }
+            if (dateTo) {
+              query = query.lte('created_at', new Date(dateTo).toISOString());
+            }
+            if (search) {
+              const safeSearch = escapeLikeInput(search);
+              query = query.or(`email.ilike.%${safeSearch}%,full_name.ilike.%${safeSearch}%`);
+            }
 
-              // Apply date filters
-              if (dateFrom) {
-                signupUsers = signupUsers.filter(
-                  (u) => new Date(u.created_at) >= new Date(dateFrom)
-                );
-              }
-              if (dateTo) {
-                signupUsers = signupUsers.filter(
-                  (u) => new Date(u.created_at) <= new Date(dateTo)
-                );
-              }
-              if (search) {
-                const searchLower = search.toLowerCase();
-                signupUsers = signupUsers.filter(
-                  (u) => (u.email || '').toLowerCase().includes(searchLower)
-                );
-              }
+            const { data: profileUsers } = await query;
 
-              signupEntries = signupUsers.map((user) => ({
+            if (profileUsers) {
+              signupEntries = profileUsers.map((user: { id: string; email: string | null; full_name: string | null; created_at: string }) => ({
                 id: `signup-${user.id}`,
                 timestamp: user.created_at,
                 category: 'signup' as const,
@@ -181,8 +186,9 @@ export async function GET(request: NextRequest) {
                 action: 'user_signup',
                 target: user.email || 'unknown',
                 metadata: {
-                  provider: user.app_metadata?.provider || 'email',
-                  confirmed: !!user.email_confirmed_at,
+                  provider: 'email',
+                  confirmed: true,
+                  full_name: user.full_name,
                 },
               }));
             }

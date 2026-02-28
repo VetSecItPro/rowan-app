@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -12,7 +11,8 @@ export const dynamic = 'force-dynamic';
 
 interface PerformanceMetricsResponse {
   configured: boolean;
-  source?: 'vercel' | 'health' | 'placeholder';
+  source?: 'vercel';
+  note?: string;
   metrics?: {
     p50: number;
     p95: number;
@@ -109,49 +109,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Fallback: Calculate from health endpoint data
-    try {
-      // Run multiple test queries to sample response times
-      const samples: number[] = [];
-      const sampleCount = 10;
-
-      for (let i = 0; i < sampleCount; i++) {
-        const start = Date.now();
-        await supabaseAdmin.from('users').select('id').limit(1);
-        const responseTime = Date.now() - start;
-        samples.push(responseTime);
-      }
-
-      // Sort samples for percentile calculation
-      samples.sort((a, b) => a - b);
-
-      // Calculate percentiles
-      const p50Index = Math.floor(samples.length * 0.5);
-      const p95Index = Math.floor(samples.length * 0.95);
-      const p99Index = Math.floor(samples.length * 0.99);
-
-      const metrics = {
-        p50: samples[p50Index] || 0,
-        p95: samples[p95Index] || samples[samples.length - 1] || 0,
-        p99: samples[p99Index] || samples[samples.length - 1] || 0,
-      };
-
-      const response: PerformanceMetricsResponse = {
-        configured: true,
-        source: 'health',
-        metrics,
-        timestamp: new Date().toISOString(),
-      };
-      return NextResponse.json(response);
-
-    } catch (healthError) {
-      logger.error('Health endpoint sampling error:', healthError, { component: 'api-route', action: 'api_request' });
-    }
-
-    // Final fallback: Return placeholder
+    // Vercel Analytics not configured — return "not configured" instead of fake percentiles
     const response: PerformanceMetricsResponse = {
       configured: false,
-      source: 'placeholder',
+      note: 'Configure VERCEL_API_TOKEN, VERCEL_TEAM_ID, and VERCEL_PROJECT_ID for production performance metrics',
       timestamp: new Date().toISOString(),
     };
     return NextResponse.json(response);

@@ -21,4 +21,6 @@ Config.overrideWebpackConfig((currentConfiguration) => {
   };
 });
 
-Config.setPort(3100);
+// Studio port: use --port=3100 CLI flag instead of hardcoding,
+// so the render process can auto-select a free port.
+Config.setStudioPort(3100);

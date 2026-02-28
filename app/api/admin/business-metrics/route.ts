@@ -194,9 +194,9 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
       .select('user_id')
       .gte('created_at', thirtyDaysAgo.toISOString()),
 
-    // 5. Total users count
+    // 5. Total users count (profiles table)
     supabaseAdmin
-      .from('users')
+      .from('profiles')
       .select('id', { count: 'exact', head: true }),
 
     // 6. Activated users (users who have a space AND at least 1 feature event)

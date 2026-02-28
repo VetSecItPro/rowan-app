@@ -17,6 +17,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface SubscriptionMetrics {
   mrr: number;
@@ -26,7 +28,6 @@ interface SubscriptionMetrics {
   proSubscribers: number;
   familySubscribers: number;
   freeUsers: number;
-  trialUsers: number;
   tierDistribution: {
     tier: string;
     count: number;
@@ -101,6 +102,80 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
   const fetchData = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+    barColors?: string[];
+    formatter?: (value: number) => string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = (metric: string) => {
+    if (!metrics) return;
+    let data: DrillDownDataPoint[] = [];
+    let title = '';
+    let color = '#10b981';
+    let barColors: string[] | undefined;
+    let formatter: ((value: number) => string) | undefined;
+
+    const currencyFormatter = (v: number) =>
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
+
+    switch (metric) {
+      case 'mrr':
+        data = (metrics.tierDistribution ?? []).map((t) => ({
+          date: t.tier,
+          value: t.mrr,
+        }));
+        title = 'MRR by Tier';
+        color = '#10b981';
+        barColors = ['#3b82f6', '#a855f7', '#f59e0b', '#06b6d4'];
+        formatter = currencyFormatter;
+        break;
+      case 'subscribers':
+        data = (metrics.tierDistribution ?? []).map((t) => ({
+          date: t.tier,
+          value: t.count,
+        }));
+        if (metrics.freeUsers > 0) {
+          data.push({ date: 'Free', value: metrics.freeUsers });
+        }
+        title = 'Subscribers by Tier';
+        color = '#8b5cf6';
+        barColors = ['#3b82f6', '#a855f7', '#6b7280', '#f59e0b'];
+        break;
+      case 'conversion':
+        data = [{ date: 'Conversion Rate', value: metrics.conversionRate }];
+        title = 'Free to Paid Conversion';
+        color = '#3b82f6';
+        formatter = (v: number) => `${v}%`;
+        break;
+      case 'churn':
+        data = [{ date: 'Churn Rate', value: metrics.churnRate }];
+        title = 'Monthly Churn Rate';
+        color = metrics.churnRate > 5 ? '#ef4444' : '#10b981';
+        formatter = (v: number) => `${v}%`;
+        break;
+      case 'thisMonth':
+        data = [
+          { date: 'New', value: metrics.recentEvents?.created ?? 0 },
+          { date: 'Cancelled', value: metrics.recentEvents?.cancelled ?? 0 },
+          { date: 'Net Growth', value: metrics.netGrowth ?? 0 },
+        ];
+        title = 'This Month — Subscription Activity';
+        barColors = ['#10b981', '#ef4444', (metrics.netGrowth ?? 0) >= 0 ? '#34d399' : '#f87171'];
+        break;
+    }
+
+    if (data.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data, color, chartType: 'bar', barColors, formatter });
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -194,7 +269,13 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
         <>
           {/* Key Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div
+              className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-emerald-500/30 transition-all"
+              onClick={() => openDrillDown('mrr')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrillDown('mrr'); } }}
+            >
               <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <DollarSign className="w-3 h-3" />
                 MRR
@@ -206,7 +287,13 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
                 ARR: {formatCurrency(metrics.arr)}
               </p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div
+              className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-purple-500/30 transition-all"
+              onClick={() => openDrillDown('subscribers')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrillDown('subscribers'); } }}
+            >
               <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <Users className="w-3 h-3" />
                 Subscribers
@@ -218,7 +305,13 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
                 ARPU: {formatCurrency(metrics.arpu)}
               </p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div
+              className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-blue-500/30 transition-all"
+              onClick={() => openDrillDown('conversion')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrillDown('conversion'); } }}
+            >
               <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <Percent className="w-3 h-3" />
                 Conversion
@@ -228,7 +321,13 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
               </p>
               <p className="text-xs text-gray-400 mt-0.5">Free to paid</p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div
+              className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-red-500/30 transition-all"
+              onClick={() => openDrillDown('churn')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrillDown('churn'); } }}
+            >
               <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <TrendingDown className="w-3 h-3" />
                 Churn
@@ -266,15 +365,20 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
                     </div>
                   </div>
                 ))}
-                <div className="pt-2 border-t border-gray-700 flex justify-between text-sm">
+                <div className="pt-2 border-t border-gray-700 text-sm">
                   <span className="text-gray-400">Free: {metrics.freeUsers}</span>
-                  <span className="text-amber-400">Trial: {metrics.trialUsers}</span>
                 </div>
               </div>
             </div>
 
             {/* This Month Activity */}
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div
+              className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-blue-500/30 transition-all"
+              onClick={() => openDrillDown('thisMonth')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrillDown('thisMonth'); } }}
+            >
               <div className="flex items-center gap-2 mb-3">
                 <Calendar className="w-4 h-4 text-blue-500" />
                 <span className="text-sm font-medium text-white">This Month</span>
@@ -353,6 +457,23 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
           </div>
         </div>
       )}
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle={`${timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'Last 90 days'}`}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+          barColors={drillDown.barColors}
+          formatter={drillDown.formatter}
+        />
+      </DrillDownModal>
     </div>
   );
 });

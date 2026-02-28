@@ -18,14 +18,6 @@ interface HealthMetric {
   lastChecked: string;
 }
 
-interface PerformanceMetric {
-  endpoint: string;
-  avgResponseTime: number;
-  errorRate: number;
-  requestCount: number;
-  status: 'healthy' | 'warning' | 'critical';
-}
-
 /**
  * GET /api/admin/health
  * Get comprehensive system health and performance metrics
@@ -84,7 +76,7 @@ export async function GET(req: NextRequest) {
       (async (): Promise<HealthMetric> => {
         try {
           const start = Date.now();
-          const { error } = await supabaseAdmin.from('users').select('id').limit(1);
+          const { error } = await supabaseAdmin.from('profiles').select('id').limit(1);
           const responseTime = Date.now() - start;
 
           if (error) {
@@ -174,7 +166,7 @@ export async function GET(req: NextRequest) {
         try {
           const testStart = Date.now();
           // Test a simple database query to measure API response time
-          await supabaseAdmin.from('users').select('id').limit(1);
+          await supabaseAdmin.from('profiles').select('id').limit(1);
           const apiResponseTime = Date.now() - testStart;
 
           return {
@@ -195,15 +187,46 @@ export async function GET(req: NextRequest) {
         }
       })(),
 
-      // Error monitoring (using recent logs)
+      // Error monitoring via Sentry (only if configured)
       (async (): Promise<HealthMetric> => {
         try {
-          // SECURITY: Placeholder metrics — labeled as such — FIX-027
+          const sentryOrg = process.env.SENTRY_ORG;
+          const sentryProject = process.env.SENTRY_PROJECT;
+          const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
+
+          if (!sentryOrg || !sentryProject || !sentryAuthToken) {
+            return {
+              name: 'Error Rate',
+              status: 'warning',
+              value: 'Not configured',
+              description: 'Set SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN to enable error monitoring',
+              lastChecked: now,
+            };
+          }
+
+          // Query Sentry for recent error count (last 24h)
+          const sentryUrl = `https://sentry.io/api/0/projects/${sentryOrg}/${sentryProject}/issues/?query=is:unresolved&statsPeriod=24h&sort=freq`;
+          const sentryResponse = await fetch(sentryUrl, {
+            headers: { Authorization: `Bearer ${sentryAuthToken}` },
+          });
+
+          if (sentryResponse.ok) {
+            const issues = await sentryResponse.json();
+            const errorCount = Array.isArray(issues) ? issues.length : 0;
+            return {
+              name: 'Error Rate',
+              status: errorCount === 0 ? 'healthy' : errorCount < 10 ? 'warning' : 'critical',
+              value: `${errorCount} issues`,
+              description: `${errorCount} unresolved issues in the last 24 hours (Sentry)`,
+              lastChecked: now,
+            };
+          }
+
           return {
             name: 'Error Rate',
-            status: 'healthy',
-            value: 'N/A (placeholder)',
-            description: 'Error rate monitoring not yet implemented — integrate with Sentry or Vercel Analytics',
+            status: 'warning',
+            value: 'API error',
+            description: 'Failed to fetch error data from Sentry',
             lastChecked: now,
           };
         } catch {
@@ -241,48 +264,6 @@ export async function GET(req: NextRequest) {
     const uptimeMinutes = Math.floor((process.uptime() % 3600) / 60);
     const uptime = `${uptimeHours}h ${uptimeMinutes}m`;
 
-    // SECURITY: Performance metrics are placeholders — labeled as such — FIX-027
-    // TODO: Integrate with Vercel Analytics API or Sentry performance data
-    const performanceMetrics: PerformanceMetric[] = [
-      {
-        endpoint: '/api/subscriptions',
-        avgResponseTime: 0,
-        errorRate: 0,
-        requestCount: 0,
-        status: 'healthy',
-      },
-      {
-        endpoint: '/api/launch/notify',
-        avgResponseTime: 0,
-        errorRate: 0,
-        requestCount: 0,
-        status: 'healthy',
-      },
-      {
-        endpoint: '/api/admin/dashboard',
-        avgResponseTime: 0,
-        errorRate: 0,
-        requestCount: 0,
-        status: 'healthy',
-      },
-      {
-        endpoint: '/api/admin/analytics',
-        avgResponseTime: 0,
-        errorRate: 0,
-        requestCount: 0,
-        status: 'healthy',
-      },
-    ];
-
-    // Update performance metric statuses based on their values
-    performanceMetrics.forEach(metric => {
-      if (metric.avgResponseTime > 1000 || metric.errorRate > 5) {
-        metric.status = 'critical';
-      } else if (metric.avgResponseTime > 500 || metric.errorRate > 2) {
-        metric.status = 'warning';
-      }
-    });
-
     const responseTime = Date.now() - startTime;
 
     // Health data response
@@ -300,7 +281,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       health: healthData,
-      performance: performanceMetrics,
       timestamp: now,
     });
 

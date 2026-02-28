@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, memo, useMemo } from 'react';
+import { useState, memo, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import { Eye, Layers, Clock, MousePointer, RefreshCw, Grid3X3 } from 'lucide-react';
 import { AnalyticsPanel } from './AnalyticsPanel';
 import { FeatureUsagePanel } from './FeatureUsagePanel';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 type SubTab = 'traffic' | 'features' | 'sessions' | 'adoption';
 
@@ -45,11 +47,51 @@ const AdoptionPanel = memo(function AdoptionPanel() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const avgScore = data?.avgScore ?? 0;
+  const distribution = data?.distribution ?? [];
+
   const features = data?.features;
   const sortedFeatures = useMemo(() => {
     if (!features) return [];
     return [...features].sort((a, b) => b.triedItPct - a.triedItPct);
   }, [features]);
+
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'engagementScore' && distribution.length > 0) {
+      const chartData = distribution.map(d => ({ date: d.label, value: d.count }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Engagement Score Distribution',
+        metric: 'Users',
+        data: chartData,
+        color: '#06b6d4',
+        chartType: 'bar',
+      });
+    }
+    if (metric === 'featureAdoption' && sortedFeatures.length > 0) {
+      const chartData = sortedFeatures.map(f => ({
+        date: f.feature.replace(/_/g, ' '),
+        value: f.triedItPct,
+      }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Feature Adoption — Tried It %',
+        metric: 'Adoption %',
+        data: chartData,
+        color: '#06b6d4',
+        chartType: 'bar',
+      });
+    }
+  }, [distribution, sortedFeatures]);
 
   const getCellColor = (pct: number) => {
     if (pct > 30) return 'text-green-400 bg-green-900/20';
@@ -66,22 +108,22 @@ const AdoptionPanel = memo(function AdoptionPanel() {
     );
   }
 
-  const avgScore = data?.avgScore ?? 0;
-  const distribution = data?.distribution ?? [];
-
   return (
     <div className="space-y-6">
       {/* Top Row — Score + Distribution */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Average Engagement Score */}
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('engagementScore')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-cyan-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <Grid3X3 className="w-4 h-4 text-cyan-500" />
             <span className="text-sm font-medium text-gray-400">Average Engagement Score</span>
           </div>
           <p className="text-4xl font-bold text-white">{avgScore.toFixed(1)}</p>
-          <p className="text-xs text-gray-400 mt-1">Across all active users</p>
-        </div>
+          <p className="text-xs text-gray-400 mt-1">Across all active users &middot; Click to drill down</p>
+        </button>
 
         {/* Score Distribution */}
         <div className="bg-gray-800 rounded-lg p-5">
@@ -111,10 +153,14 @@ const AdoptionPanel = memo(function AdoptionPanel() {
 
       {/* Feature Adoption Matrix */}
       <div className="bg-gray-800 rounded-lg p-5">
-        <div className="flex items-center gap-2 mb-4">
+        <button
+          onClick={() => openDrillDown('featureAdoption')}
+          className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity cursor-pointer"
+        >
           <Grid3X3 className="w-5 h-5 text-cyan-500" />
           <h3 className="text-lg font-semibold text-white">Feature Adoption Matrix</h3>
-        </div>
+          <span className="text-xs text-gray-500 ml-1">Click to chart</span>
+        </button>
 
         {sortedFeatures.length > 0 ? (
           <div className="overflow-x-auto">
@@ -167,6 +213,20 @@ const AdoptionPanel = memo(function AdoptionPanel() {
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-900/40 inline-block" /> &lt;15% — Low</span>
         </div>
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });

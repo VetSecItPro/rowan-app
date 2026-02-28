@@ -39,6 +39,12 @@ export function Footer() {
               Legal
             </Link>
             <Link
+              href="/feedback"
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Feedback
+            </Link>
+            <Link
               href="/settings/documentation"
               className="text-sm text-gray-400 hover:text-white transition-colors"
             >

@@ -22,10 +22,7 @@ const CACHE_PREFIX = 'rowan:admin:';
 const CACHE_TTL = {
   dashboardStats: 300,     // 5 minutes for dashboard stats (rarely changes)
   usersList: 600,          // 10 minutes for users list (infrequent updates)
-  betaRequests: 600,       // 10 minutes for beta requests (infrequent updates)
   analytics: 900,          // 15 minutes for analytics (expensive queries, historical data)
-  betaStats: 300,          // 5 minutes for beta stats
-  notificationStats: 300,  // 5 minutes for notification stats
   subscriptionAnalytics: 600, // 10 minutes for subscription metrics (revenue data)
   businessMetrics: 600,      // 10 minutes for business scorecard / unit economics
   userLifecycle: 600,        // 10 minutes for lifecycle stages / space analytics
@@ -141,10 +138,7 @@ export const ADMIN_CACHE_TTL = CACHE_TTL;
 export const ADMIN_CACHE_KEYS = {
   dashboardStats: 'dashboard:stats',
   usersList: (page: number, limit: number) => `users:list:${page}:${limit}`,
-  betaRequests: (page: number, status: string | null) => `beta:requests:${page}:${status || 'all'}`,
   analytics: (range: string) => `analytics:${range}`,
-  betaStats: 'beta:stats',
-  notificationStats: 'notifications:stats',
   subscriptionMetrics: 'subscriptions:metrics',
   subscriptionEvents: (eventType: string | null, limit: number, offset: number) =>
     `subscriptions:events:${eventType || 'all'}:${limit}:${offset}`,
@@ -157,4 +151,5 @@ export const ADMIN_CACHE_KEYS = {
   auditTrail: (page: number, filter: string) => `audit:trail:${page}:${filter}`,
   adminGoals: 'admin:goals',
   visitorAnalytics: (range: string) => `visitor-analytics:${range}`,
+  inviteAnalytics: 'invite-analytics',
 } as const;

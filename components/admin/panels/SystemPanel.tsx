@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import { HeartPulse, Download, Gauge, Target, AlertTriangle, Clock, Activity, Info, Database, TrendingUp } from 'lucide-react';
 import { HealthPanel } from './HealthPanel';
 import { ExportPanel } from './ExportPanel';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 type SubTab = 'health' | 'export' | 'performance' | 'database' | 'goals';
 
@@ -32,7 +34,8 @@ interface SentryStatsData {
 
 interface PerformanceMetricsData {
   configured: boolean;
-  source?: 'vercel' | 'health' | 'placeholder';
+  source?: 'vercel';
+  note?: string;
   metrics?: {
     p50: number;
     p95: number;
@@ -61,14 +64,15 @@ const PerformancePanel = memo(function PerformancePanel() {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (sentryLoading || perfLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3 text-sm text-gray-400">Loading performance data...</span>
-      </div>
-    );
-  }
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
 
   const p50 = perfData?.metrics?.p50 ?? 0;
   const p95 = perfData?.metrics?.p95 ?? 0;
@@ -78,45 +82,117 @@ const PerformancePanel = memo(function PerformancePanel() {
   const errors7d = sentryData?.errorCounts?.last7d ?? 0;
   const errors30d = sentryData?.errorCounts?.last30d ?? 0;
 
+  const openDrillDown = useCallback((metric: string) => {
+    let chartData: DrillDownDataPoint[] = [];
+    let title = '';
+
+    switch (metric) {
+      case 'responseTime': {
+        chartData = [
+          { date: 'P50', value: p50 },
+          { date: 'P95', value: p95 },
+          { date: 'P99', value: p99 },
+        ];
+        title = 'API Response Time Distribution';
+        break;
+      }
+      case 'errors': {
+        chartData = [
+          { date: '24h', value: errors24h },
+          { date: '7d', value: errors7d },
+          { date: '30d', value: errors30d },
+        ];
+        title = 'Error Count by Period';
+        break;
+      }
+    }
+
+    if (chartData.length > 0) {
+      setDrillDown({
+        isOpen: true,
+        title,
+        metric: metric === 'responseTime' ? 'ms' : 'Errors',
+        data: chartData,
+        color: metric === 'responseTime' ? '#3b82f6' : '#f97316',
+        chartType: 'bar',
+      });
+    }
+  }, [p50, p95, p99, errors24h, errors7d, errors30d]);
+
+  if (sentryLoading || perfLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+        <span className="ml-3 text-sm text-gray-400">Loading performance data...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* API Response Time Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 rounded-lg p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Gauge className="w-4 h-4 text-blue-500" />
-            <span className="text-sm font-medium text-gray-400">P50 Response Time</span>
-          </div>
-          <p className="text-3xl font-bold text-white">
-            {perfData?.configured && p50 > 0 ? `${p50}ms` : '--'}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            {perfData?.configured ? `Source: ${perfData.source}` : 'Not configured'}
-          </p>
-        </div>
+      {perfData?.configured ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button
+            onClick={() => openDrillDown('responseTime')}
+            className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-blue-500/30 transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Gauge className="w-4 h-4 text-blue-500" />
+              <span className="text-sm font-medium text-gray-400">P50 Response Time</span>
+            </div>
+            <p className="text-3xl font-bold text-white">
+              {p50 > 0 ? `${p50}ms` : '--'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">Source: {perfData.source}</p>
+          </button>
 
-        <div className="bg-gray-800 rounded-lg p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-4 h-4 text-purple-500" />
-            <span className="text-sm font-medium text-gray-400">P95 Response Time</span>
-          </div>
-          <p className="text-3xl font-bold text-white">
-            {perfData?.configured && p95 > 0 ? `${p95}ms` : '--'}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">95th percentile</p>
-        </div>
+          <button
+            onClick={() => openDrillDown('responseTime')}
+            className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-purple-500/30 transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="w-4 h-4 text-purple-500" />
+              <span className="text-sm font-medium text-gray-400">P95 Response Time</span>
+            </div>
+            <p className="text-3xl font-bold text-white">
+              {p95 > 0 ? `${p95}ms` : '--'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">95th percentile</p>
+          </button>
 
-        <div className="bg-gray-800 rounded-lg p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-medium text-gray-400">P99 Response Time</span>
-          </div>
-          <p className="text-3xl font-bold text-white">
-            {perfData?.configured && p99 > 0 ? `${p99}ms` : '--'}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">99th percentile</p>
+          <button
+            onClick={() => openDrillDown('responseTime')}
+            className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-green-500/30 transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-4 h-4 text-green-500" />
+              <span className="text-sm font-medium text-gray-400">P99 Response Time</span>
+            </div>
+            <p className="text-3xl font-bold text-white">
+              {p99 > 0 ? `${p99}ms` : '--'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">99th percentile</p>
+          </button>
         </div>
-      </div>
+      ) : (
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Gauge className="w-5 h-5 text-blue-500" />
+            <h3 className="text-sm font-semibold text-white">API Response Times</h3>
+          </div>
+          <div className="p-4 bg-blue-900/20 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+              <p className="text-sm text-blue-300">
+                Performance metrics require Vercel Analytics integration.
+                Configure VERCEL_API_TOKEN, VERCEL_TEAM_ID, and VERCEL_PROJECT_ID
+                environment variables to enable P50/P95/P99 response time tracking.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Rate from Sentry */}
       <div className="bg-gray-800 rounded-lg p-5">
@@ -126,21 +202,30 @@ const PerformancePanel = memo(function PerformancePanel() {
         </div>
         {sentryData?.configured ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-700/50 rounded-lg">
+            <button
+              onClick={() => openDrillDown('errors')}
+              className="p-4 bg-gray-700/50 rounded-lg text-left hover:bg-gray-700/70 hover:ring-1 hover:ring-orange-500/30 transition-all cursor-pointer"
+            >
               <div className="text-xs text-gray-400 mb-1">Last 24 Hours</div>
               <div className="text-2xl font-bold text-white">{errors24h.toLocaleString()}</div>
               <div className="text-xs text-gray-400 mt-1">errors</div>
-            </div>
-            <div className="p-4 bg-gray-700/50 rounded-lg">
+            </button>
+            <button
+              onClick={() => openDrillDown('errors')}
+              className="p-4 bg-gray-700/50 rounded-lg text-left hover:bg-gray-700/70 hover:ring-1 hover:ring-orange-500/30 transition-all cursor-pointer"
+            >
               <div className="text-xs text-gray-400 mb-1">Last 7 Days</div>
               <div className="text-2xl font-bold text-white">{errors7d.toLocaleString()}</div>
               <div className="text-xs text-gray-400 mt-1">errors</div>
-            </div>
-            <div className="p-4 bg-gray-700/50 rounded-lg">
+            </button>
+            <button
+              onClick={() => openDrillDown('errors')}
+              className="p-4 bg-gray-700/50 rounded-lg text-left hover:bg-gray-700/70 hover:ring-1 hover:ring-orange-500/30 transition-all cursor-pointer"
+            >
               <div className="text-xs text-gray-400 mb-1">Last 30 Days</div>
               <div className="text-2xl font-bold text-white">{errors30d.toLocaleString()}</div>
               <div className="text-xs text-gray-400 mt-1">errors</div>
-            </div>
+            </button>
           </div>
         ) : (
           <div className="p-4 bg-orange-900/20 rounded-lg">
@@ -152,18 +237,19 @@ const PerformancePanel = memo(function PerformancePanel() {
         )}
       </div>
 
-      {/* Performance Note */}
-      {perfData?.configured && perfData.source !== 'vercel' && (
-        <div className="p-4 bg-gray-700/30 rounded-lg">
-          <div className="flex items-start gap-2">
-            <Info className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-            <p className="text-sm text-gray-400">
-              Performance metrics calculated from health endpoint sampling. For more accurate data,
-              configure Vercel Analytics API with VERCEL_API_TOKEN, VERCEL_TEAM_ID, and VERCEL_PROJECT_ID.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });
@@ -192,6 +278,35 @@ const DatabaseGrowthPanel = memo(function DatabaseGrowthPanel() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Drill-down state — must be declared before any early returns (Rules of Hooks)
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const tables = data?.tables || [];
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'tables' && tables.length > 0) {
+      const chartData = tables.slice(0, 10).map(t => ({
+        date: t.tableName,
+        value: t.rowCount,
+      }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Top 10 Tables by Row Count',
+        metric: 'Rows',
+        data: chartData,
+        color: '#3b82f6',
+        chartType: 'bar',
+      });
+    }
+  }, [tables]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -201,7 +316,6 @@ const DatabaseGrowthPanel = memo(function DatabaseGrowthPanel() {
     );
   }
 
-  const tables = data?.tables || [];
   const totalSize = data?.totalSize || 'N/A';
   const totalRows = tables.reduce((sum, table) => sum + table.rowCount, 0);
 
@@ -209,32 +323,41 @@ const DatabaseGrowthPanel = memo(function DatabaseGrowthPanel() {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('tables')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-blue-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <Database className="w-4 h-4 text-blue-500" />
             <span className="text-sm font-medium text-gray-400">Total Database Size</span>
           </div>
           <p className="text-3xl font-bold text-white">{totalSize}</p>
           <p className="text-xs text-gray-400 mt-1">Current disk usage</p>
-        </div>
+        </button>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('tables')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-green-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-green-500" />
             <span className="text-sm font-medium text-gray-400">Total Rows</span>
           </div>
           <p className="text-3xl font-bold text-white">{totalRows.toLocaleString()}</p>
           <p className="text-xs text-gray-400 mt-1">Across all tables</p>
-        </div>
+        </button>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <button
+          onClick={() => openDrillDown('tables')}
+          className="bg-gray-800 rounded-lg p-5 text-left hover:bg-gray-750 hover:ring-1 hover:ring-purple-500/30 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-2 mb-2">
             <Gauge className="w-4 h-4 text-purple-500" />
             <span className="text-sm font-medium text-gray-400">Table Count</span>
           </div>
           <p className="text-3xl font-bold text-white">{tables.length}</p>
           <p className="text-xs text-gray-400 mt-1">Public schema</p>
-        </div>
+        </button>
       </div>
 
       {/* Tables List */}
@@ -288,6 +411,20 @@ const DatabaseGrowthPanel = memo(function DatabaseGrowthPanel() {
           </p>
         </div>
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });

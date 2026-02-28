@@ -135,10 +135,10 @@ export async function GET(request: NextRequest) {
 
         // Fetch all data in parallel
         const [usersResult, recentEventsResult, allTimeEventsResult, sessionEventsResult] = await Promise.allSettled([
-          // All users
+          // All users (profiles table)
           supabaseAdmin
-            .from('users')
-            .select('id, email, last_seen')
+            .from('profiles')
+            .select('id, email, updated_at')
             .limit(50000),
 
           // Feature events from last 30 days (for engagement scoring)
@@ -231,16 +231,16 @@ export async function GET(request: NextRequest) {
             lastActive = metrics.lastEventDate.toISOString();
             featuresUsed = metrics.features.size;
           } else {
-            // No recent events — check last_seen for some recency signal
-            if (user.last_seen) {
-              const daysSinceLastSeen = Math.floor(
-                (now.getTime() - new Date(user.last_seen).getTime()) / (1000 * 60 * 60 * 24)
+            // No recent events — check updated_at for some recency signal
+            if (user.updated_at) {
+              const daysSinceLastActive = Math.floor(
+                (now.getTime() - new Date(user.updated_at).getTime()) / (1000 * 60 * 60 * 24)
               );
-              score = calculateRecencyScore(daysSinceLastSeen);
+              score = calculateRecencyScore(daysSinceLastActive);
             } else {
               score = 0;
             }
-            lastActive = user.last_seen || '';
+            lastActive = user.updated_at || '';
             featuresUsed = 0;
           }
 

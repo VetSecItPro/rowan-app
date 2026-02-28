@@ -38,9 +38,12 @@ import type {
 // Gemini 2.5 Flash pricing (per 1M tokens)
 // ---------------------------------------------------------------------------
 
+// Pricing from: https://openrouter.ai/google/gemini-2.5-flash
+// Last verified: 2026-02-28
+// Update if model or provider changes
 const GEMINI_PRICING = {
-  input_per_million: 0.30,   // $0.30 / 1M input tokens (Gemini 2.5 Flash)
-  output_per_million: 2.50,  // $2.50 / 1M output tokens (Gemini 2.5 Flash)
+  input_per_million: 0.15,   // $0.15 / 1M input tokens (OpenRouter Gemini 2.5 Flash)
+  output_per_million: 0.60,  // $0.60 / 1M output tokens (OpenRouter Gemini 2.5 Flash)
 };
 
 /** Calculate estimated cost in USD for a token usage record */

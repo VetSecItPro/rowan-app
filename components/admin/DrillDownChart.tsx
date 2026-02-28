@@ -5,16 +5,20 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
+  Cell,
 } from 'recharts';
 
 export interface DrillDownDataPoint {
   date: string;
   value: number;
+  [key: string]: string | number;
 }
 
 interface DrillDownChartProps {
@@ -24,6 +28,14 @@ interface DrillDownChartProps {
   color?: string;
   previousColor?: string;
   formatter?: (value: number) => string;
+  /** Render as bar chart instead of area chart (useful for categorical data) */
+  chartType?: 'area' | 'bar';
+  /** Data key for bar chart values (defaults to 'value') */
+  valueKey?: string;
+  /** Data key for bar chart labels (defaults to 'date') */
+  nameKey?: string;
+  /** Optional color array for individual bars */
+  barColors?: string[];
 }
 
 const CHART_COLORS = {
@@ -41,20 +53,33 @@ export const DrillDownChart = memo(function DrillDownChart({
   color = CHART_COLORS.current,
   previousColor = CHART_COLORS.previous,
   formatter,
+  chartType = 'area',
+  valueKey = 'value',
+  nameKey = 'date',
+  barColors,
 }: DrillDownChartProps) {
   const chartData = useMemo(() => {
+    if (chartType === 'bar') {
+      return data.map((point) => ({ ...point }));
+    }
     return data.map((point, i) => ({
       date: point.date,
       current: point.value,
       previous: previousData?.[i]?.value ?? undefined,
     }));
-  }, [data, previousData]);
+  }, [data, previousData, chartType, valueKey]);
 
   const formatValue = formatter ?? ((v: number) => v.toLocaleString());
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  /** For bar charts, truncate long labels */
+  const formatBarLabel = (label: string) => {
+    if (label.length > 12) return label.slice(0, 12) + '…';
+    return label;
   };
 
   if (data.length === 0) {
@@ -65,6 +90,57 @@ export const DrillDownChart = memo(function DrillDownChart({
     );
   }
 
+  // Bar chart rendering for categorical data
+  if (chartType === 'bar') {
+    return (
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
+            <XAxis
+              dataKey={nameKey}
+              tickFormatter={formatBarLabel}
+              tick={{ fill: CHART_COLORS.text, fontSize: 11 }}
+              axisLine={{ stroke: CHART_COLORS.grid }}
+              tickLine={false}
+              interval={0}
+              angle={data.length > 6 ? -35 : 0}
+              textAnchor={data.length > 6 ? 'end' : 'middle'}
+              height={data.length > 6 ? 60 : 30}
+            />
+            <YAxis
+              tickFormatter={(v) => formatValue(v)}
+              tick={{ fill: CHART_COLORS.text, fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+              width={48}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1f2937',
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '13px',
+              }}
+              formatter={(value) => [formatValue(Number(value ?? 0)), metric]}
+              labelFormatter={(label) => String(label)}
+            />
+            <Bar dataKey={valueKey} radius={[4, 4, 0, 0]}>
+              {chartData.map((_, index) => (
+                <Cell
+                  key={index}
+                  fill={barColors?.[index % (barColors?.length ?? 1)] ?? color}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+
+  // Area chart rendering (default — time-series data)
   return (
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">

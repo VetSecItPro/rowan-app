@@ -4,7 +4,6 @@ import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
-  BarChart3,
   TrendingUp,
   Users,
   Eye,
@@ -59,8 +58,6 @@ interface AnalyticsData {
   summary: {
     totalUsers: number;
     totalNotifications: number;
-    totalBetaRequests: number;
-    activeBetaUsers: number;
     growthRate: number;
     churnRate: number;
     totalPageViews: number;
@@ -73,12 +70,6 @@ interface AnalyticsData {
   osBreakdown: OsBreakdown[];
   topPages: TopPage[];
   hourlyActivity: number[];
-  betaMetrics: {
-    conversionRate: number;
-    approvalRate: number;
-    retentionRate: number;
-    averageActivityScore: number;
-  };
   userGrowth: Array<{ date: string; users: number }>;
 }
 
@@ -356,8 +347,6 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
     summary: {
       totalUsers: 0,
       totalNotifications: 0,
-      totalBetaRequests: 0,
-      activeBetaUsers: 0,
       growthRate: 0,
       churnRate: 0,
       totalPageViews: 0,
@@ -376,12 +365,6 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
     osBreakdown: [],
     topPages: [],
     hourlyActivity: [],
-    betaMetrics: {
-      conversionRate: 0,
-      approvalRate: 0,
-      retentionRate: 0,
-      averageActivityScore: 0,
-    },
     userGrowth: [],
   };
 
@@ -617,40 +600,6 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
             valueKey="count"
             color="orange"
           />
-        </div>
-      </div>
-
-      {/* Beta Program Summary */}
-      <div className="bg-gray-800 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <BarChart3 className="w-4 h-4 text-pink-500" />
-          <h3 className="text-sm font-semibold text-white">Beta Program Summary</h3>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-white">
-              {data?.summary?.totalBetaRequests ?? 0}
-            </p>
-            <p className="text-xs text-gray-400">Beta Requests</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-white">
-              {data?.summary?.activeBetaUsers ?? 0}
-            </p>
-            <p className="text-xs text-gray-400">Active Users</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-white">
-              {data?.betaMetrics?.approvalRate ?? 0}%
-            </p>
-            <p className="text-xs text-gray-400">Approval Rate</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-white">
-              {data?.betaMetrics?.conversionRate ?? 0}%
-            </p>
-            <p className="text-xs text-gray-400">Conversion Rate</p>
-          </div>
         </div>
       </div>
 

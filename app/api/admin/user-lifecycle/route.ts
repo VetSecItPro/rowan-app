@@ -67,37 +67,25 @@ interface LifecycleData {
 }
 
 /**
- * Fetch all users from auth.admin.listUsers with pagination
+ * Fetch all users from the profiles table
  */
-async function fetchAllAuthUsers(): Promise<{ id: string; email?: string; created_at: string }[]> {
-  const allUsers: { id: string; email?: string; created_at: string }[] = [];
-  let page = 1;
-  const perPage = 1000;
+async function fetchAllUsers(): Promise<{ id: string; email?: string; created_at: string }[]> {
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('id, email, created_at')
+    .order('created_at', { ascending: true })
+    .limit(50000);
 
-  while (true) {
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
-
-    if (error) {
-      logger.error('Failed to fetch auth users page:', error, { component: 'api-route', action: 'api_request' });
-      break;
-    }
-
-    if (!data.users || data.users.length === 0) break;
-
-    allUsers.push(
-      ...data.users.map((u) => ({
-        id: u.id,
-        email: u.email,
-        created_at: u.created_at,
-      }))
-    );
-
-    // If we got fewer than perPage, we've reached the last page
-    if (data.users.length < perPage) break;
-    page++;
+  if (error) {
+    logger.error('Failed to fetch profiles:', error, { component: 'api-route', action: 'api_request' });
+    return [];
   }
 
-  return allUsers;
+  return (data || []).map((u) => ({
+    id: u.id,
+    email: u.email ?? undefined,
+    created_at: u.created_at,
+  }));
 }
 
 export async function GET(req: NextRequest) {
@@ -132,10 +120,10 @@ export async function GET(req: NextRequest) {
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
         // Fetch all auth users
-        const authUsers = await fetchAllAuthUsers();
-        const totalUsers = authUsers.length;
-        const userIds = authUsers.map((u) => u.id);
-        const userCreatedMap = new Map(authUsers.map((u) => [u.id, new Date(u.created_at)]));
+        const allUsers = await fetchAllUsers();
+        const totalUsers = allUsers.length;
+        const userIds = allUsers.map((u) => u.id);
+        const userCreatedMap = new Map(allUsers.map((u) => [u.id, new Date(u.created_at)]));
 
         // Parallel data fetching
         const [
@@ -263,7 +251,7 @@ export async function GET(req: NextRequest) {
           churned: 0,
         };
 
-        authUsers.forEach((user) => {
+        allUsers.forEach((user) => {
           const createdAt = userCreatedMap.get(user.id)!;
           const daysSinceSignup = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
           const lastEvent = userLastEvent.get(user.id);
@@ -358,7 +346,7 @@ export async function GET(req: NextRequest) {
         });
 
         const timeToValueHours: number[] = [];
-        authUsers.forEach((user) => {
+        allUsers.forEach((user) => {
           const firstEvent = userFirstMeaningfulEvent.get(user.id);
           if (!firstEvent) return;
           const signupDate = userCreatedMap.get(user.id)!;
@@ -413,8 +401,8 @@ export async function GET(req: NextRequest) {
             const gapDays = (events[i].getTime() - events[i - 1].getTime()) / (1000 * 60 * 60 * 24);
             if (gapDays >= 30) {
               hadChurnGap = true;
-              // Check if there are events after this gap
-              if (i < events.length) {
+              // Check if there are events AFTER this gap (not just the gap-ending event itself)
+              if (i < events.length - 1) {
                 returnedAfterGap = true;
               }
             }
@@ -428,8 +416,24 @@ export async function GET(req: NextRequest) {
           }
         });
 
-        // Also count users who are currently churned (no events in 30+ days, signup > 30 days ago)
-        authUsers.forEach((user) => {
+        // Track users already counted as churned from the timeline loop
+        const countedInTimeline = new Set<string>();
+        userEventTimeline.forEach((events, userId) => {
+          if (events.length < 2) return;
+          events.sort((a, b) => a.getTime() - b.getTime());
+          for (let i = 1; i < events.length; i++) {
+            const gapDays = (events[i].getTime() - events[i - 1].getTime()) / (1000 * 60 * 60 * 24);
+            if (gapDays >= 30) {
+              countedInTimeline.add(userId);
+              break;
+            }
+          }
+        });
+
+        // Count users who are currently churned but weren't caught by the timeline gap loop
+        allUsers.forEach((user) => {
+          if (countedInTimeline.has(user.id)) return; // Already counted
+
           const lastEvent = userLastEvent.get(user.id);
           const createdAt = userCreatedMap.get(user.id)!;
           const daysSinceSignup = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
@@ -440,8 +444,8 @@ export async function GET(req: NextRequest) {
               totalChurnedEver++;
             } else {
               const daysSinceLastEvent = (now.getTime() - lastEvent.getTime()) / (1000 * 60 * 60 * 24);
-              // Currently churned but no gap detected in timeline (only had events, then stopped)
-              if (daysSinceLastEvent >= 30 && !userEventTimeline.has(user.id)) {
+              // Had events but currently inactive 30+ days (no internal gap, just went silent)
+              if (daysSinceLastEvent >= 30) {
                 totalChurnedEver++;
               }
             }

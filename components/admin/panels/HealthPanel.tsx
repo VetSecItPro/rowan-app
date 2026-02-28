@@ -2,6 +2,7 @@
 
 import { memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   HeartPulse,
   CheckCircle,
@@ -76,7 +77,7 @@ export const HealthPanel = memo(function HealthPanel() {
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['admin-health'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/health');
+      const response = await adminFetch('/api/admin/health');
       if (!response.ok) throw new Error('Failed to fetch health data');
       const result = await response.json();
       return {

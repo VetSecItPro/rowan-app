@@ -2,6 +2,7 @@
 
 import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   Layers,
   TrendingUp,
@@ -9,6 +10,8 @@ import {
   Minus,
   RefreshCw,
 } from 'lucide-react';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface FeatureUsageSummary {
   feature: string;
@@ -78,11 +81,21 @@ const DeviceBar = memo(function DeviceBar({ breakdown }: { breakdown: { mobile: 
 export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
 
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
   // React Query for feature usage with caching
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin-feature-usage', timeRange],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/feature-usage?range=${timeRange}`);
+      const response = await adminFetch(`/api/admin/feature-usage?range=${timeRange}`);
       if (!response.ok) throw new Error('Failed to fetch feature usage');
       const result = await response.json();
       if (result.success) {
@@ -97,6 +110,57 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
   const fetchData = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Open drill-down for a specific stat card metric
+  const openDrillDown = useCallback((metric: string) => {
+    if (!data) return;
+    let drillData: DrillDownDataPoint[] = [];
+    let title = '';
+    let color = '#f59e0b';
+    const chartType: 'area' | 'bar' = 'bar';
+
+    const summary = data.summary ?? [];
+
+    switch (metric) {
+      case 'views':
+        drillData = summary.map((f) => ({
+          date: f.displayName,
+          value: f.pageViews,
+        }));
+        title = 'Page Views by Feature';
+        color = '#3b82f6';
+        break;
+      case 'users':
+        drillData = summary.map((f) => ({
+          date: f.displayName,
+          value: f.uniqueUsers,
+        }));
+        title = 'Unique Users by Feature';
+        color = '#8b5cf6';
+        break;
+      case 'actions':
+        drillData = summary.map((f) => ({
+          date: f.displayName,
+          value: f.totalActions,
+        }));
+        title = 'Total Actions by Feature';
+        color = '#10b981';
+        break;
+      case 'devices':
+        drillData = [
+          { date: 'Mobile', value: data.totals?.deviceBreakdown?.mobile ?? 0 },
+          { date: 'Desktop', value: data.totals?.deviceBreakdown?.desktop ?? 0 },
+          { date: 'Tablet', value: data.totals?.deviceBreakdown?.tablet ?? 0 },
+        ];
+        title = 'Device Breakdown';
+        color = '#06b6d4';
+        break;
+    }
+
+    if (drillData.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data: drillData, color, chartType });
+    }
+  }, [data]);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -153,15 +217,33 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
       {/* Stats Row - All 7 cards in single row */}
       <div className="overflow-x-auto">
       <div className="grid grid-cols-7 gap-2 flex-shrink-0 min-w-[600px]">
-        <div className="bg-gray-800 rounded-lg p-2 text-center">
+        <div
+          className="bg-gray-800 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('views')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('views'); }}
+        >
           <p className="text-lg font-bold text-white">{formatNumber(data?.totals?.totalPageViews ?? 0)}</p>
           <p className="text-xs text-gray-400">Views</p>
         </div>
-        <div className="bg-gray-800 rounded-lg p-2 text-center">
+        <div
+          className="bg-gray-800 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('users')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('users'); }}
+        >
           <p className="text-lg font-bold text-white">{formatNumber(data?.totals?.totalUniqueUsers ?? 0)}</p>
           <p className="text-xs text-gray-400">Users</p>
         </div>
-        <div className="bg-gray-800 rounded-lg p-2 text-center">
+        <div
+          className="bg-gray-800 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('actions')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('actions'); }}
+        >
           <p className="text-lg font-bold text-white">{formatNumber(data?.totals?.totalActions ?? 0)}</p>
           <p className="text-xs text-gray-400">Actions</p>
         </div>
@@ -169,15 +251,33 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
           <p className="text-lg font-bold text-amber-400">{data?.summary?.length ?? 0}</p>
           <p className="text-xs text-amber-400">Features</p>
         </div>
-        <div className="bg-gray-800 rounded-lg p-2 text-center">
+        <div
+          className="bg-gray-800 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('devices')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('devices'); }}
+        >
           <p className="text-lg font-bold text-blue-400">{formatNumber(data?.totals?.deviceBreakdown?.mobile ?? 0)}</p>
           <p className="text-xs text-gray-400">Mobile</p>
         </div>
-        <div className="bg-gray-800 rounded-lg p-2 text-center">
+        <div
+          className="bg-gray-800 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('devices')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('devices'); }}
+        >
           <p className="text-lg font-bold text-purple-400">{formatNumber(data?.totals?.deviceBreakdown?.desktop ?? 0)}</p>
           <p className="text-xs text-gray-400">Desktop</p>
         </div>
-        <div className="bg-gray-800 rounded-lg p-2 text-center">
+        <div
+          className="bg-gray-800 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('devices')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('devices'); }}
+        >
           <p className="text-lg font-bold text-green-400">{formatNumber(data?.totals?.deviceBreakdown?.tablet ?? 0)}</p>
           <p className="text-xs text-gray-400">Tablet</p>
         </div>
@@ -242,6 +342,21 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
           )}
         </div>
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle={`Last ${timeRange === '7d' ? '7 days' : timeRange === '30d' ? '30 days' : '90 days'}`}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });
