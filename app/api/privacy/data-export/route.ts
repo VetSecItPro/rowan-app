@@ -307,6 +307,11 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
   };
 
   try {
+    // NOTE: The following queries intentionally use select('*') because this is a GDPR
+    // "right of access" data export. Regulations require providing a complete copy of all
+    // personal data — column-pruning would violate compliance obligations. Do not replace
+    // select('*') here with specific column lists.
+
     // Profile data
     if (includeData?.profile !== false) {
       const { data: profile } = await supabase
@@ -544,7 +549,7 @@ async function sendExportReadyEmail(
     }
 
     await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: profile.email,
       subject: 'Your Data Export is Ready',
       html: `

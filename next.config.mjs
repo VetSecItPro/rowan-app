@@ -16,13 +16,17 @@ const nextConfig = {
   outputFileTracingRoot: __dirname,
 
   typescript: {
-    // Skip type-check on Vercel — 300K LoC OOMs on 8GB build machine.
-    // Always run `pnpm type-check` locally before pushing.
+    // SECURITY NOTE (F-006): TypeScript checking is SKIPPED during `next build`
+    // because Vercel's 8 GB build machine OOMs on this codebase (~300K LoC).
+    // Enforcement: CI runs `pnpm type-check` as a REQUIRED check on every PR.
+    // See .github/workflows/ci.yml → "quality" job.
     ignoreBuildErrors: true,
   },
   eslint: {
-    // ESLint has a circular structure error - skip during builds
-    // Run ESLint separately with: npm run lint
+    // SECURITY NOTE (F-006): ESLint is SKIPPED during `next build`
+    // because of a circular structure error in the ESLint config.
+    // Enforcement: CI runs `pnpm lint` as a REQUIRED check on every PR.
+    // See .github/workflows/ci.yml → "quality" job.
     ignoreDuringBuilds: true,
   },
   // Workaround for Next.js 15.x Html import bug

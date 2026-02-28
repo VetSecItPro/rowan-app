@@ -505,7 +505,19 @@ export const CalendarConnections = memo(function CalendarConnections() {
       }
 
       // Redirect to OAuth provider
+      // SECURITY: Validate the OAuth URL to prevent open redirect attacks.
+      // Only allow known OAuth provider domains.
       if (data.auth_url) {
+        const allowedOrigins = [
+          'https://accounts.google.com',
+          'https://login.microsoftonline.com',
+        ];
+        const isAllowedOAuthUrl = allowedOrigins.some((origin) =>
+          data.auth_url.startsWith(origin)
+        );
+        if (!isAllowedOAuthUrl) {
+          throw new Error('Unexpected OAuth redirect URL from server');
+        }
         logger.info('[CalendarConnections] Redirecting to OAuth:', { component: 'CalendarConnections', data: data.auth_url });
         window.location.href = data.auth_url;
       }

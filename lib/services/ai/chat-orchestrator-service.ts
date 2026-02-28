@@ -14,6 +14,15 @@
  * All tools auto-execute immediately. Results are sent back to the model for
  * a natural-language follow-up. No confirmation step — all Rowan actions
  * are low-stakes and easily reversible (add/edit/delete tasks, meals, etc.).
+ *
+ * SECURITY NOTE (F-037 — Excessive Agency on AI Tool Calls):
+ * Tool calls are auto-executed without an explicit user confirmation step.
+ * This is an intentional design decision: all available tools operate within
+ * the authenticated user's own space (enforced by RLS), actions are limited
+ * to household data (tasks, meals, events, etc.), and all writes are
+ * reversible. If the scope of available tools ever expands to include
+ * irreversible or high-privilege operations (e.g., account deletion,
+ * payment actions, admin functions), a confirmation gate should be added.
  */
 
 import OpenAI from 'openai';
@@ -239,6 +248,125 @@ const historyCache = new LRUCache<string, ChatCompletionMessageParam[]>({
 });
 
 // ---------------------------------------------------------------------------
+// Destructive tool confirmation gate (F-037)
+// ---------------------------------------------------------------------------
+
+/**
+ * Tool names that are considered destructive (irreversible deletes).
+ * When the AI wants to call one of these, execution is held and the user
+ * is asked to confirm before proceeding.
+ *
+ * Bulk completion tools are intentionally NOT listed here — completing
+ * items is not irreversible (status can be reverted) and the UX cost of
+ * confirming every bulk action outweighs the risk.
+ */
+const DESTRUCTIVE_TOOL_NAMES = new Set([
+  'delete_task',
+  'delete_chore',
+  'delete_event',
+  'delete_reminder',
+  'delete_shopping_item',
+  'delete_shopping_list',
+  'delete_meal',
+  'delete_goal',
+  'delete_goal_checkin',
+  'delete_expense',
+  'delete_bill',
+  'delete_project',
+  'delete_message',
+  'delete_task_comment',
+]);
+
+interface PendingToolCall {
+  id: string;
+  name: string;
+  args: Record<string, unknown>;
+  /** Human-readable description of what will be deleted, for the confirmation message. */
+  description: string;
+  /** Expiry timestamp — pending actions expire after 5 minutes of inactivity. */
+  expiresAt: number;
+}
+
+/** Pending destructive actions awaiting user confirmation: conversationId -> action */
+const pendingConfirmations = new LRUCache<string, PendingToolCall>({
+  max: 100,
+  ttl: 5 * 60 * 1000, // 5 minutes — stale pending actions expire automatically
+});
+
+/** Phrases that count as a user confirming a pending destructive action */
+const CONFIRMATION_PHRASES = [
+  'yes',
+  'confirm',
+  'go ahead',
+  'do it',
+  'proceed',
+  'ok',
+  'okay',
+  'sure',
+  'yep',
+  'yeah',
+  'delete it',
+  'delete them',
+  'remove it',
+  'remove them',
+];
+
+/**
+ * Returns true if the user's message is a confirmation of a pending action.
+ */
+function isConfirmation(message: string): boolean {
+  const normalized = message.trim().toLowerCase();
+  return CONFIRMATION_PHRASES.some(
+    (phrase) => normalized === phrase || normalized.startsWith(phrase + ' ') || normalized.endsWith(' ' + phrase)
+  );
+}
+
+/**
+ * Build a human-readable description of what a destructive tool will do,
+ * so the confirmation message is specific rather than generic.
+ */
+function buildDestructiveDescription(toolName: string, args: Record<string, unknown>): string {
+  // Prefer an explicit name/title arg, fall back to ID or generic label
+  const label =
+    (args.title as string | undefined) ||
+    (args.name as string | undefined) ||
+    (args.task_id as string | undefined) ||
+    (args.event_id as string | undefined) ||
+    (args.reminder_id as string | undefined) ||
+    (args.shopping_item_id as string | undefined) ||
+    (args.shopping_list_id as string | undefined) ||
+    (args.meal_id as string | undefined) ||
+    (args.goal_id as string | undefined) ||
+    (args.expense_id as string | undefined) ||
+    (args.bill_id as string | undefined) ||
+    (args.project_id as string | undefined) ||
+    (args.message_id as string | undefined) ||
+    (args.chore_id as string | undefined) ||
+    (args.checkin_id as string | undefined) ||
+    (args.comment_id as string | undefined) ||
+    'this item';
+
+  const actionMap: Record<string, string> = {
+    delete_task: `delete the task "${label}"`,
+    delete_chore: `delete the chore "${label}"`,
+    delete_event: `delete the event "${label}"`,
+    delete_reminder: `delete the reminder "${label}"`,
+    delete_shopping_item: `delete the shopping item "${label}"`,
+    delete_shopping_list: `delete the shopping list "${label}"`,
+    delete_meal: `delete the meal "${label}"`,
+    delete_goal: `delete the goal "${label}"`,
+    delete_goal_checkin: `delete the goal check-in "${label}"`,
+    delete_expense: `delete the expense "${label}"`,
+    delete_bill: `delete the bill "${label}"`,
+    delete_project: `delete the project "${label}"`,
+    delete_message: `delete the message "${label}"`,
+    delete_task_comment: `delete the comment "${label}"`,
+  };
+
+  return actionMap[toolName] ?? `perform a destructive action on "${label}"`;
+}
+
+// ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
 
@@ -295,11 +423,78 @@ class ChatOrchestratorService {
   /**
    * Process a user message and yield streaming events.
    * Tries PRIMARY_MODEL first; on failure, falls back to FALLBACK_MODEL.
+   *
+   * SECURITY (F-037): Before forwarding the message to the LLM, we check
+   * whether there is a pending destructive action awaiting confirmation for
+   * this conversation. If the user's message is a confirmation phrase, the
+   * stored action is executed immediately without an additional LLM round-trip.
+   * If the user's message is NOT a confirmation, the pending action is cleared
+   * (the user implicitly cancelled) and normal processing resumes.
    */
   async *processMessage(
     params: ProcessMessageParams
   ): AsyncGenerator<ChatStreamEvent> {
     const { message, conversationId, context, spaceContext } = params;
+
+    // -- Pending confirmation check (F-037) ----------------------------------
+    const pending = pendingConfirmations.get(conversationId);
+    if (pending) {
+      if (pending.expiresAt < Date.now()) {
+        // Expired — discard silently and proceed with normal processing
+        pendingConfirmations.delete(conversationId);
+      } else if (isConfirmation(message)) {
+        // User confirmed — execute the stored destructive action now
+        pendingConfirmations.delete(conversationId);
+
+        const history = this.getHistory(conversationId);
+        history.push({ role: 'user', content: message });
+
+        yield {
+          type: 'tool_call',
+          data: {
+            id: pending.id,
+            toolName: pending.name,
+            parameters: pending.args,
+          },
+        };
+
+        const toolResult = await executeTool(pending.name, pending.args, context);
+
+        history.push({
+          role: 'tool',
+          tool_call_id: pending.id,
+          content: JSON.stringify(toolResult),
+        });
+
+        yield {
+          type: 'result',
+          data: {
+            id: pending.id,
+            toolName: pending.name,
+            success: toolResult.success,
+            data: toolResult.data,
+            message: toolResult.message,
+          },
+        };
+
+        // Synthesize a brief assistant confirmation so the conversation reads naturally
+        const confirmText = toolResult.success
+          ? `Done — I've ${pending.description.replace(/^delete/, 'deleted').replace(/^remove/, 'removed')}.`
+          : `Sorry, I wasn't able to complete that action: ${toolResult.message}`;
+
+        history.push({ role: 'assistant', content: confirmText });
+        this.saveHistory(conversationId, history);
+
+        yield { type: 'text', data: confirmText };
+        yield { type: 'done', data: '' };
+        return;
+      } else {
+        // User didn't confirm — treat as cancellation and resume normal flow
+        pendingConfirmations.delete(conversationId);
+        // Continue below to process the new message normally
+      }
+    }
+    // -- End pending confirmation check --------------------------------------
 
     try {
       const systemPrompt = spaceContext
@@ -363,6 +558,7 @@ class ChatOrchestratorService {
           systemPrompt,
           context,
           usedModel,
+          conversationId,
         );
       } else if (result.text) {
         history.push({ role: 'assistant', content: result.text });
@@ -473,10 +669,18 @@ class ChatOrchestratorService {
   /**
    * Process function calls in a multi-turn loop.
    *
-   * All tools auto-execute immediately. Results are sent back to the model.
+   * Non-destructive tools auto-execute immediately and their results are sent
+   * back to the model. Destructive tools (any tool in DESTRUCTIVE_TOOL_NAMES)
+   * are intercepted before execution: a confirmation message is returned to the
+   * user and the action is stored in `pendingConfirmations`. The next user
+   * message is checked at the top of `processMessage` — if it is a confirmation
+   * phrase, the action executes then; otherwise it is discarded.
+   *
    * If the model's follow-up contains MORE function calls (e.g., it listed
    * items first, now wants to complete them), we loop and execute those too.
    * Loops up to MAX_TOOL_ROUNDS times to prevent runaway cycles.
+   *
+   * SECURITY (F-037): Destructive tool confirmation gate implemented here.
    */
   private async *handleFunctionCalls(
     calls: Array<{ id: string; name: string; args: Record<string, unknown> }>,
@@ -484,6 +688,7 @@ class ChatOrchestratorService {
     systemPrompt: string,
     context: ToolExecutionContext,
     model: string = PRIMARY_MODEL,
+    conversationId?: string,
   ): AsyncGenerator<ChatStreamEvent> {
     let currentCalls = calls;
     let round = 0;
@@ -491,8 +696,57 @@ class ChatOrchestratorService {
     while (currentCalls.length > 0 && round < ChatOrchestratorService.MAX_TOOL_ROUNDS) {
       round++;
 
-      // Execute each tool call and add results to history
+      // Separate destructive calls (need confirmation) from safe calls (auto-execute)
+      const safeCalls: typeof currentCalls = [];
+      const destructiveCalls: typeof currentCalls = [];
+
       for (const fc of currentCalls) {
+        if (DESTRUCTIVE_TOOL_NAMES.has(fc.name)) {
+          destructiveCalls.push(fc);
+        } else {
+          safeCalls.push(fc);
+        }
+      }
+
+      // -- Handle destructive tools: request confirmation, do NOT execute ----
+      if (destructiveCalls.length > 0 && conversationId) {
+        // If there are multiple destructive calls, handle the first and defer the rest.
+        // In practice the model rarely issues multiple deletes in one turn, but we
+        // guard against it by only storing the first pending action.
+        const fc = destructiveCalls[0];
+        const description = buildDestructiveDescription(fc.name, fc.args);
+
+        const confirmationPrompt =
+          destructiveCalls.length === 1
+            ? `I'd like to ${description}. This action cannot be undone. Please reply "yes" or "confirm" to proceed, or say anything else to cancel.`
+            : `I'd like to ${description} (and ${destructiveCalls.length - 1} other item${destructiveCalls.length - 1 > 1 ? 's' : ''}). This action cannot be undone. Please reply "yes" or "confirm" to proceed, or say anything else to cancel.`;
+
+        // Store the first destructive action as pending
+        pendingConfirmations.set(conversationId, {
+          id: fc.id,
+          name: fc.name,
+          args: fc.args,
+          description,
+          expiresAt: Date.now() + 5 * 60 * 1000,
+        });
+
+        logger.info('[ChatOrchestrator] Destructive tool intercepted — awaiting confirmation', {
+          component: 'ai-chat-orchestrator',
+          action: 'destructive_tool_intercepted',
+          toolName: fc.name,
+          conversationId,
+        });
+
+        // Surface the confirmation prompt to the user
+        yield { type: 'text', data: confirmationPrompt };
+        history.push({ role: 'assistant', content: confirmationPrompt });
+
+        // Don't loop further — we're waiting for confirmation
+        return;
+      }
+
+      // -- Execute safe (non-destructive) tools immediately ------------------
+      for (const fc of safeCalls) {
         yield {
           type: 'tool_call',
           data: {
@@ -521,6 +775,12 @@ class ChatOrchestratorService {
             message: toolResult.message,
           },
         };
+      }
+
+      // If all calls this round were destructive (handled above), we've already returned.
+      // If there were no safe calls either, exit the loop.
+      if (safeCalls.length === 0) {
+        break;
       }
 
       // Send results back to model — check if it wants MORE tool calls
@@ -621,9 +881,10 @@ class ChatOrchestratorService {
 
   // -- Utilities -----------------------------------------------------------
 
-  /** Clear a conversation's history from memory */
+  /** Clear a conversation's history and any pending confirmation from memory */
   clearConversation(conversationId: string): void {
     historyCache.delete(conversationId);
+    pendingConfirmations.delete(conversationId);
   }
 }
 

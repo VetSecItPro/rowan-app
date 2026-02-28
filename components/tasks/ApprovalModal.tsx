@@ -120,12 +120,12 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     }
 
     try {
-      await taskApprovalsService.updateApprovalStatus(approvalId, 'approved', reviewNote);
+      await taskApprovalsService.updateApprovalStatus(approvalId, 'approved', reviewNote, undefined, currentUserId);
       setReviewNote('');
       loadApprovals();
     } catch (error) {
       logger.error('Error approving:', error, { component: 'ApprovalModal', action: 'component_action' });
-      showError('Failed to approve');
+      showError(error instanceof Error ? error.message : 'Failed to approve');
     }
   }
 
@@ -136,7 +136,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     }
 
     try {
-      await taskApprovalsService.updateApprovalStatus(approvalId, 'rejected', reviewNote);
+      await taskApprovalsService.updateApprovalStatus(approvalId, 'rejected', reviewNote, undefined, currentUserId);
       setReviewNote('');
       loadApprovals();
     } catch (error) {

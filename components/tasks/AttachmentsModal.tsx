@@ -82,7 +82,8 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
   async function handleDownload(attachment: TaskAttachment) {
     try {
       const url = await taskAttachmentsService.getAttachmentUrl((attachment as TaskAttachment & { file_path?: string }).file_path ?? '');
-      window.open(url, '_blank');
+      const safeUrl = url.startsWith('https://') || url.startsWith('http://') ? url : null;
+      if (safeUrl) window.open(safeUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {
       logger.error('Error downloading file:', error, { component: 'AttachmentsModal', action: 'component_action' });
     }

@@ -29,7 +29,7 @@ interface SignupResult {
 async function attemptSignup(userId: number): Promise<SignupResult> {
   const startTime = Date.now();
   const email = `breaking-point-test-${Date.now()}-user${userId}@test.rowan.test`;
-  const password = 'BreakingPoint$Test2026!Secure';
+  const password = process.env.LOAD_TEST_PASSWORD || 'changeme';
 
   const supabase = createClient(SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 

@@ -10,6 +10,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +19,13 @@ export const dynamic = 'force-dynamic';
 // GET — Export all AI data for the authenticated user
 // ---------------------------------------------------------------------------
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
+  const ip = extractIP(req.headers);
+  const { success: rateLimitOk } = await checkGeneralRateLimit(ip);
+  if (!rateLimitOk) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
@@ -29,7 +37,8 @@ export async function GET(_req: NextRequest) {
     const { data: conversations, error: convError } = await supabase
       .from('ai_conversations')
       .select('id, space_id, title, started_at, last_message_at, message_count, summary, model_used, total_input_tokens, total_output_tokens, created_at')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (convError) {
       logger.error('[AI Data] Failed to export conversations', convError);
@@ -45,7 +54,8 @@ export async function GET(_req: NextRequest) {
         .from('ai_messages')
         .select('id, conversation_id, role, content, input_type, tool_calls_json, tool_results_json, input_tokens, output_tokens, model_used, latency_ms, created_at')
         .in('conversation_id', conversationIds)
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true })
+        .limit(10000);
 
       if (msgError) {
         logger.error('[AI Data] Failed to export messages', msgError);
@@ -99,7 +109,13 @@ export async function GET(_req: NextRequest) {
 // DELETE — Delete all AI data for the authenticated user
 // ---------------------------------------------------------------------------
 
-export async function DELETE(_req: NextRequest) {
+export async function DELETE(req: NextRequest) {
+  const ip = extractIP(req.headers);
+  const { success: rateLimitOk } = await checkGeneralRateLimit(ip);
+  if (!rateLimitOk) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {

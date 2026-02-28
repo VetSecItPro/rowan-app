@@ -70,6 +70,10 @@ export const rewardsService = {
    * Create a new reward
    */
   async createReward(input: CreateRewardInput): Promise<RewardCatalogItem> {
+    if (input.cost_points < 0) {
+      throw new Error('cost_points must be non-negative');
+    }
+
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -99,6 +103,10 @@ export const rewardsService = {
    * Update a reward
    */
   async updateReward(rewardId: string, input: UpdateRewardInput): Promise<RewardCatalogItem> {
+    if (input.cost_points !== undefined && input.cost_points < 0) {
+      throw new Error('cost_points must be non-negative');
+    }
+
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -296,6 +304,22 @@ export const rewardsService = {
     approvedBy: string
   ): Promise<RewardRedemption> {
     const supabase = createClient();
+
+    // Security: Verify approver is not the same user who requested the redemption
+    const { data: redemption, error: fetchError } = await supabase
+      .from('reward_redemptions')
+      .select('user_id')
+      .eq('id', redemptionId)
+      .eq('status', 'pending')
+      .single();
+
+    if (fetchError || !redemption) {
+      throw new Error('Redemption not found or already processed');
+    }
+
+    if (redemption.user_id === approvedBy) {
+      throw new Error('Cannot approve your own redemption');
+    }
 
     const { data, error } = await supabase
       .from('reward_redemptions')

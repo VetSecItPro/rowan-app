@@ -82,9 +82,11 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
   const handleDownload = (attachment: ReminderAttachment) => {
     if (attachment.type === 'file' && attachment.file_path) {
       const url = reminderAttachmentsService.getFileUrl(attachment.file_path);
-      window.open(url, '_blank');
+      const safeUrl = url.startsWith('https://') || url.startsWith('http://') ? url : null;
+      if (safeUrl) window.open(safeUrl, '_blank', 'noopener,noreferrer');
     } else if (attachment.type === 'url' && attachment.url) {
-      window.open(attachment.url, '_blank');
+      const safeUrl = attachment.url.startsWith('https://') || attachment.url.startsWith('http://') ? attachment.url : null;
+      if (safeUrl) window.open(safeUrl, '_blank', 'noopener,noreferrer');
     }
   };
 

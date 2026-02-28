@@ -9,6 +9,7 @@ import {
 } from '@/lib/services/bulk-operations-service';
 import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 const ArchiveRequestSchema = z.object({
   partnership_id: z.string().uuid().optional(),
@@ -31,6 +32,10 @@ const ArchiveRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limit check - expensive operation (5 per hour)
     const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkExpensiveOperationRateLimit(ip);

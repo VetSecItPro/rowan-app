@@ -26,6 +26,7 @@ function makeChain(resolvedValue: unknown) {
 const SPACE_ID = '550e8400-e29b-41d4-a716-446655440001';
 const REWARD_ID = '550e8400-e29b-41d4-a716-446655440002';
 const USER_ID = '550e8400-e29b-41d4-a716-446655440003';
+const APPROVER_ID = '550e8400-e29b-41d4-a716-446655440099';
 const REDEMPTION_ID = '550e8400-e29b-41d4-a716-446655440004';
 
 const MOCK_REWARD = {
@@ -407,29 +408,59 @@ describe('rewardsService', () => {
   describe('approveRedemption()', () => {
     it('should approve a pending redemption', async () => {
       const { createClient } = await import('@/lib/supabase/client');
-      const approved = { ...MOCK_REDEMPTION, status: 'approved', approved_by: USER_ID };
-      const chain = makeChain({ data: approved, error: null });
+      // First call: fetch redemption for self-approval check (returns user_id != approver)
+      const selfCheckChain = makeChain({ data: { user_id: USER_ID }, error: null });
+      // Second call: update redemption status
+      const approved = { ...MOCK_REDEMPTION, status: 'approved', approved_by: APPROVER_ID };
+      const updateChain = makeChain({ data: approved, error: null });
+
+      const fromMock = vi.fn()
+        .mockReturnValueOnce(selfCheckChain)   // self-approval check
+        .mockReturnValueOnce(updateChain);      // actual update
+
       vi.mocked(createClient).mockReturnValue({
-        from: vi.fn().mockReturnValue(chain),
+        from: fromMock,
       } as unknown as ReturnType<typeof createClient>);
 
       const { rewardsService } = await import('@/lib/services/rewards/rewards-service');
-      const result = await rewardsService.approveRedemption(REDEMPTION_ID, USER_ID);
+      const result = await rewardsService.approveRedemption(REDEMPTION_ID, APPROVER_ID);
 
       expect(result.status).toBe('approved');
     });
 
-    it('should throw when approval fails', async () => {
+    it('should throw when approver is the same user (F-003)', async () => {
       const { createClient } = await import('@/lib/supabase/client');
-      const chain = makeChain({ data: null, error: { message: 'Update failed' } });
+      const selfCheckChain = makeChain({ data: { user_id: USER_ID }, error: null });
       vi.mocked(createClient).mockReturnValue({
-        from: vi.fn().mockReturnValue(chain),
+        from: vi.fn().mockReturnValue(selfCheckChain),
       } as unknown as ReturnType<typeof createClient>);
 
       const { rewardsService } = await import('@/lib/services/rewards/rewards-service');
 
       await expect(
         rewardsService.approveRedemption(REDEMPTION_ID, USER_ID)
+      ).rejects.toThrow('Cannot approve your own redemption');
+    });
+
+    it('should throw when approval fails', async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      // Self-approval check passes (different user)
+      const selfCheckChain = makeChain({ data: { user_id: USER_ID }, error: null });
+      // Update fails
+      const updateChain = makeChain({ data: null, error: { message: 'Update failed' } });
+
+      const fromMock = vi.fn()
+        .mockReturnValueOnce(selfCheckChain)
+        .mockReturnValueOnce(updateChain);
+
+      vi.mocked(createClient).mockReturnValue({
+        from: fromMock,
+      } as unknown as ReturnType<typeof createClient>);
+
+      const { rewardsService } = await import('@/lib/services/rewards/rewards-service');
+
+      await expect(
+        rewardsService.approveRedemption(REDEMPTION_ID, APPROVER_ID)
       ).rejects.toThrow('Failed to approve redemption');
     });
   });

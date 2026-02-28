@@ -4,6 +4,13 @@ on:
   pull_request:
     branches: [main]
 
+# F-019: Minimal token permissions — prevents supply-chain attacks from
+# exfiltrating the GITHUB_TOKEN with write access.
+# TODO: Pin action versions to full SHA (e.g. actions/checkout@<sha>) once
+# a Dependabot/Renovate workflow is in place to keep SHAs up to date.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -55,8 +62,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Dependency audit
+        # F-006: Fail CI on HIGH+ vulnerabilities — enforces supply chain security
         run: pnpm audit --audit-level=high
-        continue-on-error: true
 
       - name: Secret pattern scan
         run: |

@@ -99,36 +99,84 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
 
     if (deletionRecordError) throw deletionRecordError;
 
-    // Cascade delete personal data across all tables
+    // F-040: Comprehensive cascade delete across ALL user data tables.
+    // Order matters: delete child/junction rows before parent rows to
+    // respect foreign key constraints.
+
+    // ── Phase 1: User-scoped data (keyed by user_id, not space_id) ──
+    // These tables reference the user directly regardless of space.
+
+    // AI data
+    await supabase.from('ai_messages').delete().eq('user_id', userId);
+    await supabase.from('ai_conversations').delete().eq('user_id', userId);
+    await supabase.from('ai_user_settings').delete().eq('user_id', userId);
+
+    // Notifications & push
+    await supabase.from('in_app_notifications').delete().eq('user_id', userId);
+    await supabase.from('push_tokens').delete().eq('user_id', userId);
+    await supabase.from('notification_preferences').delete().eq('user_id', userId);
+
+    // User preferences & presence
+    await supabase.from('user_locations').delete().eq('user_id', userId);
+    await supabase.from('user_feedback').delete().eq('user_id', userId);
+    await supabase.from('user_audit_log').delete().eq('user_id', userId);
+
+    // Achievements & points
+    await supabase.from('achievement_progress').delete().eq('user_id', userId);
+    await supabase.from('achievement_badges').delete().eq('user_id', userId);
+    await supabase.from('point_transactions').delete().eq('user_id', userId);
+
+    // Data export requests
+    await supabase.from('account_deletion_requests').delete().eq('user_id', userId);
+
+    // ── Phase 2: Space-scoped data (keyed by space_id) ──
     if (spaceIds.length > 0) {
-      // Delete expenses
+      // Goal child tables (must delete before goals)
+      await supabase.from('goal_check_ins').delete().in('space_id', spaceIds);
+      await supabase.from('goal_contributions').delete().in('space_id', spaceIds);
+
+      // Task child tables (must delete before tasks)
+      await supabase.from('task_time_entries').delete().in('space_id', spaceIds);
+
+      // Mentions
+      await supabase.from('mentions').delete().in('space_id', spaceIds);
+
+      // Location & geofencing
+      await supabase.from('geofence_events').delete().in('space_id', spaceIds);
+      await supabase.from('location_sharing_settings').delete().in('space_id', spaceIds);
+      await supabase.from('availability_blocks').delete().in('space_id', spaceIds);
+
+      // Calendar integrations
+      await supabase.from('calendar_connections').delete().in('space_id', spaceIds);
+
+      // Expenses
       await supabase.from('expenses').delete().in('space_id', spaceIds);
 
-      // Delete budgets
+      // Budgets
       await supabase.from('budgets').delete().in('space_id', spaceIds);
 
-      // Delete bills
+      // Bills
       await supabase.from('bills').delete().in('space_id', spaceIds);
 
-      // Delete goals
+      // Goals (after child tables)
       await supabase.from('goals').delete().in('space_id', spaceIds);
 
-      // Delete projects
+      // Projects
       await supabase.from('projects').delete().in('space_id', spaceIds);
 
-      // Delete tasks
+      // Tasks (after child tables)
       await supabase.from('tasks').delete().in('space_id', spaceIds);
 
-      // Delete calendar events
+      // Calendar events
       await supabase.from('events').delete().in('space_id', spaceIds);
 
-      // Delete reminders
+      // Reminders
       await supabase.from('reminders').delete().in('space_id', spaceIds);
 
-      // Delete messages
+      // Messages
       await supabase.from('messages').delete().in('space_id', spaceIds);
 
-      // Delete shopping lists and items
+      // Shopping lists and items
       const { data: shoppingLists } = await supabase
         .from('shopping_lists')
         .select('id')
@@ -140,17 +188,16 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
         await supabase.from('shopping_lists').delete().in('space_id', spaceIds);
       }
 
-      // Delete meals
+      // Meals & recipes
       await supabase.from('meals').delete().in('space_id', spaceIds);
-
-      // Delete recipes
       await supabase.from('recipes').delete().in('space_id', spaceIds);
+
+      // Rewards
+      await supabase.from('reward_redemptions').delete().in('space_id', spaceIds);
     }
 
-    // Remove user from spaces
+    // ── Phase 3: Remove memberships and user record ──
     await supabase.from('space_members').delete().eq('user_id', userId);
-
-    // Delete user profile
     await supabase.from('users').delete().eq('id', userId);
 
     return { success: true };
@@ -171,9 +218,9 @@ async function isAccountMarkedForDeletion(userId: string, supabase: SupabaseClie
     .from('deleted_accounts')
     .select('user_id')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
-  return !error && !!data;
+  return !error && data !== null;
 }
 
 /**

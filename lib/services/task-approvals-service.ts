@@ -32,8 +32,31 @@ export const taskApprovalsService = {
     return data || [];
   },
 
-  async updateApprovalStatus(approvalId: string, status: 'approved' | 'rejected' | 'changes_requested', note?: string, changesRequested?: string): Promise<TaskApproval> {
+  async updateApprovalStatus(approvalId: string, status: 'approved' | 'rejected' | 'changes_requested', note?: string, changesRequested?: string, callerId?: string): Promise<TaskApproval> {
     const supabase = createClient();
+
+    // Security: Verify caller is the designated approver, not the requester
+    if (callerId) {
+      const { data: approval, error: fetchError } = await supabase
+        .from('task_approvals')
+        .select('approver_id, requested_by')
+        .eq('id', approvalId)
+        .eq('status', 'pending')
+        .single();
+
+      if (fetchError || !approval) {
+        throw new Error('Approval not found or already processed');
+      }
+
+      if (approval.requested_by === callerId) {
+        throw new Error('Cannot approve your own task approval request');
+      }
+
+      if (approval.approver_id !== callerId) {
+        throw new Error('Only the designated approver can update this approval');
+      }
+    }
+
     const { data, error } = await supabase.from('task_approvals').update({
       status, review_note: note, changes_requested: changesRequested
     }).eq('id', approvalId).select().single();

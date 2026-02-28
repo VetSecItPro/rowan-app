@@ -200,7 +200,7 @@ async function send7DayDeletionReminder(
   }
 
   await resend.emails.send({
-    from: 'Rowan <noreply@rowan.app>',
+    from: 'Rowan <noreply@rowanapp.com>',
     to: email,
     subject: 'Account Deletion in 7 Days - Last Chance to Cancel',
     html: `
@@ -265,7 +265,7 @@ async function send1DayDeletionReminder(
   }
 
   await resend.emails.send({
-    from: 'Rowan <noreply@rowan.app>',
+    from: 'Rowan <noreply@rowanapp.com>',
     to: email,
     subject: '🚨 URGENT: Account Deletion Tomorrow - Final Notice',
     html: `
@@ -365,7 +365,7 @@ async function sendDeletionCompletedEmail(email: string, userName: string) {
     }
 
   await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: email,
       subject: 'Account Successfully Deleted',
       html: `

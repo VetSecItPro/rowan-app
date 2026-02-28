@@ -51,10 +51,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get current privacy preferences
+    // Get current privacy preferences (only the columns needed for this CCPA update)
     const { data: currentPrefs, error: prefsError } = await supabase
       .from('user_privacy_preferences')
-      .select('*')
+      .select('share_data_with_partners')
       .eq('user_id', userId)
       .single();
 

@@ -17,6 +17,7 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import { get, set, del } from 'idb-keyval';
+import { isNative } from '@/lib/native/capacitor';
 
 const CACHE_KEY = 'rowan-query-cache';
 const CACHE_VERSION = 2; // Bumped: now includes userId for cross-user validation
@@ -164,10 +165,13 @@ export async function clearPersistedCache(): Promise<void> {
   } catch {
     // IndexedDB clear failure — stale cache expires via TTL
   }
-  try {
-    localStorage.removeItem(CACHE_KEY + '-backup');
-  } catch {
-    // localStorage clear failure — backup expires in 5 min
+  // Only attempt localStorage cleanup on web — native never writes this backup (F-017)
+  if (!isNative) {
+    try {
+      localStorage.removeItem(CACHE_KEY + '-backup');
+    } catch {
+      // localStorage clear failure — backup expires in 5 min
+    }
   }
 }
 
@@ -209,6 +213,16 @@ export function clearAllAppStorage(): void {
  * IndexedDB operations are async and can be interrupted during page close.
  * localStorage.setItem is synchronous and completes before the page closes.
  * The backup has a shorter TTL (5 min vs 24h) and is deleted after successful restore.
+ *
+ * SECURITY (F-017 fix):
+ * On native platforms (iOS/Android), localStorage is backed by the app's
+ * WebView storage, which can be read by anyone with physical access or a
+ * backup tool if the device is not encrypted or is compromised. Because the
+ * cache contains user IDs and family data, we skip the localStorage backup
+ * entirely on native and rely solely on IndexedDB (which is also sandboxed
+ * within the app's WebView but avoids a second plaintext copy). On web the
+ * risk is lower since localStorage is per-origin and protected by the browser
+ * sandbox.
  */
 export function setupCachePersistence(queryClient: QueryClient): () => void {
   let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -227,12 +241,18 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
     scheduleSave();
   });
 
-  // Sync backup to localStorage on unload (IndexedDB is async and unreliable here)
+  // Sync backup to localStorage on unload (IndexedDB is async and unreliable here).
+  // SECURITY (F-017): Skipped entirely on native platforms — plaintext localStorage
+  // is a higher risk on native (WebView storage accessible via backups/physical access).
+  // Native builds rely solely on IndexedDB persistence via the periodic + visibility saves.
   const handleUnload = () => {
     // Don't re-save during signout — cache was intentionally cleared
     if (_isSigningOut) return;
 
-    if (typeof navigator !== 'undefined') {
+    // Skip localStorage backup on native — security risk (F-017)
+    if (isNative) return;
+
+    if (typeof window !== 'undefined') {
       try {
         const state = queryClient.getQueryCache().getAll().map((query) => ({
           queryKey: query.queryKey,
@@ -275,6 +295,9 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
 /**
  * Restore from localStorage backup (used after page load)
  *
+ * On native platforms this always returns false — no localStorage backup is
+ * ever written on native (F-017 fix), so there is nothing to restore.
+ *
  * @param queryClient - The query client to restore into
  * @param currentUserId - The currently authenticated user's ID. If provided,
  *   the backup is only restored if it belongs to this user.
@@ -283,6 +306,9 @@ export async function restoreFromBackup(
   queryClient: QueryClient,
   currentUserId?: string,
 ): Promise<boolean> {
+  // Native never writes this backup — skip restore attempt entirely (F-017)
+  if (isNative) return false;
+
   try {
     const backup = localStorage.getItem(CACHE_KEY + '-backup');
     if (!backup) return false;

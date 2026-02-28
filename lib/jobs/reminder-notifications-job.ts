@@ -301,7 +301,7 @@ async function sendEmailNotifications(supabase: SupabaseClient, batch: Notificat
     }
 
     const { error: sendError } = await resend.emails.send({
-      from: 'Rowan <reminders@rowan.app>',
+      from: 'Rowan <reminders@rowanapp.com>',
       to: batch.userEmail,
       subject: emailSubject,
       html: emailHtml,
