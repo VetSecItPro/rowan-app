@@ -27,6 +27,7 @@ import {
   ClipboardList,
   HeartHandshake,
   Link as LinkIcon,
+  MessageSquareText,
   type LucideIcon
 } from 'lucide-react';
 // Dynamically import content panels — only one shows at a time based on activeTab.
@@ -48,6 +49,7 @@ const AIUsagePanel = dynamic(() => import('@/components/admin/panels').then(m =>
 const AuditTrailPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.AuditTrailPanel })), { ssr: false, loading: panelLoader });
 const CustomerSuccessPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.CustomerSuccessPanel })), { ssr: false, loading: panelLoader });
 const ExecutiveSummaryPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.ExecutiveSummaryPanel })), { ssr: false, loading: panelLoader });
+const FeedbackPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.FeedbackPanel })), { ssr: false, loading: panelLoader });
 import { ComparisonProvider } from '@/components/admin/ComparisonContext';
 import { ComparisonToggle } from '@/components/admin/ComparisonToggle';
 import { DrillDownModal } from '@/components/admin/DrillDownModal';
@@ -69,7 +71,7 @@ interface ActivityItem {
   email?: string;
 }
 
-type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'ai' | 'audit' | 'success' | 'investor' | 'system';
+type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'ai' | 'audit' | 'success' | 'feedback' | 'investor' | 'system';
 
 interface Tab {
   id: TabId;
@@ -89,6 +91,7 @@ const TABS: Tab[] = [
   { id: 'ai', label: 'AI Costs', icon: Bot, color: 'text-sky-500', description: 'AI usage & cost monitoring' },
   { id: 'audit', label: 'Audit Trail', icon: ClipboardList, color: 'text-amber-500', description: 'Activity log & compliance' },
   { id: 'success', label: 'Customer Success', icon: HeartHandshake, color: 'text-pink-500', description: 'Engagement health & feedback' },
+  { id: 'feedback', label: 'Feedback', icon: MessageSquareText, color: 'text-teal-500', description: 'Bug reports & feature requests' },
   { id: 'investor', label: 'Investor Links', icon: LinkIcon, color: 'text-emerald-500', description: 'Executive summary access' },
   { id: 'system', label: 'System', icon: Settings, color: 'text-gray-400', description: 'Health & settings' },
 ];
@@ -243,7 +246,7 @@ function AdminDashboardContent() {
 
   // Get initial tab from URL or default to 'overview'
   const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'ai', 'audit', 'success', 'investor', 'system'];
+  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'ai', 'audit', 'success', 'feedback', 'investor', 'system'];
   const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'overview';
 
   const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
@@ -411,6 +414,8 @@ function AdminDashboardContent() {
         return <AuditTrailPanel />;
       case 'success':
         return <CustomerSuccessPanel />;
+      case 'feedback':
+        return <FeedbackPanel />;
       case 'investor':
         return <ExecutiveSummaryPanel />;
       case 'system':

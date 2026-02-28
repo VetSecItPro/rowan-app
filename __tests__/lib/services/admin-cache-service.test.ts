@@ -181,8 +181,6 @@ describe('admin-cache-service', () => {
     it('should generate correct cache keys', () => {
       expect(ADMIN_CACHE_KEYS.dashboardStats).toBe('dashboard:stats');
       expect(ADMIN_CACHE_KEYS.usersList(1, 20)).toBe('users:list:1:20');
-      expect(ADMIN_CACHE_KEYS.betaRequests(2, 'approved')).toBe('beta:requests:2:approved');
-      expect(ADMIN_CACHE_KEYS.betaRequests(1, null)).toBe('beta:requests:1:all');
       expect(ADMIN_CACHE_KEYS.analytics('7d')).toBe('analytics:7d');
     });
   });

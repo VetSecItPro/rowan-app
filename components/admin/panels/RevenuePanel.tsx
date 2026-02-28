@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import { DollarSign, TrendingUp, CreditCard, ArrowUpRight, Repeat, RefreshCw, AlertCircle, BarChart3, Users } from 'lucide-react';
 import { SubscriptionsPanel } from './SubscriptionsPanel';
 import { getBenchmarkLevel, getBenchmarkColor, getBenchmarkBgColor } from '@/lib/constants/benchmarks';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 type SubTab = 'subscriptions' | 'mrr' | 'conversions' | 'waterfall' | 'cohorts';
 
@@ -25,7 +27,6 @@ interface SubscriptionMetrics {
   proSubscribers: number;
   familySubscribers: number;
   freeUsers: number;
-  trialUsers: number;
   tierDistribution: { tier: string; count: number; percentage: number; mrr: number }[];
   periodDistribution: { period: string; count: number; percentage: number }[];
   newSubscriptionsThisMonth: number;
@@ -48,8 +49,11 @@ interface DailyRevenueData {
   mrr: number;
   newMrr: number;
   churnedMrr: number;
-  subscriptions: number;
+  newSubscriptions: number;
   cancellations: number;
+  upgrades: number;
+  downgrades: number;
+  reactivations: number;
 }
 
 interface SubscriptionAnalyticsResponse {
@@ -139,6 +143,99 @@ const MrrPanel = memo(function MrrPanel() {
   const { data, isLoading, refetch, isFetching } = useSubscriptionAnalytics();
   const { data: businessData } = useBusinessMetrics();
 
+  // Drill-down state — must be declared before any early returns (Rules of Hooks)
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+    nameKey?: string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const metrics = data?.metrics;
+  const dailyRevenue = data?.dailyRevenue || [];
+  const totalSubscribers = metrics?.totalSubscribers || 0;
+
+  // Open drill-down for MRR sub-panel metrics — must be declared before any early returns
+  const openDrillDown = useCallback((metric: string) => {
+    let chartData: DrillDownDataPoint[] = [];
+    let title = '';
+    let color = '#10b981';
+    let chartType: 'area' | 'bar' = 'area';
+    let nameKey = 'date';
+
+    switch (metric) {
+      case 'mrr':
+        chartData = dailyRevenue.map(d => ({ date: d.date, value: d.mrr }));
+        title = 'MRR — Daily Trend';
+        color = '#10b981';
+        break;
+      case 'arr':
+        chartData = dailyRevenue.map(d => ({ date: d.date, value: d.mrr * 12 }));
+        title = 'ARR — Daily Trend (MRR × 12)';
+        color = '#3b82f6';
+        break;
+      case 'mrrGrowth':
+        chartData = dailyRevenue.map((d, i) => ({
+          date: d.date,
+          value: i > 0 && dailyRevenue[i - 1].mrr > 0
+            ? Math.round(((d.mrr - dailyRevenue[i - 1].mrr) / dailyRevenue[i - 1].mrr) * 100)
+            : 0,
+        }));
+        title = 'MRR Growth Rate — Daily %';
+        color = '#f59e0b';
+        break;
+      case 'arpu':
+        // ARPU = MRR / total paid subscribers (constant denominator per day)
+        chartData = dailyRevenue.map(d => ({
+          date: d.date,
+          value: totalSubscribers > 0 ? Math.round((d.mrr / totalSubscribers) * 100) / 100 : 0,
+        }));
+        title = 'ARPU — Daily Trend';
+        color = '#8b5cf6';
+        break;
+      case 'ltv':
+        // LTV = ARPU × 12 (simple annualized estimate)
+        chartData = dailyRevenue.map(d => ({
+          date: d.date,
+          value: totalSubscribers > 0 ? Math.round(((d.mrr / totalSubscribers) * 12) * 100) / 100 : 0,
+        }));
+        title = 'LTV Estimate — Daily Trend';
+        color = '#06b6d4';
+        break;
+      case 'newMrr':
+        chartData = dailyRevenue.map(d => ({ date: d.date, value: d.newMrr }));
+        title = 'New MRR — Daily';
+        color = '#10b981';
+        break;
+      case 'churnedMrr':
+        chartData = dailyRevenue.map(d => ({ date: d.date, value: d.churnedMrr }));
+        title = 'Churned MRR — Daily';
+        color = '#ef4444';
+        break;
+      case 'netGrowth':
+        chartData = dailyRevenue.map(d => ({ date: d.date, value: d.newMrr - d.churnedMrr }));
+        title = 'Net MRR — Daily (New - Churned)';
+        color = '#3b82f6';
+        break;
+      case 'tierRevenue': {
+        const tiers = metrics?.tierDistribution || [];
+        chartData = tiers.map(t => ({ date: t.tier, value: t.mrr, name: t.tier }));
+        title = 'Revenue by Tier';
+        color = '#8b5cf6';
+        chartType = 'bar';
+        nameKey = 'date';
+        break;
+      }
+    }
+
+    if (chartData.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data: chartData, color, chartType, nameKey });
+    }
+  }, [dailyRevenue, metrics, totalSubscribers]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -146,9 +243,6 @@ const MrrPanel = memo(function MrrPanel() {
       </div>
     );
   }
-
-  const metrics = data?.metrics;
-  const dailyRevenue = data?.dailyRevenue || [];
 
   const mrr = metrics?.mrr || 0;
   const arr = metrics?.arr || 0;
@@ -177,7 +271,13 @@ const MrrPanel = memo(function MrrPanel() {
     <div className="space-y-6">
       {/* MRR Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-green-600 rounded-xl p-5 text-white">
+        <div
+          className="bg-green-600 rounded-xl p-5 text-white cursor-pointer hover:bg-green-500 transition-colors"
+          onClick={() => openDrillDown('mrr')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('mrr'); }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Monthly Recurring Revenue</p>
@@ -188,13 +288,25 @@ const MrrPanel = memo(function MrrPanel() {
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div
+          className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('arr')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('arr'); }}
+        >
           <p className="text-sm font-medium text-gray-400">ARR</p>
           <p className="text-2xl font-bold text-white mt-1">{formatCurrency(arr)}</p>
           <p className="text-xs text-gray-400 mt-1">Annual run rate</p>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div
+          className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('mrrGrowth')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('mrrGrowth'); }}
+        >
           <p className="text-sm font-medium text-gray-400">MRR Growth</p>
           <p className={`text-2xl font-bold mt-1 ${mrrGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {mrrGrowth >= 0 ? '+' : ''}{mrrGrowth}%
@@ -202,7 +314,13 @@ const MrrPanel = memo(function MrrPanel() {
           <p className="text-xs text-gray-400 mt-1">Month over month</p>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div
+          className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('arpu')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('arpu'); }}
+        >
           <p className="text-sm font-medium text-gray-400">ARPU</p>
           <p className="text-2xl font-bold text-white mt-1">{formatCurrency(arpu)}</p>
           <p className="text-xs text-gray-400 mt-1">Per paying user</p>
@@ -211,7 +329,13 @@ const MrrPanel = memo(function MrrPanel() {
 
       {/* LTV, LTV:CAC, Projected Revenue */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div
+          className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('ltv')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('ltv'); }}
+        >
           <p className="text-sm font-medium text-gray-400">Customer LTV</p>
           <p className="text-2xl font-bold text-white mt-1">
             {ltv > 0 ? formatCurrencyPrecise(ltv) : '--'}
@@ -229,7 +353,13 @@ const MrrPanel = memo(function MrrPanel() {
           </p>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div
+          className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('tierRevenue')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('tierRevenue'); }}
+        >
           <p className="text-sm font-medium text-gray-400">Projected Revenue (12mo)</p>
           <p className="text-2xl font-bold text-white mt-1">
             {projectedAnnualRevenue > 0 ? formatCurrency(projectedAnnualRevenue) : '--'}
@@ -253,12 +383,12 @@ const MrrPanel = memo(function MrrPanel() {
           </button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-3 bg-green-900/20 rounded-lg text-center">
+          <div className="p-3 bg-green-900/20 rounded-lg text-center cursor-pointer hover:bg-green-900/30 transition-colors" onClick={() => openDrillDown('newMrr')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('newMrr'); }}>
             <ArrowUpRight className="w-5 h-5 text-green-500 mx-auto mb-1" />
             <p className="text-lg font-bold text-green-400">{formatCurrency(newMrrThisMonth)}</p>
             <p className="text-xs text-green-300">New MRR</p>
           </div>
-          <div className="p-3 bg-blue-900/20 rounded-lg text-center">
+          <div className="p-3 bg-blue-900/20 rounded-lg text-center cursor-pointer hover:bg-blue-900/30 transition-colors" onClick={() => openDrillDown('netGrowth')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('netGrowth'); }}>
             <TrendingUp className="w-5 h-5 text-blue-500 mx-auto mb-1" />
             <p className="text-lg font-bold text-blue-400">
               {netGrowth >= 0 ? '+' : ''}{netGrowth}
@@ -272,7 +402,7 @@ const MrrPanel = memo(function MrrPanel() {
             </p>
             <p className="text-xs text-orange-300">Cancellations</p>
           </div>
-          <div className="p-3 bg-red-900/20 rounded-lg text-center">
+          <div className="p-3 bg-red-900/20 rounded-lg text-center cursor-pointer hover:bg-red-900/30 transition-colors" onClick={() => openDrillDown('churnedMrr')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('churnedMrr'); }}>
             <ArrowUpRight className="w-5 h-5 text-red-500 mx-auto mb-1 rotate-180" />
             <p className="text-lg font-bold text-red-400">{formatCurrency(churnedMrrThisMonth)}</p>
             <p className="text-xs text-red-300">Churned MRR</p>
@@ -310,15 +440,31 @@ const MrrPanel = memo(function MrrPanel() {
         )}
       </div>
 
-      {/* Beta Phase Note */}
+      {/* No Revenue Note */}
       {mrr === 0 && (
         <div className="p-4 bg-blue-900/20 rounded-lg">
           <p className="text-sm text-blue-300">
-            <strong>Beta Phase:</strong> Revenue metrics will populate once paid subscriptions are active.
-            During beta, all users have free access.
+            Revenue metrics will populate once paid subscriptions are active.
           </p>
         </div>
       )}
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle="Last 30 days"
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+          nameKey={drillDown.nameKey}
+          formatter={(v) => drillDown.metric.includes('Growth') ? `${v}%` : `$${v.toLocaleString()}`}
+        />
+      </DrillDownModal>
     </div>
   );
 });
@@ -514,6 +660,68 @@ const RevenueCohortsPanel = memo(function RevenueCohortsPanel() {
 const ConversionsPanel = memo(function ConversionsPanel() {
   const { data, isLoading, refetch, isFetching } = useSubscriptionAnalytics();
 
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    const dailyRevenue = data?.dailyRevenue || [];
+    let chartData: DrillDownDataPoint[] = [];
+    let title = '';
+    let color = '#a855f7';
+    let chartType: 'area' | 'bar' = 'area';
+
+    switch (metric) {
+      case 'conversion': {
+        // Show actual tier distribution instead of a fabricated daily percentage
+        const tiers = data?.metrics?.tierDistribution || [];
+        const freeCount = data?.metrics?.freeUsers || 0;
+        chartData = [
+          { date: 'Free', value: freeCount },
+          ...tiers.map(t => ({
+            date: t.tier.charAt(0).toUpperCase() + t.tier.slice(1),
+            value: t.count,
+          })),
+        ];
+        title = 'User Distribution by Tier';
+        color = '#a855f7';
+        chartType = 'bar';
+        break;
+      }
+      case 'upgrades':
+        chartData = dailyRevenue.map(d => ({ date: d.date, value: d.upgrades }));
+        title = 'Upgrade Events — Daily';
+        color = '#10b981';
+        break;
+      case 'churn':
+        chartData = dailyRevenue.map(d => ({
+          date: d.date,
+          value: d.cancellations,
+        }));
+        title = 'Cancellations — Daily';
+        color = '#ef4444';
+        break;
+      case 'tierDistribution': {
+        const tiers = data?.metrics?.tierDistribution || [];
+        chartData = tiers.map(t => ({ date: t.tier, value: t.count }));
+        title = 'Tier Distribution';
+        color = '#8b5cf6';
+        chartType = 'bar';
+        break;
+      }
+    }
+
+    if (chartData.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data: chartData, color, chartType });
+    }
+  }, [data]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -525,21 +733,20 @@ const ConversionsPanel = memo(function ConversionsPanel() {
   const metrics = data?.metrics;
   const conversionRate = metrics?.conversionRate || 0;
   const freeUsers = metrics?.freeUsers || 0;
-  const trialUsers = metrics?.trialUsers || 0;
   const totalSubscribers = metrics?.totalSubscribers || 0;
   const recentEvents = metrics?.recentEvents;
 
   // Calculate funnel percentages
-  const totalUsers = freeUsers + trialUsers + totalSubscribers;
+  // Note: Trial users are managed by Polar. We don't track trial state separately.
+  const totalUsers = freeUsers + totalSubscribers;
   const freePercent = totalUsers > 0 ? Math.round((freeUsers / totalUsers) * 100) : 100;
-  const trialPercent = totalUsers > 0 ? Math.round((trialUsers / totalUsers) * 100) : 0;
   const paidPercent = totalUsers > 0 ? Math.round((totalSubscribers / totalUsers) * 100) : 0;
 
   return (
     <div className="space-y-6">
       {/* Conversion Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors" onClick={() => openDrillDown('conversion')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('conversion'); }}>
           <div className="flex items-center gap-2 mb-2">
             <Repeat className="w-4 h-4 text-purple-500" />
             <span className="text-sm font-medium text-gray-400">Free to Paid</span>
@@ -550,7 +757,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
           <p className="text-xs text-gray-400 mt-1">Conversion rate</p>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors" onClick={() => openDrillDown('upgrades')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('upgrades'); }}>
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-green-500" />
             <span className="text-sm font-medium text-gray-400">Upgrades</span>
@@ -561,7 +768,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
           <p className="text-xs text-gray-400 mt-1">This month</p>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5 cursor-pointer hover:bg-gray-750 transition-colors" onClick={() => openDrillDown('churn')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('churn'); }}>
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-orange-500 rotate-180" />
             <span className="text-sm font-medium text-gray-400">Downgrades</span>
@@ -628,17 +835,6 @@ const ConversionsPanel = memo(function ConversionsPanel() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-24 text-sm text-gray-400">Trial</div>
-            <div className="flex-1 bg-gray-700 rounded-full h-8 overflow-hidden">
-              <div
-                className="h-8 rounded-full bg-purple-500 flex items-center justify-end px-3 transition-all duration-500"
-                style={{ width: `${Math.max(trialPercent, 2)}%` }}
-              >
-                <span className="text-xs text-white font-medium">{trialUsers}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
             <div className="w-24 text-sm text-gray-400">Paid</div>
             <div className="flex-1 bg-gray-700 rounded-full h-8 overflow-hidden">
               <div
@@ -683,11 +879,25 @@ const ConversionsPanel = memo(function ConversionsPanel() {
       {totalSubscribers === 0 && (
         <div className="p-4 bg-purple-900/20 rounded-lg">
           <p className="text-sm text-purple-300">
-            <strong>Beta Phase:</strong> All current users have free beta access.
             Conversion tracking will become more meaningful when paid plans launch.
           </p>
         </div>
       )}
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle="Last 30 days"
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });

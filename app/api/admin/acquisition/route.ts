@@ -161,9 +161,9 @@ export async function GET(req: NextRequest) {
             .gte('created_at', previousStart.toISOString())
             .lt('created_at', startDate.toISOString()),
 
-          // Users who actually signed up (conversions)
+          // Users who actually signed up (conversions) — query profiles table
           supabaseAdmin
-            .from('users')
+            .from('profiles')
             .select('id, created_at')
             .gte('created_at', startDate.toISOString())
             .limit(10000),
@@ -287,7 +287,7 @@ export async function GET(req: NextRequest) {
               .order('created_at', { ascending: true })
               .limit(10000),
             supabaseAdmin
-              .from('users')
+              .from('profiles')
               .select('created_at')
               .gte('created_at', previousStart.toISOString())
               .lt('created_at', startDate.toISOString())

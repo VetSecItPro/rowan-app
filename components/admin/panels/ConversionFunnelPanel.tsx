@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   TrendingUp,
   RefreshCw,
@@ -14,6 +15,8 @@ import {
   Clock,
   BarChart3,
 } from 'lucide-react';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface FunnelStep {
   id: string;
@@ -54,7 +57,7 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
   const { data, isLoading, refetch, isFetching } = useQuery<FunnelData>({
     queryKey: ['admin-conversion-funnel'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/analytics/funnel');
+      const response = await adminFetch('/api/admin/analytics/funnel');
       if (!response.ok) throw new Error('Failed to fetch funnel data');
       const result = await response.json();
       return result.funnel;
@@ -66,6 +69,71 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
   const fetchData = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+    barColors?: string[];
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'funnelStages' && data?.steps && data.steps.length > 0) {
+      const stepColorMap: Record<string, string> = {
+        blue: '#3b82f6',
+        purple: '#a855f7',
+        green: '#22c55e',
+        emerald: '#10b981',
+        amber: '#f59e0b',
+      };
+      const chartData = data.steps.map(s => ({ date: s.label, value: s.count }));
+      const colors = data.steps.map(s => stepColorMap[s.color] ?? '#8b5cf6');
+      setDrillDown({
+        isOpen: true,
+        title: 'Funnel Stage Breakdown',
+        metric: 'Users',
+        data: chartData,
+        color: '#8b5cf6',
+        chartType: 'bar',
+        barColors: colors,
+      });
+    }
+    if (metric === 'conversionRates' && data?.conversionRates) {
+      const rates = data.conversionRates;
+      const chartData: DrillDownDataPoint[] = [
+        { date: 'Signup → Space', value: rates.signupToSpace },
+        { date: 'Space → Action', value: rates.spaceToAction },
+        { date: 'Action → Active', value: rates.actionToActive },
+        { date: 'Active → Power', value: rates.activeToPower },
+        { date: 'Overall', value: rates.overallConversion },
+      ];
+      setDrillDown({
+        isOpen: true,
+        title: 'Conversion Rates',
+        metric: 'Rate %',
+        data: chartData,
+        color: '#8b5cf6',
+        chartType: 'bar',
+      });
+    }
+    if (metric === 'topFeatures' && data?.topActivationFeatures && data.topActivationFeatures.length > 0) {
+      const chartData = data.topActivationFeatures.map(f => ({
+        date: f.feature.replace(/_/g, ' '),
+        value: f.users,
+      }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Top Activation Features',
+        metric: 'Users',
+        data: chartData,
+        color: '#10b981',
+        chartType: 'bar',
+      });
+    }
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -178,7 +246,10 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
                 </div>
               )}
 
-              <div className={`p-4 rounded-lg border ${colors.border} ${colors.bg}`}>
+              <div
+                onClick={() => openDrillDown('funnelStages')}
+                className={`p-4 rounded-lg border ${colors.border} ${colors.bg} cursor-pointer hover:ring-1 hover:ring-indigo-500/30 transition-all`}
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Icon className={`w-4 h-4 ${colors.text}`} />
@@ -210,7 +281,11 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
       {/* Conversion Rates */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {conversionSteps.map((cs) => (
-          <div key={cs.label} className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+          <div
+            key={cs.label}
+            onClick={() => openDrillDown('conversionRates')}
+            className="p-4 bg-gray-800 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-indigo-500/30 transition-all"
+          >
             <p className="text-xs font-medium text-gray-400 mb-1">{cs.label}</p>
             <p className={`text-xl font-bold ${getConversionColor(cs.value)}`}>
               {cs.value}%
@@ -252,7 +327,10 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
 
         {/* Feature Adoption */}
         <div className="bg-gray-800 rounded-lg p-5 border border-gray-700">
-          <div className="flex items-center gap-2 mb-4">
+          <div
+            onClick={() => openDrillDown('topFeatures')}
+            className="flex items-center gap-2 mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <BarChart3 className="w-4 h-4 text-emerald-400" />
             <span className="text-sm font-semibold text-white">Top Activation Features</span>
           </div>
@@ -284,7 +362,10 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
       </div>
 
       {/* Overall Conversion */}
-      <div className="p-4 bg-gray-800 rounded-lg border border-gray-700 flex items-center justify-between">
+      <div
+        onClick={() => openDrillDown('conversionRates')}
+        className="p-4 bg-gray-800 rounded-lg border border-gray-700 flex items-center justify-between cursor-pointer hover:bg-gray-750 hover:ring-1 hover:ring-indigo-500/30 transition-all"
+      >
         <div>
           <p className="text-sm font-medium text-gray-400">Overall: Signup → Power User</p>
           <p className="text-xs text-gray-500 mt-0.5">End-to-end activation rate</p>
@@ -293,6 +374,20 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
           {rates.overallConversion}%
         </p>
       </div>
+
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+          barColors={drillDown.barColors}
+        />
+      </DrillDownModal>
     </div>
   );
 });

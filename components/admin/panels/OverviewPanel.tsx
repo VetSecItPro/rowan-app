@@ -6,7 +6,6 @@ import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   Users,
   TrendingUp,
-  Eye,
   Globe,
   Activity,
   AlertCircle,
@@ -27,11 +26,6 @@ interface DashboardStats {
     active: number;
     new: number;
   };
-  beta: {
-    requests: number;
-    approved: number;
-    pending: number;
-  };
   subscriptions: {
     active: number;
     mrr: number;
@@ -46,17 +40,22 @@ interface AnalyticsData {
   summary: {
     totalPageViews: number;
     uniqueVisitors: number;
-    activeBetaUsers: number;
     growthRate: number;
   };
   trafficMetrics: {
     totalPageViews: number;
     uniqueSessions: number;
   };
-  betaMetrics: {
-    conversionRate: number;
-    approvalRate: number;
-  };
+}
+
+interface InviteAnalytics {
+  totalSent: number;
+  accepted: number;
+  pending: number;
+  expired: number;
+  cancelled: number;
+  conversionRate: number;
+  dailyTrend: { date: string; sent: number; accepted: number }[];
 }
 
 // KPI Card with trend indicator
@@ -130,10 +129,10 @@ const KPICard = memo(function KPICard({
 // Health Status Indicator
 const HealthStatus = memo(function HealthStatus({
   status,
-  uptime,
+  uptimeDisplay,
 }: {
   status: 'healthy' | 'degraded' | 'down';
-  uptime: number;
+  uptimeDisplay: string;
 }) {
   const statusConfig = {
     healthy: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-900/30', label: 'All Systems Operational' },
@@ -150,12 +149,12 @@ const HealthStatus = memo(function HealthStatus({
         <StatusIcon className={`w-6 h-6 ${config.color}`} />
         <div>
           <p className={`font-medium ${config.color}`}>{config.label}</p>
-          <p className="text-sm text-gray-400">Uptime: {uptime}%</p>
+          <p className="text-sm text-gray-400">Process uptime: {uptimeDisplay || '--'}</p>
         </div>
       </div>
       <div className="text-right">
-        <p className="text-2xl font-bold text-white">{uptime}%</p>
-        <p className="text-xs text-gray-400">Last 30 days</p>
+        <p className={`text-2xl font-bold ${config.color}`}>{status === 'healthy' ? 'OK' : status === 'degraded' ? 'WARN' : 'DOWN'}</p>
+        <p className="text-xs text-gray-400">Current status</p>
       </div>
     </div>
   );
@@ -166,13 +165,21 @@ const QuickStat = memo(function QuickStat({
   label,
   value,
   subValue,
+  onClick,
 }: {
   label: string;
   value: string | number;
   subValue?: string;
+  onClick?: () => void;
 }) {
   return (
-    <div className="text-center p-3 bg-gray-800 rounded-lg">
+    <div
+      className={`text-center p-3 bg-gray-800 rounded-lg ${onClick ? 'cursor-pointer hover:bg-gray-750 transition-colors' : ''}`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+    >
       <p className="text-2xl font-bold text-white">{value}</p>
       <p className="text-xs text-gray-400">{label}</p>
       {subValue && <p className="text-xs text-gray-400 mt-0.5">{subValue}</p>}
@@ -236,6 +243,19 @@ export const OverviewPanel = memo(function OverviewPanel() {
     gcTime: 15 * 60 * 1000,
   });
 
+  // Fetch real health status
+  const { data: healthData } = useQuery({
+    queryKey: ['admin-health-status'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/health');
+      if (!response.ok) throw new Error('Failed to fetch health');
+      const result = await response.json();
+      return result.health as { overall: 'healthy' | 'warning' | 'critical'; uptime: string };
+    },
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
   // Fetch real visitor analytics from site_visits
   const { data: visitorData } = useQuery({
     queryKey: ['admin-visitor-analytics', '30d'],
@@ -244,6 +264,19 @@ export const OverviewPanel = memo(function OverviewPanel() {
       if (!response.ok) throw new Error('Failed to fetch visitor analytics');
       const result = await response.json();
       return result.visitorAnalytics as { uniqueVisitors: number; totalPageViews: number; signupConversionRate: number };
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
+
+  // Fetch invite analytics
+  const { data: inviteData } = useQuery<InviteAnalytics>({
+    queryKey: ['admin-invite-analytics'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/invite-analytics');
+      if (!response.ok) throw new Error('Failed to fetch invite analytics');
+      const result = await response.json();
+      return result.inviteAnalytics;
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
@@ -303,6 +336,23 @@ export const OverviewPanel = memo(function OverviewPanel() {
 
   // Open drill-down for a specific KPI metric
   const openDrillDown = useCallback((metric: string) => {
+    // Handle invite drill-down separately
+    if (metric === 'invites') {
+      if (!inviteData?.dailyTrend?.length) return;
+      const data: DrillDownDataPoint[] = inviteData.dailyTrend.map(d => ({
+        date: d.date,
+        value: d.sent,
+      }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Invites — Daily Sent vs Accepted',
+        metric: 'invites',
+        data,
+        color: '#f97316',
+      });
+      return;
+    }
+
     if (!analyticsData) return;
     let data: DrillDownDataPoint[] = [];
     let previousData: DrillDownDataPoint[] | undefined;
@@ -353,7 +403,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
     if ((data?.length ?? 0) > 0) {
       setDrillDown({ isOpen: true, title, metric, data, previousData, color });
     }
-  }, [analyticsData, compareEnabled]);
+  }, [analyticsData, compareEnabled, inviteData]);
 
   if (isLoading) {
     return (
@@ -368,15 +418,17 @@ export const OverviewPanel = memo(function OverviewPanel() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const safeStats: Partial<DashboardStats> & Record<string, any> = stats || {};
   const analytics: AnalyticsData = analyticsData || {
-    summary: { totalPageViews: 0, uniqueVisitors: 0, activeBetaUsers: 0, growthRate: 0 },
+    summary: { totalPageViews: 0, uniqueVisitors: 0, growthRate: 0 },
     trafficMetrics: { totalPageViews: 0, uniqueSessions: 0 },
-    betaMetrics: { conversionRate: 0, approvalRate: 0 },
   };
 
   return (
     <div className="space-y-6">
       {/* Health Status */}
-      <HealthStatus status="healthy" uptime={99.9} />
+      <HealthStatus
+        status={healthData?.overall === 'critical' ? 'down' : healthData?.overall === 'warning' ? 'degraded' : healthData ? 'healthy' : 'degraded'}
+        uptimeDisplay={healthData?.uptime || '--'}
+      />
 
       {/* Business Health Scorecard */}
       {scorecardItems.length > 0 && (
@@ -431,14 +483,14 @@ export const OverviewPanel = memo(function OverviewPanel() {
           />
           <KPICard
             title="Active Users"
-            value={analytics.summary?.activeBetaUsers || 0}
+            value={safeStats.users?.active || 0}
             icon={Activity}
             color="green"
             onClick={() => openDrillDown('active')}
           />
           <KPICard
             title="Conversion Rate"
-            value={`${analytics.betaMetrics?.conversionRate || 0}%`}
+            value={`${visitorData?.signupConversionRate ?? 0}%`}
             icon={TrendingUp}
             color="purple"
             onClick={() => openDrillDown('conversion')}
@@ -450,12 +502,24 @@ export const OverviewPanel = memo(function OverviewPanel() {
       <div>
         <h3 className="text-sm font-semibold text-gray-300 mb-3">Growth & Acquisition</h3>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-          <QuickStat label="Beta Requests" value={safeStats.betaRequests || 0} />
-          <QuickStat label="Codes Sent" value={safeStats.codesSent || 0} />
           <QuickStat label="Signups" value={safeStats.totalUsers || 0} />
           <QuickStat label="Launch Signups" value={safeStats.launchSignups || 0} />
-          <QuickStat label="Invite Success" value={`${analytics.betaMetrics?.approvalRate || 0}%`} />
           <QuickStat label="Unique Visitors" value={analytics.trafficMetrics?.uniqueSessions || 0} />
+          <QuickStat
+            label="Invites Sent"
+            value={inviteData?.totalSent || 0}
+            onClick={() => openDrillDown('invites')}
+          />
+          <QuickStat
+            label="Accepted"
+            value={inviteData?.accepted || 0}
+            onClick={() => openDrillDown('invites')}
+          />
+          <QuickStat
+            label="Invite Rate"
+            value={`${inviteData?.conversionRate || 0}%`}
+            onClick={() => openDrillDown('invites')}
+          />
         </div>
       </div>
 

@@ -17,13 +17,13 @@ const QueryParamsSchema = z.object({
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
-type AuthUserRecord = {
+type ProfileRecord = {
   id: string;
-  email?: string | null;
-  created_at?: string | null;
-  last_sign_in_at?: string | null;
-  email_confirmed_at?: string | null;
-  user_metadata?: Record<string, unknown> | null;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 /**
@@ -66,32 +66,36 @@ export async function GET(req: NextRequest) {
     const { users, totalUsers } = await withCache(
       ADMIN_CACHE_KEYS.usersList(page, limit),
       async () => {
-        // Fetch users from auth.users table using admin client
-        const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers({
-          page,
-          perPage: limit,
-        });
+        // Query profiles table — same source as Recent Activity
+        const offset = (page - 1) * limit;
+        const { data: profiles, error: profilesError, count } = await supabaseAdmin
+          .from('profiles')
+          .select('id, email, full_name, avatar_url, created_at, updated_at', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(offset, offset + limit - 1);
 
-        if (authError) {
-          throw new Error(`Failed to fetch auth users: ${authError.message}`);
+        if (profilesError) {
+          throw new Error(`Failed to fetch profiles: ${profilesError.message}`);
         }
 
-        const authUserRecords = authUsers.users as AuthUserRecord[];
+        const profileRecords = (profiles || []) as ProfileRecord[];
 
-        // Transform users data
-        const users = authUserRecords.map((user) => ({
-          id: user.id,
-          email: user.email || '',
-          created_at: user.created_at,
-          last_sign_in_at: user.last_sign_in_at,
-          email_confirmed_at: user.email_confirmed_at,
-          status: user.last_sign_in_at ? 'active' : 'inactive',
-          user_metadata: user.user_metadata,
+        // Determine active status: updated within the last 30 days
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        const users = profileRecords.map((profile) => ({
+          id: profile.id,
+          email: profile.email || '',
+          full_name: profile.full_name || '',
+          avatar_url: profile.avatar_url || '',
+          created_at: profile.created_at,
+          last_sign_in_at: profile.updated_at,
+          status: profile.updated_at >= thirtyDaysAgo ? 'active' : 'inactive',
         }));
 
         return {
           users,
-          totalUsers: authUsers.total || users.length,
+          totalUsers: count ?? users.length,
         };
       },
       { ttl: ADMIN_CACHE_TTL.usersList, skipCache: forceRefresh }

@@ -13,13 +13,11 @@ export const dynamic = 'force-dynamic';
 // Type definitions for this route's database queries
 interface AdminUser {
   id: string;
-  email: string;
-  name: string | null;
+  email: string | null;
+  full_name: string | null;
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
-  last_seen: string | null;
-  is_online: boolean | null;
 }
 
 /**
@@ -69,19 +67,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get all users with their presence info (using admin client to bypass RLS)
+    // Get all users with their presence info from profiles table
     const { data: users, error: usersError } = await supabaseAdmin
-      .from('users')
-      .select(`
-        id,
-        email,
-        name,
-        avatar_url,
-        created_at,
-        updated_at,
-        last_seen,
-        is_online
-      `)
+      .from('profiles')
+      .select('id, email, full_name, avatar_url, created_at, updated_at')
       .order('created_at', { ascending: false });
 
     if (usersError) {
@@ -89,16 +78,17 @@ export async function GET(req: NextRequest) {
       throw new Error('Failed to fetch users');
     }
 
-    // Determine online status based on last_seen within 5 minutes
+    // Determine online status based on updated_at within 5 minutes
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
     const enrichedUsers = (users as AdminUser[] | null)?.map((user: AdminUser) => {
-      const recentlySeen = user.last_seen
-        ? new Date(user.last_seen).getTime() > fiveMinutesAgo
+      const isOnline = user.updated_at
+        ? new Date(user.updated_at).getTime() > fiveMinutesAgo
         : false;
 
       return {
         ...user,
-        is_online: user.is_online || recentlySeen,
+        name: user.full_name,
+        is_online: isOnline,
       };
     });
 

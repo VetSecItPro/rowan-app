@@ -53,17 +53,23 @@ export async function GET(req: NextRequest) {
         // Get current date for today's stats
         const today = new Date().toISOString().split('T')[0];
 
-        // Fetch auth users (source of truth for real user count)
-        const authUsersResult = await supabaseAdmin.auth.admin.listUsers();
-        const authUsers = authUsersResult.data?.users || [];
-        const totalUsers = authUsers.length;
-
-        // Calculate active users (logged in within last 30 days)
+        // Fetch user counts from profiles table (source of truth)
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-        const activeUsers = authUsers.filter(user => {
-          const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at) : null;
-          return lastSignIn && lastSignIn > thirtyDaysAgo;
-        }).length;
+
+        const [totalUsersResult, activeUsersResult] = await Promise.allSettled([
+          supabaseAdmin
+            .from('profiles')
+            .select('id', { count: 'exact', head: true }),
+          supabaseAdmin
+            .from('profiles')
+            .select('id', { count: 'exact', head: true })
+            .gte('updated_at', thirtyDaysAgo.toISOString()),
+        ]);
+
+        const totalUsers = totalUsersResult.status === 'fulfilled'
+          ? (totalUsersResult.value.count ?? 0) : 0;
+        const activeUsers = activeUsersResult.status === 'fulfilled'
+          ? (activeUsersResult.value.count ?? 0) : 0;
 
         // Fetch other statistics in parallel
         const [

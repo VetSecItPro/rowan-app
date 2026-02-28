@@ -14,13 +14,16 @@ import {
   Activity,
   Home,
 } from 'lucide-react';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface User {
   id: string;
   email: string;
+  full_name: string;
+  avatar_url: string;
   created_at: string;
   last_sign_in_at: string | null;
-  email_confirmed_at: string | null;
   status: 'active' | 'inactive' | 'suspended';
 }
 
@@ -78,7 +81,10 @@ const UserListPanel = memo(function UserListPanel() {
 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
-      const matchesSearch = (user.email || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const term = debouncedSearchTerm.toLowerCase();
+      const matchesSearch =
+        (user.email || '').toLowerCase().includes(term) ||
+        (user.full_name || '').toLowerCase().includes(term);
       const matchesFilter =
         filter === 'all' ||
         (filter === 'active' && user.status === 'active') ||
@@ -128,7 +134,7 @@ const UserListPanel = memo(function UserListPanel() {
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by email..."
+            placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white"
@@ -157,7 +163,7 @@ const UserListPanel = memo(function UserListPanel() {
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase">User</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase">Joined</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase">Last Sign In</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase">Last Active</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
@@ -165,12 +171,25 @@ const UserListPanel = memo(function UserListPanel() {
                   <tr key={user.id} className="hover:bg-gray-800/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-indigo-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Users className="w-4 h-4 text-indigo-400" />
+                        {user.avatar_url ? (
+                          <img
+                            src={user.avatar_url}
+                            alt=""
+                            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-indigo-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Users className="w-4 h-4 text-indigo-400" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-medium text-white truncate">
+                            {user.full_name || user.email}
+                          </p>
+                          {user.full_name && (
+                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                          )}
                         </div>
-                        <span className="font-medium text-white">
-                          {user.email}
-                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -215,6 +234,45 @@ const LifecyclePanel = memo(function LifecyclePanel() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // All hooks must be declared before any early returns (Rules of Hooks)
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const stageCards = useMemo(() => {
+    const stg = lifecycleData?.stages || {};
+    return [
+      { label: 'New', count: stg.new ?? 0, color: 'text-yellow-400', bg: 'bg-yellow-900/20' },
+      { label: 'Activated', count: stg.activated ?? 0, color: 'text-yellow-400', bg: 'bg-yellow-900/20' },
+      { label: 'Engaged', count: stg.engaged ?? 0, color: 'text-green-400', bg: 'bg-green-900/20' },
+      { label: 'Power User', count: stg.power_user ?? 0, color: 'text-green-400', bg: 'bg-green-900/20' },
+      { label: 'At-Risk', count: stg.at_risk ?? 0, color: 'text-red-400', bg: 'bg-red-900/20' },
+      { label: 'Churned', count: stg.churned ?? 0, color: 'text-red-400', bg: 'bg-red-900/20' },
+    ];
+  }, [lifecycleData]);
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'stages') {
+      const chartData: DrillDownDataPoint[] = stageCards.map(s => ({
+        date: s.label,
+        value: s.count,
+      }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Lifecycle Stage Distribution',
+        metric: 'Users',
+        data: chartData,
+        color: '#8b5cf6',
+        chartType: 'bar',
+      });
+    }
+  }, [stageCards]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -224,18 +282,8 @@ const LifecyclePanel = memo(function LifecyclePanel() {
     );
   }
 
-  const stages = lifecycleData?.stages || {};
   const timeToValue = lifecycleData?.timeToValue || {};
   const resurrectionRate = lifecycleData?.resurrectionRate ?? 0;
-
-  const stageCards = [
-    { label: 'New', count: stages.new ?? 0, color: 'text-yellow-400', bg: 'bg-yellow-900/20' },
-    { label: 'Activated', count: stages.activated ?? 0, color: 'text-yellow-400', bg: 'bg-yellow-900/20' },
-    { label: 'Engaged', count: stages.engaged ?? 0, color: 'text-green-400', bg: 'bg-green-900/20' },
-    { label: 'Power User', count: stages.power_user ?? 0, color: 'text-green-400', bg: 'bg-green-900/20' },
-    { label: 'At-Risk', count: stages.at_risk ?? 0, color: 'text-red-400', bg: 'bg-red-900/20' },
-    { label: 'Churned', count: stages.churned ?? 0, color: 'text-red-400', bg: 'bg-red-900/20' },
-  ];
 
   return (
     <div className="space-y-6">
@@ -244,7 +292,14 @@ const LifecyclePanel = memo(function LifecyclePanel() {
         <h3 className="text-sm font-semibold text-gray-300 mb-3">Lifecycle Stages</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {stageCards.map((stage) => (
-            <div key={stage.label} className={`${stage.bg} rounded-lg p-4 text-center`}>
+            <div
+              key={stage.label}
+              className={`${stage.bg} rounded-lg p-4 text-center cursor-pointer hover:bg-gray-750 transition-colors`}
+              onClick={() => openDrillDown('stages')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('stages'); }}
+            >
               <p className="text-xs text-gray-400">{stage.label}</p>
               <p className={`text-2xl font-bold ${stage.color}`}>{stage.count}</p>
             </div>
@@ -275,6 +330,19 @@ const LifecyclePanel = memo(function LifecyclePanel() {
           <p className="text-xs text-gray-400 mt-2">Churned users who returned</p>
         </div>
       </div>
+
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });
@@ -291,6 +359,44 @@ const SpacesPanel = memo(function SpacesPanel() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // All hooks must be declared before any early returns (Rules of Hooks)
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const spaceAnalytics = lifecycleData?.spaceAnalytics || {};
+
+  const distributionCards = useMemo(() => {
+    const dist = spaceAnalytics.distribution || {};
+    return [
+      { label: 'Single User', count: dist.singleUser ?? 0, bg: 'bg-gray-800' },
+      { label: '2-3 Members', count: dist.smallGroup ?? 0, bg: 'bg-gray-800' },
+      { label: '4+ Members', count: dist.largeGroup ?? 0, bg: 'bg-gray-800' },
+    ];
+  }, [spaceAnalytics]);
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'distribution') {
+      const chartData: DrillDownDataPoint[] = distributionCards.map(c => ({
+        date: c.label,
+        value: c.count,
+      }));
+      setDrillDown({
+        isOpen: true,
+        title: 'Space Size Distribution',
+        metric: 'Spaces',
+        data: chartData,
+        color: '#6366f1',
+        chartType: 'bar',
+      });
+    }
+  }, [distributionCards]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -300,21 +406,19 @@ const SpacesPanel = memo(function SpacesPanel() {
     );
   }
 
-  const spaceAnalytics = lifecycleData?.spaceAnalytics || {};
   const avgMembers = spaceAnalytics.avgMembersPerSpace ?? 0;
-  const distribution = spaceAnalytics.distribution || {};
   const mostActive = spaceAnalytics.mostActiveSpaces || [];
-
-  const distributionCards = [
-    { label: 'Single User', count: distribution.singleUser ?? 0, bg: 'bg-gray-800' },
-    { label: '2-3 Members', count: distribution.smallGroup ?? 0, bg: 'bg-gray-800' },
-    { label: '4+ Members', count: distribution.largeGroup ?? 0, bg: 'bg-gray-800' },
-  ];
 
   return (
     <div className="space-y-6">
       {/* Avg Members */}
-      <div className="bg-gray-800 rounded-lg p-5 text-center">
+      <div
+        className="bg-gray-800 rounded-lg p-5 text-center cursor-pointer hover:bg-gray-750 transition-colors"
+        onClick={() => openDrillDown('distribution')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('distribution'); }}
+      >
         <p className="text-xs text-gray-400">Avg Members per Space</p>
         <p className="text-4xl font-bold text-indigo-400 mt-1">{avgMembers}</p>
       </div>
@@ -324,7 +428,14 @@ const SpacesPanel = memo(function SpacesPanel() {
         <h3 className="text-sm font-semibold text-gray-300 mb-3">Space Size Distribution</h3>
         <div className="grid grid-cols-3 gap-3">
           {distributionCards.map((card) => (
-            <div key={card.label} className={`${card.bg} rounded-lg p-4 text-center border border-gray-700`}>
+            <div
+              key={card.label}
+              className={`${card.bg} rounded-lg p-4 text-center border border-gray-700 cursor-pointer hover:bg-gray-750 transition-colors`}
+              onClick={() => openDrillDown('distribution')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('distribution'); }}
+            >
               <p className="text-xs text-gray-400">{card.label}</p>
               <p className="text-2xl font-bold text-white mt-1">{card.count}</p>
             </div>
@@ -366,6 +477,19 @@ const SpacesPanel = memo(function SpacesPanel() {
           </p>
         </div>
       )}
+
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+        />
+      </DrillDownModal>
     </div>
   );
 });

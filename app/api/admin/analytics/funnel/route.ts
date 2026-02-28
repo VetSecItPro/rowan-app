@@ -95,8 +95,11 @@ export async function GET(req: NextRequest) {
           timeToSpaceResult,
           timeToActionResult,
         ] = await Promise.allSettled([
-          // Stage 1: Total real signups (auth.users is source of truth, not users table which has test orphans)
-          supabaseAdmin.auth.admin.listUsers(),
+          // Stage 1: Total real signups from profiles table
+          supabaseAdmin
+            .from('profiles')
+            .select('id, created_at')
+            .limit(50000),
 
           // Stage 2: Users who created/joined a space (fetch data to filter by real auth users)
           supabaseAdmin
@@ -145,12 +148,12 @@ export async function GET(req: NextRequest) {
             .limit(5000),
         ]);
 
-        // Extract counts — auth.users returns { data: { users: User[] } }
-        const authUsers = totalUsersResult.status === 'fulfilled'
-          ? (totalUsersResult.value.data?.users ?? []) : [];
-        const totalUsers = authUsers.length;
-        // Build a set of real auth user IDs to filter orphans from other queries
-        const realUserIds = new Set(authUsers.map((u: { id: string }) => u.id));
+        // Extract counts — profiles query returns { data: ProfileRow[] }
+        const profileUsers = totalUsersResult.status === 'fulfilled'
+          ? (totalUsersResult.value.data ?? []) : [];
+        const totalUsers = profileUsers.length;
+        // Build a set of real user IDs to filter orphans from other queries
+        const realUserIds = new Set(profileUsers.map((u: { id: string }) => u.id));
 
         // Filter space_members to only real auth users
         const spaceUsersData = spaceUsersResult.status === 'fulfilled'
@@ -207,9 +210,8 @@ export async function GET(req: NextRequest) {
           .slice(0, 6);
 
         // Time-to-milestones (median calculation)
-        // Use auth.users created_at (already fetched above) — no orphan pollution
         const userCreatedMap = new Map<string, string>();
-        for (const u of authUsers as { id: string; created_at: string }[]) {
+        for (const u of profileUsers as { id: string; created_at: string }[]) {
           userCreatedMap.set(u.id, u.created_at);
         }
 

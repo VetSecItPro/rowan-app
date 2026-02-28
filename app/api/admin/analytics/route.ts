@@ -110,9 +110,9 @@ export async function GET(req: NextRequest) {
             .order('created_at', { ascending: true })
             .limit(10000),
 
-          // User registrations over time
+          // User registrations over time (profiles table)
           supabaseAdmin
-            .from('users')
+            .from('profiles')
             .select('created_at, id')
             .gte('created_at', startDate.toISOString())
             .order('created_at', { ascending: true })
@@ -358,7 +358,7 @@ export async function GET(req: NextRequest) {
               .lt('created_at', previousEnd.toISOString())
               .limit(50000),
             supabaseAdmin
-              .from('users')
+              .from('profiles')
               .select('created_at')
               .gte('created_at', previousStart.toISOString())
               .lt('created_at', previousEnd.toISOString())

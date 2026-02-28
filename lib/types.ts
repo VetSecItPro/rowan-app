@@ -804,6 +804,25 @@ export interface CreateSpaceInput {
   name: string;
 }
 
+// =============================================
+// USER FEEDBACK TYPES
+// =============================================
+
+export type FeedbackCategory = 'bug_report' | 'feature_request' | 'general';
+export type FeedbackStatus = 'open' | 'in_progress' | 'done' | 'deleted';
+
+export interface UserFeedback {
+  id: string;
+  user_id: string;
+  category: FeedbackCategory;
+  title: string;
+  description: string;
+  status: FeedbackStatus;
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreateInvitationInput {
   space_id: string;
   email: string;

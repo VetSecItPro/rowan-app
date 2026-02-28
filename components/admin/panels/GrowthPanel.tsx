@@ -355,7 +355,19 @@ const SignupsPanel = memo(function SignupsPanel() {
 });
 
 // Activation Funnel Panel
+const FUNNEL_COLORS = ['#10b981', '#3b82f6', '#a855f7', '#f59e0b'];
+
 const ActivationFunnelPanel = memo(function ActivationFunnelPanel() {
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    color?: string;
+    chartType?: 'area' | 'bar';
+    barColors?: string[];
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
   const { data: lifecycleData, isLoading } = useQuery({
     queryKey: ['admin-user-lifecycle'],
     queryFn: async () => {
@@ -390,6 +402,19 @@ const ActivationFunnelPanel = memo(function ActivationFunnelPanel() {
     ];
   }, [lifecycleData]);
 
+  const openDrillDown = useCallback((metric: string) => {
+    if (metric === 'funnel' && funnelSteps.length > 0) {
+      setDrillDown({
+        isOpen: true,
+        title: 'Activation Funnel — User Counts',
+        metric: 'funnel',
+        data: funnelSteps.map(s => ({ date: s.label, value: s.count })),
+        chartType: 'bar',
+        barColors: FUNNEL_COLORS,
+      });
+    }
+  }, [funnelSteps]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -402,7 +427,13 @@ const ActivationFunnelPanel = memo(function ActivationFunnelPanel() {
   return (
     <div className="space-y-6">
       {/* Funnel Visualization */}
-      <div>
+      <div
+        className="cursor-pointer hover:opacity-90 transition-opacity"
+        onClick={() => openDrillDown('funnel')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('funnel'); }}
+      >
         <h3 className="text-sm font-semibold text-gray-300 mb-4">Activation Funnel</h3>
         <div className="space-y-3">
           {funnelSteps.map((step, i) => (
@@ -460,6 +491,21 @@ const ActivationFunnelPanel = memo(function ActivationFunnelPanel() {
         <h4 className="text-sm font-semibold text-white mb-2">Viral Coefficient (K-factor)</h4>
         <p className="text-sm text-gray-400">K-factor tracking available when invite system is used</p>
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          metric={drillDown.metric}
+          color={drillDown.color}
+          chartType={drillDown.chartType}
+          barColors={drillDown.barColors}
+        />
+      </DrillDownModal>
     </div>
   );
 });
@@ -551,6 +597,22 @@ const TrafficPanel = memo(function TrafficPanel() {
         }
         title = 'Page Views — Daily Trend';
         color = '#3b82f6';
+        break;
+      case 'pagesPerVisit':
+        chartData = dailyTrend.map(d => ({
+          date: d.date,
+          value: d.uniqueVisitors > 0 ? Math.round((d.pageViews / d.uniqueVisitors) * 10) / 10 : 0,
+        }));
+        title = 'Pages Per Visit — Daily Trend';
+        color = '#f59e0b';
+        break;
+      case 'conversionRate':
+        chartData = dailyTrend.map(d => ({
+          date: d.date,
+          value: d.uniqueVisitors > 0 ? Math.round((d.pageViews / d.uniqueVisitors) * 100) / 100 : 0,
+        }));
+        title = 'Signup Conversion Rate — Daily %';
+        color = '#10b981';
         break;
     }
 
@@ -652,12 +714,24 @@ const TrafficPanel = memo(function TrafficPanel() {
           )}
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-5">
+        <div
+          className="bg-gray-800 rounded-xl p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('pagesPerVisit')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('pagesPerVisit'); }}
+        >
           <p className="text-sm font-medium text-gray-400">Pages / Visit</p>
           <p className="text-2xl font-bold text-white mt-1">{pagesPerVisit}</p>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-5">
+        <div
+          className="bg-gray-800 rounded-xl p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('conversionRate')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('conversionRate'); }}
+        >
           <p className="text-sm font-medium text-gray-400">Conversion Rate</p>
           <p className="text-2xl font-bold text-white mt-1">
             {conversionRate > 0 ? `${conversionRate}%` : '--'}

@@ -2,12 +2,12 @@
 
 import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   Download,
   FileText,
   Users,
   Mail,
-  Shield,
   MessageSquare,
   Calendar,
   CheckCircle,
@@ -82,18 +82,16 @@ export const ExportPanel = memo(function ExportPanel() {
     queryKey: ['admin-export-counts'],
     queryFn: async () => {
       // Fetch counts in parallel
-      const [usersRes, notificationsRes, betaRes, feedbackRes] = await Promise.allSettled([
-        fetch('/api/admin/users?range=all').then(r => r.json()),
-        fetch('/api/admin/notifications?limit=1').then(r => r.json()),
-        fetch('/api/admin/beta-requests?range=all').then(r => r.json()),
-        fetch('/api/admin/feedback?range=90d').then(r => r.json()),
+      const [usersRes, notificationsRes, feedbackRes] = await Promise.allSettled([
+        adminFetch('/api/admin/users?range=all').then(r => r.json()),
+        adminFetch('/api/admin/notifications?limit=1').then(r => r.json()),
+        adminFetch('/api/admin/feedback?limit=1').then(r => r.json()),
       ]);
 
       return {
         users: usersRes.status === 'fulfilled' ? (usersRes.value.users?.length || 0) : 0,
         notifications: notificationsRes.status === 'fulfilled' ? (notificationsRes.value.pagination?.total || 0) : 0,
-        beta: betaRes.status === 'fulfilled' ? (betaRes.value.requests?.length || 0) : 0,
-        feedback: feedbackRes.status === 'fulfilled' ? (feedbackRes.value.data?.length || 0) : 0,
+        feedback: feedbackRes.status === 'fulfilled' ? (feedbackRes.value.feedback?.total || 0) : 0,
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -119,20 +117,11 @@ export const ExportPanel = memo(function ExportPanel() {
       color: 'bg-green-500',
     },
     {
-      id: 'beta',
-      name: 'Beta Requests',
-      description: 'Export beta access requests and approval status',
-      icon: Shield,
-      endpoint: '/api/admin/beta-requests?range=all',
-      count: counts?.beta,
-      color: 'bg-purple-500',
-    },
-    {
       id: 'feedback',
       name: 'Feedback',
       description: 'Export user feedback submissions and status',
       icon: MessageSquare,
-      endpoint: '/api/admin/feedback?range=90d',
+      endpoint: '/api/admin/feedback?limit=100',
       count: counts?.feedback,
       color: 'bg-pink-500',
     },
@@ -142,7 +131,7 @@ export const ExportPanel = memo(function ExportPanel() {
     setExportingId(option.id);
 
     try {
-      const response = await fetch(option.endpoint);
+      const response = await adminFetch(option.endpoint);
       if (!response.ok) throw new Error('Export failed');
 
       const data = await response.json();
@@ -154,10 +143,8 @@ export const ExportPanel = memo(function ExportPanel() {
         records = data.users || [];
       } else if (option.id === 'notifications') {
         records = data.notifications || [];
-      } else if (option.id === 'beta') {
-        records = data.requests || [];
       } else if (option.id === 'feedback') {
-        records = data.data || [];
+        records = data.feedback?.items || [];
       }
 
       if (records.length === 0) {

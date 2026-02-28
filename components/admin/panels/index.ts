@@ -22,3 +22,4 @@ export { AIUsagePanel } from './AIUsagePanel';
 export { AuditTrailPanel } from './AuditTrailPanel';
 export { CustomerSuccessPanel } from './CustomerSuccessPanel';
 export { ExecutiveSummaryPanel } from './ExecutiveSummaryPanel';
+export { FeedbackPanel } from './FeedbackPanel';
