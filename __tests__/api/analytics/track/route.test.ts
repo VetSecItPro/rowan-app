@@ -47,11 +47,26 @@ describe('/api/analytics/track', () => {
       expect(data.success).toBe(false);
     });
 
-    it('returns 400 for invalid event (bad feature)', async () => {
+    it('returns 401 for unauthenticated request (F-027)', async () => {
       const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
       const { createClient } = await import('@/lib/supabase/server');
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
       vi.mocked(createClient).mockResolvedValue(makeSupabase(null) as any);
+
+      const res = await POST(new NextRequest('http://localhost/api/analytics/track', {
+        method: 'POST',
+        body: JSON.stringify({ feature: 'tasks', action: 'page_view' }),
+      }));
+      const data = await res.json();
+      expect(res.status).toBe(401);
+      expect(data.success).toBe(false);
+    });
+
+    it('returns 400 for invalid event (bad feature)', async () => {
+      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { createClient } = await import('@/lib/supabase/server');
+      vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
+      vi.mocked(createClient).mockResolvedValue(makeSupabase({ id: 'user-1' }) as any);
 
       const res = await POST(new NextRequest('http://localhost/api/analytics/track', {
         method: 'POST',
@@ -66,7 +81,7 @@ describe('/api/analytics/track', () => {
       const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
       const { createClient } = await import('@/lib/supabase/server');
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
-      vi.mocked(createClient).mockResolvedValue(makeSupabase(null) as any);
+      vi.mocked(createClient).mockResolvedValue(makeSupabase({ id: 'user-1' }) as any);
 
       const res = await POST(new NextRequest('http://localhost/api/analytics/track', {
         method: 'POST',
@@ -75,23 +90,6 @@ describe('/api/analytics/track', () => {
       const data = await res.json();
       expect(res.status).toBe(400);
       expect(data.success).toBe(false);
-    });
-
-    it('returns 200 for single event from anonymous user', async () => {
-      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
-      const { createClient } = await import('@/lib/supabase/server');
-      vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
-      // Anonymous user — getUser returns null
-      vi.mocked(createClient).mockResolvedValue(makeSupabase(null) as any);
-
-      const res = await POST(new NextRequest('http://localhost/api/analytics/track', {
-        method: 'POST',
-        body: JSON.stringify({ feature: 'tasks', action: 'page_view' }),
-      }));
-      const data = await res.json();
-      expect(res.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.recorded).toBe(1);
     });
 
     it('returns 200 for single event from authenticated user', async () => {
@@ -116,7 +114,7 @@ describe('/api/analytics/track', () => {
       const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
       const { createClient } = await import('@/lib/supabase/server');
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
-      vi.mocked(createClient).mockResolvedValue(makeSupabase(null) as any);
+      vi.mocked(createClient).mockResolvedValue(makeSupabase({ id: 'user-1' }) as any);
 
       const res = await POST(new NextRequest('http://localhost/api/analytics/track', {
         method: 'POST',
@@ -131,7 +129,7 @@ describe('/api/analytics/track', () => {
       const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
       const { createClient } = await import('@/lib/supabase/server');
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
-      vi.mocked(createClient).mockResolvedValue(makeSupabase(null) as any);
+      vi.mocked(createClient).mockResolvedValue(makeSupabase({ id: 'user-1' }) as any);
 
       const res = await POST(new NextRequest('http://localhost/api/analytics/track', {
         method: 'POST',

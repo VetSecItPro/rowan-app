@@ -24,6 +24,7 @@ import { featureFlags } from '@/lib/constants/feature-flags';
 import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import {
   detectPIIInUserInput,
+  redactPII,
   sanitizeContextForLLM,
 } from '@/lib/services/ai/ai-privacy-service';
 import { sanitizeUserInput } from '@/lib/services/ai/ai-input-sanitizer';
@@ -135,8 +136,9 @@ export async function POST(req: NextRequest) {
     }
     const safeMessage = sanitized.wasModified ? sanitized.sanitized : message;
 
-    // -- PII detection (warn but don't block) ------------------------------
+    // -- PII detection: warn and redact before sending to LLM --------------
     const piiResult = detectPIIInUserInput(safeMessage);
+    const messageForLLM = piiResult.hasPII ? redactPII(safeMessage) : safeMessage;
 
     // -- Build space context for system prompt ----------------------------
     const rawSpaceContext = await aiContextService.buildFullContext(supabase, spaceId, user);
@@ -171,7 +173,7 @@ export async function POST(req: NextRequest) {
           }
 
           const events = chatOrchestratorService.processMessage({
-            message: safeMessage,
+            message: messageForLLM,
             conversationId: activeConversationId,
             context: { spaceId, userId: user.id, supabase },
             spaceContext,

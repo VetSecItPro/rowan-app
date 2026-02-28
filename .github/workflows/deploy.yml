@@ -5,6 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# F-019: Minimal token permissions — prevents supply-chain attacks from
+# exfiltrating the GITHUB_TOKEN with write access.
+# TODO: Pin action versions to full SHA (e.g. actions/checkout@<sha>) once
+# a Dependabot/Renovate workflow is in place to keep SHAs up to date.
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-production
   cancel-in-progress: false # NEVER cancel in-progress migrations

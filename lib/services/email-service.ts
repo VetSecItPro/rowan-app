@@ -35,7 +35,14 @@ import { EmailChangeEmail } from '@/lib/emails/templates/email-change-email';
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Email service configuration
-const FROM_EMAIL = 'Rowan <notifications@rowanapp.com>';
+// notifications@rowanapp.com  — general in-app notifications (tasks, events, messages, shopping, meals, daily digest)
+// reminders@rowanapp.com      — reminder-type notifications (general reminders, event reminders, meal reminders)
+// noreply@rowanapp.com        — transactional auth emails (password reset, magic link, verification, email change, invitations, subscription)
+const FROM_NOTIFICATIONS = 'Rowan <notifications@rowanapp.com>';
+const FROM_REMINDERS = 'Rowan <reminders@rowanapp.com>';
+const FROM_NOREPLY = 'Rowan <noreply@rowanapp.com>';
+/** @deprecated Use the specific FROM_* constants instead */
+const FROM_EMAIL = FROM_NOTIFICATIONS;
 const REPLY_TO_EMAIL = 'contact@steelmotionllc.com';
 
 /**
@@ -329,7 +336,7 @@ export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise
     const emailHtml = await render(TaskAssignmentEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOTIFICATIONS,
       to: [data.recipientEmail],
       subject: `New Task Assignment: ${data.taskTitle}`,
       html: emailHtml,
@@ -370,7 +377,7 @@ export async function sendEventReminderEmail(data: EventReminderData): Promise<E
     const emailHtml = await render(EventReminderEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_REMINDERS,
       to: [data.recipientEmail],
       subject: `Event Reminder: ${data.eventTitle}`,
       html: emailHtml,
@@ -411,7 +418,7 @@ export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailRe
     const emailHtml = await render(NewMessageEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOTIFICATIONS,
       to: [data.recipientEmail],
       subject: `New message from ${data.senderName}`,
       html: emailHtml,
@@ -457,7 +464,7 @@ export async function sendShoppingListEmail(data: ShoppingListData): Promise<Ema
     };
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOTIFICATIONS,
       to: [data.recipientEmail],
       subject: `Shopping list ${actionLabels[data.actionType]}: ${data.listName}`,
       html: emailHtml,
@@ -504,7 +511,7 @@ export async function sendMealReminderEmail(data: MealReminderData): Promise<Ema
     };
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_REMINDERS,
       to: [data.recipientEmail],
       subject: `${reminderLabels[data.reminderType]}: ${data.mealName}`,
       html: emailHtml,
@@ -546,7 +553,7 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
     const emailHtml = await render(GeneralReminderEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_REMINDERS,
       to: [data.recipientEmail],
       subject: `Reminder: ${data.reminderTitle}`,
       html: emailHtml,
@@ -620,7 +627,7 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
         // Sanitize tag values - Resend only allows ASCII letters, numbers, underscores, dashes
         const sanitizeTag = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
         const response = await resend.emails.send({
-          from: FROM_EMAIL,
+          from: FROM_NOREPLY,
           to: [data.recipientEmail],
           subject: `You're invited to join "${data.spaceName}" on Rowan`,
           html: emailHtml,
@@ -672,7 +679,7 @@ export async function sendPasswordResetEmail(data: PasswordResetData): Promise<E
     const emailHtml = await render(PasswordResetEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.userEmail],
       subject: 'Reset your password - Rowan',
       html: emailHtml,
@@ -711,7 +718,7 @@ export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResu
     const emailHtml = await render(MagicLinkEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.userEmail],
       subject: 'Sign in to Rowan - Magic Link',
       html: emailHtml,
@@ -750,7 +757,7 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
     const emailHtml = await render(EmailVerificationEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.userEmail],
       subject: 'Verify your email address - Welcome to Rowan!',
       html: emailHtml,
@@ -796,7 +803,7 @@ export async function sendEmailChangeEmail(data: EmailChangeData): Promise<Email
     }));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.newEmail],
       subject: 'Confirm your new email address - Rowan',
       html: emailHtml,
@@ -848,7 +855,7 @@ export async function sendDailyDigestEmail(data: DailyDigestData): Promise<Email
     }));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOTIFICATIONS,
       to: [data.recipientEmail],
       subject: `Your Daily Digest for ${data.date}`,
       html: emailHtml,
@@ -906,7 +913,7 @@ export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<E
     }));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOTIFICATIONS,
       to: [data.recipientEmail],
       subject: `Your Daily Briefing for ${data.date}`,
       html: emailHtml,
@@ -1117,7 +1124,7 @@ export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData
     const emailHtml = await render(SubscriptionWelcomeEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.recipientEmail],
       subject: `Welcome to Rowan ${tierName}! Your subscription is active`,
       html: emailHtml,
@@ -1160,7 +1167,7 @@ export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<E
     const emailHtml = await render(PaymentFailedEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.recipientEmail],
       subject: 'Action needed: Your Rowan payment couldn\'t be processed',
       html: emailHtml,
@@ -1204,7 +1211,7 @@ export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelled
     const emailHtml = await render(SubscriptionCancelledEmail(data));
 
     const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_NOREPLY,
       to: [data.recipientEmail],
       subject: `Your Rowan ${tierName} subscription has been cancelled`,
       html: emailHtml,

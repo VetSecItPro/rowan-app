@@ -1,43 +1,58 @@
 /**
  * Storage Native Bridge
  *
- * Wraps @capacitor/preferences for persistent key-value storage on iOS/Android.
- * Falls back to localStorage when running in a web browser.
+ * Provides persistent key-value storage with a security-tiered approach:
+ *
+ * - Native (iOS/Android): Uses `capacitor-secure-storage-plugin`, which maps
+ *   to iOS Keychain and Android EncryptedSharedPreferences. All values are
+ *   encrypted at rest. `@capacitor/preferences` (unencrypted SharedPreferences /
+ *   UserDefaults) is no longer used on native — that was F-016.
+ *
+ * - Web: Falls back to localStorage, which is per-origin and considered
+ *   acceptable for non-credential web data. A console warning is emitted so
+ *   developers remain aware that web storage is plaintext.
+ *
+ * SECURITY (F-016 fix):
+ *   The previous implementation used @capacitor/preferences on native, which
+ *   stores data in plaintext SharedPreferences (Android) / unprotected
+ *   UserDefaults (iOS). All native writes now go through SecureStoragePlugin
+ *   so that user IDs, space IDs, and preference data are encrypted at rest.
  */
 
-import { isNative } from './capacitor';
+import { isNative, isPluginAvailable } from './capacitor';
 
-// Types from the plugin
-type PreferencesPlugin = typeof import('@capacitor/preferences').Preferences;
+// Types
+type SecureStoragePluginType =
+  typeof import('capacitor-secure-storage-plugin').SecureStoragePlugin;
 
-// Dynamic import to avoid bundling issues on web
-let PreferencesPlugin: PreferencesPlugin | null = null;
+// Lazy-loaded SecureStoragePlugin instance (native only)
+let _securePlugin: SecureStoragePluginType | null = null;
 
-async function getPreferencesPlugin(): Promise<PreferencesPlugin | null> {
-  if (!isNative) return null;
+async function getSecurePlugin(): Promise<SecureStoragePluginType | null> {
+  if (!isNative || !isPluginAvailable('SecureStoragePlugin')) return null;
 
-  if (!PreferencesPlugin) {
-    const mod = await import('@capacitor/preferences');
-    PreferencesPlugin = mod.Preferences;
+  if (!_securePlugin) {
+    const mod = await import('capacitor-secure-storage-plugin');
+    _securePlugin = mod.SecureStoragePlugin;
   }
-  return PreferencesPlugin;
+  return _securePlugin;
 }
 
 /**
- * Store a value by key
+ * Store a value by key.
  *
- * On native: uses Capacitor Preferences (SharedPreferences / UserDefaults).
- * On web: uses localStorage.
+ * On native: encrypted via SecureStoragePlugin (Keychain / EncryptedSharedPreferences).
+ * On web: localStorage (plaintext, per-origin).
  */
 export async function setItem(key: string, value: string): Promise<void> {
-  const plugin = await getPreferencesPlugin();
+  const plugin = await getSecurePlugin();
 
   if (plugin) {
     try {
       await plugin.set({ key, value });
       return;
     } catch {
-      // Plugin error — fall through to web
+      // Plugin error — fall through to web fallback
     }
   }
 
@@ -52,19 +67,20 @@ export async function setItem(key: string, value: string): Promise<void> {
 }
 
 /**
- * Retrieve a value by key
+ * Retrieve a value by key.
  *
  * @returns The stored value, or null if not found.
  */
 export async function getItem(key: string): Promise<string | null> {
-  const plugin = await getPreferencesPlugin();
+  const plugin = await getSecurePlugin();
 
   if (plugin) {
     try {
       const result = await plugin.get({ key });
       return result.value;
     } catch {
-      // Plugin error — fall through to web
+      // Key not found or plugin error — return null
+      return null;
     }
   }
 
@@ -81,17 +97,17 @@ export async function getItem(key: string): Promise<string | null> {
 }
 
 /**
- * Remove a stored value by key
+ * Remove a stored value by key.
  */
 export async function removeItem(key: string): Promise<void> {
-  const plugin = await getPreferencesPlugin();
+  const plugin = await getSecurePlugin();
 
   if (plugin) {
     try {
       await plugin.remove({ key });
       return;
     } catch {
-      // Plugin error — fall through to web
+      // Plugin error — fall through to web fallback
     }
   }
 
@@ -106,17 +122,21 @@ export async function removeItem(key: string): Promise<void> {
 }
 
 /**
- * Clear all stored key-value pairs
+ * Clear all stored key-value pairs.
+ *
+ * NOTE: On native, SecureStoragePlugin.clear() removes only keys written by
+ * this app's secure storage namespace. On web, localStorage.clear() removes
+ * ALL keys for this origin — callers should prefer removeItem for targeted cleanup.
  */
 export async function clear(): Promise<void> {
-  const plugin = await getPreferencesPlugin();
+  const plugin = await getSecurePlugin();
 
   if (plugin) {
     try {
       await plugin.clear();
       return;
     } catch {
-      // Plugin error — fall through to web
+      // Plugin error — fall through to web fallback
     }
   }
 
@@ -131,20 +151,22 @@ export async function clear(): Promise<void> {
 }
 
 /**
- * Get all stored keys
+ * Get all stored keys.
  *
- * @returns Array of all keys in storage.
+ * NOTE: SecureStoragePlugin does not expose a `keys()` method, so on native
+ * this returns an empty array. Callers that need key enumeration should
+ * maintain their own key registry. On web, localStorage.key() enumeration
+ * works as before.
+ *
+ * @returns Array of all keys in storage (web only; empty on native).
  */
 export async function keys(): Promise<string[]> {
-  const plugin = await getPreferencesPlugin();
+  const plugin = await getSecurePlugin();
 
   if (plugin) {
-    try {
-      const result = await plugin.keys();
-      return result.keys;
-    } catch {
-      // Plugin error — fall through to web
-    }
+    // SecureStoragePlugin has no keys() API — return empty on native.
+    // Callers that require key listing should track keys explicitly.
+    return [];
   }
 
   // Web fallback

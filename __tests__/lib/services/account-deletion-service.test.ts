@@ -12,6 +12,7 @@ const mockSupabaseClient = vi.hoisted(() => {
   chainable.eq = vi.fn(() => chainable);
   chainable.in = vi.fn(() => chainable);
   chainable.single = vi.fn(() => Promise.resolve({ data: null, error: null }));
+  chainable.maybeSingle = vi.fn(() => Promise.resolve({ data: null, error: null }));
   return chainable;
 });
 
@@ -98,7 +99,7 @@ describe('accountDeletionService', () => {
     it('should return true when account is marked for deletion', async () => {
       const userId = 'user-123';
 
-      mockSupabaseClient.single.mockResolvedValueOnce({
+      mockSupabaseClient.maybeSingle.mockResolvedValueOnce({
         data: { user_id: userId },
         error: null,
       });
@@ -111,9 +112,9 @@ describe('accountDeletionService', () => {
     it('should return false when account is not marked for deletion', async () => {
       const userId = 'user-123';
 
-      mockSupabaseClient.single.mockResolvedValueOnce({
+      mockSupabaseClient.maybeSingle.mockResolvedValueOnce({
         data: null,
-        error: { message: 'Not found', code: 'PGRST116' },
+        error: null,
       });
 
       const result = await accountDeletionService.isAccountMarkedForDeletion(userId, mockSupabaseClient as never);

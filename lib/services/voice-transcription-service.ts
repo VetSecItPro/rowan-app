@@ -104,12 +104,15 @@ export const voiceTranscriptionService = {
   async searchTranscriptions(userId: string, query: string): Promise<VoiceTranscriptionResult[]> {
     const supabase = createClient();
 
+    // Sanitize FTS query: strip PostgreSQL full-text search operators to prevent injection
+    const sanitizedQuery = query.replace(/[&|!:*()"'<>]/g, ' ').trim();
+
     // nosemgrep: supabase-missing-space-id-filter — voice_transcriptions is user-scoped (no space_id column)
     const { data, error } = await supabase
       .from('voice_transcriptions')
       .select('transcription, confidence, language, audio_duration, word_count, keywords')
       .eq('user_id', userId)
-      .textSearch('transcription', query)
+      .textSearch('transcription', sanitizedQuery)
       .order('created_at', { ascending: false });
 
     if (error) {

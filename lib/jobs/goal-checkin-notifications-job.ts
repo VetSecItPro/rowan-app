@@ -372,7 +372,7 @@ async function sendGoalCheckInReminderEmail(batch: CheckInNotificationBatch): Pr
 
   try {
     const { error } = await resend.emails.send({
-      from: 'Rowan <reminders@rowan.app>',
+      from: 'Rowan <reminders@rowanapp.com>',
       to: batch.userEmail,
       subject: emailSubject,
       html: emailHtml,

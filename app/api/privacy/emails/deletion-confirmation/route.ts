@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     const cancelUrl = `${getAppUrl()}/settings/privacy-data`;
 
     const { error: sendError } = await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: profile.email,
       subject: 'Account Deletion Requested - 30 Day Grace Period',
       html: `

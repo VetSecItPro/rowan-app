@@ -15,7 +15,6 @@ import type { CapacitorConfig } from '@capacitor/cli';
  */
 
 const serverUrl = process.env.CAPACITOR_SERVER_URL || 'https://rowan-app.vercel.app';
-const isProduction = process.env.NODE_ENV === 'production';
 
 const config: CapacitorConfig = {
   appId: 'com.rowan.app',
@@ -29,8 +28,8 @@ const config: CapacitorConfig = {
     // This keeps all API routes, SSR, and real-time features working
     url: serverUrl,
 
-    // Allow HTTP in development
-    cleartext: !isProduction,
+    // Always disallow HTTP cleartext traffic for security
+    cleartext: false,
 
     // Handle navigation properly
     androidScheme: 'https',
@@ -88,9 +87,10 @@ const config: CapacitorConfig = {
 
   // Android configuration
   android: {
-    allowMixedContent: !isProduction,
+    // Always false for security; dev overrides via environment-specific config
+    allowMixedContent: false,
     captureInput: true,
-    webContentsDebuggingEnabled: !isProduction,
+    webContentsDebuggingEnabled: false,
     // Permissions will be added in AndroidManifest.xml:
     // - ACCESS_FINE_LOCATION
     // - ACCESS_COARSE_LOCATION

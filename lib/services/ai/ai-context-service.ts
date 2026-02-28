@@ -303,19 +303,30 @@ class AIContextService {
     user: { id: string; email?: string; user_metadata?: { name?: string } }
   ): Promise<FullAIContext> {
     try {
-      const [staticCtx, summary, activity] = await Promise.all([
+      const [staticCtx, summary, activity, profileResult] = await Promise.all([
         this.getStaticContext(supabase, spaceId),
         this.getSummaryContext(supabase, spaceId),
         this.getRecentActivity(supabase, spaceId),
+        // Fetch the user's display name from their profile — never use email
+        supabase
+          .from('user_profiles')
+          .select('name')
+          .eq('user_id', user.id)
+          .single(),
       ]);
+
+      type ProfileRow = { name: string | null };
+      const profileName = (profileResult.data as ProfileRow | null)?.name;
+      // Use profile name, then user_metadata name, then a generic greeting.
+      // Never fall back to an email address.
+      const userName = profileName || user.user_metadata?.name || 'there';
 
       return {
         spaceId,
         spaceName: staticCtx.spaceName,
         members: staticCtx.members,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        userName:
-          user.user_metadata?.name || user.email?.split('@')[0] || 'there',
+        userName,
         userId: user.id,
         // Legacy fields (for backward compat with system-prompt.ts)
         recentTasks: [], // Summary provides counts instead
@@ -338,14 +349,14 @@ class AIContextService {
         action: 'build_full_context',
       });
 
-      // Fallback: return minimal context
+      // Fallback: return minimal context. Never use email as display name.
+      const userName = user.user_metadata?.name || 'there';
       return {
         spaceId,
         spaceName: 'My Space',
         members: [],
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        userName:
-          user.user_metadata?.name || user.email?.split('@')[0] || 'there',
+        userName,
         userId: user.id,
       };
     }

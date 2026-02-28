@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { error: sendError } = await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: profile.email,
       subject: 'Account Deletion Cancelled',
       html: `

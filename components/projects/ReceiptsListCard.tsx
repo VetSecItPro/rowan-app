@@ -57,7 +57,8 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
   const handleViewReceipt = async (receipt: Receipt) => {
     try {
       const url = await receiptsService.getReceiptImageUrl(receipt.storage_path);
-      window.open(url, '_blank');
+      const safeUrl = url.startsWith('https://') || url.startsWith('http://') ? url : null;
+      if (safeUrl) window.open(safeUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {
       logger.error('Failed to get receipt URL:', error, { component: 'ReceiptsListCard', action: 'component_action' });
     }

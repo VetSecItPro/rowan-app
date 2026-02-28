@@ -7,6 +7,8 @@
  * e.g., "2 cups all-purpose flour, sifted" → "All-purpose flour"
  */
 
+import { escapeRegExp } from '@/lib/utils/input-sanitization';
+
 // Common measurement units to strip
 const UNITS = [
   // Volume
@@ -105,9 +107,9 @@ export function simplifyIngredient(ingredient: string): string {
   );
   result = result.replace(connectorPattern, '');
 
-  // Remove descriptors (as whole words)
+  // Remove descriptors (as whole words); escapeRegExp guards against ReDoS
   DESCRIPTORS.forEach(descriptor => {
-    const pattern = new RegExp(`\\b${descriptor}\\b`, 'gi');
+    const pattern = new RegExp(`\\b${escapeRegExp(descriptor)}\\b`, 'gi');
     result = result.replace(pattern, '');
   });
 

@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: 'Invalid request data', details: error.issues },
+        { success: false, error: 'Invalid request data' },
         { status: 400 }
       );
     }
@@ -467,7 +467,7 @@ async function sendExportCompletionEmail(
     }
 
     await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: profile.email,
       subject: '✅ Your Data Export is Ready',
       html: `
@@ -557,7 +557,7 @@ async function sendExportFailureEmail(userId: string) {
     }
 
     await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: profile.email,
       subject: '❌ Data Export Failed',
       html: `

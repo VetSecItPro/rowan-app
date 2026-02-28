@@ -12,9 +12,17 @@ import { listConversations } from '@/lib/services/ai/conversation-persistence-se
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import { withDynamicDataCache } from '@/lib/utils/cache-headers';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export async function GET(req: NextRequest) {
   try {
+    const ip = extractIP(req.headers);
+    const { success: rateLimitOk } = await checkGeneralRateLimit(ip);
+    if (!rateLimitOk) {
+      return Response.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     if (!featureFlags.isAICompanionEnabled()) {
       return Response.json({ error: 'AI companion is not enabled' }, { status: 403 });
     }

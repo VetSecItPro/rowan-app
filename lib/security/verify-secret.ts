@@ -28,6 +28,19 @@ export function verifySecret(provided: string | null, expected: string | undefin
  * Extracts the token from "Bearer <token>" format and compares it
  * using timing-safe comparison.
  *
+ * All cron routes send: `Authorization: Bearer <CRON_SECRET>`. Vercel Cron
+ * automatically injects this header when the `CRON_SECRET` env var is set in
+ * the project settings. On Vercel, the cron infrastructure also sends the
+ * `x-vercel-cron-signature` header for additional verification; however, that
+ * header requires the raw request body and HMAC-SHA256, which is incompatible
+ * with Next.js route handlers that consume the body stream. The Bearer token
+ * check is therefore the authoritative gate for all cron routes.
+ *
+ * SECURITY RECOMMENDATION — Secret rotation:
+ *   Rotate CRON_SECRET periodically (every 90 days) and immediately after any
+ *   suspected exposure. Update the value in both Vercel project settings and
+ *   any external schedulers before the old value is retired.
+ *
  * @param authHeader - The full Authorization header value (e.g., "Bearer abc123")
  * @param cronSecret - The expected CRON_SECRET value
  * @returns true if the bearer token matches, false otherwise

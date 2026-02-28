@@ -39,8 +39,19 @@ function MagicLinkHandler() {
         }
 
         // Redirect to Supabase's action link - it handles session creation
+        // SECURITY: Validate the redirect URL to prevent open redirect attacks.
+        // Only allow relative paths or known Supabase auth domains.
         if (data.action_url) {
-          window.location.href = data.action_url;
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+          const isRelative = data.action_url.startsWith('/');
+          const isSameOrigin = data.action_url.startsWith(window.location.origin);
+          const isSupabaseAuth = supabaseUrl && data.action_url.startsWith(supabaseUrl);
+          if (isRelative || isSameOrigin || isSupabaseAuth) {
+            window.location.href = data.action_url;
+          } else {
+            setStatus('error');
+            setMessage('Invalid authentication URL. Please try again.');
+          }
           return;
         }
 

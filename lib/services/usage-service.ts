@@ -73,43 +73,16 @@ export async function incrementUsage(
 
   const columnName = columnMap[usageType];
 
-  // First, try to get existing record
-  const { data: existing } = await supabase
-    .from('daily_usage')
-    .select('id, ' + columnName)
-    .eq('user_id', userId)
-    .eq('date', today)
-    .single();
+  // Atomic increment via RPC — prevents race conditions on concurrent requests
+  const { error } = await supabase.rpc('increment_daily_usage', {
+    p_user_id: userId,
+    p_usage_type: columnName,
+    p_amount: amount,
+  });
 
-  if (existing) {
-    // Update existing record
-    const currentValue = (existing as Record<string, number>)[columnName] || 0;
-    const { error } = await supabase
-      .from('daily_usage')
-      .update({ [columnName]: currentValue + amount })
-      .eq('id', existing.id);
-
-    if (error) {
-      logger.error('Error incrementing usage:', error, { component: 'lib-usage-service', action: 'service_call' });
-      return { success: false, error: error.message };
-    }
-  } else {
-    // Insert new record with default values
-    const { error } = await supabase
-      .from('daily_usage')
-      .insert({
-        user_id: userId,
-        date: today,
-        tasks_created: usageType === 'tasks_created' ? amount : 0,
-        messages_sent: usageType === 'messages_sent' ? amount : 0,
-        shopping_list_updates: usageType === 'shopping_list_updates' ? amount : 0,
-        quick_actions_used: usageType === 'quick_actions_used' ? amount : 0,
-      });
-
-    if (error) {
-      logger.error('Error creating usage record:', error, { component: 'lib-usage-service', action: 'service_call' });
-      return { success: false, error: error.message };
-    }
+  if (error) {
+    logger.error('Error incrementing usage:', error, { component: 'lib-usage-service', action: 'service_call' });
+    return { success: false, error: error.message };
   }
 
   return { success: true };

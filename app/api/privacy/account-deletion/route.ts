@@ -356,7 +356,7 @@ async function sendDeletionConfirmationEmail(
     }
 
     await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: email,
       subject: 'Account Deletion Requested - 30 Day Grace Period',
       html: `
@@ -417,7 +417,7 @@ async function sendDeletionCancellationEmail(email: string, userName: string) {
     }
 
     await resend.emails.send({
-      from: 'Rowan <noreply@rowan.app>',
+      from: 'Rowan <noreply@rowanapp.com>',
       to: email,
       subject: 'Account Deletion Cancelled',
       html: `

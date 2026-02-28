@@ -251,7 +251,7 @@ describe('AIContextService', () => {
       expect(result.userName).toBe('Alice Smith');
     });
 
-    it('should extract username from email when no name available', async () => {
+    it('should fallback to generic greeting when no name available (F-036: never expose email)', async () => {
       const supabase = {
         from: vi.fn().mockImplementation(() => {
           throw new Error('DB unavailable');
@@ -266,7 +266,8 @@ describe('AIContextService', () => {
         user
       );
 
-      expect(result.userName).toBe('john.doe');
+      // F-036: Username never falls back to email to prevent PII leakage
+      expect(result.userName).toBe('there');
     });
   });
 });

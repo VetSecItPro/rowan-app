@@ -145,6 +145,10 @@ export async function getGoalContribution(contributionId: string): Promise<GoalC
 export async function createGoalContribution(
   input: CreateGoalContributionInput
 ): Promise<GoalContribution> {
+  if (input.amount < 0) {
+    throw new Error('Amount must be non-negative');
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -179,6 +183,10 @@ export async function updateGoalContribution(
   contributionId: string,
   updates: UpdateGoalContributionInput
 ): Promise<GoalContribution> {
+  if (updates.amount !== undefined && updates.amount < 0) {
+    throw new Error('Amount must be non-negative');
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase

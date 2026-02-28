@@ -56,8 +56,9 @@ const TrackEventSchema = z.object({
 });
 
 // Batch tracking schema (for multiple events)
+// F-028: Batch size capped at 10 (down from 50) to limit request abuse surface.
 const BatchTrackSchema = z.object({
-  events: z.array(TrackEventSchema).min(1).max(50),
+  events: z.array(TrackEventSchema).min(1).max(10),
 });
 
 /**
@@ -128,8 +129,14 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Get authenticated user (optional - allow anonymous tracking)
+    // F-027: Require authentication — anonymous tracking is not permitted.
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     // Parse request body
     const body = await request.json();

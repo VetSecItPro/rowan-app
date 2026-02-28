@@ -45,7 +45,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     // Validate token
     const { data: tokenData, error: tokenError } = await supabaseAdmin
       .from('investor_summary_tokens')
-      .select('id, expires_at, is_revoked, access_count')
+      .select('id, expires_at, is_revoked, access_count, created_at')
       .eq('token', token)
       .single();
 
@@ -73,6 +73,25 @@ export async function GET(req: NextRequest, context: RouteContext) {
     const now = new Date();
     const expiresAt = new Date(tokenData.expires_at);
     if (expiresAt < now) {
+      return NextResponse.json(
+        { error: 'This link has expired' },
+        { status: 401 }
+      );
+    }
+
+    // Enforce a maximum token lifetime of 90 days regardless of expires_at.
+    // This prevents tokens that were created without a near-term expiry from
+    // remaining valid indefinitely.
+    const MAX_TOKEN_LIFETIME_DAYS = 90;
+    const createdAt = new Date(tokenData.created_at);
+    const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSinceCreation > MAX_TOKEN_LIFETIME_DAYS) {
+      logger.warn('Investor summary token exceeded maximum lifetime', {
+        component: 'api-route',
+        action: 'token_expired',
+        ip,
+        daysSinceCreation: Math.floor(daysSinceCreation),
+      });
       return NextResponse.json(
         { error: 'This link has expired' },
         { status: 401 }
