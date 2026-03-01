@@ -131,17 +131,11 @@ export function extractIP(headers: Headers): string {
     return realIP.trim();
   }
 
-  // 4. x-forwarded-for - SECURITY: Use LAST IP, not first
-  // The last IP is set by our trusted proxy; first can be spoofed
-  const forwardedFor = headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const ips = forwardedFor.split(',').map(ip => ip.trim());
-    // Use the last IP in the chain (most trusted - set by our infra)
-    const lastIP = ips[ips.length - 1];
-    if (lastIP && isValidIP(lastIP)) {
-      return lastIP;
-    }
-  }
+  // 4. x-forwarded-for - SECURITY: Only trust when behind a known reverse proxy.
+  // Without a trusted proxy (Vercel/Cloudflare), the entire header is client-controlled.
+  // We only reach here if no platform header was found, meaning we're likely
+  // self-hosted or in development — do NOT trust x-forwarded-for in that case.
+  // This prevents rate limit bypass via X-Forwarded-For header spoofing.
 
   // 5. In development, use a stable identifier per session
   // SECURITY: Do NOT use a constant IP that all dev instances share

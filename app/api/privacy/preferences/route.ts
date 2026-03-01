@@ -131,9 +131,7 @@ export async function PATCH(request: NextRequest) {
     const validatedData = PrivacyPreferenceUpdateSchema.parse(body);
 
     // Get client IP and user agent for audit trail
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    const realIp = request.headers.get('x-real-ip');
-    const clientIp = forwardedFor?.split(',')[0] || realIp || 'unknown';
+    const clientIp = extractIP(request.headers);
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Update privacy preferences

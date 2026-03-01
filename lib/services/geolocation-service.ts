@@ -44,11 +44,12 @@ export const geolocationService = {
 
       logger.info('[Geolocation] Fetching location from IP...', { component: 'lib-geolocation-service' });
 
-      // Use our server-side API route instead of direct external call
+      // Use our server-side API route (requires auth cookie)
       const response = await fetch('/api/geolocation', {
         headers: {
           'Accept': 'application/json',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) {

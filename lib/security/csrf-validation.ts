@@ -36,10 +36,10 @@ export function validateCsrfRequest(request: NextRequest): NextResponse | null {
     return null;
   }
 
-  const authHeader = request.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    return null;
-  }
+  // SECURITY (RT-017): Removed Bearer header CSRF bypass.
+  // A fake "Authorization: Bearer x" header could skip CSRF validation while
+  // the request still authenticated via cookies. CSRF protection must always apply
+  // for cookie-authenticated state-changing requests regardless of Authorization header.
 
   // Validate CSRF token
   if (!validateCsrfToken(request)) {

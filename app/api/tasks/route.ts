@@ -5,7 +5,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
-import { createTaskSchema } from '@/lib/validations/task-schemas';
+import { createTaskSchema, validateAndSanitizeTask } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
 import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
@@ -204,7 +204,8 @@ export async function POST(req: NextRequest) {
 
     let validatedData;
     try {
-      validatedData = createTaskSchema.parse({
+      // SECURITY (RT-014): Use validateAndSanitizeTask to strip HTML/XSS from title and text fields
+      validatedData = validateAndSanitizeTask({
         ...body,
         created_by: user.id,
       });

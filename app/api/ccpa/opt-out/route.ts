@@ -86,9 +86,7 @@ export async function POST(request: NextRequest) {
     const validatedData = OptOutRequestSchema.parse(body);
 
     // Get request metadata
-    const ipAddress = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-                      request.headers.get('x-real-ip') ||
-                      'unknown';
+    const ipAddress = extractIP(request.headers);
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Check if user is likely a California resident based on IP

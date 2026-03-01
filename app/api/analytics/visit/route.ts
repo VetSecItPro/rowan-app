@@ -61,16 +61,22 @@ function detectBrowser(ua: string): string {
 /** Records a page visit beacon */
 export async function POST(request: NextRequest) {
   try {
-    // Rate limit: 100 requests per minute per IP
+    // SECURITY (RT-006): Rate limit reduced from 100 to 20 per minute to prevent DB write flooding
     const ip = extractIP(request.headers);
-    const allowed = fallbackRateLimit(ip, 100, 60 * 1000);
+    const allowed = fallbackRateLimit(ip, 20, 60 * 1000);
 
     if (!allowed) {
       return new Response(null, { status: 429 });
     }
 
-    // Parse and validate the beacon payload
-    const body = await request.json();
+    // SECURITY (RT-007): Safely parse JSON — return 400 on malformed input, not 500
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response(null, { status: 400 });
+    }
+
     const parseResult = VisitBeaconSchema.safeParse(body);
 
     if (!parseResult.success) {

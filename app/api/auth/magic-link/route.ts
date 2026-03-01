@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { sendMagicLinkEmail, type MagicLinkData } from '@/lib/services/email-service';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ const MagicLinkRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP
-    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+    const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkAuthRateLimit(`magic-link:${ip}`);
 
     if (!rateLimitPassed) {
