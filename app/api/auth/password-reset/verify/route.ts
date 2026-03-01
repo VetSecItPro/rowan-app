@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -21,7 +22,7 @@ const PasswordResetVerifySchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
-    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+    const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkAuthRateLimit(`password-reset-verify:${ip}`);
 
     if (!rateLimitPassed) {

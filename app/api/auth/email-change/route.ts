@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { sendEmailChangeEmail, type EmailChangeData } from '@/lib/services/email-service';
@@ -18,7 +19,7 @@ const EmailChangeRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP
-    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+    const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkAuthRateLimit(`email-change:${ip}`);
 
     if (!rateLimitPassed) {

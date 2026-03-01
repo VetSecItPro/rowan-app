@@ -102,9 +102,15 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // SECURITY (RT-016): Strip admin headers from incoming requests to prevent spoofing.
+  // These headers are only set by middleware on the response — never trust them from the client.
+  const sanitizedHeaders = new Headers(req.headers);
+  sanitizedHeaders.delete('x-admin-verified');
+  sanitizedHeaders.delete('x-admin-id');
+
   let response = NextResponse.next({
     request: {
-      headers: req.headers,
+      headers: sanitizedHeaders,
     },
   });
 
@@ -132,7 +138,7 @@ export async function middleware(req: NextRequest) {
           });
           response = NextResponse.next({
             request: {
-              headers: req.headers,
+              headers: sanitizedHeaders,
             },
           });
           response.cookies.set({
@@ -149,7 +155,7 @@ export async function middleware(req: NextRequest) {
           });
           response = NextResponse.next({
             request: {
-              headers: req.headers,
+              headers: sanitizedHeaders,
             },
           });
           response.cookies.set({

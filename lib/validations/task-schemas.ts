@@ -18,7 +18,17 @@ export const taskBaseSchema = z.object({
       // Accept full ISO datetime (2026-02-13T10:00:00Z) or date-only (2026-02-13) or datetime without tz (2026-02-13T10:00:00)
       if (z.string().datetime().safeParse(val).success) return true;
       return /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/.test(val);
-    }, 'Invalid date format'),
+    }, 'Invalid date format')
+    .refine(val => {
+      // SECURITY (RT-012/013): Enforce reasonable date range bounds
+      if (val === null || val === undefined) return true;
+      const date = new Date(val);
+      if (isNaN(date.getTime())) return true; // Let format check above handle invalid dates
+      const minDate = new Date('2000-01-01');
+      const maxDate = new Date();
+      maxDate.setFullYear(maxDate.getFullYear() + 10); // 10 years from now
+      return date >= minDate && date <= maxDate;
+    }, 'Due date must be between year 2000 and 10 years from now'),
   category: z.string().max(100).trim().optional().nullable()
     .transform(val => val === '' ? null : val),
   estimated_hours: z.union([

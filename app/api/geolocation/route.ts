@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
@@ -8,6 +9,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // SECURITY (RT-004): Require authentication — geolocation exposes IP/location data
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     // Rate limiting
     const ip = extractIP(request.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -15,11 +23,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    // SECURITY: Use most-trusted IP source (Vercel header, then last x-forwarded-for) — FIX-028
-    const vercelIP = request.headers.get('x-vercel-forwarded-for');
-    const forwarded = request.headers.get('x-forwarded-for');
-    const realIP = request.headers.get('x-real-ip');
-    let clientIP = vercelIP?.split(',')[0]?.trim() || forwarded?.split(',').pop()?.trim() || realIP || '';
+    // SECURITY: Use extractIP for consistent, safe IP resolution
+    let clientIP = extractIP(request.headers);
 
     // Handle localhost and development - try to get real IP first
     if (!clientIP || clientIP === '::1' || clientIP === '127.0.0.1' || clientIP.includes('localhost')) {

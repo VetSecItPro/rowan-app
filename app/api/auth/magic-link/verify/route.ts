@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Rate limiting: Use API rate limit (10/10s) instead of auth rate limit (10/hour)
     // Verification with a valid token should be more lenient than requesting new links
     // The token itself provides security - if someone has a valid token, let them verify it
-    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+    const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkApiRateLimit(`magic-link-verify:${ip}`);
 
     if (!rateLimitPassed) {

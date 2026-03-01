@@ -6,6 +6,7 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { updateTaskSchema } from '@/lib/validations/task-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 import { ZodError } from 'zod';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
@@ -141,7 +142,24 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     let validatedUpdates;
     try {
-      validatedUpdates = updateTaskSchema.parse(updates);
+      const parsed = updateTaskSchema.parse(updates);
+      // SECURITY (RT-014): Sanitize text fields to prevent stored XSS
+      validatedUpdates = {
+        ...parsed,
+        title: parsed.title ? sanitizePlainText(parsed.title) : parsed.title,
+        description: parsed.description !== undefined
+          ? (parsed.description ? sanitizePlainText(parsed.description) : parsed.description)
+          : undefined,
+        category: parsed.category !== undefined
+          ? (parsed.category ? sanitizePlainText(parsed.category) : parsed.category)
+          : undefined,
+        quick_note: parsed.quick_note !== undefined
+          ? (parsed.quick_note ? sanitizePlainText(parsed.quick_note) : parsed.quick_note)
+          : undefined,
+        tags: parsed.tags !== undefined
+          ? (parsed.tags ? sanitizePlainText(parsed.tags) : parsed.tags)
+          : undefined,
+      };
     } catch (error) {
       if (error instanceof ZodError) {
         return NextResponse.json(

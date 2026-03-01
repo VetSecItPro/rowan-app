@@ -82,8 +82,18 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // If requesting another user's history, check their privacy settings
+    // SECURITY (RT-011): If requesting another user's history, verify they belong to the same space
     if (targetUserId !== user.id) {
+      try {
+        await verifySpaceAccess(targetUserId, spaceId);
+      } catch {
+        return NextResponse.json(
+          { error: 'User not found in this space' },
+          { status: 404 }
+        );
+      }
+
+      // Check their privacy settings
       const targetSettings = await getSharingSettings(targetUserId, spaceId, supabase);
       if (targetSettings && !targetSettings.sharing_enabled) {
         return withUserDataCache(
