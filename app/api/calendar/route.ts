@@ -11,6 +11,9 @@ import { z } from 'zod';
 import { createCalendarEventSchema } from '@/lib/validations/calendar-event-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
+import { notifyNewCalendarEvent } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 /**
  * GET /api/calendar
@@ -150,12 +153,24 @@ export async function POST(req: NextRequest) {
     }
 
     // Create calendar event using service with sanitized inputs
+    const sanitizedTitle = sanitizePlainText(title);
     const event = await calendarService.createEvent({
       ...body,
-      title: sanitizePlainText(title),
+      title: sanitizedTitle,
       description: description ? sanitizePlainText(description) : undefined,
       location: location ? sanitizePlainText(location) : undefined,
     }, supabase);
+
+    // Push notification: notify space members of new event
+    fireAndForgetPush(async () => {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+      const creatorName = profile?.display_name || 'Someone';
+      await notifyNewCalendarEvent(space_id, user.id, sanitizedTitle, creatorName);
+    });
 
     return NextResponse.json({
       success: true,

@@ -10,7 +10,7 @@
  * - Expo Push Notifications - requires EXPO_ACCESS_TOKEN env var
  */
 
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -24,7 +24,6 @@ import { logger } from '@/lib/logger';
 export interface PushToken {
   id: string;
   user_id: string;
-  space_id: string;
   token: string;
   platform: 'ios' | 'android' | 'web';
   device_name: string | null;
@@ -97,7 +96,6 @@ const registerTokenSchema = z.object({
 
 const sendNotificationSchema = z.object({
   userIds: z.array(z.string().uuid()).min(1),
-  spaceId: z.string().uuid(),
   notification: z.object({
     title: z.string().min(1).max(100),
     body: z.string().min(1).max(500),
@@ -142,15 +140,13 @@ const sendNotificationSchema = z.object({
  */
 export async function registerPushToken(
   userId: string,
-  spaceId: string,
   input: z.infer<typeof registerTokenSchema>
 ): Promise<{ success: boolean; tokenId?: string; error?: string }> {
   try {
     const validated = registerTokenSchema.parse(input);
-    const supabase = await createClient();
 
     // Check if token already exists for this user
-    const { data: existingToken } = await supabase
+    const { data: existingToken } = await supabaseAdmin
       .from('push_tokens')
       .select('id')
       .eq('user_id', userId)
@@ -159,10 +155,9 @@ export async function registerPushToken(
 
     if (existingToken) {
       // Update existing token
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('push_tokens')
         .update({
-          space_id: spaceId,
           platform: validated.platform,
           device_name: validated.deviceName || null,
           is_active: true,
@@ -177,11 +172,10 @@ export async function registerPushToken(
     }
 
     // Insert new token
-    const { data: newToken, error } = await supabase
+    const { data: newToken, error } = await supabaseAdmin
       .from('push_tokens')
       .insert({
         user_id: userId,
-        space_id: spaceId,
         token: validated.token,
         platform: validated.platform,
         device_name: validated.deviceName || null,
@@ -219,9 +213,7 @@ export async function unregisterPushToken(
   token: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient();
-
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('push_tokens')
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
@@ -250,9 +242,7 @@ export async function deactivateAllTokens(
   userId: string
 ): Promise<{ success: boolean; count: number }> {
   try {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('push_tokens')
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
@@ -269,27 +259,23 @@ export async function deactivateAllTokens(
 }
 
 /**
- * Retrieves all active push tokens for specified users within a space.
+ * Retrieves all active push tokens for specified users.
  *
  * Used to gather device tokens before sending notifications. Only returns
- * tokens that are marked as active and belong to the specified space.
+ * tokens that are marked as active. Push tokens are device-level and not
+ * scoped to a specific space.
  *
  * @param userIds - Array of user IDs to fetch tokens for
- * @param spaceId - The space ID to filter tokens by
  * @returns Array of active push token records
  */
 export async function getActiveTokensForUsers(
-  userIds: string[],
-  spaceId: string
+  userIds: string[]
 ): Promise<PushToken[]> {
   try {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('push_tokens')
-      .select('id, user_id, space_id, token, platform, device_name, is_active, last_used_at, created_at, updated_at')
+      .select('id, user_id, token, platform, device_name, is_active, last_used_at, created_at, updated_at')
       .in('user_id', userIds)
-      .eq('space_id', spaceId)
       .eq('is_active', true);
 
     if (error) throw error;
@@ -326,7 +312,7 @@ export async function sendPushNotification(
     const validated = sendNotificationSchema.parse(input);
 
     // Get active tokens for the target users
-    const tokens = await getActiveTokensForUsers(validated.userIds, validated.spaceId);
+    const tokens = await getActiveTokensForUsers(validated.userIds);
 
     if (tokens.length === 0) {
       logger.info('No active push tokens found for users', { userIds: validated.userIds });
@@ -402,10 +388,8 @@ export async function notifySpaceMembers(
   type: NotificationType
 ): Promise<{ success: boolean; sentCount: number }> {
   try {
-    const supabase = await createClient();
-
     // Get all space members
-    const { data: members, error } = await supabase
+    const { data: members, error } = await supabaseAdmin
       .from('space_members')
       .select('user_id')
       .eq('space_id', spaceId);
@@ -423,7 +407,6 @@ export async function notifySpaceMembers(
 
     const result = await sendPushNotification({
       userIds,
-      spaceId,
       notification,
       type,
     });
@@ -679,8 +662,7 @@ function getChannelForType(type: NotificationType): string {
 
 async function updateTokenLastUsed(tokenId: string): Promise<void> {
   try {
-    const supabase = await createClient();
-    await supabase
+    await supabaseAdmin
       .from('push_tokens')
       .update({ last_used_at: new Date().toISOString() })
       .eq('id', tokenId);
@@ -692,8 +674,7 @@ async function updateTokenLastUsed(tokenId: string): Promise<void> {
 
 async function deactivateToken(tokenId: string): Promise<void> {
   try {
-    const supabase = await createClient();
-    await supabase
+    await supabaseAdmin
       .from('push_tokens')
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('id', tokenId);
@@ -768,20 +749,17 @@ export async function notifyLocationDeparture(
 /**
  * Notifies a user when they are assigned a task.
  *
- * @param spaceId - The unique identifier of the space containing the task
  * @param assignedToUserId - The user ID of the person assigned to the task
  * @param taskTitle - The title of the assigned task
  * @param assignedByName - The display name of the person who assigned the task
  */
 export async function notifyTaskAssigned(
-  spaceId: string,
   assignedToUserId: string,
   taskTitle: string,
   assignedByName: string
 ): Promise<void> {
   await sendPushNotification({
     userIds: [assignedToUserId],
-    spaceId,
     notification: {
       title: 'New task assigned',
       body: `${assignedByName} assigned you: ${taskTitle}`,
@@ -795,18 +773,15 @@ export async function notifyTaskAssigned(
 /**
  * Notifies a user that their task is overdue.
  *
- * @param spaceId - The unique identifier of the space containing the task
  * @param userId - The user ID of the task assignee
  * @param taskTitle - The title of the overdue task
  */
 export async function notifyTaskOverdue(
-  spaceId: string,
   userId: string,
   taskTitle: string
 ): Promise<void> {
   await sendPushNotification({
     userIds: [userId],
-    spaceId,
     notification: {
       title: 'Task overdue',
       body: `"${taskTitle}" is now overdue`,
@@ -822,20 +797,17 @@ export async function notifyTaskOverdue(
  *
  * Truncates message previews longer than 100 characters for cleaner display.
  *
- * @param spaceId - The unique identifier of the space
  * @param recipientUserIds - Array of user IDs to notify (conversation participants minus sender)
  * @param senderName - The display name of the message sender
  * @param messagePreview - A preview of the message content
  */
 export async function notifyNewMessage(
-  spaceId: string,
   recipientUserIds: string[],
   senderName: string,
   messagePreview: string
 ): Promise<void> {
   await sendPushNotification({
     userIds: recipientUserIds,
-    spaceId,
     notification: {
       title: senderName,
       body: messagePreview.length > 100 ? messagePreview.slice(0, 100) + '...' : messagePreview,
@@ -851,13 +823,11 @@ export async function notifyNewMessage(
  *
  * Formats the time until the event appropriately (minutes or hours).
  *
- * @param spaceId - The unique identifier of the space
  * @param userIds - Array of user IDs to notify (event participants)
  * @param eventTitle - The title of the upcoming event
  * @param minutesUntil - Minutes until the event starts
  */
 export async function notifyEventReminder(
-  spaceId: string,
   userIds: string[],
   eventTitle: string,
   minutesUntil: number
@@ -868,7 +838,6 @@ export async function notifyEventReminder(
 
   await sendPushNotification({
     userIds,
-    spaceId,
     notification: {
       title: 'Upcoming event',
       body: `${eventTitle} starts ${timeText}`,
@@ -882,20 +851,17 @@ export async function notifyEventReminder(
 /**
  * Notifies users when a goal reaches a milestone.
  *
- * @param spaceId - The unique identifier of the space
  * @param userIds - Array of user IDs to notify (goal participants)
  * @param goalTitle - The title of the goal
  * @param percentComplete - The current completion percentage of the goal
  */
 export async function notifyGoalMilestone(
-  spaceId: string,
   userIds: string[],
   goalTitle: string,
   percentComplete: number
 ): Promise<void> {
   await sendPushNotification({
     userIds,
-    spaceId,
     notification: {
       title: 'Goal milestone reached! 🎉',
       body: `"${goalTitle}" is now ${percentComplete}% complete`,
@@ -903,5 +869,80 @@ export async function notifyGoalMilestone(
       actionUrl: '/goals',
     },
     type: 'goal_milestone',
+  });
+}
+
+/**
+ * Notifies the task creator when their task is completed by someone else.
+ *
+ * @param creatorUserId - The user ID of the task creator
+ * @param taskTitle - The title of the completed task
+ * @param completedByName - The display name of the person who completed the task
+ */
+export async function notifyTaskCompleted(
+  creatorUserId: string,
+  taskTitle: string,
+  completedByName: string
+): Promise<void> {
+  await sendPushNotification({
+    userIds: [creatorUserId],
+    notification: {
+      title: 'Task completed',
+      body: `${completedByName} completed: ${taskTitle}`,
+      data: { taskTitle },
+      actionUrl: '/tasks',
+    },
+    type: 'task_assigned',
+  });
+}
+
+/**
+ * Notifies space members when a new calendar event is created.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param excludeUserId - User ID of the creator (excluded from notifications)
+ * @param eventTitle - The title of the new event
+ * @param creatorName - The display name of the event creator
+ */
+export async function notifyNewCalendarEvent(
+  spaceId: string,
+  excludeUserId: string,
+  eventTitle: string,
+  creatorName: string
+): Promise<void> {
+  await notifySpaceMembers(
+    spaceId,
+    excludeUserId,
+    {
+      title: 'New event',
+      body: `${creatorName} added: ${eventTitle}`,
+      data: { eventTitle },
+      actionUrl: '/calendar',
+    },
+    'event_reminder'
+  );
+}
+
+/**
+ * Notifies a user when they are assigned a chore.
+ *
+ * @param assignedToUserId - The user ID of the person assigned to the chore
+ * @param choreTitle - The title of the assigned chore
+ * @param assignedByName - The display name of the person who assigned the chore
+ */
+export async function notifyChoreAssigned(
+  assignedToUserId: string,
+  choreTitle: string,
+  assignedByName: string
+): Promise<void> {
+  await sendPushNotification({
+    userIds: [assignedToUserId],
+    notification: {
+      title: 'New chore assigned',
+      body: `${assignedByName} assigned you: ${choreTitle}`,
+      data: { choreTitle },
+      actionUrl: '/household',
+    },
+    type: 'chore_reminder',
   });
 }

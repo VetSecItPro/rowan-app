@@ -116,7 +116,6 @@ export async function POST(req: NextRequest) {
 
     const result = await sendPushNotification({
       userIds: memberIds,
-      spaceId: validated.space_id,
       notification: {
         title: 'Emergency Alert',
         body: emergencyMessage,
