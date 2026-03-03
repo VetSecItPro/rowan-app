@@ -6,7 +6,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
@@ -230,7 +230,7 @@ export async function updateUserLocation(
   supabaseClient?: SupabaseClient
 ): Promise<{ success: true; data: UserLocation } | { success: false; error: string }> {
   try {
-    const supabase = supabaseClient ? supabaseAdmin : getSupabaseClient();
+    const supabase = supabaseClient ?? getSupabaseClient();
     const validated = LocationUpdateSchema.parse(locationData);
 
     const { data, error } = await supabase
@@ -501,7 +501,7 @@ export async function createPlace(
   supabaseClient?: SupabaseClient
 ): Promise<{ success: true; data: FamilyPlace } | { success: false; error: string }> {
   try {
-    const supabase = supabaseClient ? supabaseAdmin : getSupabaseClient();
+    const supabase = supabaseClient ?? getSupabaseClient();
     const validated = CreatePlaceSchema.parse(placeData);
 
     const { data, error } = await supabase
