@@ -11,6 +11,9 @@ import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { withDynamicDataCache } from '@/lib/utils/cache-headers';
 import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
+import { notifyNewMessage } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 const isSafeHttpUrl = (value: string): boolean => {
   try {
@@ -256,6 +259,28 @@ export async function POST(req: NextRequest) {
 
     // Track message usage
     await trackUsage(user.id, 'messages_sent');
+
+    // Push notification: notify all space members except sender
+    fireAndForgetPush(async () => {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+      const senderName = profile?.display_name || 'Someone';
+
+      // Get all space members except the sender
+      const { data: members } = await supabaseAdmin
+        .from('space_members')
+        .select('user_id')
+        .eq('space_id', space_id)
+        .neq('user_id', user.id);
+
+      const recipientIds = (members || []).map((m: { user_id: string }) => m.user_id);
+      if (recipientIds.length > 0) {
+        await notifyNewMessage(recipientIds, senderName, sanitizedContent);
+      }
+    });
 
     return NextResponse.json({
       success: true,

@@ -16,7 +16,7 @@ const registerSchema = z.object({
   token: z.string().min(1, 'Token is required'),
   platform: z.enum(['ios', 'android', 'web']),
   deviceName: z.string().optional(),
-  spaceId: z.string().uuid('Invalid space ID'),
+  spaceId: z.string().uuid('Invalid space ID').optional(),
 });
 
 const unregisterSchema = z.object({
@@ -62,22 +62,24 @@ export async function POST(request: NextRequest) {
 
     const { token, platform, deviceName, spaceId } = validated.data;
 
-    // Verify user is member of the space
-    const { data: membership, error: memberError } = await supabase
-      .from('space_members')
-      .select('space_id')
-      .eq('space_id', spaceId)
-      .eq('user_id', user.id)
-      .single();
+    // Verify user is member of the space (if spaceId provided)
+    if (spaceId) {
+      const { data: membership, error: memberError } = await supabase
+        .from('space_members')
+        .select('space_id')
+        .eq('space_id', spaceId)
+        .eq('user_id', user.id)
+        .single();
 
-    if (memberError || !membership) {
-      return NextResponse.json(
-        { error: 'Not a member of this space' },
-        { status: 403 }
-      );
+      if (memberError || !membership) {
+        return NextResponse.json(
+          { error: 'Not a member of this space' },
+          { status: 403 }
+        );
+      }
     }
 
-    const result = await registerPushToken(user.id, spaceId, {
+    const result = await registerPushToken(user.id, {
       token,
       platform,
       deviceName,

@@ -10,6 +10,9 @@ import { sanitizePlainText } from '@/lib/sanitize';
 import { ZodError } from 'zod';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { notifyTaskAssigned, notifyTaskCompleted } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 /**
  * GET /api/tasks/[id]
@@ -184,6 +187,41 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       assigned_to: validatedUpdates.assigned_to ?? undefined,
       due_date: validatedUpdates.due_date ?? undefined,
     }, supabase);
+
+    // Push notification: task reassigned to a different user
+    if (
+      validatedUpdates.assigned_to &&
+      validatedUpdates.assigned_to !== existingTask.assigned_to &&
+      validatedUpdates.assigned_to !== user.id
+    ) {
+      fireAndForgetPush(async () => {
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        const actorName = profile?.display_name || 'Someone';
+        await notifyTaskAssigned(validatedUpdates.assigned_to!, updatedTask.title, actorName);
+      });
+    }
+
+    // Push notification: task completed — notify creator
+    if (
+      validatedUpdates.status === 'completed' &&
+      existingTask.status !== 'completed' &&
+      existingTask.created_by &&
+      existingTask.created_by !== user.id
+    ) {
+      fireAndForgetPush(async () => {
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        const actorName = profile?.display_name || 'Someone';
+        await notifyTaskCompleted(existingTask.created_by!, updatedTask.title, actorName);
+      });
+    }
 
     return NextResponse.json({
       success: true,

@@ -11,6 +11,9 @@ import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
+import { notifyTaskAssigned } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 // Types for query options
 interface TaskQueryOptions {
@@ -247,6 +250,19 @@ export async function POST(req: NextRequest) {
       estimated_hours: validatedData.estimated_hours ?? undefined,
       calendar_sync: validatedData.calendar_sync ?? false,
     }, supabase);
+
+    // Push notification: notify assigned user (if not the creator)
+    if (task.assigned_to && task.assigned_to !== user.id) {
+      fireAndForgetPush(async () => {
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        const actorName = profile?.display_name || 'Someone';
+        await notifyTaskAssigned(task.assigned_to!, task.title, actorName);
+      });
+    }
 
     // Track task creation usage
     try {

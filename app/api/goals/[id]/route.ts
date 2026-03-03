@@ -12,6 +12,9 @@ import { updateGoalSchema } from '@/lib/validations/goal-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { notifyGoalMilestone } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 /**
  * GET /api/goals/[id]
@@ -192,6 +195,33 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       title: title ? sanitizePlainText(title) : undefined,
       description: description ? sanitizePlainText(description) : undefined,
     }, supabase);
+
+    // Push notification: goal milestone reached (25%, 50%, 75%, 100%)
+    const milestones = [25, 50, 75, 100];
+    const newProgress = updatedGoal.progress ?? 0;
+    const oldProgress = existingGoal.progress ?? 0;
+    const crossedMilestone = milestones.find(
+      (m) => oldProgress < m && newProgress >= m
+    );
+
+    if (crossedMilestone) {
+      fireAndForgetPush(async () => {
+        // Get all space members to notify
+        const { data: members } = await supabaseAdmin
+          .from('space_members')
+          .select('user_id')
+          .eq('space_id', existingGoal.space_id);
+
+        const memberIds = (members || []).map((m: { user_id: string }) => m.user_id);
+        if (memberIds.length > 0) {
+          await notifyGoalMilestone(
+            memberIds,
+            updatedGoal.title,
+            crossedMilestone
+          );
+        }
+      });
+    }
 
     return NextResponse.json({
       success: true,

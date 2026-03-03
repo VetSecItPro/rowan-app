@@ -12,6 +12,9 @@ import { logger } from '@/lib/logger';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { notifyChoreAssigned } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 // Types for query options
 interface ChoreQueryOptions {
@@ -221,6 +224,19 @@ export async function POST(req: NextRequest) {
       sort_order: validatedData.sort_order ?? undefined,
       category: validatedData.category ?? undefined,
     }, supabase);
+
+    // Push notification: notify assigned user (if not the creator)
+    if (chore.assigned_to && chore.assigned_to !== user.id) {
+      fireAndForgetPush(async () => {
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        const actorName = profile?.display_name || 'Someone';
+        await notifyChoreAssigned(chore.assigned_to!, chore.title, actorName);
+      });
+    }
 
     return NextResponse.json({
       success: true,
