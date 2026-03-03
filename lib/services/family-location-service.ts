@@ -11,6 +11,8 @@ import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { notifyLocationArrival, notifyLocationDeparture } from '@/lib/services/push-notification-service';
+import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 // =============================================
 // TYPES
@@ -126,14 +128,16 @@ const CreatePlaceSchema = z.object({
 
 const UpdatePlaceSchema = CreatePlaceSchema.partial();
 
+const HH_MM_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 const UpdateSharingSettingsSchema = z.object({
   sharing_enabled: z.boolean().optional(),
   precision: z.enum(['exact', 'approximate', 'city', 'hidden']).optional(),
   history_retention_days: z.number().min(1).max(365).optional(),
   notify_arrivals: z.boolean().optional(),
   notify_departures: z.boolean().optional(),
-  quiet_hours_start: z.string().nullable().optional(),
-  quiet_hours_end: z.string().nullable().optional(),
+  quiet_hours_start: z.string().regex(HH_MM_REGEX, 'Must be HH:MM format (00:00-23:59)').nullable().optional(),
+  quiet_hours_end: z.string().regex(HH_MM_REGEX, 'Must be HH:MM format (00:00-23:59)').nullable().optional(),
 });
 
 // =============================================
@@ -371,6 +375,25 @@ export async function getFamilyLocations(
       .select('id, space_id, name, icon, color, latitude, longitude, address, radius_meters, notify_on_arrival, notify_on_departure, created_by, created_at, updated_at')
       .eq('space_id', spaceId);
 
+    // Batch fetch latest location for all members (avoids N+1 queries)
+    const memberIds = (members ?? []).map((m: { user_id: string }) => m.user_id);
+    const { data: allLocations } = memberIds.length > 0
+      ? await supabase
+          .from('user_locations')
+          .select('id, user_id, space_id, latitude, longitude, accuracy, altitude, altitude_accuracy, speed, heading, battery_level, is_charging, recorded_at, created_at')
+          .eq('space_id', spaceId)
+          .in('user_id', memberIds)
+          .order('recorded_at', { ascending: false })
+      : { data: [] };
+
+    // Deduplicate: keep only the most recent location per user
+    const latestLocationMap = new Map<string, UserLocation>();
+    for (const loc of allLocations ?? []) {
+      if (!latestLocationMap.has(loc.user_id)) {
+        latestLocationMap.set(loc.user_id, loc);
+      }
+    }
+
     const familyLocations: FamilyMemberLocation[] = [];
 
     for (const member of members ?? []) {
@@ -385,9 +408,7 @@ export async function getFamilyLocations(
         continue;
       }
 
-      // Get last location
-      const location = await getLastLocation(member.user_id, spaceId, supabase);
-
+      const location = latestLocationMap.get(member.user_id);
       if (!location) continue;
 
       // Apply privacy precision
@@ -882,8 +903,8 @@ async function createGeofenceEvent(
       supabase.from('family_places').select('name').eq('id', placeId).single(),
     ]);
 
-    const userName = userResult.data?.name ?? 'Someone';
-    const placeName = placeResult.data?.name ?? 'a saved place';
+    const userName = sanitizePlainText(userResult.data?.name ?? 'Someone');
+    const placeName = sanitizePlainText(placeResult.data?.name ?? 'a saved place');
 
     // Check the triggering user's quiet hours setting
     const settings = await getSharingSettings(userId, spaceId, supabase);
@@ -899,22 +920,30 @@ async function createGeofenceEvent(
       return;
     }
 
-    // Send push notification to family members
+    // Send push notification to family members (non-blocking)
     if (eventType === 'arrival') {
-      await notifyLocationArrival(spaceId, userId, userName, placeName);
+      fireAndForgetPush(() => notifyLocationArrival(spaceId, userId, userName, placeName));
     } else {
-      await notifyLocationDeparture(spaceId, userId, userName, placeName);
+      fireAndForgetPush(() => notifyLocationDeparture(spaceId, userId, userName, placeName));
     }
 
     // Mark the event as notified
     if (eventData?.id) {
-      await supabase
+      const { error: updateError } = await supabase
         .from('geofence_events')
         .update({
           notification_sent: true,
           notification_sent_at: new Date().toISOString(),
         })
         .eq('id', eventData.id);
+
+      if (updateError) {
+        logger.error('Failed to mark geofence event as notified', updateError instanceof Error ? updateError : new Error(JSON.stringify(updateError)), {
+          component: 'family-location-service',
+          action: 'update_geofence_event',
+          details: { eventId: eventData.id },
+        });
+      }
     }
 
     logger.info(`Geofence event: ${userName} ${eventType} at ${placeName}`, {
@@ -945,13 +974,13 @@ export async function getGeofenceEvents(
     const { data, error } = await supabase
       .from('geofence_events')
       .select(`
-        *,
+        id, user_id, space_id, place_id, event_type, latitude, longitude, notification_sent, notification_sent_at, occurred_at, created_at,
         users (
           name,
           avatar_url
         ),
         family_places (
-          *
+          id, name, latitude, longitude, radius_meters, icon, color
         )
       `)
       .eq('space_id', spaceId)

@@ -114,22 +114,32 @@ export async function POST(req: NextRequest) {
       ? `${userName} needs help: "${validated.message}"`
       : `${userName} triggered an emergency alert`;
 
-    const result = await sendPushNotification({
-      userIds: memberIds,
-      notification: {
-        title: 'Emergency Alert',
-        body: emergencyMessage,
-        sound: 'emergency',
-        data: {
-          type: 'emergency',
-          latitude: String(validated.latitude),
-          longitude: String(validated.longitude),
-          mapsUrl,
-          userId: user.id,
+    let pushResult;
+    try {
+      pushResult = await sendPushNotification({
+        userIds: memberIds,
+        notification: {
+          title: 'Emergency Alert',
+          body: emergencyMessage,
+          sound: 'emergency',
+          data: {
+            type: 'emergency',
+            latitude: String(validated.latitude),
+            longitude: String(validated.longitude),
+            mapsUrl,
+            userId: user.id,
+          },
         },
-      },
-      type: 'location_emergency',
-    });
+        type: 'location_emergency',
+      });
+    } catch (pushError) {
+      logger.error('Emergency push notification failed', pushError instanceof Error ? pushError : new Error('Push failed'), {
+        component: 'api-location-emergency',
+        action: 'send_push',
+        details: { userId: user.id, spaceId: validated.space_id, memberCount: memberIds.length },
+      });
+      Sentry.captureException(pushError);
+    }
 
     logger.info('Emergency alert triggered', {
       userId: user.id,
@@ -141,7 +151,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'Emergency alert sent to all family members',
       notified: memberIds.length,
-      pushResults: result,
+      pushResults: pushResult ?? null,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

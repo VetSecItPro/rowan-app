@@ -97,9 +97,13 @@ export function addBackgroundLocationListener(
 
   let handle: PluginListenerHandle | null = null;
 
-  BackgroundLocation.addListener('locationUpdate', callback).then((h) => {
-    handle = h;
-  });
+  BackgroundLocation.addListener('locationUpdate', callback)
+    .then((h) => {
+      handle = h;
+    })
+    .catch((error) => {
+      console.error('Failed to register background location listener:', error);
+    });
 
   return () => {
     handle?.remove();
