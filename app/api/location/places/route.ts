@@ -11,6 +11,8 @@ import { withUserDataCache } from '@/lib/utils/cache-headers';
 import { getUserTier } from '@/lib/services/subscription-service';
 import { getFeatureLimits } from '@/lib/config/feature-limits';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { z } from 'zod';
+import { createPlaceRouteSchema, updatePlaceRouteSchema } from '@/lib/validations/location-schemas';
 
 /**
  * GET /api/location/places
@@ -130,16 +132,10 @@ export async function POST(req: NextRequest) {
 
     setSentryUser(user);
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { space_id, ...placeData } = body;
-
-    if (!space_id) {
-      return NextResponse.json(
-        { error: 'space_id is required' },
-        { status: 400 }
-      );
-    }
+    const validated = createPlaceRouteSchema.parse(body);
+    const { space_id, ...placeData } = validated;
 
     // Verify user has access to this space
     try {
@@ -166,6 +162,13 @@ export async function POST(req: NextRequest) {
       data: result.data,
     }, { status: 201 });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request data', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     logger.error('Create place error', error instanceof Error ? error : new Error('Unknown error'), {
       component: 'api-location-places',
       action: 'create_place',
@@ -216,16 +219,10 @@ export async function PUT(req: NextRequest) {
 
     setSentryUser(user);
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { id, space_id, ...updateData } = body;
-
-    if (!id || !space_id) {
-      return NextResponse.json(
-        { error: 'id and space_id are required' },
-        { status: 400 }
-      );
-    }
+    const validated = updatePlaceRouteSchema.parse(body);
+    const { id, space_id, ...updateData } = validated;
 
     // Verify user has access to this space
     try {
@@ -252,6 +249,13 @@ export async function PUT(req: NextRequest) {
       data: result.data,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request data', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     logger.error('Update place error', error instanceof Error ? error : new Error('Unknown error'), {
       component: 'api-location-places',
       action: 'update_place',

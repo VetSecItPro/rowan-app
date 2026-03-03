@@ -42,8 +42,7 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
     label: 'Family',
     items: [
       { name: 'Messages', href: '/messages', icon: MessageCircle, gradient: 'bg-gradient-messages', description: 'Chat instantly' },
-      // Hidden until mobile app ships — location sharing requires Capacitor native
-      // { name: 'Family Location', href: '/location', icon: MapPin, gradient: 'bg-gradient-location', description: 'Stay connected' },
+      { name: 'Family Location', href: '/location', icon: MapPin, gradient: 'bg-gradient-location', description: 'Stay connected' },
     ],
   },
   {
