@@ -20,7 +20,16 @@ const RETENTION_DAYS = 90;
 
 /** Deletes AI conversations and usage data older than the retention period */
 export async function GET(req: NextRequest) {
-  // Verify cron secret
+  // SECURITY: Fail-closed if CRON_SECRET is not configured
+  if (!process.env.CRON_SECRET) {
+    logger.error('[AI Cleanup] CRON_SECRET environment variable not configured', undefined, {
+      component: 'ai-cleanup',
+      action: 'verify_secret',
+    });
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  // Verify cron secret (timing-safe comparison)
   const authHeader = req.headers.get('authorization');
   if (!verifyCronSecret(authHeader, process.env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
