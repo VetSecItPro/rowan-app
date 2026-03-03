@@ -13,9 +13,9 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
 const registerSchema = z.object({
-  token: z.string().min(1, 'Token is required'),
+  token: z.string().min(1, 'Token is required').max(4096, 'Token too long'),
   platform: z.enum(['ios', 'android', 'web']),
-  deviceName: z.string().optional(),
+  deviceName: z.string().max(255).optional(),
   spaceId: z.string().uuid('Invalid space ID').optional(),
 });
 

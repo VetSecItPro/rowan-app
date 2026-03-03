@@ -128,8 +128,9 @@ export async function POST(req: NextRequest) {
 
     // Parse and validate request body with Zod
     const body = await req.json();
+    let validatedData;
     try {
-      createCalendarEventSchema.parse(body);
+      validatedData = createCalendarEventSchema.parse(body);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    const { space_id, title, description, location } = body;
+    const { space_id, title, description, location } = validatedData;
 
     // Verify user has access to this space
     try {
@@ -155,7 +156,7 @@ export async function POST(req: NextRequest) {
     // Create calendar event using service with sanitized inputs
     const sanitizedTitle = sanitizePlainText(title);
     const event = await calendarService.createEvent({
-      ...body,
+      ...validatedData,
       title: sanitizedTitle,
       description: description ? sanitizePlainText(description) : undefined,
       location: location ? sanitizePlainText(location) : undefined,
