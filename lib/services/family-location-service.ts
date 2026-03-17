@@ -975,10 +975,6 @@ export async function getGeofenceEvents(
       .from('geofence_events')
       .select(`
         id, user_id, space_id, place_id, event_type, latitude, longitude, notification_sent, notification_sent_at, occurred_at, created_at,
-        users (
-          name,
-          avatar_url
-        ),
         family_places (
           id, name, latitude, longitude, radius_meters, icon, color
         )
@@ -995,13 +991,25 @@ export async function getGeofenceEvents(
       return [];
     }
 
+    // Fetch user details separately (no FK between geofence_events and users)
+    const userIds = [...new Set((data ?? []).map((e: { user_id: string }) => e.user_id))];
+    const userMap = new Map<string, { name: string; avatar_url: string | null }>();
+    if (userIds.length > 0) {
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, name, avatar_url')
+        .in('id', userIds);
+      for (const u of users ?? []) {
+        userMap.set(u.id, { name: u.name ?? 'Unknown', avatar_url: u.avatar_url });
+      }
+    }
+
     type GeofenceEventRow = GeofenceEvent & {
-      users: { name: string; avatar_url: string | null } | null;
       family_places: FamilyPlace | null;
     };
     return (data ?? []).map((event: GeofenceEventRow) => ({
       ...event,
-      user: event.users as { name: string; avatar_url: string | null },
+      user: userMap.get(event.user_id) ?? { name: 'Unknown', avatar_url: null },
       place: event.family_places as FamilyPlace,
     }));
   } catch (error) {

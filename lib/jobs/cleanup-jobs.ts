@@ -13,8 +13,6 @@ export async function runDailyCleanup() {
   await Promise.all([
     cleanupExpiredSnoozedTasks(),
     cleanupOldQuickActionUsage(),
-    cleanupOldActivityLogs(),
-    autoCompleteMealPlanTasks(),
     cleanupExpiredShoppingTasks(),
   ]);
 
@@ -38,26 +36,6 @@ async function cleanupOldQuickActionUsage() {
     logger.info('✓ Cleaned up old quick action usage', { component: 'cleanup-jobs' });
   } catch (error) {
     logger.error('✗ Error cleaning up quick actions:', error, { component: 'cleanup-jobs', action: 'service_call' });
-  }
-}
-
-async function cleanupOldActivityLogs() {
-  try {
-    const { error } = await supabaseAdmin.rpc('cleanup_old_activity_logs');
-    if (error) throw error;
-    logger.info('✓ Cleaned up old activity logs', { component: 'cleanup-jobs' });
-  } catch (error) {
-    logger.error('✗ Error cleaning up activity logs:', error, { component: 'cleanup-jobs', action: 'service_call' });
-  }
-}
-
-async function autoCompleteMealPlanTasks() {
-  try {
-    const { error } = await supabaseAdmin.rpc('auto_complete_meal_tasks');
-    if (error) throw error;
-    logger.info('✓ Auto-completed meal plan tasks', { component: 'cleanup-jobs' });
-  } catch (error) {
-    logger.error('✗ Error auto-completing meal tasks:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }
 
