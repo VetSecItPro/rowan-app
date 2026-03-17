@@ -82,7 +82,7 @@ export const DrillDownChart = memo(function DrillDownChart({
     return label;
   };
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
         No data available for this metric
