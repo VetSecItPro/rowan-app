@@ -1,5 +1,7 @@
 // Google Calendar Service
 // Phase 2: OAuth flow, API wrapper, and sync operations
+// NOTE: Token storage (get_oauth_token/store_oauth_token RPCs and calendar_oauth_tokens table)
+// was removed in the 2026-03-18 cleanup. OAuth flows will fail until token storage is rebuilt.
 
 import { calendar as googleCalendar, calendar_v3, auth } from '@googleapis/calendar';
 import { createClient } from '@/lib/supabase/server';

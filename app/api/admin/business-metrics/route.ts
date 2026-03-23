@@ -166,7 +166,6 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
     dauResult,
     mauResult,
     totalUsersResult,
-    activatedUsersResult,
     authUsersResult,
   ] = await Promise.allSettled([
     // 1. All active subscriptions (for current MRR, cohort revenue, NRR)
@@ -199,10 +198,7 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
       .from('profiles')
       .select('id', { count: 'exact', head: true }),
 
-    // 6. Activated users (users who have a space AND at least 1 feature event)
-    supabaseAdmin.rpc('get_activated_user_count').maybeSingle(),
-
-    // 7. Auth users with created_at (for cohort analysis — via subscriptions join)
+    // 6. Auth users with created_at (for cohort analysis — via subscriptions join)
     //    We query subscriptions + auth user creation from the subscriptions side
     //    since supabaseAdmin can access auth.users via joins
     supabaseAdmin
@@ -302,16 +298,7 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
   // 7. Activation Rate
   //    Users with a space AND at least 1 feature_event / total users
   // -----------------------------------------------------------------------
-  let activatedCount = 0;
-
-  if (activatedUsersResult.status === 'fulfilled' && activatedUsersResult.value.data) {
-    // If the RPC exists and returns data
-    const rpcData = activatedUsersResult.value.data as { count?: number } | null;
-    activatedCount = rpcData?.count || 0;
-  } else {
-    // Fallback: query manually
-    activatedCount = await getActivatedUserCountFallback();
-  }
+  const activatedCount = await getActivatedUserCountFallback();
 
   const activationRate = totalUsers > 0
     ? Number(((activatedCount / totalUsers) * 100).toFixed(1))

@@ -10,13 +10,21 @@
  * Note: Build-time linting is disabled (next.config.mjs) due to 3,500+
  * non-critical issues. Security rules verified to pass.
  */
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
-import nextTypeScript from "eslint-config-next/typescript";
+import { createRequire } from "module";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const require = createRequire(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Load FlatCompat via CJS to avoid Node 25 ESM resolution issues with @eslint/eslintrc
+const { FlatCompat } = require("@eslint/eslintrc");
+const compat = new FlatCompat({ baseDirectory: __dirname });
 
 const eslintConfig = [
   // Extend Next.js recommended config (includes TypeScript support)
-  ...nextCoreWebVitals,
-  ...nextTypeScript,
+  // Using FlatCompat because eslint-config-next 15.x exports legacy format
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
 
   // Global ignores
   {

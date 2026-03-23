@@ -1,5 +1,7 @@
 // Apple CalDAV Service
 // Phase 3: CalDAV protocol implementation for Apple Calendar sync
+// NOTE: Token storage (get_oauth_token/store_oauth_token RPCs and calendar_oauth_tokens table)
+// was removed in the 2026-03-18 cleanup. Credential flows will fail until token storage is rebuilt.
 
 import { createDAVClient, DAVCalendar, DAVObject, DAVClient } from 'tsdav';
 import { createClient } from '@/lib/supabase/server';

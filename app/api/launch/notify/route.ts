@@ -109,15 +109,6 @@ export async function POST(req: NextRequest) {
       throw new Error(`Failed to create subscription: ${insertError.message}`);
     }
 
-    // Increment daily analytics for launch signups
-    const today = new Date().toISOString().split('T')[0];
-    const { error: analyticsError } = await supabase
-      .rpc('increment_launch_signups', { target_date: today });
-
-    if (analyticsError) {
-      logger.error('Failed to update analytics:', analyticsError, { component: 'api-route', action: 'api_request' });
-    }
-
     // Get total subscriber count for response
     const { count: totalSubscribers, error: countError } = await supabase
       .from('launch_notifications')

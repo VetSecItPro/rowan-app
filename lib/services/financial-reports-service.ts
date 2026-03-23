@@ -349,23 +349,87 @@ class FinancialReportsService {
     }
   }
 
-  // Get financial data for reports
+  // Get financial data for reports (direct query — replaces dropped RPC)
   private async getFinancialReportData(
     spaceId: string,
     startDate: string,
     endDate: string,
     config: ReportConfig
   ): Promise<ReportData> {
-    const { data, error } = await this.supabase
-      .rpc('get_financial_report_data', {
-        p_space_id: spaceId,
-        p_start_date: startDate,
-        p_end_date: endDate,
-        p_config: config
-      });
+    // Fetch expenses
+    const { data: expenses, error: expError } = await this.supabase
+      .from('expenses')
+      .select('id, amount, category, vendor, description, date, is_recurring')
+      .eq('space_id', spaceId)
+      .gte('date', startDate)
+      .lte('date', endDate);
 
-    if (error) throw error;
-    return data;
+    if (expError) throw expError;
+
+    // Fetch budgets
+    const { data: budgets, error: budError } = await this.supabase
+      .from('budgets')
+      .select('category, amount, period')
+      .eq('space_id', spaceId);
+
+    if (budError) throw budError;
+
+    // Fetch goals if needed
+    let goals: GoalData[] = [];
+    if (config.includeGoals) {
+      const { data: goalData, error: goalError } = await this.supabase
+        .from('goals')
+        .select('id, title, category, target_amount, current_amount, status, target_date')
+        .eq('space_id', spaceId);
+
+      if (goalError) throw goalError;
+      goals = (goalData ?? []).map((g: Record<string, unknown>) => ({
+        id: g.id,
+        title: g.title,
+        category: g.category,
+        target_amount: g.target_amount,
+        current_amount: g.current_amount,
+        status: g.status,
+        target_date: g.target_date
+      }));
+    }
+
+    const expenseData: ExpenseData[] = (expenses ?? []).map((e: Record<string, unknown>) => ({
+      id: e.id,
+      amount: e.amount,
+      category: e.category,
+      vendor: e.vendor,
+      description: e.description,
+      date: e.date,
+      is_recurring: e.is_recurring ?? false
+    }));
+
+    const budgetData: BudgetData[] = (budgets ?? []).map((b: Record<string, unknown>) => ({
+      category: b.category,
+      budgeted_amount: b.amount,
+      period: b.period
+    }));
+
+    const totalExpenses = expenseData.reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalBudget = budgetData.reduce((sum, b) => sum + (b.budgeted_amount || 0), 0);
+
+    return {
+      expenses: expenseData,
+      budgets: budgetData,
+      goals,
+      metrics: {
+        total_expenses: totalExpenses,
+        total_budget: totalBudget,
+        budget_remaining: totalBudget - totalExpenses,
+        expense_count: expenseData.length,
+        avg_expense: expenseData.length > 0 ? totalExpenses / expenseData.length : 0,
+        max_expense: expenseData.length > 0 ? Math.max(...expenseData.map(e => e.amount)) : 0,
+        categories_count: new Set(expenseData.map(e => e.category)).size,
+        vendors_count: new Set(expenseData.filter(e => e.vendor).map(e => e.vendor)).size,
+      },
+      date_range: { start: startDate, end: endDate },
+      generated_at: new Date().toISOString()
+    };
   }
 
   // Generate charts configuration based on data and config
@@ -794,11 +858,9 @@ class FinancialReportsService {
 
   // Utility functions
   private async generateShareToken(): Promise<string> {
-    const { data, error } = await this.supabase
-      .rpc('generate_report_share_token');
-
-    if (error) throw error;
-    return data;
+    // Generate a URL-safe random token (replaces dropped RPC)
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
   }
 
   /**
