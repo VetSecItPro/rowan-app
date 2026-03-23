@@ -85,6 +85,7 @@
     "@remotion/player": "^4.0.421",
     "@remotion/tailwind-v4": "^4.0.421",
     "@sentry/nextjs": "^10.38.0",
+    "@serwist/next": "^9.5.7",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "@tailwindcss/postcss": "^4.1.14",
@@ -114,7 +115,7 @@
     "leaflet": "^1.9.4",
     "lru-cache": "^11.2.6",
     "lucide-react": "^0.563.0",
-    "next": "15.5.13",
+    "next": "15.5.14",
     "openai": "^6.22.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -160,6 +161,7 @@
     "minimatch": "^10.2.1",
     "pg": "^8.18.0",
     "postcss": "^8",
+    "serwist": "^9.5.7",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5",
@@ -183,7 +185,8 @@
       "serialize-javascript": ">=7.0.3",
       "flatted": ">=3.4.0",
       "immutable": ">=4.3.8",
-      "undici": ">=7.24.0"
+      "undici": ">=7.24.0",
+      "socket.io-parser": ">=4.2.6"
     }
   }
 }
