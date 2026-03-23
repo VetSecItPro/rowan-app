@@ -13,8 +13,10 @@ const NETWORK_TIMEOUT = 3000;
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/rowan-logo.png',
+  '/rowan-icon-192.png',
+  '/rowan-icon-512.png',
   '/rowan-logo-maskable.png',
+  '/apple-touch-icon.png',
   '/offline.html', // Fallback page for offline
 ];
 
@@ -266,8 +268,8 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: 'Rowan Notification',
     body: 'You have a new notification',
-    icon: '/icon-192x192.png',
-    badge: '/badge-72x72.png',
+    icon: '/rowan-icon-192.png',
+    badge: '/rowan-icon-96.png',
     data: {},
   };
 

@@ -1,11 +1,8 @@
 'use client';
 
-import { Suspense, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { Check, Sparkles, ArrowRight, Users, Shield, Zap } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { logger } from '@/lib/logger';
 import { Footer } from '@/components/layout/Footer';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 
@@ -18,31 +15,6 @@ export default function UpgradePage() {
 }
 
 function UpgradePageContent() {
-  const searchParams = useSearchParams();
-  const emailParam = searchParams?.get('email');
-  const hasTrackedRef = useRef(false);
-
-  async function trackUpgradePageVisit(email: string) {
-    try {
-      await supabase.rpc('track_upgrade_page_visit', { user_email: email });
-    } catch (error) {
-      logger.error('Error tracking upgrade visit:', error, { component: 'page', action: 'execution' });
-      // Fail silently - don't disrupt user experience
-    }
-  }
-
-  useEffect(() => {
-    // Track page visit for conversion analytics
-    if (!emailParam || hasTrackedRef.current) {
-      return;
-    }
-
-    hasTrackedRef.current = true;
-    if (emailParam) {
-      trackUpgradePageVisit(emailParam);
-    }
-  }, [emailParam]);
-
   return (
     <div className="min-h-screen bg-black flex flex-col">
       <PublicHeader />

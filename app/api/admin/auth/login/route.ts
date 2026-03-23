@@ -138,14 +138,6 @@ export async function POST(req: NextRequest) {
       ipAddress: ip,
     });
 
-    // Increment daily analytics for admin logins
-    const today = new Date().toISOString().split('T')[0];
-    try {
-      await supabaseAdmin.rpc('increment_admin_logins', { target_date: today });
-    } catch {
-      // Fail silently if function doesn't exist
-    }
-
     return NextResponse.json({
       success: true,
       admin: {

@@ -162,17 +162,7 @@ export async function GET(request: NextRequest) {
       query = query.lte('timestamp', validatedParams.endDate);
     }
 
-    // Execute main query and summary query in parallel
-    const [logsResult, summaryResult] = await Promise.all([
-      query,
-      supabase
-        .from('monetization_error_summary')
-        .select('error_type, count, first_seen, last_seen')
-        .limit(100),
-    ]);
-
-    const { data: logs, error, count } = logsResult;
-    const { data: errorSummary } = summaryResult;
+    const { data: logs, error, count } = await query;
 
     if (error) {
       logger.error('[ADMIN_LOGS] Query error:', error, { component: 'api-route', action: 'api_request' });
@@ -197,7 +187,7 @@ export async function GET(request: NextRequest) {
         },
         stats: {
           realtime: errorStats,
-          summary: errorSummary || [],
+          summary: [],
         },
       },
     });
