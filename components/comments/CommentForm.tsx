@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
 
@@ -41,15 +41,11 @@ export default function CommentForm({
   // Load space members for mentions
   useEffect(() => {
     const loadMembers = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('space_members')
-        .select('user_id, users(email)')
-        .eq('space_id', spaceId);
-
-      if (data) {
-        setMentions(data as SpaceMember[]);
-      }
+      const members = await fetchSpaceMembersLight(spaceId);
+      setMentions(members.map(m => ({
+        user_id: m.user_id,
+        users: m.users ? { email: m.users.email } : null,
+      })) as SpaceMember[]);
     };
 
     loadMembers();

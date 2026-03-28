@@ -4,22 +4,9 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Smile, Plus } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
+import { goalCheckInReactionsService, type CheckInReaction } from '@/lib/services/goal-checkin-reactions-service';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
-
-interface CheckInReaction {
-  id: string;
-  check_in_id: string;
-  user_id: string;
-  emoji: string;
-  created_at: string;
-  users?: {
-    id: string;
-    email: string;
-    full_name?: string;
-    avatar_url?: string;
-  };
-}
 
 interface CheckInReactionsProps {
   checkInId: string;
@@ -59,42 +46,22 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
     try {
       setLoading(true);
 
-      // First check if the table exists
-      const { data: checkInsData, error: checkInsError } = await supabase
-        .from('goal_check_ins')
-        .select('id')
-        .eq('id', checkInId)
-        .limit(1);
-
-      if (checkInsError) {
-        logger.error('Error checking check-in existence:', checkInsError, { component: 'CheckInReactions', action: 'component_action' });
-        return;
-      }
-
-      if (!checkInsData || checkInsData.length === 0) {
+      const exists = await goalCheckInReactionsService.checkInExists(checkInId);
+      if (!exists) {
         logger.warn('Check-in not found:', { component: 'CheckInReactions', error: checkInId });
         return;
       }
 
-      // Try to load reactions - this table might not exist yet
-      const { data: reactionsData, error } = await supabase
-        .from('goal_check_in_reactions')
-        .select(`
-          *,
-          users!goal_check_in_reactions_user_id_fkey(id, email, full_name, avatar_url)
-        `)
-        .eq('check_in_id', checkInId);
+      const reactionsData = await goalCheckInReactionsService.getReactions(checkInId);
 
-      if (error) {
-        // Table might not exist yet, that's okay
-        logger.info('Reactions table not available yet:', { component: 'CheckInReactions', data: error.message });
+      if (reactionsData.length === 0 && !reactions.length) {
         setReactions([]);
         setReactionCounts({});
         setUserReactions(new Set());
         return;
       }
 
-      setReactions(reactionsData || []);
+      setReactions(reactionsData);
 
       // Calculate reaction counts
       const counts: Record<string, number> = {};
@@ -114,7 +81,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
     } finally {
       setLoading(false);
     }
-  }, [checkInId, supabase, user]);
+  }, [checkInId, user]);
 
   useEffect(() => {
     loadUser();
@@ -133,15 +100,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
       const hasReacted = userReactions.has(emoji);
 
       if (hasReacted) {
-        // Remove reaction
-        const { error } = await supabase
-          .from('goal_check_in_reactions')
-          .delete()
-          .eq('check_in_id', checkInId)
-          .eq('user_id', user.id)
-          .eq('emoji', emoji);
-
-        if (error) throw error;
+        await goalCheckInReactionsService.removeReaction(checkInId, user.id, emoji);
 
         // Update local state
         setReactionCounts(prev => ({
@@ -154,16 +113,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
           return newSet;
         });
       } else {
-        // Add reaction
-        const { error } = await supabase
-          .from('goal_check_in_reactions')
-          .insert([{
-            check_in_id: checkInId,
-            user_id: user.id,
-            emoji
-          }]);
-
-        if (error) throw error;
+        await goalCheckInReactionsService.addReaction(checkInId, user.id, emoji);
 
         hapticSuccess();
 

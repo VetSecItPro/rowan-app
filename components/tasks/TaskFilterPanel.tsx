@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Filter, X, Search, Calendar, User, Tag, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { taskCategoriesService } from '@/lib/services/task-categories-service';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 
 interface TaskFilterPanelProps {
   spaceId: string;
@@ -49,22 +50,16 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   const [, setLoading] = useState(true);
 
   const loadFilterOptions = useCallback(async () => {
-    const supabase = createClient();
-
     const [categoriesData, membersData] = await Promise.all([
-      supabase.from('task_categories').select('id, name, color').eq('space_id', spaceId),
-      supabase.from('space_members').select(`
-        user_id,
-        users!user_id (
-          id,
-          email,
-          full_name
-        )
-      `).eq('space_id', spaceId),
+      taskCategoriesService.getCategories(spaceId),
+      fetchSpaceMembersLight(spaceId),
     ]);
 
-    setCategories(categoriesData.data || []);
-    setMembers((membersData.data as SpaceMember[]) || []);
+    setCategories(categoriesData);
+    setMembers(membersData.map(m => ({
+      user_id: m.user_id,
+      users: m.users ? { id: m.users.id, email: m.users.email, full_name: m.users.name } : null,
+    })) as SpaceMember[]);
     setLoading(false);
   }, [spaceId]);
 

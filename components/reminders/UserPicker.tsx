@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { User, Search, X, UserCheck } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { logger } from '@/lib/logger';
 
 interface SpaceMember {
@@ -42,28 +42,14 @@ export function UserPicker({
     const fetchMembers = async () => {
       try {
         setLoading(true);
-        const supabase = createClient();
+        const data = await fetchSpaceMembersLight(spaceId);
+        const mapped = data.map(m => ({
+          user_id: m.user_id,
+          users: m.users ? { id: m.users.id, name: m.users.name, email: m.users.email, avatar_url: m.users.avatar_url } : null,
+        })) as unknown as SpaceMember[];
 
-        const { data, error } = await supabase
-          .from('space_members')
-          .select(`
-            user_id,
-            users!user_id (
-              id,
-              name,
-              email,
-              avatar_url
-            )
-          `)
-          .eq('space_id', spaceId);
-
-        if (error) {
-          logger.error('Error fetching space members:', error, { component: 'UserPicker', action: 'component_action' });
-          return;
-        }
-
-        setMembers((data as unknown as SpaceMember[]) || []);
-        setFilteredMembers((data as unknown as SpaceMember[]) || []);
+        setMembers(mapped);
+        setFilteredMembers(mapped);
       } catch (error) {
         logger.error('Error fetching space members:', error, { component: 'UserPicker', action: 'component_action' });
       } finally {

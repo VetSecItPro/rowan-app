@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { logger } from '@/lib/logger';
 
 interface SpaceMember {
@@ -34,23 +35,15 @@ export function SpaceMembersIndicator() {
     const supabase = createClient();
 
     const loadMembers = async () => {
-      const { data, error } = await supabase
-        .from('space_members')
-        .select(`
-          user_id,
-          users (
-            name,
-            color_theme
-          )
-        `)
-        .eq('space_id', currentSpace.id);
-
-      if (error) {
+      try {
+        const data = await fetchSpaceMembersLight(currentSpace.id);
+        setMembers(data.map(m => ({
+          user_id: m.user_id,
+          users: { name: m.users?.name || '', color_theme: m.users?.color_theme || '' },
+        })) as SpaceMember[]);
+      } catch (error) {
         logger.error('Failed to load space members:', error, { component: 'SpaceMembersIndicator', action: 'component_action' });
-        return;
       }
-
-      setMembers((data as SpaceMember[]) || []);
     };
 
     loadMembers();

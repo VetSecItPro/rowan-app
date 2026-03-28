@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, DollarSign, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import type { Expense } from '@/lib/services/expense-service';
+import { getRecurringExpensesForCalendar, type RecurringExpenseSummary } from '@/lib/services/bill-calendar-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { logger } from '@/lib/logger';
 
@@ -12,7 +11,7 @@ interface RecurringBillsCalendarProps {
 }
 
 interface BillOccurrence {
-  expense: Expense;
+  expense: RecurringExpenseSummary;
   date: Date;
   isPaid: boolean;
   amount: number;
@@ -25,7 +24,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const generateBillOccurrences = useCallback((expenses: Expense[]) => {
+  const generateBillOccurrences = useCallback((expenses: RecurringExpenseSummary[]) => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const occurrences: BillOccurrence[] = [];
@@ -98,19 +97,8 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
   const loadRecurringExpenses = useCallback(async () => {
     try {
       setLoading(true);
-      const supabase = createClient();
-
-      // Get all recurring expenses for the space
-      const { data, error } = await supabase
-        .from('expenses')
-        .select('id, date, amount, description, category, recurring_frequency, payment_method, is_recurring')
-        .eq('space_id', spaceId)
-        .eq('is_recurring', true)
-        .order('date', { ascending: true });
-
-      if (error) throw error;
-
-      generateBillOccurrences(data || []);
+      const data = await getRecurringExpensesForCalendar(spaceId);
+      generateBillOccurrences(data);
     } catch (error) {
       logger.error('Error loading recurring expenses:', error, { component: 'RecurringBillsCalendar', action: 'component_action' });
     } finally {

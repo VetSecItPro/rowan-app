@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { logger } from '@/lib/logger';
 
 interface SpaceMember {
@@ -43,30 +43,18 @@ export function MentionInput({
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const supabase = createClient();
-
   // Fetch space members
   useEffect(() => {
     const fetchMembers = async () => {
-      const { data, error } = await supabase
-        .from('space_members')
-        .select(`
-          user_id,
-          user:user_id!inner (
-            id,
-            name,
-            email,
-            avatar_url
-          )
-        `)
-        .eq('space_id', spaceId);
-
-      if (error) {
+      try {
+        const data = await fetchSpaceMembersLight(spaceId);
+        setMembers(data.map(m => ({
+          user_id: m.user_id,
+          user: m.users ? { id: m.users.id, name: m.users.name, email: m.users.email, avatar_url: m.users.avatar_url } : null,
+        })) as unknown as SpaceMember[]);
+      } catch (error) {
         logger.error('Error fetching space members:', error, { component: 'MentionInput', action: 'component_action' });
-        return;
       }
-
-      setMembers((data as unknown as SpaceMember[]) || []);
     };
 
     fetchMembers();

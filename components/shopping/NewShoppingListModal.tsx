@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, Check, FileText } from 'lucide-react';
 import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { Dropdown } from '@/components/ui/Dropdown';
 
@@ -67,30 +67,13 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
   useEffect(() => {
     const loadMembers = async () => {
       if (spaceId) {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from('space_members')
-          .select(`
-            user_id,
-            role,
-            joined_at,
-            users:user_id (
-              id,
-              email,
-              name
-            )
-          `)
-          .eq('space_id', spaceId)
-          .order('joined_at', { ascending: true });
-
-        if (!error && data) {
-          setSpaceMembers((data as SpaceMemberRow[]).map((member) => ({
-            user_id: member.user_id,
-            display_name: member.users?.name,
-            email: member.users?.email,
-            role: member.role,
-          })));
-        }
+        const members = await fetchSpaceMembersLight(spaceId);
+        setSpaceMembers(members.map((member) => ({
+          user_id: member.user_id,
+          display_name: member.users?.name ?? undefined,
+          email: member.users?.email ?? undefined,
+          role: member.role,
+        })));
       }
     };
     loadMembers();

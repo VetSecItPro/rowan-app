@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { getSpaceName } from '@/lib/services/spaces-service';
 import { Check, X, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useValidatedSearchParams, InvitationAcceptParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
@@ -68,13 +69,8 @@ function AcceptInvitationContent() {
         }
 
         // Get space name to display
-        const { data: space } = await supabase
-          .from('spaces')
-          .select('name')
-          .eq('id', result.data.spaceId)
-          .single();
-
-        setSpaceName(space?.name || 'the space');
+        const name = await getSpaceName(result.data.spaceId);
+        setSpaceName(name || 'the space');
         setSuccess(true);
       } catch (err) {
         logger.error('Error accepting invitation:', err, { component: 'page', action: 'execution' });

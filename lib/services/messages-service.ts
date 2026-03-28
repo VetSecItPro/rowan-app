@@ -1397,4 +1397,35 @@ export const messagesService = {
 
     return channel;
   },
+
+  /**
+   * Get unread message count for a space, excluding messages sent by the given user.
+   */
+  async getUnreadCount(spaceId: string, userId: string, supabaseClient?: SupabaseClient): Promise<number> {
+    const supabase = getSupabaseClient(supabaseClient);
+    try {
+      const { count, error } = await supabase
+        .from('messages')
+        .select('*, conversations!inner(space_id)', { count: 'exact', head: true })
+        .eq('conversations.space_id', spaceId)
+        .eq('read', false)
+        .neq('sender_id', userId);
+
+      if (error) {
+        logger.error('Error fetching unread count:', error, {
+          component: 'messagesService',
+          action: 'getUnreadCount',
+        });
+        return 0;
+      }
+
+      return count || 0;
+    } catch (error) {
+      logger.error('Error fetching unread count:', error, {
+        component: 'messagesService',
+        action: 'getUnreadCount',
+      });
+      return 0;
+    }
+  },
 };

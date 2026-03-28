@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { calendarService } from '@/lib/services/calendar-service';
 import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link, Upload, FileText } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
@@ -129,21 +129,8 @@ export const CalendarConnections = memo(function CalendarConnections() {
     }
 
     try {
-      const supabase = createClient();
-      const { data, error: fetchError } = await supabase
-        .from('calendar_connections')
-        .select('id, provider, provider_account_id, sync_status, sync_direction, last_sync_at, last_error_message, created_at')
-        .eq('space_id', currentSpace.id)
-        .order('created_at', { ascending: false });
-
-      if (fetchError) {
-        logger.error('Failed to fetch connections:', fetchError, { component: 'CalendarConnections', action: 'component_action' });
-        // Don't show error for empty table or permission issues on new spaces
-        if (fetchError.code !== 'PGRST116') {
-          setError('Failed to load calendar connections');
-        }
-      }
-      setConnections(data || []);
+      const data = await calendarService.getCalendarConnections(currentSpace.id);
+      setConnections(data as CalendarConnection[]);
     } catch (err) {
       logger.error('Failed to fetch connections:', err, { component: 'CalendarConnections', action: 'component_action' });
       // Don't show error to user for initial load issues

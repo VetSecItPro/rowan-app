@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Bell } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { messagesService } from '@/lib/services/messages-service';
 import { logger } from '@/lib/logger';
 
 interface MessageNotificationBellProps {
@@ -41,19 +42,8 @@ export function MessageNotificationBell({
   // Fetch unread count
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const { count, error } = await supabase
-        .from('messages')
-        .select('*, conversations!inner(space_id)', { count: 'exact', head: true })
-        .eq('conversations.space_id', spaceId)
-        .eq('read', false)
-        .neq('sender_id', userId);
-
-      if (error) {
-        logger.error('Error fetching unread count:', error, { component: 'MessageNotificationBell', action: 'component_action' });
-        return;
-      }
-
-      store.setCount(count || 0);
+      const count = await messagesService.getUnreadCount(spaceId, userId, supabase);
+      store.setCount(count);
     } catch (error) {
       logger.error('Error fetching unread count:', error, { component: 'MessageNotificationBell', action: 'component_action' });
     }

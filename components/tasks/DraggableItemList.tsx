@@ -24,7 +24,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Clock, AlertCircle, MoreVertical, CheckSquare, Pause } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { tasksService } from '@/lib/services/tasks-service';
+import { choresService } from '@/lib/services/chores-service';
 
 interface UnifiedItem {
   id: string;
@@ -358,50 +359,28 @@ export function DraggableItemList({
 
     // Update database with separate logic for tasks and chores
     try {
-      const supabase = createClient();
-
       // Group updates by type
-      const taskUpdates = updatedItems
-        .filter(item => item.type === 'task')
-        .map((item, index) =>
-          supabase
-            .from('tasks')
-            .update({ sort_order: index, updated_at: new Date().toISOString() })
-            .eq('id', item.id)
-        );
-
-      // For chores, check if sort_order column exists first
+      const taskItems = updatedItems.filter(item => item.type === 'task');
       const choreItems = updatedItems.filter(item => item.type === 'chore');
-      const choreUpdates = [];
 
-      if (choreItems.length > 0) {
-        try {
-          // Test if sort_order column exists by trying to read it
-          const { error: testError } = await supabase
-            .from('chores')
-            .select('sort_order')
-            .limit(1);
-
-          if (!testError) {
-            // Column exists, proceed with updates
-            choreUpdates.push(
-              ...choreItems.map((item, index) =>
-                supabase
-                  .from('chores')
-                  .update({ sort_order: index, updated_at: new Date().toISOString() })
-                  .eq('id', item.id)
-              )
-            );
-          } else {
-            logger.info('🏠 sort_order column not found for chores, skipping chore reordering', { component: 'DraggableItemList' });
-          }
-        } catch {
-          logger.info('🏠 sort_order column not available for chores yet, skipping chore reordering', { component: 'DraggableItemList' });
-        }
+      // Update tasks via service
+      if (taskItems.length > 0) {
+        await tasksService.updateTaskSortOrders(
+          taskItems.map((item, index) => ({ id: item.id, sort_order: index }))
+        );
       }
 
-      // Execute both task and chore updates
-      await Promise.all([...taskUpdates, ...choreUpdates]);
+      // For chores, check if sort_order column exists first
+      if (choreItems.length > 0) {
+        const hasSortOrder = await choresService.hasSortOrderColumn();
+        if (hasSortOrder) {
+          await choresService.bulkUpdateChoreOrder(
+            choreItems.map((item, index) => ({ id: item.id, sort_order: index }))
+          );
+        } else {
+          logger.info('sort_order column not found for chores, skipping chore reordering', { component: 'DraggableItemList' });
+        }
+      }
 
       logger.info('✅ Successfully updated sort order for available items', { component: 'DraggableItemList' });
     } catch (error) {

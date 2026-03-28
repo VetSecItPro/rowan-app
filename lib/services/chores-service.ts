@@ -283,6 +283,23 @@ export const choresService = {
   },
 
   /**
+   * Tests whether the sort_order column exists on the chores table.
+   * Returns true if the column is queryable, false otherwise.
+   */
+  async hasSortOrderColumn(): Promise<boolean> {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase
+        .from('chores')
+        .select('sort_order')
+        .limit(1);
+      return !error;
+    } catch {
+      return false;
+    }
+  },
+
+  /**
    * Bulk updates chore sort orders for drag and drop reordering.
    * @param updates - Array of {id, sort_order} objects
    * @throws Error if any update fails

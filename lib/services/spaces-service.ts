@@ -12,7 +12,7 @@ type UserSpaceRow = {
   spaces: Pick<Space, 'id' | 'name' | 'created_at' | 'updated_at'> | null;
 };
 
-type SpaceMemberRow = {
+export type SpaceMemberRow = {
   space_id: string;
   user_id: string;
   role: string;
@@ -22,6 +22,7 @@ type SpaceMemberRow = {
     name: string | null;
     email: string | null;
     avatar_url: string | null;
+    color_theme: string | null;
   } | null;
 };
 
@@ -269,6 +270,112 @@ export async function getSpaceMembers(
       success: false,
       error: 'Failed to fetch space members'
     };
+  }
+}
+
+/**
+ * Light-weight client-side fetch of space members.
+ * Relies on RLS (no explicit userId auth check) — suitable for
+ * component-level queries where the user is already authenticated.
+ *
+ * @param spaceId - Space ID
+ * @param options - Optional filters
+ * @returns Array of space member rows
+ */
+export async function fetchSpaceMembersLight(
+  spaceId: string,
+  options?: { excludeUserId?: string }
+): Promise<SpaceMemberRow[]> {
+  try {
+    const supabase = createClient();
+
+    let query = supabase
+      .from('space_members')
+      .select(`
+        space_id,
+        user_id,
+        role,
+        joined_at,
+        users (
+          id,
+          name,
+          email,
+          avatar_url,
+          color_theme
+        )
+      `)
+      .eq('space_id', spaceId)
+      .order('joined_at', { ascending: true });
+
+    if (options?.excludeUserId) {
+      query = query.neq('user_id', options.excludeUserId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      logger.error('[spaces-service] fetchSpaceMembersLight error:', error, { component: 'lib-spaces-service', action: 'service_call' });
+      throw error;
+    }
+
+    return (data || []) as SpaceMemberRow[];
+  } catch (error) {
+    logger.error('[spaces-service] fetchSpaceMembersLight error:', error, { component: 'lib-spaces-service', action: 'service_call' });
+    return [];
+  }
+}
+
+/**
+ * Get the name of a space by ID.
+ * Accepts an optional supabase client for server-component usage.
+ * Relies on RLS for access control.
+ */
+export async function getSpaceName(
+  spaceId: string,
+  supabaseClient?: SupabaseClient
+): Promise<string | null> {
+  try {
+    const supabase = getSupabaseClient(supabaseClient);
+    const { data, error } = await supabase
+      .from('spaces')
+      .select('name')
+      .eq('id', spaceId)
+      .single();
+
+    if (error) {
+      logger.error('[spaces-service] getSpaceName error:', error, { component: 'lib-spaces-service', action: 'service_call' });
+      return null;
+    }
+
+    return data?.name ?? null;
+  } catch (error) {
+    logger.error('[spaces-service] getSpaceName error:', error, { component: 'lib-spaces-service', action: 'service_call' });
+    return null;
+  }
+}
+
+/**
+ * Get the user's first space_id (for page-level auth redirects).
+ * Accepts an optional supabase client for server-component usage.
+ * Relies on RLS.
+ */
+export async function getUserFirstSpaceId(
+  userId: string,
+  supabaseClient?: SupabaseClient
+): Promise<string | null> {
+  try {
+    const supabase = getSupabaseClient(supabaseClient);
+    const { data, error } = await supabase
+      .from('space_members')
+      .select('space_id')
+      .eq('user_id', userId)
+      .limit(1)
+      .single();
+
+    if (error || !data) return null;
+    return data.space_id;
+  } catch {
+    return null;
   }
 }
 
