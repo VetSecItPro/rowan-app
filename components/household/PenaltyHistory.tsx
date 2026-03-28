@@ -24,7 +24,7 @@ import {
 import type { LatePenalty } from '@/lib/services/rewards/late-penalty-service';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { cn } from '@/lib/utils';
 
 interface SpaceMember {
@@ -66,28 +66,13 @@ export function PenaltyHistory({ className, userId, limit = 20 }: PenaltyHistory
   const fetchMembers = useCallback(async () => {
     if (!currentSpace?.id) return;
 
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('space_members')
-      .select(`
-        user_id,
-        role,
-        users!user_id (
-          id,
-          email,
-          display_name
-        )
-      `)
-      .eq('space_id', currentSpace.id);
-
-    if (data) {
-      setMembers(data.map((d: { user_id: string; role: string; users: { email?: string; display_name?: string } | null }) => ({
-        user_id: d.user_id,
-        role: d.role,
-        email: d.users?.email,
-        display_name: d.users?.display_name,
-      })));
-    }
+    const data = await fetchSpaceMembersLight(currentSpace.id);
+    setMembers(data.map(d => ({
+      user_id: d.user_id,
+      role: d.role,
+      email: d.users?.email ?? undefined,
+      display_name: d.users?.name ?? undefined,
+    })));
   }, [currentSpace?.id]);
 
   // Fetch penalties

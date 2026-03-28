@@ -12,7 +12,7 @@ type UserSpaceRow = {
   spaces: Pick<Space, 'id' | 'name' | 'created_at' | 'updated_at'> | null;
 };
 
-type SpaceMemberRow = {
+export type SpaceMemberRow = {
   space_id: string;
   user_id: string;
   role: string;
@@ -22,6 +22,7 @@ type SpaceMemberRow = {
     name: string | null;
     email: string | null;
     avatar_url: string | null;
+    color_theme: string | null;
   } | null;
 };
 
@@ -299,7 +300,8 @@ export async function fetchSpaceMembersLight(
           id,
           name,
           email,
-          avatar_url
+          avatar_url,
+          color_theme
         )
       `)
       .eq('space_id', spaceId)
