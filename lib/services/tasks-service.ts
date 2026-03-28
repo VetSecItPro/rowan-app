@@ -691,6 +691,58 @@ export const tasksService = {
    * const overdue = await tasksService.getOverdueTasks(spaceId);
    * ```
    */
+  /**
+   * Search tasks by title within a space (used by dependency picker, etc.)
+   */
+  async searchTasks(
+    spaceId: string,
+    searchTerm: string,
+    options?: { excludeId?: string; limit?: number }
+  ): Promise<Pick<Task, 'id' | 'title' | 'status' | 'priority'>[]> {
+    const supabase = createClient();
+    try {
+      let query = supabase
+        .from('tasks')
+        .select('id, title, status, priority')
+        .eq('space_id', spaceId)
+        .ilike('title', `%${sanitizeSearchInput(searchTerm)}%`)
+        .limit(options?.limit ?? 10);
+
+      if (options?.excludeId) {
+        query = query.neq('id', options.excludeId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw new Error(`Failed to search tasks: ${error.message}`);
+      return data || [];
+    } catch (error) {
+      logger.error('Error in searchTasks', error, { component: 'tasksService', action: 'searchTasks' });
+      throw error;
+    }
+  },
+
+  /**
+   * Update sort_order for multiple tasks in a single batch.
+   * Used by drag-and-drop reordering.
+   */
+  async updateTaskSortOrders(updates: Array<{ id: string; sort_order: number }>): Promise<void> {
+    const supabase = createClient();
+    try {
+      await Promise.all(
+        updates.map(({ id, sort_order }) =>
+          supabase
+            .from('tasks')
+            .update({ sort_order, updated_at: new Date().toISOString() })
+            .eq('id', id)
+        )
+      );
+    } catch (error) {
+      logger.error('Error in updateTaskSortOrders', error, { component: 'tasksService', action: 'updateTaskSortOrders' });
+      throw error;
+    }
+  },
+
   async getOverdueTasks(spaceId: string): Promise<Task[]> {
     const supabase = createClient();
     try {

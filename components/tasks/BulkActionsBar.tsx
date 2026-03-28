@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CheckCircle, Trash2, AlertCircle, X, MoreHorizontal } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { tasksService } from '@/lib/services/tasks-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
 import { showError } from '@/lib/utils/toast';
@@ -24,14 +24,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   async function bulkUpdateStatus(status: string) {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('tasks')
-        .update({ status, updated_at: new Date().toISOString() })
-        .in('id', selectedTaskIds);
-
-      if (error) throw error;
-
+      await tasksService.updateTasksBatch(selectedTaskIds, { status });
       onActionComplete();
       onClearSelection();
     } catch (error) {
@@ -45,14 +38,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   async function bulkUpdatePriority(priority: string) {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('tasks')
-        .update({ priority, updated_at: new Date().toISOString() })
-        .in('id', selectedTaskIds);
-
-      if (error) throw error;
-
+      await tasksService.updateTasksBatch(selectedTaskIds, { priority });
       onActionComplete();
       onClearSelection();
     } catch (error) {
@@ -66,14 +52,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   async function bulkDelete() {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .in('id', selectedTaskIds);
-
-      if (error) throw error;
-
+      await tasksService.deleteTasksBatch(selectedTaskIds);
       setShowDeleteConfirm(false);
       onActionComplete();
       onClearSelection();
@@ -88,18 +67,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   async function bulkComplete() {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('tasks')
-        .update({
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .in('id', selectedTaskIds);
-
-      if (error) throw error;
-
+      await tasksService.updateTasksBatch(selectedTaskIds, { status: 'completed' });
       onActionComplete();
       onClearSelection();
     } catch (error) {

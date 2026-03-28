@@ -22,7 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, AlertCircle, MoreVertical, CheckSquare } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { tasksService } from '@/lib/services/tasks-service';
 
 interface Task {
   id: string;
@@ -356,14 +356,9 @@ export function DraggableTaskList({
     // Update all affected tasks in database (batch update)
     // Don't call onTasksReorder to avoid infinite loop - let real-time handle updates
     try {
-      const supabase = createClient();
-      const updates = updatedTasks.map((task, index) =>
-        supabase
-          .from('tasks')
-          .update({ sort_order: index, updated_at: new Date().toISOString() })
-          .eq('id', task.id)
+      await tasksService.updateTaskSortOrders(
+        updatedTasks.map((task, index) => ({ id: task.id, sort_order: index }))
       );
-      await Promise.all(updates);
     } catch (error) {
       logger.error('Error updating task order:', error, { component: 'DraggableTaskList', action: 'component_action' });
       // Revert on error

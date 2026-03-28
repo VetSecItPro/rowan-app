@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
 import { taskApprovalsService } from '@/lib/services/task-approvals-service';
 import { Modal } from '@/components/ui/Modal';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { logger } from '@/lib/logger';
 import { showError, showWarning } from '@/lib/utils/toast';
 
@@ -73,21 +73,11 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
   }, [taskId]);
 
   const loadSpaceMembers = useCallback(async () => {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('space_members')
-      .select(`
-        user_id,
-        users!user_id (
-          id,
-          email,
-          full_name
-        )
-      `)
-      .eq('space_id', spaceId)
-      .neq('user_id', currentUserId);
-
-    setSpaceMembers((data ?? []) as SpaceMember[]);
+    const members = await fetchSpaceMembersLight(spaceId, { excludeUserId: currentUserId });
+    setSpaceMembers(members.map(m => ({
+      user_id: m.user_id,
+      users: m.users ? { id: m.users.id, email: m.users.email, full_name: m.users.name } : null,
+    })) as SpaceMember[]);
   }, [spaceId, currentUserId]);
 
   useEffect(() => {

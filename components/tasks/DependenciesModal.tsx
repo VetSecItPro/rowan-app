@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
 import { AlertCircle, Search, Trash2 } from 'lucide-react';
 import { taskDependenciesService } from '@/lib/services/task-dependencies-service';
-import { createClient } from '@/lib/supabase/client';
+import { tasksService } from '@/lib/services/tasks-service';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 import { showError, showWarning } from '@/lib/utils/toast';
@@ -68,16 +68,11 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
   }
 
   async function searchTasks() {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('tasks')
-      .select('id, title, status, priority')
-      .eq('space_id', spaceId)
-      .neq('id', taskId)
-      .ilike('title', `%${searchTerm}%`)
-      .limit(10);
-
-    setSearchResults(data || []);
+    const results = await tasksService.searchTasks(spaceId, searchTerm, {
+      excludeId: taskId,
+      limit: 10,
+    });
+    setSearchResults(results);
   }
 
   async function addDependency(dependentTaskId: string) {

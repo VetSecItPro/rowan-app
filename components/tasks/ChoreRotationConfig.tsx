@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Repeat, Users, Calendar, Settings, Trash2, Play, Pause } from 'lucide-react';
 import { choreRotationService } from '@/lib/services/chore-rotation-service';
-import { createClient } from '@/lib/supabase/client';
+import { fetchSpaceMembersLight } from '@/lib/services/spaces-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
 import { showError, showWarning } from '@/lib/utils/toast';
@@ -78,20 +78,11 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
   }
 
   async function loadSpaceMembers() {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('space_members')
-      .select(`
-        user_id,
-        users!user_id (
-          id,
-          email,
-          full_name
-        )
-      `)
-      .eq('space_id', spaceId);
-
-    setSpaceMembers((data ?? []) as SpaceMember[]);
+    const members = await fetchSpaceMembersLight(spaceId);
+    setSpaceMembers(members.map(m => ({
+      user_id: m.user_id,
+      users: m.users ? { id: m.users.id, email: m.users.email, full_name: m.users.name } : null,
+    })) as SpaceMember[]);
   }
 
   async function handleSave() {
