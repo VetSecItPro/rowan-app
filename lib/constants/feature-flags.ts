@@ -8,6 +8,8 @@
  * Enable features by setting environment variables in .env.local
  */
 
+import { logger } from '../logger';
+
 // Feature flag interface for type safety
 interface FeatureFlags {
   PERSONAL_WORKSPACES: boolean;
@@ -133,8 +135,7 @@ export const featureFlagHelpers = {
    */
   logFeatureFlags(): void {
     if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console -- intentional debug logging
-      console.log('🚩 Feature Flags Status:', FEATURE_FLAGS);
+      logger.debug('Feature Flags Status', { flags: FEATURE_FLAGS });
     }
   },
 

@@ -7,6 +7,7 @@
  */
 
 import { isNative, isPluginAvailable } from './capacitor';
+import { logger } from '../logger';
 
 // Dynamic import to avoid bundling the native plugin on web
 type SecureStoragePluginType =
@@ -42,9 +43,7 @@ export async function secureSet(key: string, value: string): Promise<void> {
 
   // Web fallback
   if (typeof window !== 'undefined') {
-    console.warn(
-      '[SecureStorage] Using localStorage — data is NOT encrypted. Use native builds for secure storage.'
-    );
+    logger.warn('[SecureStorage] Using localStorage — data is NOT encrypted. Use native builds for secure storage.');
     localStorage.setItem(key, value);
   }
 }
@@ -68,9 +67,7 @@ export async function secureGet(key: string): Promise<string | null> {
 
   // Web fallback
   if (typeof window !== 'undefined') {
-    console.warn(
-      '[SecureStorage] Reading from localStorage — data is NOT encrypted.'
-    );
+    logger.warn('[SecureStorage] Reading from localStorage — data is NOT encrypted.');
     return localStorage.getItem(key);
   }
 
@@ -115,9 +112,7 @@ export async function secureClear(): Promise<void> {
 
   // Web fallback
   if (typeof window !== 'undefined') {
-    console.warn(
-      '[SecureStorage] Clearing localStorage — this removes ALL localStorage entries, not just secure storage.'
-    );
+    logger.warn('[SecureStorage] Clearing localStorage — this removes ALL localStorage entries, not just secure storage.');
     localStorage.clear();
   }
 }
