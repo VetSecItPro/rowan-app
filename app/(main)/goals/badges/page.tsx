@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getUserFirstSpaceId } from '@/lib/services/spaces-service';
 import BadgeCollection from '@/components/goals/badges/BadgeCollection';
 import Link from 'next/link';
 
@@ -24,14 +25,9 @@ export default async function BadgesPage() {
   }
 
   // Get active space
-  const { data: spaces } = await supabase
-    .from('space_members')
-    .select('space_id')
-    .eq('user_id', session.user.id)
-    .limit(1)
-    .single();
+  const spaceId = await getUserFirstSpaceId(session.user.id, supabase);
 
-  if (!spaces) {
+  if (!spaceId) {
     redirect('/onboarding');
   }
 
@@ -74,7 +70,7 @@ export default async function BadgesPage() {
         </div>
 
         {/* Badge Collection */}
-        <BadgeCollection userId={session.user.id} spaceId={spaces.space_id} />
+        <BadgeCollection userId={session.user.id} spaceId={spaceId} />
       </div>
     </div>
   );

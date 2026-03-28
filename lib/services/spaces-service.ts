@@ -327,11 +327,15 @@ export async function fetchSpaceMembersLight(
 
 /**
  * Get the name of a space by ID.
+ * Accepts an optional supabase client for server-component usage.
  * Relies on RLS for access control.
  */
-export async function getSpaceName(spaceId: string): Promise<string | null> {
+export async function getSpaceName(
+  spaceId: string,
+  supabaseClient?: SupabaseClient
+): Promise<string | null> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('spaces')
       .select('name')
@@ -352,11 +356,15 @@ export async function getSpaceName(spaceId: string): Promise<string | null> {
 
 /**
  * Get the user's first space_id (for page-level auth redirects).
+ * Accepts an optional supabase client for server-component usage.
  * Relies on RLS.
  */
-export async function getUserFirstSpaceId(userId: string): Promise<string | null> {
+export async function getUserFirstSpaceId(
+  userId: string,
+  supabaseClient?: SupabaseClient
+): Promise<string | null> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('space_members')
       .select('space_id')

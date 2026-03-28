@@ -13,6 +13,7 @@ import { CheckCircle, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useValidatedSearchParams, PaymentSuccessParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { createClient } from '@/lib/supabase/client';
+import { checkSubscriptionActive } from '@/lib/services/subscription-client-service';
 import { Footer } from '@/components/layout/Footer';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 
@@ -43,13 +44,7 @@ function PaymentSuccessContent() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('status, tier')
-        .eq('user_id', user.id)
-        .single();
-
-      return data?.status === 'active' && data?.tier !== 'free';
+      return await checkSubscriptionActive(user.id);
     } catch {
       return false;
     }
