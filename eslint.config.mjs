@@ -54,7 +54,7 @@ const eslintConfig = [
       "react/no-danger": "warn",
 
       // General quality
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-console": ["error", { allow: ["error"] }],
 
       // Enforce explicit types — disallow explicit 'any'
       "@typescript-eslint/no-explicit-any": "error",
