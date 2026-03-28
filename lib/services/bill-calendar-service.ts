@@ -188,6 +188,43 @@ export function subscribeToUpcomingBills(
   return channel;
 }
 
+export interface RecurringExpenseSummary {
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+  category: string | null;
+  recurring_frequency: string | null;
+  payment_method: string | null;
+  is_recurring: boolean;
+}
+
+/**
+ * Get all recurring expenses for a space (for bill calendar display).
+ */
+export async function getRecurringExpensesForCalendar(
+  spaceId: string
+): Promise<RecurringExpenseSummary[]> {
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('id, date, amount, description, category, recurring_frequency, payment_method, is_recurring')
+      .eq('space_id', spaceId)
+      .eq('is_recurring', true)
+      .order('date', { ascending: true });
+
+    if (error) throw error;
+    return (data || []) as RecurringExpenseSummary[];
+  } catch (error) {
+    logger.error('[bill-calendar-service] getRecurringExpensesForCalendar error:', error, {
+      component: 'lib-bill-calendar-service',
+      action: 'service_call',
+    });
+    throw error;
+  }
+}
+
 /** Aggregated service for bill-calendar integration (upcoming bills, overdue tracking, payments). */
 export const billCalendarService = {
   createBillCalendarEvent,
@@ -198,4 +235,5 @@ export const billCalendarService = {
   markBillAsPaid,
   getTotalBillsUpcoming,
   subscribeToUpcomingBills,
+  getRecurringExpensesForCalendar,
 };

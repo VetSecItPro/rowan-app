@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 import type { EnhancedRecurrencePattern } from './recurring-events-service';
 
 /**
@@ -91,6 +92,17 @@ export interface EventTemplate {
   last_used_at?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CalendarConnection {
+  id: string;
+  provider: string;
+  provider_account_id: string;
+  sync_status: string;
+  sync_direction: string;
+  last_sync_at: string | null;
+  last_error_message: string | null;
+  created_at: string;
 }
 
 export interface CreateTemplateInput {
@@ -886,5 +898,34 @@ export const calendarService = {
       const { recurringEventsService } = await import('./recurring-events-service');
       return recurringEventsService.serializeToSimplePattern(pattern);
     }
-  }
+  },
+
+  /**
+   * Get calendar connections for a space.
+   */
+  async getCalendarConnections(spaceId: string): Promise<CalendarConnection[]> {
+    const supabase = createClient();
+    try {
+      const { data, error } = await supabase
+        .from('calendar_connections')
+        .select('id, provider, provider_account_id, sync_status, sync_direction, last_sync_at, last_error_message, created_at')
+        .eq('space_id', spaceId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        // Don't throw for empty table or permission issues on new spaces
+        if (error.code !== 'PGRST116') {
+          throw error;
+        }
+      }
+
+      return (data || []) as CalendarConnection[];
+    } catch (error) {
+      logger.error('Error in getCalendarConnections', error, {
+        component: 'calendarService',
+        action: 'getCalendarConnections',
+      });
+      throw error;
+    }
+  },
 };

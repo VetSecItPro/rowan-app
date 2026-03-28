@@ -22,8 +22,8 @@ import {
   CheckCircle2,
   AlertTriangle
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { notificationPreferencesService } from '@/lib/services/notification-preferences-service';
 import { pushService } from '@/lib/services/push-service';
 
 interface NotificationPreferences {
@@ -272,40 +272,21 @@ export const NotificationSettings = memo(function NotificationSettings() {
       try {
         setLoading(true);
         setError(null);
-        const supabase = createClient();
 
-        // nosemgrep: supabase-missing-space-id-filter — space_id filter applied conditionally below
-        let query = supabase
-          .from('user_notification_preferences')
-          .select('id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone, timezone')
-          .eq('user_id', user.id);
-
-        if (currentSpace?.id) {
-          query = query.eq('space_id', currentSpace.id);
-        }
-
-        const { data, error: fetchError } = await query.maybeSingle();
-
-        if (fetchError) throw fetchError;
+        const data = await notificationPreferencesService.getPreferences(
+          user.id,
+          currentSpace?.id
+        );
 
         if (data) {
           setPreferences(data);
         } else {
           // Create default preferences
-          const newPrefs = {
-            user_id: user.id,
-            space_id: currentSpace?.id || null,
-            ...defaultPreferences
-          };
-
-          // nosemgrep: supabase-missing-space-id-filter — space_id included in newPrefs object above
-          const { data: created, error: createError } = await supabase
-            .from('user_notification_preferences')
-            .insert(newPrefs)
-            .select()
-            .single();
-
-          if (createError) throw createError;
+          const created = await notificationPreferencesService.createDefaults(
+            user.id,
+            currentSpace?.id || null,
+            defaultPreferences
+          );
           setPreferences(created);
         }
       } catch (err) {
@@ -411,34 +392,26 @@ export const NotificationSettings = memo(function NotificationSettings() {
     try {
       setSaving(true);
       setError(null);
-      const supabase = createClient();
 
-      // nosemgrep: supabase-missing-space-id-filter — update scoped by .eq('id', preferences.id) below
-      const { error: updateError } = await supabase
-        .from('user_notification_preferences')
-        .update({
-          email_enabled: preferences.email_enabled,
-          email_due_reminders: preferences.email_due_reminders,
-          email_assignments: preferences.email_assignments,
-          email_mentions: preferences.email_mentions,
-          email_comments: preferences.email_comments,
-          in_app_enabled: preferences.in_app_enabled,
-          in_app_due_reminders: preferences.in_app_due_reminders,
-          in_app_assignments: preferences.in_app_assignments,
-          in_app_mentions: preferences.in_app_mentions,
-          in_app_comments: preferences.in_app_comments,
-          notification_frequency: preferences.notification_frequency,
-          quiet_hours_enabled: preferences.quiet_hours_enabled,
-          quiet_hours_start: preferences.quiet_hours_start,
-          quiet_hours_end: preferences.quiet_hours_end,
-          digest_enabled: preferences.digest_enabled,
-          digest_time: preferences.digest_time,
-          digest_timezone: preferences.digest_timezone,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', preferences.id);
-
-      if (updateError) throw updateError;
+      await notificationPreferencesService.updatePreferences(preferences.id, {
+        email_enabled: preferences.email_enabled,
+        email_due_reminders: preferences.email_due_reminders,
+        email_assignments: preferences.email_assignments,
+        email_mentions: preferences.email_mentions,
+        email_comments: preferences.email_comments,
+        in_app_enabled: preferences.in_app_enabled,
+        in_app_due_reminders: preferences.in_app_due_reminders,
+        in_app_assignments: preferences.in_app_assignments,
+        in_app_mentions: preferences.in_app_mentions,
+        in_app_comments: preferences.in_app_comments,
+        notification_frequency: preferences.notification_frequency,
+        quiet_hours_enabled: preferences.quiet_hours_enabled,
+        quiet_hours_start: preferences.quiet_hours_start,
+        quiet_hours_end: preferences.quiet_hours_end,
+        digest_enabled: preferences.digest_enabled,
+        digest_time: preferences.digest_time,
+        digest_timezone: preferences.digest_timezone,
+      });
 
       setHasChanges(false);
       setSuccess(true);
