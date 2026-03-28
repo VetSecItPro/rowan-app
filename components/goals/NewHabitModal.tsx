@@ -72,7 +72,6 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
     target_count: 1,
   });
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editHabit) {
       setFormData({
@@ -96,7 +95,6 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
       });
     }
   }, [editHabit, spaceId]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleCategoryChange = (value: string | undefined) => {
     setFormData({ ...formData, category: value || '' });

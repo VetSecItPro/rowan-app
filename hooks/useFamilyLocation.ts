@@ -362,7 +362,7 @@ export function useFamilyLocation(
   // API (external system) and sets state based on the permission/position result.
   useEffect(() => {
     if (enableTracking && spaceId && !isTracking && permissionStatus !== 'unavailable') {
-      startTracking(); // eslint-disable-line react-hooks/set-state-in-effect -- async geolocation API interaction; setState occurs in async callbacks
+      startTracking();
     }
   }, [enableTracking, spaceId, isTracking, permissionStatus, startTracking]);
 

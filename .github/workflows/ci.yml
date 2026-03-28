@@ -45,11 +45,7 @@ jobs:
             tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.yaml') }}-
 
       - name: Lint
-        # SECURITY NOTE (F-006): ESLint currently crashes due to ajv/eslintrc
-        # compatibility bug. Lint is non-blocking until eslint config is fixed.
-        # See next.config.mjs ignoreDuringBuilds comment for details.
         run: pnpm lint
-        continue-on-error: true
       - run: pnpm type-check
 
   # ─── Security scanning ───
@@ -88,7 +84,6 @@ jobs:
           config: >-
             p/owasp-top-ten
             p/nextjs
-        continue-on-error: true
 
   # ─── Production build + bundle analysis ───
   build:

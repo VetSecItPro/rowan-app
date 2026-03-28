@@ -20,10 +20,10 @@ if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_SENTRY_DSN)
       'ETIMEDOUT',
     ],
 
-    // OPTIMIZATION: Dynamic error sampling - 50% of errors
+    // OPTIMIZATION: Dynamic error sampling - drop 10% of errors
     beforeSend(event) {
-      // Sample 50% of error events
-      if (Math.random() > 0.5) {
+      // Keep 90% of error events (drop 10% for cost savings)
+      if (Math.random() > 0.9) {
         return null;
       }
       return event;

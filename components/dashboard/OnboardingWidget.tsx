@@ -175,11 +175,9 @@ export function OnboardingWidget() {
   const [isClient, setIsClient] = useState(false);
 
   // Hydration safety — one-time mount flag
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setIsClient(true);
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const completedCount = progress.completedSteps.length;
   const totalSteps = ONBOARDING_STEPS.length;

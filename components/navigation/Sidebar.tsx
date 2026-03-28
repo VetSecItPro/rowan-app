@@ -248,7 +248,6 @@ export function Sidebar() {
 
   // Load saved state from localStorage - default collapsed on all screen sizes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const saved = localStorage.getItem(SIDEBAR_STORAGE_KEY);
 

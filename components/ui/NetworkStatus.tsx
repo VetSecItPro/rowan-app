@@ -29,7 +29,7 @@ export function NetworkStatus() {
     if (isOnline && wasOfflineRef.current) {
       // Show "back online" message briefly if we were offline
       wasOfflineRef.current = false;
-      setShowBanner(true); // eslint-disable-line react-hooks/set-state-in-effect -- reacting to external network reconnection event
+      setShowBanner(true);
       const timer = setTimeout(() => setShowBanner(false), 3000);
       return () => clearTimeout(timer);
     } else if (!isOnline) {
@@ -42,7 +42,7 @@ export function NetworkStatus() {
   // Reacting to external network quality state from useNetworkStatus.
   useEffect(() => {
     if (quality === 'poor' && isOnline) {
-      setShowPoorConnectionWarning(true); // eslint-disable-line react-hooks/set-state-in-effect -- reacting to external network quality change
+      setShowPoorConnectionWarning(true);
       const timer = setTimeout(() => setShowPoorConnectionWarning(false), 5000);
       return () => clearTimeout(timer);
     }

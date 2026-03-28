@@ -28,7 +28,6 @@ export function RestoreAccountModal({
     const remaining = Math.ceil(
       (new Date(permanentDeletionAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
     );
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- derived countdown updates from server data
     setDaysRemaining(remaining);
   }, [permanentDeletionAt]);
 

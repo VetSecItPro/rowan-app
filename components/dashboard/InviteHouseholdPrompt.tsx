@@ -73,12 +73,10 @@ export function InviteHouseholdPrompt({ memberCount }: InviteHouseholdPromptProp
   const [dismissed, setDismissedState] = useState(true); // Start true to avoid flash
 
   // Hydration safety — one-time mount flag
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setHydrated(true);
     setDismissedState(isDismissed());
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Determine if prompt should be visible
   const shouldShow = useMemo(

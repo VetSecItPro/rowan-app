@@ -17,7 +17,6 @@ export function CookieConsentBanner() {
 
   useEffect(() => {
     // Mark component as mounted to prevent hydration issues
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -26,7 +25,6 @@ export function CookieConsentBanner() {
     if (mounted) {
       try {
         if (!hasUserMadeCookieChoice()) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
           setIsVisible(true);
         }
       } catch (error) {

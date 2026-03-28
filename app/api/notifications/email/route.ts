@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { Resend } from 'resend';
+import DOMPurify from 'isomorphic-dompurify';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -101,15 +102,11 @@ export async function POST(req: NextRequest) {
     // Sanitize HTML to prevent phishing/XSS via email injection
     let html = typeof data?.html === 'string' ? data.html : undefined;
     if (html) {
-      // Strip dangerous tags: scripts, forms, iframes, objects, embeds
-      html = html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<form\b[^>]*>[\s\S]*?<\/form>/gi, '')
-        .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '')
-        .replace(/<object\b[^>]*>[\s\S]*?<\/object>/gi, '')
-        .replace(/<embed\b[^>]*\/?>/gi, '')
-        .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-        .replace(/on\w+\s*=\s*\S+/gi, '');
+      html = DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'em', 'strong', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'blockquote', 'pre', 'code'],
+        ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'target', 'rel', 'width', 'height', 'align', 'valign', 'colspan', 'rowspan'],
+        ALLOW_DATA_ATTR: false,
+      });
     }
     const text = typeof data?.text === 'string' ? data.text : undefined;
 
