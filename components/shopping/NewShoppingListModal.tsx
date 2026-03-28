@@ -70,8 +70,8 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
         const members = await fetchSpaceMembersLight(spaceId);
         setSpaceMembers(members.map((member) => ({
           user_id: member.user_id,
-          display_name: member.users?.name,
-          email: member.users?.email,
+          display_name: member.users?.name ?? undefined,
+          email: member.users?.email ?? undefined,
           role: member.role,
         })));
       }

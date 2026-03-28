@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CheckCircle, Trash2, AlertCircle, X, MoreHorizontal } from 'lucide-react';
 import { tasksService } from '@/lib/services/tasks-service';
+import type { UpdateTaskInput } from '@/lib/validations/task-schemas';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
 import { showError } from '@/lib/utils/toast';
@@ -21,7 +22,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
 
   if (selectedTaskIds.length === 0) return null;
 
-  async function bulkUpdateStatus(status: string) {
+  async function bulkUpdateStatus(status: UpdateTaskInput['status']) {
     setLoading(true);
     try {
       await tasksService.updateTasksBatch(selectedTaskIds, { status });
@@ -35,7 +36,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
     }
   }
 
-  async function bulkUpdatePriority(priority: string) {
+  async function bulkUpdatePriority(priority: UpdateTaskInput['priority']) {
     setLoading(true);
     try {
       await tasksService.updateTasksBatch(selectedTaskIds, { priority });
