@@ -475,10 +475,7 @@ export async function middleware(req: NextRequest) {
     if (isApiRoute) {
       const pathname = req.nextUrl.pathname;
       const isCsrfExempt = CSRF_EXEMPT_ROUTES.some(route => pathname.startsWith(route));
-      const authHeader = req.headers.get('authorization');
-      const hasBearerAuth = authHeader?.startsWith('Bearer ');
-
-      if (!isCsrfExempt && !hasBearerAuth) {
+      if (!isCsrfExempt) {
         const csrfCookie = req.cookies.get('__csrf_token')?.value;
         const csrfHeader = req.headers.get(CSRF_HEADER_NAME);
 
