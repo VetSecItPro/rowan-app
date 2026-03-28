@@ -39,25 +39,10 @@ importers:
       '@capacitor-community/native-market':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/action-sheet':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
       '@capacitor/android':
         specifier: ^8.0.1
         version: 8.0.2(@capacitor/core@8.0.2)
-      '@capacitor/app':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/app-launcher':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/browser':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
       '@capacitor/camera':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/clipboard':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
       '@capacitor/core':
@@ -66,12 +51,6 @@ importers:
       '@capacitor/device':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/dialog':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/filesystem':
-        specifier: ^8.1.1
-        version: 8.1.1(@capacitor/core@8.0.2)
       '@capacitor/geolocation':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
@@ -96,12 +75,6 @@ importers:
       '@capacitor/push-notifications':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/screen-orientation':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/screen-reader':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
       '@capacitor/share':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
@@ -109,9 +82,6 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
       '@capacitor/status-bar':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/toast':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
       '@capawesome/capacitor-badge':
@@ -601,11 +571,6 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
-  '@capacitor/action-sheet@8.0.0':
-    resolution: {integrity: sha512-6NYSv9EeaPiInu+/4AfuvSlJEaH+F7J6UmAejVdPW8YHF+Qinc/DKYkMvqMx+8MXVKIptCA0Zwz8JnabuNCl2Q==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
   '@capacitor/android@7.4.5':
     resolution: {integrity: sha512-G76C+PGIFkG+hxj6JLlY003txRaGZwsXBPo4b4xiZMZaD6DG++sDCoumYl/5xL40dL2b8P5tb3CKf/khWyL2Gw==}
     peerDependencies:
@@ -616,25 +581,10 @@ packages:
     peerDependencies:
       '@capacitor/core': ^8.0.0
 
-  '@capacitor/app-launcher@8.0.0':
-    resolution: {integrity: sha512-sHPE1fkRfyxisDDMHKdSXNHT147q+7+6gSVQi7KCCZ2B9Ibl3/QlFVzWDp0z0OuCHVz97jjoML9jqd5ELg94+g==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
   '@capacitor/app@7.1.1':
     resolution: {integrity: sha512-H4rmMXlL6GEDs2Yds5JvYqZxz4mdp7R4XdGJ7p+oGV+YapuQ2kW38UabuhdP6qSrKfIeLde6qx+8FEX02krypA==}
     peerDependencies:
       '@capacitor/core': '>=7.0.0'
-
-  '@capacitor/app@8.0.0':
-    resolution: {integrity: sha512-OwzIkUs4w433Bu9WWAEbEYngXEfJXZ9Wmdb8eoaqzYBgB0W9/3Ed/mh6sAYPNBAZlpyarmewgP7Nb+d3Vrh+xA==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
-  '@capacitor/browser@8.0.0':
-    resolution: {integrity: sha512-xey7maszGABKuStvXDV4vXN+EzIyz0o7zlyzw4JKG6o/1GzqeqHqVuE+8Ux+Hks3DZji4LoriWZVgVF6mR6RGg==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
 
   '@capacitor/camera@8.0.0':
     resolution: {integrity: sha512-Iu8j2oxoIhY2mLuoEckbL7PFgw1XFm1nqmeWdIkILpcT3H9A+BrSDUDlzWqM/EeaDKo6JnhR59tYHwUhOdXaUg==}
@@ -646,11 +596,6 @@ packages:
     engines: {node: '>=22.0.0'}
     hasBin: true
 
-  '@capacitor/clipboard@8.0.0':
-    resolution: {integrity: sha512-nRgx07ThaoxOaTObZo/G39se9wA3oVgP0ooNO539P1TOZzWObwuXWObZgvaRJNpJfHVYcNe45Ylb8nlYl7VleA==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
   '@capacitor/core@7.4.5':
     resolution: {integrity: sha512-JnUywi0WRbqm4QYoplNsMQ7KAVuyrQFha0dOH9YDVCyrVHUvPcvrnK+9j5elUMgy+pOh3ve+pk6BVoySr91c+A==}
 
@@ -659,11 +604,6 @@ packages:
 
   '@capacitor/device@8.0.0':
     resolution: {integrity: sha512-qFmlTDnAvUwIg93YUF3u3ovqpDFqUl2RFkf2dVIF8Py7vTA+GjQIHQWITcBKfeUENoVXPNn04t5nxg5mAkjNEA==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
-  '@capacitor/dialog@8.0.0':
-    resolution: {integrity: sha512-ri19ISkWK89JHgVgR1JHZ4Yf6jzZHrXCMG4mqeiuUQqXXu6nw0uVBwEy9MwNQRw3Wlq/KboqLeIs1pQnOswqrQ==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -717,16 +657,6 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
-  '@capacitor/screen-orientation@8.0.0':
-    resolution: {integrity: sha512-wjIYtDuNAbbg+rovOQPL9jYXBBNy8YJCKzicAZA9AKfHUubREuxrLmkuE2K95kckFfHuWtZ45wzr0Yapmn2c5A==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
-  '@capacitor/screen-reader@8.0.0':
-    resolution: {integrity: sha512-F7H9+KH/Fq4urJNFATyhMV2SpMY8rB7A0ncoTfb7CIBRy27nA1ssdmpjLKahluVG2M813HIKY5Oc1aphVxSVIw==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
   '@capacitor/share@8.0.0':
     resolution: {integrity: sha512-VU+xT4LFwr4keIC0UKDqGQVAiNlAHwoTMQg8wVVSxtn/k32VOvvtqFfu63qnXr40WKytZWrxJfVESvRjd761yg==}
     peerDependencies:
@@ -744,11 +674,6 @@ packages:
 
   '@capacitor/synapse@1.0.4':
     resolution: {integrity: sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw==}
-
-  '@capacitor/toast@8.0.0':
-    resolution: {integrity: sha512-khWSYsBd+kc28s+nTfswxEfTQ3edY2f0BbvPZmEoBnXclunZbC7Bn1/ZyjKtM9wEA1RC5Umq4RUeFh8TtP+02g==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
 
   '@capawesome/capacitor-badge@8.0.0':
     resolution: {integrity: sha512-dkcrXmjoxe01E8QkUAykQqXEstk2/x/ZfsYX+uMXo+UcJBILXWZtj/2JIHARRWaxCZjhr4iZnmyVziRKYCdSAg==}
@@ -8016,10 +7941,6 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.0.2
 
-  '@capacitor/action-sheet@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
   '@capacitor/android@7.4.5(@capacitor/core@7.4.5)':
     dependencies:
       '@capacitor/core': 7.4.5
@@ -8028,21 +7949,9 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.0.2
 
-  '@capacitor/app-launcher@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
   '@capacitor/app@7.1.1(@capacitor/core@7.4.5)':
     dependencies:
       '@capacitor/core': 7.4.5
-
-  '@capacitor/app@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
-  '@capacitor/browser@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
 
   '@capacitor/camera@8.0.0(@capacitor/core@8.0.2)':
     dependencies:
@@ -8070,10 +7979,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/clipboard@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
   '@capacitor/core@7.4.5':
     dependencies:
       tslib: 2.8.1
@@ -8083,10 +7988,6 @@ snapshots:
       tslib: 2.8.1
 
   '@capacitor/device@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
-  '@capacitor/dialog@8.0.0(@capacitor/core@8.0.2)':
     dependencies:
       '@capacitor/core': 8.0.2
 
@@ -8132,14 +8033,6 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.0.2
 
-  '@capacitor/screen-orientation@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
-  '@capacitor/screen-reader@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-
   '@capacitor/share@8.0.0(@capacitor/core@8.0.2)':
     dependencies:
       '@capacitor/core': 8.0.2
@@ -8153,10 +8046,6 @@ snapshots:
       '@capacitor/core': 8.0.2
 
   '@capacitor/synapse@1.0.4': {}
-
-  '@capacitor/toast@8.0.0(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
 
   '@capawesome/capacitor-badge@8.0.0(@capacitor/core@8.0.2)':
     dependencies:
