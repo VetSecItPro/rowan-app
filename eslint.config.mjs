@@ -56,6 +56,9 @@ const eslintConfig = [
       // General quality
       "no-console": ["warn", { allow: ["warn", "error"] }],
 
+      // Enforce explicit types — disallow implicit 'any'
+      "@typescript-eslint/no-explicit-any": "error",
+
       // Allow underscore-prefixed variables to mark intentionally unused vars
       "@typescript-eslint/no-unused-vars": [
         "warn",

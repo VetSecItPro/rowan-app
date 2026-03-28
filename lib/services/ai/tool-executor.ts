@@ -30,8 +30,7 @@ import { createProjectSchema } from '@/lib/validations/project-schemas';
  * 2. Null values are deleted (become undefined)
  * 3. The AI sends values from our tool definitions which match the schemas
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function stripNulls<TTarget>(obj: Record<string, any>): TTarget {
+function stripNulls<TTarget>(obj: Record<string, unknown>): TTarget {
   const result = { ...obj };
   for (const key of Object.keys(result)) {
     if (result[key] === null) {
