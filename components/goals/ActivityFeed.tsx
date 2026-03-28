@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { MessageCircle, Users, Calendar, CheckCircle2, Target, Mic } from 'lucide-react';
 import { GoalActivity, GoalComment } from '@/lib/services/goals-service';
+import { activityService } from '@/lib/services/goals/activity-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
@@ -87,33 +88,15 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     try {
       setLoading(true);
 
-      // Return empty activities for invalid spaceIds
       if (!spaceId) {
         setActivities([]);
         return;
       }
 
-      // nosemgrep: supabase-missing-space-id-filter — space_id filter applied via .eq('space_id', spaceId) below
-      let query = supabase
-        .from('goal_activities')
-        .select(`
-          *,
-          users!goal_activities_user_id_fkey(id, email, name, avatar_url),
-          goals!goal_activities_goal_id_fkey(id, title),
-          goal_milestones!goal_activities_milestone_id_fkey(id, title),
-          goal_check_ins!goal_activities_check_in_id_fkey(id, progress_percentage, mood)
-        `)
-        .eq('space_id', spaceId);
+      const activitiesData = goalId
+        ? await activityService.getGoalActivityFeed(goalId, 50)
+        : await activityService.getActivityFeed(spaceId, 50);
 
-      if (goalId) {
-        query = query.eq('goal_id', goalId);
-      }
-
-      const { data: activitiesData, error } = await query
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
       setActivities(activitiesData || []);
     } catch (error) {
       logger.error('Error loading activities:', error, { component: 'ActivityFeed', action: 'component_action' });
@@ -121,7 +104,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     } finally {
       setLoading(false);
     }
-  }, [goalId, spaceId, supabase]);
+  }, [goalId, spaceId]);
 
   useEffect(() => {
     loadUser();
@@ -132,17 +115,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     if (comments[activityId]) return; // Already loaded
 
     try {
-      // nosemgrep: supabase-missing-space-id-filter — comments scoped by goal_id (goal already space-filtered)
-      const { data: commentsData, error } = await supabase
-        .from('goal_comments')
-        .select(`
-          *,
-          users!goal_comments_user_id_fkey(id, email, name, avatar_url)
-        `)
-        .eq('goal_id', activityId) // This might need adjustment based on your schema
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
+      const commentsData = await activityService.getGoalComments(activityId);
       setComments(prev => ({ ...prev, [activityId]: commentsData || [] }));
     } catch (error) {
       logger.error('Error loading comments:', error, { component: 'ActivityFeed', action: 'component_action' });
