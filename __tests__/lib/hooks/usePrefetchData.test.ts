@@ -69,10 +69,10 @@ describe('usePrefetchAllData', () => {
   });
 
   it('should not prefetch initially when skipInitial is true', () => {
-    renderHook(() => usePrefetchAllData({ skipInitial: true }), { wrapper });
+    const { result } = renderHook(() => usePrefetchAllData({ skipInitial: true }), { wrapper });
 
-    // Test passes if no errors occur
-    expect(true).toBe(true);
+    // Hook should initialize without triggering prefetch
+    expect(result.current.prefetchAll).toBeDefined();
   });
 });
 

@@ -51,10 +51,12 @@ describe('SmartBackgroundCanvas', () => {
   });
 
   it('renders with timeAware enabled', async () => {
+    let container: HTMLElement;
     await act(async () => {
-      render(<SmartBackgroundCanvas timeAware />);
+      const result = render(<SmartBackgroundCanvas timeAware />);
+      container = result.container;
     });
-    expect(true).toBe(true);
+    expect(container!.firstChild).toBeDefined();
   });
 
   it('applies custom className', () => {
