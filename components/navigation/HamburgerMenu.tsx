@@ -52,7 +52,6 @@ export function HamburgerMenu() {
 
   // Mount check for portal
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     return () => setMounted(false);
   }, []);
@@ -75,7 +74,6 @@ export function HamburgerMenu() {
 
   // Close menu when route changes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
   }, [pathname]);
 

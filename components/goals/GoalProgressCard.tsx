@@ -32,7 +32,6 @@ export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProp
   }, [goal.id]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadGoalData();
   }, [loadGoalData]);
 

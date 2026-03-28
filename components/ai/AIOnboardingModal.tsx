@@ -95,7 +95,6 @@ export function AIOnboardingModal({ isOpen, onClose, onOpenChat }: AIOnboardingM
   const prevOpenRef = useRef(isOpen);
 
   // Reset to first slide when modal opens
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (isOpen && !prevOpenRef.current) {
       setCurrentSlide(0);
@@ -103,7 +102,6 @@ export function AIOnboardingModal({ isOpen, onClose, onOpenChat }: AIOnboardingM
     }
     prevOpenRef.current = isOpen;
   }, [isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const isFirstSlide = currentSlide === 0;
   const isLastSlide = currentSlide === SLIDES.length - 1;

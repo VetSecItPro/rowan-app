@@ -62,13 +62,11 @@ export default function RestoreAccountPage() {
     if (!user) return;
 
     // User is logged in, check deletion status
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- async status fetch updates component state
     checkDeletionStatus();
   }, [user, authLoading, router]);
 
   useEffect(() => {
     if (!deletionInfo) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- derived countdown updates from server data
       setDaysRemaining(0);
       return;
     }

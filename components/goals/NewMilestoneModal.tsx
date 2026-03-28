@@ -33,7 +33,6 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editMilestone) {
       setFormData({
@@ -60,7 +59,6 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
     }
     setShowEmojiPicker(false);
   }, [editMilestone, goalId, isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleDependencyChange = (value: string | undefined) => {
     setFormData({ ...formData, depends_on_goal_id: value || '' });

@@ -39,7 +39,6 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
   useEffect(() => {
     if (isOpen) {
       // Pick a random motivational message
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessage(motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]);
 
       // Auto-close after 5 seconds

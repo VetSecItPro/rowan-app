@@ -24,7 +24,6 @@ export function CCPANoticeBanner({ onDismiss, autoDetect = true }: CCPANoticeBan
   const [isDismissed, setIsDismissed] = useState(false);
   const [confidence, setConfidence] = useState<'high' | 'medium' | 'low'>('low');
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     // Check if user has already dismissed the notice
     const dismissed = localStorage.getItem('ccpa-notice-dismissed');
@@ -246,7 +245,6 @@ export function CCPANoticeProvider({ children }: { children: React.ReactNode }) 
       setShowCompact(true);
     }
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
     <>

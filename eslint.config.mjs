@@ -36,6 +36,9 @@ const eslintConfig = [
       "*.config.js",
       "*.config.mjs",
       "public/sw.js",
+      ".claude/**",
+      "remotion/**",
+      "next-env.d.ts",
     ],
   },
 

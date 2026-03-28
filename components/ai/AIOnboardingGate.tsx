@@ -46,7 +46,6 @@ export function AIOnboardingGate() {
   useEffect(() => {
     if (!isLoading && settings.ai_onboarding_seen && !isOnboardingSeen()) {
       markOnboardingSeen();
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing server state to local; necessary for cross-device consistency
       setDismissed(true);
     }
   }, [isLoading, settings.ai_onboarding_seen]);

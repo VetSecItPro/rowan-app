@@ -76,7 +76,6 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
     { value: 'snack', label: 'Snack', icon: Cookie, color: 'text-amber-500' },
   ];
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editMeal) {
       // Convert ISO timestamp to yyyy-MM-dd format for date input
@@ -100,7 +99,6 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
       });
     }
   }, [editMeal, spaceId]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
