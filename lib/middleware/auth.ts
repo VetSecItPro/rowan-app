@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import type { User } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 // SECURITY: 90-day session duration — FIX-024
 const SESSION_COOKIE_MAX_AGE = 90 * 24 * 60 * 60; // 7776000 seconds
@@ -13,6 +13,7 @@ export interface AuthSession {
 export interface AuthResult {
   response: NextResponse;
   session: AuthSession | null;
+  supabase: SupabaseClient;
 }
 
 /**
@@ -59,5 +60,5 @@ export async function initAuth(req: NextRequest, sanitizedHeaders: Headers): Pro
   const { data: { user: authUser } } = await supabase.auth.getUser();
   const session: AuthSession | null = authUser ? { user: authUser } : null;
 
-  return { response, session };
+  return { response, session, supabase };
 }

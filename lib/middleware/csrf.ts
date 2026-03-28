@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { CSRF_EXEMPT_ROUTES, CSRF_HEADER_NAME, generateCsrfToken } from '@/lib/security/csrf';
+import { PROTECTED_PATHS } from '@/lib/middleware/constants';
 
 /**
  * Returns true if the pathname is a static asset that should bypass all middleware.
@@ -23,7 +24,7 @@ export function isStaticAsset(pathname: string): boolean {
  * Validates CSRF for state-changing API requests and rotates the token on success.
  * Returns a 403 response on failure, null if validation passes or is not required.
  *
- * Skips validation for: cron routes, webhook routes, CSRF-exempt routes, Bearer-authed requests.
+ * Skips validation for: cron routes, webhook routes, CSRF-exempt routes.
  */
 export function checkCsrf(req: NextRequest, response: NextResponse): NextResponse | null {
   const { pathname } = req.nextUrl;
@@ -54,8 +55,7 @@ export function checkCsrf(req: NextRequest, response: NextResponse): NextRespons
   if (!isApiRoute) return null;
 
   const isCsrfExempt = CSRF_EXEMPT_ROUTES.some(route => pathname.startsWith(route));
-  const hasBearerAuth = req.headers.get('authorization')?.startsWith('Bearer ');
-  if (isCsrfExempt || hasBearerAuth) return null;
+  if (isCsrfExempt) return null;
 
   const csrfCookie = req.cookies.get('__csrf_token')?.value;
   const csrfHeader = req.headers.get(CSRF_HEADER_NAME);
@@ -84,11 +84,3 @@ export function checkCsrf(req: NextRequest, response: NextResponse): NextRespons
 
   return null;
 }
-
-// Kept here so csrf.ts doesn't depend on middleware.ts (avoids circular imports)
-const PROTECTED_PATHS = [
-  '/dashboard', '/tasks', '/calendar', '/messages', '/reminders',
-  '/shopping', '/meals', '/projects', '/recipes', '/goals', '/settings',
-  '/invitations', '/feedback', '/expenses', '/budget', '/budget-setup',
-  '/location', '/rewards', '/achievements', '/year-in-review', '/reports',
-];

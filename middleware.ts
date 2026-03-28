@@ -10,7 +10,6 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 import { isStaticAsset, checkCsrf } from '@/lib/middleware/csrf';
 import { checkBotBlocking } from '@/lib/middleware/bot-blocking';
 import { checkBodySize, getSanitizedHeaders } from '@/lib/middleware/request-validation';
@@ -18,13 +17,7 @@ import { initAuth } from '@/lib/middleware/auth';
 import { handleAdminPath } from '@/lib/middleware/admin-session';
 import { checkEmailVerification } from '@/lib/middleware/email-verification';
 import { applySecurityHeaders, generateNonce } from '@/lib/middleware/csp';
-
-const PROTECTED_PATHS = [
-  '/dashboard', '/tasks', '/calendar', '/messages', '/reminders',
-  '/shopping', '/meals', '/projects', '/recipes', '/goals', '/settings',
-  '/invitations', '/feedback', '/expenses', '/budget', '/budget-setup',
-  '/location', '/rewards', '/achievements', '/year-in-review', '/reports',
-];
+import { PROTECTED_PATHS } from '@/lib/middleware/constants';
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -38,16 +31,12 @@ export async function middleware(req: NextRequest) {
   if (sizeBlock) return sizeBlock;
 
   const sanitizedHeaders = getSanitizedHeaders(req);
-  const { response, session } = await initAuth(req, sanitizedHeaders);
+  const { response, session, supabase } = await initAuth(req, sanitizedHeaders);
 
-  // Admin SSO + session management
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { get: (name) => req.cookies.get(name)?.value } }
-  );
+  // Admin SSO + session management (reuses the auth-layer Supabase client
+  // so any JWT refresh during the RPC call persists via cookie handlers)
   const adminResult = await handleAdminPath(req, session, response, () =>
-    Promise.resolve(supabase.rpc('get_admin_details'))
+    supabase.rpc('get_admin_details')
   );
   if (adminResult) return adminResult;
 
