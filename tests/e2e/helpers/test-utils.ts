@@ -588,8 +588,7 @@ export async function getTaskCount(page: Page): Promise<number> {
 export async function simulatePolarWebhook(
   page: Page,
   eventType: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload: Record<string, any>
+  payload: Record<string, unknown>
 ): Promise<Response> {
   const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 

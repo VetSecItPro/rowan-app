@@ -34,6 +34,8 @@ interface DashboardStats {
     status: 'healthy' | 'degraded' | 'down';
     uptime: number;
   };
+  totalUsers?: number;
+  launchSignups?: number;
 }
 
 interface AnalyticsData {
@@ -415,8 +417,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
   }
 
   // Use stats directly (already extracted in queryFn), provide defaults
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const safeStats: Partial<DashboardStats> & Record<string, any> = stats || {};
+  const safeStats: Partial<DashboardStats> = stats || {};
   const analytics: AnalyticsData = analyticsData || {
     summary: { totalPageViews: 0, uniqueVisitors: 0, growthRate: 0 },
     trafficMetrics: { totalPageViews: 0, uniqueSessions: 0 },

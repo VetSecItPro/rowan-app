@@ -89,8 +89,7 @@ export async function invalidateAdminCache(): Promise<void> {
     const allKeys: string[] = [];
     let cursor = 0;
     do {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Upstash Redis scan returns [string | number, string[]]
-      const [nextCursor, batch]: [any, string[]] = await redis.scan(cursor, { match: `${CACHE_PREFIX}*`, count: 100 });
+      const [nextCursor, batch]: [string | number, string[]] = await redis.scan(cursor, { match: `${CACHE_PREFIX}*`, count: 100 });
       cursor = Number(nextCursor);
       allKeys.push(...batch);
     } while (cursor !== 0);

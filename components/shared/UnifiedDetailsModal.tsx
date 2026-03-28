@@ -6,7 +6,7 @@ import {
   X, FileText, Paperclip, MessageSquare, CheckSquare, Home,
   Calendar, Clock, User, Send, Trash2, Upload, Edit3,
 } from 'lucide-react';
-import { Task, Chore } from '@/lib/types';
+import { Task, Chore, CreateTaskInput, CreateChoreInput } from '@/lib/types';
 import {
   TASK_CATEGORIES,
   CHORE_CATEGORIES,
@@ -46,8 +46,7 @@ interface UnifiedDetailsModalProps {
   userId: string;
   onEdit?: (item: ItemWithType) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSave?: (item: any) => void | Promise<void | { id: string }>;
+  onSave?(item: ItemWithType | CreateTaskInput | CreateChoreInput): void | Promise<void | { id: string }>;
   onUpdate?: () => void;
 }
 
@@ -114,9 +113,9 @@ function DetailsModalContent({
     try {
       await onSave({
         ...item,
-        status: editedStatus,
-        priority: editedPriority,
-      });
+        status: editedStatus as ItemWithType['status'],
+        ...('priority' in item ? { priority: editedPriority as Task['priority'] } : {}),
+      } as ItemWithType);
       setHasChanges(false);
       onUpdate?.();
     } catch (error) {
