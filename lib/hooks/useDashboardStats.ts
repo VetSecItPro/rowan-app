@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { Space } from '@/lib/types';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+// NOTE: 9 separate channels consolidated into 1 to reduce list_changes WAL polling overhead
 
 // Debounce utility to coalesce rapid real-time events into a single reload
 function debounce<T extends (...args: unknown[]) => unknown>(fn: T, ms: number): T {
@@ -409,125 +410,36 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
         debounce(() => loadAllStatsRef.current(), 500)
     );
 
-    // Real-time subscriptions
+    // Real-time subscriptions — single consolidated channel to reduce WAL polling overhead
     useEffect(() => {
         loadAllStats();
 
         const supabase = createClient();
-        const channels: RealtimeChannel[] = [];
+        let channel: RealtimeChannel | null = null;
 
         if (currentSpace) {
             const spaceId = currentSpace.id;
+            const reload = () => { debouncedReload.current(); };
 
-            const tasksChannel = supabase
-                .channel(`dashboard_tasks:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'tasks',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
+            channel = supabase
+                .channel(`dashboard:${spaceId}`)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_events', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'reminders', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_lists', filter: `space_id=eq.${spaceId}` }, reload)
+                // shopping_items doesn't have space_id directly, RLS handles security
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_items' }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'meals', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'goals', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'chores', filter: `space_id=eq.${spaceId}` }, reload)
                 .subscribe();
-            channels.push(tasksChannel);
-
-            const eventsChannel = supabase
-                .channel(`dashboard_events:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'calendar_events',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(eventsChannel);
-
-            const remindersChannel = supabase
-                .channel(`dashboard_reminders:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'reminders',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(remindersChannel);
-
-            const messagesChannel = supabase
-                .channel(`dashboard_messages:${spaceId}`)
-                .on('postgres_changes', {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'messages',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(messagesChannel);
-
-            // Listen to shopping_lists (has space_id) for list-level changes
-            const shoppingListsChannel = supabase
-                .channel(`dashboard_shopping_lists:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'shopping_lists',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(shoppingListsChannel);
-
-            // Listen to shopping_items for item-level changes
-            // Note: shopping_items doesn't have space_id directly, RLS handles security
-            const shoppingItemsChannel = supabase
-                .channel(`dashboard_shopping_items:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'shopping_items',
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(shoppingItemsChannel);
-
-            // Meals — auto-update when AI or user creates/modifies meals
-            const mealsChannel = supabase
-                .channel(`dashboard_meals:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'meals',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(mealsChannel);
-
-            // Goals — auto-update when AI or user creates/modifies goals
-            const goalsChannel = supabase
-                .channel(`dashboard_goals:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'goals',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(goalsChannel);
-
-            // Chores — auto-update when chores change
-            const choresChannel = supabase
-                .channel(`dashboard_chores:${spaceId}`)
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'chores',
-                    filter: `space_id=eq.${spaceId}`,
-                }, () => { debouncedReload.current(); })
-                .subscribe();
-            channels.push(choresChannel);
         }
 
         return () => {
-            channels.forEach(channel => {
+            if (channel) {
                 supabase.removeChannel(channel);
-            });
+            }
         };
     // loadAllStats intentionally excluded — it's called directly and its deps
     // (user, authLoading) are already listed. Including the callback ref causes

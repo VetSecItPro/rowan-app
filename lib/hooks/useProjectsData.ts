@@ -11,7 +11,7 @@ import type { Project } from '@/lib/services/project-tracking-service';
 import type { Expense } from '@/lib/services/budgets-service';
 import type { Bill } from '@/lib/services/bills-service';
 import { createClient } from '@/lib/supabase/client';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -215,25 +215,20 @@ export function useProjectsData(): UseProjectsDataReturn {
     }
   }, [currentSpace]);
 
-  // ─── Real-time subscriptions with incremental updates ─────────────────────
+  // ─── Real-time subscriptions — single consolidated channel ─────────────────
 
   useEffect(() => {
     if (!currentSpace) return;
 
     const supabase = createClient();
-    const channels: RealtimeChannel[] = [];
+    const spaceFilter = `space_id=eq.${currentSpace.id}`;
 
-    // Subscribe to expenses changes - incremental updates
-    const expensesChannel = supabase
-      .channel(`projects_expenses:${currentSpace.id}`)
+    const channel = supabase
+      .channel(`projects:${currentSpace.id}`)
+      // Expenses — incremental updates
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'expenses',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'INSERT', schema: 'public', table: 'expenses', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const newExpense = payload.new as Expense;
           setExpenses(prev => [newExpense, ...prev]);
@@ -242,12 +237,7 @@ export function useProjectsData(): UseProjectsDataReturn {
       )
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'expenses',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'UPDATE', schema: 'public', table: 'expenses', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const updatedExpense = payload.new as Expense;
           setExpenses(prev => prev.map(e => e.id === updatedExpense.id ? updatedExpense : e));
@@ -256,34 +246,18 @@ export function useProjectsData(): UseProjectsDataReturn {
       )
       .on(
         'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'expenses',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'DELETE', schema: 'public', table: 'expenses', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const deletedId = (payload.old as { id: string }).id;
           setExpenses(prev => prev.filter(e => e.id !== deletedId));
           refreshBudgetStats();
         }
       )
-      .subscribe();
-    channels.push(expensesChannel);
-
-    // Subscribe to budgets changes - reload budget data only
-    const budgetsChannel = supabase
-      .channel(`projects_budgets:${currentSpace.id}`)
+      // Budgets — reload budget data
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'budgets',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: '*', schema: 'public', table: 'budgets', filter: spaceFilter },
         async () => {
-          // Budget changes affect stats, reload both
           const [budgetData, stats] = await Promise.all([
             projectsService.getBudget(currentSpace.id),
             projectsService.getBudgetStats(currentSpace.id),
@@ -292,20 +266,10 @@ export function useProjectsData(): UseProjectsDataReturn {
           setBudgetStats(stats);
         }
       )
-      .subscribe();
-    channels.push(budgetsChannel);
-
-    // Subscribe to projects changes - incremental updates
-    const projectsChannel = supabase
-      .channel(`projects_projects:${currentSpace.id}`)
+      // Projects — incremental updates
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'projects',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'INSERT', schema: 'public', table: 'projects', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const newProject = payload.new as Project;
           setProjects(prev => [newProject, ...prev]);
@@ -313,12 +277,7 @@ export function useProjectsData(): UseProjectsDataReturn {
       )
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'projects',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'UPDATE', schema: 'public', table: 'projects', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const updatedProject = payload.new as Project;
           setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
@@ -326,45 +285,25 @@ export function useProjectsData(): UseProjectsDataReturn {
       )
       .on(
         'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'projects',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'DELETE', schema: 'public', table: 'projects', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const deletedId = (payload.old as { id: string }).id;
           setProjects(prev => prev.filter(p => p.id !== deletedId));
         }
       )
-      .subscribe();
-    channels.push(projectsChannel);
-
-    // Subscribe to bills changes - incremental updates
-    const billsChannel = supabase
-      .channel(`projects_bills:${currentSpace.id}`)
+      // Bills — incremental updates
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'bills',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'INSERT', schema: 'public', table: 'bills', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const newBill = payload.new as Bill;
           setBills(prev => [newBill, ...prev]);
-          refreshBudgetStats(); // Bills affect pending amount
+          refreshBudgetStats();
         }
       )
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'bills',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'UPDATE', schema: 'public', table: 'bills', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const updatedBill = payload.new as Bill;
           setBills(prev => prev.map(b => b.id === updatedBill.id ? updatedBill : b));
@@ -373,12 +312,7 @@ export function useProjectsData(): UseProjectsDataReturn {
       )
       .on(
         'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'bills',
-          filter: `space_id=eq.${currentSpace.id}`,
-        },
+        { event: 'DELETE', schema: 'public', table: 'bills', filter: spaceFilter },
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const deletedId = (payload.old as { id: string }).id;
           setBills(prev => prev.filter(b => b.id !== deletedId));
@@ -386,11 +320,10 @@ export function useProjectsData(): UseProjectsDataReturn {
         }
       )
       .subscribe();
-    channels.push(billsChannel);
 
-    // Cleanup subscriptions on unmount
+    // Cleanup single channel on unmount
     return () => {
-      channels.forEach(channel => supabase.removeChannel(channel));
+      supabase.removeChannel(channel);
     };
   }, [currentSpace, refreshBudgetStats]);
 
