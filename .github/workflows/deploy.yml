@@ -84,7 +84,7 @@ jobs:
 
           if [ "$HAS_REAL_SQL" = "true" ]; then
             echo "Pushing new migrations..."
-            npx supabase db push --linked
+            npx supabase db push --linked --include-all
           else
             echo "No new executable migrations to push (stubs only)"
           fi
