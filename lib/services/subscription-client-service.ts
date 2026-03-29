@@ -16,7 +16,7 @@ export async function checkSubscriptionActive(userId: string): Promise<boolean> 
       .from('subscriptions')
       .select('status, tier')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     return data?.status === 'active' && data?.tier !== 'free';
   } catch {

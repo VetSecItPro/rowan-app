@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/client';
-import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import type { Space } from '@/lib/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -62,9 +61,8 @@ export async function createSpace(
   supabaseClient?: SupabaseClient
 ): Promise<{ success: true; data: Space } | { success: false; error: string }> {
   try {
-    // Use admin client when called from server (supabaseClient provided), otherwise use regular client
-    // Admin client bypasses RLS which is needed for space creation
-    const supabase = supabaseClient ? supabaseAdmin : createClient();
+    // Use provided client (e.g. server-side) or fall back to browser client
+    const supabase = supabaseClient || createClient();
 
     // Validate input
     const validated = CreateSpaceSchema.parse({ name });

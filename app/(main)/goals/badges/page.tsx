@@ -15,17 +15,17 @@ export const metadata = {
 export default async function BadgesPage() {
   const supabase = await createClient();
 
-  // Get authenticated user
+  // Get authenticated user (server-side JWT validation)
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect('/login');
   }
 
   // Get active space
-  const spaceId = await getUserFirstSpaceId(session.user.id, supabase);
+  const spaceId = await getUserFirstSpaceId(user.id, supabase);
 
   if (!spaceId) {
     redirect('/onboarding');
@@ -70,7 +70,7 @@ export default async function BadgesPage() {
         </div>
 
         {/* Badge Collection */}
-        <BadgeCollection userId={session.user.id} spaceId={spaceId} />
+        <BadgeCollection userId={user.id} spaceId={spaceId} />
       </div>
     </div>
   );

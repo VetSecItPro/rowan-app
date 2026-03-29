@@ -4,8 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 /**
  * Server-side auth helper for Server Component pages.
  *
- * Verifies the user is authenticated and has an active space.
- * Redirects to /login if no session, /onboarding if no space.
+ * Verifies the user via server-side JWT validation (getUser, not getSession).
+ * Redirects to /login if unauthenticated, /onboarding if no space.
  *
  * Usage in a Server Component page:
  * ```ts
@@ -19,23 +19,23 @@ export async function serverAuth(): Promise<{ userId: string; spaceId: string }>
   const supabase = await createClient();
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect('/login');
   }
 
   const { data: spaceMember } = await supabase
     .from('space_members')
     .select('space_id')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!spaceMember) {
     redirect('/onboarding');
   }
 
-  return { userId: session.user.id, spaceId: spaceMember.space_id };
+  return { userId: user.id, spaceId: spaceMember.space_id };
 }

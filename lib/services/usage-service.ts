@@ -39,10 +39,10 @@ export async function getTodayUsage(
     .select(columnName)
     .eq('user_id', userId)
     .eq('date', today)
-    .single();
+    .maybeSingle();
 
-  if (error) {
-    // If no record exists, usage is 0
+  if (error || !data) {
+    // If no record exists or error, usage is 0
     return 0;
   }
 

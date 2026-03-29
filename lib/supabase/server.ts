@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { logger } from '@/lib/logger';
 
-/** User session cookie duration: 1 year (persistent login like Facebook/Instagram) */
-const SESSION_COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 31536000 seconds
+/** SECURITY: 90-day session duration — FIX-024 */
+const SESSION_COOKIE_MAX_AGE = 90 * 24 * 60 * 60; // 7776000 seconds
 
 /**
  * Creates an async Supabase client for server-side use (API routes, Server Actions, Route Handlers).
@@ -55,7 +55,7 @@ export async function createClient() {
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: Partial<ResponseCookie> }>) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            // Apply persistent login: 1 year cookie expiration for auth cookies
+            // Apply 90-day session duration for auth cookies — FIX-024
             const persistentOptions: Partial<ResponseCookie> = {
               ...options,
               maxAge: options?.maxAge || SESSION_COOKIE_MAX_AGE,
