@@ -238,7 +238,7 @@ export function useGoalsData(): UseGoalsDataReturn {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace, gateLoading, hasAccess]);
 
-  // ─── Real-time subscriptions ────────────────────────────────────────────────
+  // ─── Real-time subscriptions — single consolidated channel ──────────────────
 
   useEffect(() => {
     // SECURITY: Only subscribe if user has access
@@ -246,9 +246,9 @@ export function useGoalsData(): UseGoalsDataReturn {
 
     const supabase = createClient();
 
-    // Subscribe to goals changes
-    const goalsChannel = supabase
-      .channel(`goals-changes:${currentSpace.id}`)
+    const channel = supabase
+      .channel(`goals:${currentSpace.id}`)
+      // Goals changes
       .on(
         'postgres_changes',
         {
@@ -264,7 +264,6 @@ export function useGoalsData(): UseGoalsDataReturn {
           if (payload.eventType === 'INSERT') {
             const newGoal = payload.new as unknown as Goal;
             setGoals(prev => {
-              // Skip if already present (e.g. from optimistic update replacement)
               if (prev.some(g => g.id === newGoal.id)) return prev;
               return [...prev, newGoal];
             });
@@ -277,7 +276,6 @@ export function useGoalsData(): UseGoalsDataReturn {
             if (!isUserAction) {
               toast.info(`Goal updated: ${updatedGoal.title}`);
             }
-            // Clean up action tracking
             if (goalId) userActionsRef.current.delete(goalId as string);
           } else if (payload.eventType === 'DELETE') {
             const deletedId = (payload.old as Record<string, unknown>).id as string;
@@ -289,11 +287,7 @@ export function useGoalsData(): UseGoalsDataReturn {
           }
         }
       )
-      .subscribe();
-
-    // Subscribe to milestones changes
-    const milestonesChannel = supabase
-      .channel(`milestones-changes:${currentSpace.id}`)
+      // Milestones changes
       .on(
         'postgres_changes',
         {
@@ -302,7 +296,6 @@ export function useGoalsData(): UseGoalsDataReturn {
           table: 'goal_milestones'
         },
         (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
-          // Check if milestone belongs to a goal in current space
           const belongsToCurrentSpace = (milestone: Milestone) => {
             return goalsRef.current.some(g => g.id === milestone.goal_id);
           };
@@ -339,10 +332,9 @@ export function useGoalsData(): UseGoalsDataReturn {
       )
       .subscribe();
 
-    // Cleanup function
+    // Cleanup single channel
     return () => {
-      supabase.removeChannel(goalsChannel);
-      supabase.removeChannel(milestonesChannel);
+      supabase.removeChannel(channel);
     };
   }, [currentSpace, gateLoading, hasAccess]);
 
