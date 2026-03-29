@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
@@ -22,6 +22,8 @@ export interface AuthResult {
  *
  * Returns the NextResponse (with any refreshed auth cookies applied) and the session.
  *
+ * Uses the recommended getAll/setAll cookie pattern from @supabase/ssr.
+ *
  * PERF: getUser() validates JWT server-side on every request (50-200ms). Intentional
  * security trade-off — FIX-016 accepted risk.
  */
@@ -33,25 +35,29 @@ export async function initAuth(req: NextRequest, sanitizedHeaders: Headers): Pro
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value;
+        getAll() {
+          return req.cookies.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          const persistentOptions = {
-            ...options,
-            maxAge: options.maxAge || SESSION_COOKIE_MAX_AGE,
-            path: options.path || '/',
-            sameSite: options.sameSite || 'lax',
-            secure: options.secure ?? process.env.NODE_ENV === 'production',
-          };
-          req.cookies.set({ name, value, ...persistentOptions });
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
+          // Apply cookies to the request (for downstream middleware/server components)
+          cookiesToSet.forEach(({ name, value }) => {
+            req.cookies.set(name, value);
+          });
+
+          // Recreate response to pick up updated request cookies
           response = NextResponse.next({ request: { headers: sanitizedHeaders } });
-          response.cookies.set({ name, value, ...persistentOptions });
-        },
-        remove(name: string, options: CookieOptions) {
-          req.cookies.set({ name, value: '', ...options });
-          response = NextResponse.next({ request: { headers: sanitizedHeaders } });
-          response.cookies.set({ name, value: '', ...options });
+
+          // Apply cookies to the response (sent back to browser)
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set({
+              name,
+              value,
+              maxAge: (options?.maxAge as number) || SESSION_COOKIE_MAX_AGE,
+              path: (options?.path as string) || '/',
+              sameSite: (options?.sameSite as 'lax' | 'strict' | 'none') || 'lax',
+              secure: (options?.secure as boolean) ?? process.env.NODE_ENV === 'production',
+            });
+          });
         },
       },
     }

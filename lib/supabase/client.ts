@@ -6,8 +6,8 @@ let supabaseClient: ReturnType<typeof createBrowserClient> | null = null;
 // Track whether we're using placeholder values (build time)
 let isPlaceholder = false;
 
-// Session cookie duration: 1 year (persistent login like Facebook/Instagram)
-const SESSION_COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 31536000 seconds
+// SECURITY: 90-day session duration — FIX-024
+const SESSION_COOKIE_MAX_AGE = 90 * 24 * 60 * 60; // 7776000 seconds
 
 export const createClient = () => {
   // Return existing client if already created
@@ -55,7 +55,7 @@ export const createClient = () => {
         // Set each cookie
         cookiesToSet.forEach(({ name, value, options }) => {
           let cookie = `${name}=${value}`;
-          // Use provided maxAge or default to 1 year for persistent login
+          // Use provided maxAge or default to 90-day session duration
           const maxAge = options?.maxAge || SESSION_COOKIE_MAX_AGE;
           cookie += `; max-age=${maxAge}`;
           cookie += `; path=${options?.path || '/'}`;
