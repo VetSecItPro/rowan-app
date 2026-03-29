@@ -1,4 +1,16 @@
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
+/**
+ * WARNING: This script uses the `exec_sql` RPC function which allows arbitrary SQL
+ * execution. The `exec_sql` function MUST NOT exist in production databases.
+ * It should only be created temporarily in development/staging for migrations.
+ */
+
+// Safety guard: never run in production
+if (process.env.NODE_ENV === 'production') {
+  console.error('FATAL: This script must not run in production (uses exec_sql RPC).');
+  process.exit(1);
+}
+
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
