@@ -208,8 +208,8 @@ const sentryWebpackPluginOptions = {
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
 
-  // Only upload source maps in production
-  silent: true,
+  // Surface upload failures in CI; stay quiet locally
+  silent: !process.env.CI,
 
   // Upload source maps during build
   widenClientFileUpload: true,

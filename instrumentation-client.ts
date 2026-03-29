@@ -1,80 +1,76 @@
-// Client-side Sentry configuration
-// This file is automatically loaded on the client side
+// Client-side Sentry initialization (Next.js instrumentation convention)
+// Replaces deprecated sentry.client.config.ts for @sentry/nextjs v10.x+
 import * as Sentry from '@sentry/nextjs';
 
-// COMPLETELY SKIP Sentry initialization in development to avoid console errors
+// Required by @sentry/nextjs v10.x+ for navigation instrumentation
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+
 const isProduction = process.env.NODE_ENV === 'production';
 const hasDSN = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
 const isBrowser = typeof window !== 'undefined';
 
-// Only initialize Sentry in production with a valid DSN
 if (isBrowser && isProduction && hasDSN) {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-    // OPTIMIZATION: Dynamic sampling - 50% errors, 5% success transactions
-    tracesSampleRate: 0.05, // 5% of successful transactions
+    // Standardized: 5% of successful transactions (family app, low volume)
+    tracesSampleRate: 0.05,
 
     // Capture Replay for 10% of all sessions,
     // plus 100% of sessions with an error
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
 
-    // Set environment
     environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || 'production',
 
-    // Ignore common errors that aren't actionable
+    // Browser-specific errors that aren't actionable
     ignoreErrors: [
       'ResizeObserver loop limit exceeded',
-      'Non-Error promise rejection captured',
       'ResizeObserver loop completed with undelivered notifications',
+      'Non-Error promise rejection captured',
+      'Non-Error exception captured',
       // Network errors
       'Network request failed',
       'NetworkError',
       'Failed to fetch',
-      // Common browser errors that aren't actionable
-      'Script error.',
-      'Non-Error exception captured',
+      // Chunk loading errors (code-split navigation failures)
       'ChunkLoadError',
       'Loading chunk',
       'Loading CSS chunk',
+      // Generic browser noise
+      'Script error.',
     ],
 
-    // Custom integrations configuration
     integrations: [
-      // Session Replay integration with proper configuration
       Sentry.replayIntegration({
-        // Mask text content to protect user privacy
         maskAllText: true,
-        // Block media content for performance
         blockAllMedia: true,
       }),
     ],
 
-    // OPTIMIZATION: Dynamic error sampling - drop 10% of errors
+    // Drop 10% of errors randomly for cost savings
     beforeSend(event) {
-      // Keep 90% of error events (drop 10% for cost savings)
       if (Math.random() > 0.9) {
         return null;
       }
       return event;
     },
 
-    // Performance monitoring options - filter non-useful transactions
+    // Filter non-useful transactions
     beforeSendTransaction(event) {
-      // Filter out Next.js internal transactions
+      // Next.js internal / static assets
       if (event.transaction?.includes('/_next/')) {
         return null;
       }
-      // Filter out auth-related transactions (high volume, low value)
+      // Auth endpoints (high volume, low value)
       if (event.transaction?.includes('/api/auth/')) {
         return null;
       }
-      // Filter out health check endpoints
+      // Health checks
       if (event.transaction?.includes('/api/health')) {
         return null;
       }
-      // Filter out static asset requests
+      // Static asset requests
       if (event.transaction?.match(/\.(js|css|png|jpg|svg|ico|woff|woff2)$/)) {
         return null;
       }
