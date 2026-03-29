@@ -968,7 +968,7 @@ class FinancialReportsService {
       .select('id')
       .eq('report_id', reportId)
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       // Remove from favorites
