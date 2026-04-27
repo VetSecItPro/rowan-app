@@ -1,6 +1,17 @@
 -- Migration: Fix ALL Supabase Security Advisor findings
 -- Date: 2026-03-28
 -- Scope: 2 errors (security definer views, RLS disabled) + warnings (search path, permissive policies, auth initplan)
+--
+-- NOTE 2026-04-27: This migration originally addressed a "spatial_ref_sys
+-- exposed via PostGIS" advisor finding via REVOKE statements. Those REVOKEs
+-- were a silent no-op — the `postgres` role isn't a member of `supabase_admin`
+-- so it cannot revoke privileges it doesn't own. The finding was instead
+-- resolved by dropping the PostGIS extension entirely in
+-- 20260426000002_drop_postgis.sql (PostGIS was unused — location tables
+-- stored raw DECIMAL lat/lon, never PostGIS types).
+--
+-- Do NOT edit applied SQL below — migrations are immutable. This note exists
+-- so the next reader understands the spatial_ref_sys handling is superseded.
 
 BEGIN;
 
