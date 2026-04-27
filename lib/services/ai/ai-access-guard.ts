@@ -2,11 +2,34 @@
  * AI Access Guard
  *
  * Shared helper for validating AI feature access across all AI API routes.
- * Combines subscription tier check + budget check in one call.
+ * Combines subscription tier check + per-space token budget check in one call.
  *
- * Usage in API routes:
+ * # Tier Policy (single source of truth)
+ *
+ * AI features (Companion chat, briefings, suggestions, conversation history,
+ * tool execution) require **Pro tier or higher**. Specifically:
+ *
+ *   | Tier      | canUseAI | Source                                |
+ *   |-----------|----------|---------------------------------------|
+ *   | free      | false    | `lib/config/feature-limits.ts:38`     |
+ *   | pro       | true     | `lib/config/feature-limits.ts:80`     |
+ *   | family    | true     | `lib/config/feature-limits.ts:122`    |
+ *   | business  | true     | `lib/config/feature-limits.ts:164`    |
+ *
+ * If you're adding a new AI-powered feature, gate it through this guard.
+ * Do NOT introduce ad-hoc tier checks in individual routes — they drift.
+ *
+ * # Usage in API routes
+ *
  *   const access = await validateAIAccess(supabase, userId, spaceId);
  *   if (!access.allowed) return buildAIAccessDeniedResponse(access);
+ *
+ * # Why the guard returns 500 on DB errors instead of 403
+ *
+ * If we can't determine the user's tier (Supabase unreachable, RLS bug, etc.),
+ * we MUST NOT show "upgrade to unlock" to a paying customer. The guard
+ * deliberately fails open with 500 in that case so the client retries.
+ * See the "BULLETPROOF STRATEGY" comment on validateAIAccess below.
  */
 
 import { createClient } from '@/lib/supabase/server';
