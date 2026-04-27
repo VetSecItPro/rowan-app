@@ -7,8 +7,9 @@
  * Shows registration status and provides enable/disable controls.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import {
   Bell,
   BellOff,
@@ -17,13 +18,18 @@ import {
   AlertCircle,
   Loader2,
   Settings,
-  MapPin,
-  MessageCircle,
-  CheckSquare,
-  Calendar,
-  Target,
+  Clock,
+  UserPlus,
+  AtSign,
+  MessageSquare,
 } from 'lucide-react';
 import { usePushNotifications, usePushStatus } from '@/hooks/usePushNotifications';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import {
+  notificationPreferencesService,
+  type NotificationPreferencesRow,
+} from '@/lib/services/notification-preferences-service';
+import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 interface PushNotificationSettingsProps {
@@ -31,13 +37,41 @@ interface PushNotificationSettingsProps {
   className?: string;
 }
 
-interface NotificationCategory {
-  id: string;
+type PushCategoryKey = 'push_due_reminders' | 'push_assignments' | 'push_mentions' | 'push_comments';
+
+interface PushCategoryDef {
+  key: PushCategoryKey;
   name: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  enabled: boolean;
 }
+
+const PUSH_CATEGORIES: PushCategoryDef[] = [
+  {
+    key: 'push_due_reminders',
+    name: 'Due Reminders',
+    description: 'Tasks and events approaching their due date',
+    icon: Clock,
+  },
+  {
+    key: 'push_assignments',
+    name: 'Assignments',
+    description: "When you're assigned a task, chore, or shopping item",
+    icon: UserPlus,
+  },
+  {
+    key: 'push_mentions',
+    name: 'Mentions',
+    description: "When you're @-mentioned in a message or comment",
+    icon: AtSign,
+  },
+  {
+    key: 'push_comments',
+    name: 'Comments & Replies',
+    description: 'Replies on items you own or follow (off by default)',
+    icon: MessageSquare,
+  },
+];
 
 /** Renders push notification preference controls for each notification type. */
 export function PushNotificationSettings({ spaceId, className }: PushNotificationSettingsProps) {
@@ -52,45 +86,29 @@ export function PushNotificationSettings({ spaceId, className }: PushNotificatio
   } = usePushNotifications({ spaceId });
 
   const { isNativeApp } = usePushStatus();
+  const { user } = useAuthWithSpaces();
 
-  // Notification category preferences (would be stored in user settings)
-  const [categories, setCategories] = useState<NotificationCategory[]>([
-    {
-      id: 'location',
-      name: 'Location Updates',
-      description: 'Family arrivals and departures',
-      icon: MapPin,
-      enabled: true,
-    },
-    {
-      id: 'messages',
-      name: 'Messages',
-      description: 'New messages from family',
-      icon: MessageCircle,
-      enabled: true,
-    },
-    {
-      id: 'tasks',
-      name: 'Tasks & Chores',
-      description: 'Assignments, reminders, and due dates',
-      icon: CheckSquare,
-      enabled: true,
-    },
-    {
-      id: 'calendar',
-      name: 'Calendar Events',
-      description: 'Event reminders and updates',
-      icon: Calendar,
-      enabled: true,
-    },
-    {
-      id: 'goals',
-      name: 'Goals & Milestones',
-      description: 'Progress updates and achievements',
-      icon: Target,
-      enabled: true,
-    },
-  ]);
+  const [prefs, setPrefs] = useState<NotificationPreferencesRow | null>(null);
+  const [savingKey, setSavingKey] = useState<PushCategoryKey | null>(null);
+
+  // Load preferences when user is known
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    notificationPreferencesService
+      .getPreferences(user.id, spaceId)
+      .then((row) => {
+        if (!cancelled) setPrefs(row);
+      })
+      .catch((err) => {
+        logger.error('Failed to load notification preferences', err, {
+          component: 'PushNotificationSettings',
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, spaceId]);
 
   const handleToggle = async () => {
     if (isRegistered) {
@@ -100,13 +118,23 @@ export function PushNotificationSettings({ spaceId, className }: PushNotificatio
     }
   };
 
-  const handleCategoryToggle = (categoryId: string) => {
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.id === categoryId ? { ...cat, enabled: !cat.enabled } : cat
-      )
-    );
-    // TODO: Save to user preferences in database
+  const handleCategoryToggle = async (key: PushCategoryKey) => {
+    if (!prefs) return;
+    const next = !prefs[key];
+    const previous = prefs;
+    setPrefs({ ...prefs, [key]: next });
+    setSavingKey(key);
+    try {
+      await notificationPreferencesService.updatePreferences(prefs.id, { [key]: next });
+    } catch (err) {
+      setPrefs(previous);
+      logger.error('Failed to save push preference', err, {
+        component: 'PushNotificationSettings',
+      });
+      toast.error('Could not save preference. Please try again.');
+    } finally {
+      setSavingKey(null);
+    }
   };
 
   // Not available on this platform
@@ -217,44 +245,56 @@ export function PushNotificationSettings({ spaceId, className }: PushNotificatio
               </div>
 
               <div className="space-y-3">
-                {categories.map((category) => {
-                  const Icon = category.icon;
-                  return (
-                    <div
-                      key={category.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-gray-400" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-white">
-                            {category.name}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {category.description}
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => handleCategoryToggle(category.id)}
-                        className={cn(
-                          'relative w-10 h-5 rounded-full transition-colors',
-                          category.enabled ? 'bg-blue-500' : 'bg-gray-600'
-                        )}
+                {!prefs ? (
+                  <div className="flex items-center justify-center py-4 text-sm text-gray-400">
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading preferences...
+                  </div>
+                ) : (
+                  PUSH_CATEGORIES.map((category) => {
+                    const Icon = category.icon;
+                    const enabled = Boolean(prefs[category.key]);
+                    const saving = savingKey === category.key;
+                    return (
+                      <div
+                        key={category.key}
+                        className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50"
                       >
-                        <span
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                            <Icon className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-white">
+                              {category.name}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {category.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleCategoryToggle(category.key)}
+                          disabled={saving}
+                          aria-pressed={enabled}
                           className={cn(
-                            'absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform',
-                            category.enabled && 'translate-x-5'
+                            'relative w-10 h-5 rounded-full transition-colors',
+                            enabled ? 'bg-blue-500' : 'bg-gray-600',
+                            saving && 'opacity-50 cursor-not-allowed'
                           )}
-                        />
-                      </button>
-                    </div>
-                  );
-                })}
+                        >
+                          <span
+                            className={cn(
+                              'absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform',
+                              enabled && 'translate-x-5'
+                            )}
+                          />
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </motion.div>

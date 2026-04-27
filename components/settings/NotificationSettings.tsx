@@ -42,6 +42,12 @@ interface NotificationPreferences {
   in_app_assignments: boolean;
   in_app_mentions: boolean;
   in_app_comments: boolean;
+  // Push notifications
+  push_enabled: boolean;
+  push_due_reminders: boolean;
+  push_assignments: boolean;
+  push_mentions: boolean;
+  push_comments: boolean;
   // Notification frequency
   notification_frequency: 'instant' | 'hourly' | 'daily';
   // Quiet hours
@@ -67,6 +73,11 @@ const defaultPreferences: Omit<NotificationPreferences, 'id' | 'user_id' | 'spac
   in_app_assignments: true,
   in_app_mentions: true,
   in_app_comments: true,
+  push_enabled: true,
+  push_due_reminders: true,
+  push_assignments: true,
+  push_mentions: true,
+  push_comments: false,
   notification_frequency: 'instant',
   quiet_hours_enabled: false,
   quiet_hours_start: null,

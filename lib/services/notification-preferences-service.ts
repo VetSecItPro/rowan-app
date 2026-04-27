@@ -15,6 +15,11 @@ export interface NotificationPreferencesRow {
   in_app_assignments: boolean;
   in_app_mentions: boolean;
   in_app_comments: boolean;
+  push_enabled: boolean;
+  push_due_reminders: boolean;
+  push_assignments: boolean;
+  push_mentions: boolean;
+  push_comments: boolean;
   notification_frequency: 'instant' | 'hourly' | 'daily';
   quiet_hours_enabled: boolean;
   quiet_hours_start: string | null;
@@ -25,7 +30,7 @@ export interface NotificationPreferencesRow {
   timezone: string;
 }
 
-const PREFERENCE_COLUMNS = 'id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone, timezone';
+const PREFERENCE_COLUMNS = 'id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, push_enabled, push_due_reminders, push_assignments, push_mentions, push_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone, timezone';
 
 export const notificationPreferencesService = {
   /**
