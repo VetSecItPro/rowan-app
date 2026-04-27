@@ -212,3 +212,4 @@ household-balance-*.png
 .test-audit.json
 .deps-audit.json
 .perf-reports/
+.monitor-reports/
