@@ -19,7 +19,7 @@ import { checkEmailVerification } from '@/lib/middleware/email-verification';
 import { applySecurityHeaders, generateNonce } from '@/lib/middleware/csp';
 import { PROTECTED_PATHS } from '@/lib/middleware/constants';
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (isStaticAsset(pathname)) return NextResponse.next();
