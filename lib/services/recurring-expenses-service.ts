@@ -416,6 +416,87 @@ export async function ignorePattern(patternId: string): Promise<void> {
 }
 
 /**
+ * Merges duplicate recurring patterns into a chosen winner.
+ *
+ * Semantics (chosen for audit-safety):
+ * - Winner inherits the union of all expense_ids from itself and losers.
+ * - Winner's occurrence_count becomes the sum.
+ * - Winner's first_occurrence = earliest across the group.
+ * - Winner's last_occurrence  = latest across the group.
+ * - Winner is marked user_confirmed (the user just made an explicit choice).
+ * - Losers are marked user_ignored (tombstoned, not deleted) so analysis
+ *   doesn't re-surface them and history is preserved.
+ * - Winner's average_amount is left as-is — user picked it as canonical;
+ *   recomputing across the group could distort their stated preference.
+ */
+export async function mergePatterns(
+  winnerId: string,
+  loserIds: string[]
+): Promise<void> {
+  if (loserIds.length === 0) return;
+  if (loserIds.includes(winnerId)) {
+    throw new Error('Winner cannot also be a loser in a merge');
+  }
+
+  const supabase = createClient();
+
+  interface PatternMergeRow {
+    id: string;
+    expense_ids: string[] | null;
+    occurrence_count: number | null;
+    first_occurrence: string | null;
+    last_occurrence: string | null;
+  }
+  const { data: rawRows, error: fetchError } = await supabase
+    .from('recurring_expense_patterns')
+    .select('id, expense_ids, occurrence_count, first_occurrence, last_occurrence')
+    .in('id', [winnerId, ...loserIds]);
+  const rows = rawRows as PatternMergeRow[] | null;
+
+  if (fetchError) throw fetchError;
+  if (!rows || rows.length !== loserIds.length + 1) {
+    throw new Error('One or more patterns not found');
+  }
+
+  const winner = rows.find((r) => r.id === winnerId);
+  const losers = rows.filter((r) => r.id !== winnerId);
+  if (!winner) throw new Error('Winner pattern not found');
+
+  const mergedExpenseIds = Array.from(
+    new Set([...(winner.expense_ids || []), ...losers.flatMap((l) => l.expense_ids || [])])
+  );
+  const mergedOccurrences =
+    (winner.occurrence_count || 0) +
+    losers.reduce((sum, l) => sum + (l.occurrence_count || 0), 0);
+  const earliestFirst = [winner.first_occurrence, ...losers.map((l) => l.first_occurrence)]
+    .filter(Boolean)
+    .sort()[0];
+  const latestLast = [winner.last_occurrence, ...losers.map((l) => l.last_occurrence)]
+    .filter(Boolean)
+    .sort()
+    .reverse()[0];
+
+  const { error: winnerErr } = await supabase
+    .from('recurring_expense_patterns')
+    .update({
+      expense_ids: mergedExpenseIds,
+      occurrence_count: mergedOccurrences,
+      first_occurrence: earliestFirst,
+      last_occurrence: latestLast,
+      user_confirmed: true,
+      user_ignored: false,
+    })
+    .eq('id', winnerId);
+  if (winnerErr) throw winnerErr;
+
+  const { error: losersErr } = await supabase
+    .from('recurring_expense_patterns')
+    .update({ user_ignored: true, user_confirmed: false })
+    .in('id', loserIds);
+  if (losersErr) throw losersErr;
+}
+
+/**
  * Gets upcoming recurring expenses (next 30 days)
  */
 export async function getUpcomingRecurring(spaceId: string): Promise<RecurringExpensePattern[]> {

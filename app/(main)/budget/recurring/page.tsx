@@ -5,6 +5,7 @@ import { RefreshCw, TrendingUp, AlertCircle, Sparkles } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { RecurringPatternsList } from '@/components/expenses/RecurringPatternsList';
 import { DuplicateSubscriptions } from '@/components/expenses/DuplicateSubscriptions';
+import { DuplicateReviewModal } from '@/components/expenses/DuplicateReviewModal';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import {
@@ -34,6 +35,7 @@ export default function RecurringExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reviewGroup, setReviewGroup] = useState<DuplicateGroup | null>(null);
 
   // Load patterns
   const loadPatterns = useCallback(async () => {
@@ -114,11 +116,20 @@ export default function RecurringExpensesPage() {
     }));
   };
 
-  // Handle duplicate review
+  // Handle duplicate review — opens the side-by-side comparison modal
   const handleReviewDuplicate = (group: DuplicateGroup) => {
-    // Navigate to a comparison view or modal
-    logger.info('Review duplicate group:', { component: 'page', data: group });
-    // TODO: Implement duplicate review modal
+    setReviewGroup(group);
+  };
+
+  // After successful merge, drop the reviewed group from local duplicates list and refresh patterns
+  const handleMergedDuplicate = async () => {
+    if (reviewGroup) {
+      const reviewedIds = reviewGroup.patterns.map((p) => p.id);
+      setDuplicates((prev) =>
+        prev.filter((g) => !g.patterns.some((p) => reviewedIds.includes(p.id)))
+      );
+    }
+    await loadPatterns();
   };
 
   if (!spaceId || !user) {
@@ -217,6 +228,13 @@ export default function RecurringExpensesPage() {
           )}
         </div>
       </div>
+
+      <DuplicateReviewModal
+        isOpen={reviewGroup !== null}
+        group={reviewGroup}
+        onClose={() => setReviewGroup(null)}
+        onMerged={handleMergedDuplicate}
+      />
     </FeatureLayout>
   );
 }
