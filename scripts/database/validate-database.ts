@@ -28,10 +28,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 async function checkConnectivity(): Promise<boolean> {
   const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
-  // nosemgrep: supabase-missing-space-id-filter
-  // The `spaces` table IS the tenant table — it has no space_id column.
-  // This is a connectivity smoke test (does PostgREST respond at all?), not an app query.
-  const { error } = await supabase.from('spaces').select('id').limit(1);
+  // The `spaces` table IS the tenant table (no space_id column to filter by).
+  // This is a PostgREST connectivity smoke test, not an app query.
+  const { error } = await supabase.from('spaces').select('id').limit(1); // nosemgrep: supabase-missing-space-id-filter
   if (error) {
     console.log(`❌ Anon connectivity: ${error.message}`);
     return false;
