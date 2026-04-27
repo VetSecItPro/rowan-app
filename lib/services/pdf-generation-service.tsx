@@ -1,4 +1,7 @@
-'use client';
+// PERF: This service is consumed only by API routes (app/api/privacy/{download,generate}-export/route.ts).
+// The previous `'use client'` directive was misleading — it didn't break anything because no client
+// component imports this file, but it could pull @react-pdf/renderer (~400KB) into the client bundle
+// if a client component ever started importing it. Removing the directive makes server-only intent explicit.
 
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
