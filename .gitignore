@@ -119,7 +119,11 @@ docs/architecture/RUN_MIGRATIONS.md
 # Scripts with test credentials
 scripts/seed-test-users.mjs
 scripts/create-smoke-test-user.mjs
-scripts/database/
+# scripts/database/ — most files are one-off / contain test credentials.
+# Ignore everything except the drift-detection tooling, which CI runs.
+scripts/database/*.js
+scripts/database/*.mjs
+scripts/database/*.sql
 
 # Testing guides with passwords
 docs/guides/AUTH_TESTING_GUIDE.md
