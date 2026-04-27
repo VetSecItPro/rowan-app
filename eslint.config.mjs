@@ -56,6 +56,15 @@ const eslintConfig = [
       // General quality
       "no-console": ["error", { allow: ["error"] }],
 
+      // Code-health signal: FIXME implies urgency, ban it.
+      // TODO is allowed (legitimate backlog markers documented in task #6 audit).
+      // If the audit grows, consider adding a custom rule that requires TODOs
+      // to reference an issue (e.g., `// TODO(#123): ...`).
+      "no-warning-comments": [
+        "warn",
+        { terms: ["fixme"], location: "anywhere" },
+      ],
+
       // Enforce explicit types — disallow explicit 'any'
       "@typescript-eslint/no-explicit-any": "error",
 
