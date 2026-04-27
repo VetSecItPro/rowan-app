@@ -1,7 +1,7 @@
 /**
  * Shared constants for middleware modules.
  *
- * Centralised here so that middleware.ts and csrf.ts (and any future consumers)
+ * Centralised here so that proxy.ts and csrf.ts (and any future consumers)
  * reference the same canonical list — no drift.
  */
 
