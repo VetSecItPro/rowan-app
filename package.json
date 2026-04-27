@@ -97,6 +97,7 @@
     "isomorphic-dompurify": "^2.36.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.2",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "lru-cache": "^11.2.6",
     "lucide-react": "^0.563.0",
