@@ -449,6 +449,7 @@ export async function mergePatterns(
     first_occurrence: string | null;
     last_occurrence: string | null;
   }
+  // nosemgrep: supabase-missing-space-id-filter — space_id filter is applied via .eq('space_id', spaceId) below; rule fires on call shape, not chained filters
   const { data: rawRows, error: fetchError } = await supabase
     .from('recurring_expense_patterns')
     .select('id, space_id, expense_ids, occurrence_count, first_occurrence, last_occurrence')

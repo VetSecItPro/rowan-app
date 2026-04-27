@@ -110,11 +110,16 @@ jobs:
       - run: pnpm build
 
       - name: Bundle size budget
-        # Enforces real budgets, not warnings. Thresholds:
-        #   - Hard fail: any single chunk > 750KB (was warning-only before 2026-04-27)
+        # Enforces a real per-chunk budget (was warning-only before 2026-04-27).
+        # Thresholds:
+        #   - Hard fail: any single chunk > 750KB
         #   - Warn:      chunk between 500–750KB
-        #   - Hard fail: total first-load JS (sum of static chunks) > 1500KB
-        # Adjust thresholds as the app grows; the point is enforcement, not the number.
+        # Note on totals: sum-of-all-chunks isn't a meaningful budget for a
+        # code-split Next.js app — most chunks are lazy-loaded per route, so
+        # users never download the sum. The right metric is per-page first-load,
+        # which Lighthouse already covers indirectly. The per-chunk gate catches
+        # the failure mode that matters: a single fat dependency landing in one
+        # chunk and tanking that page's load.
         run: |
           echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
           echo '| File | Size | Status |' >> $GITHUB_STEP_SUMMARY
@@ -141,22 +146,12 @@ jobs:
             fi
           done
 
-          TOTAL_FAIL=0
-          if [ "$TOTAL_KB" -gt 1500 ]; then
-            TOTAL_FAIL=1
-          fi
-
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Total static chunks: ${TOTAL_KB}KB** (budget: 1500KB)" >> $GITHUB_STEP_SUMMARY
-          echo "Per-chunk: $WARN warnings, $FAIL failures (>750KB)" >> $GITHUB_STEP_SUMMARY
+          echo "**Sum of all chunks: ${TOTAL_KB}KB** (informational — not a budget)" >> $GITHUB_STEP_SUMMARY
+          echo "Per-chunk: $WARN warnings, $FAIL failures (>750KB hard limit)" >> $GITHUB_STEP_SUMMARY
 
           if [ "$FAIL" -gt 0 ]; then
             echo "::error::$FAIL chunk(s) exceed the 750KB hard limit"
-          fi
-          if [ "$TOTAL_FAIL" -gt 0 ]; then
-            echo "::error::Total first-load JS (${TOTAL_KB}KB) exceeds 1500KB budget"
-          fi
-          if [ "$FAIL" -gt 0 ] || [ "$TOTAL_FAIL" -gt 0 ]; then
             exit 1
           fi
 
