@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Calendar, Sparkles, MessageSquarePlus } from 'lucide-react';
 import { EventProposal, eventProposalsService } from '@/lib/services/event-proposals-service';
 import { ProposalCard } from './ProposalCard';
@@ -103,17 +103,21 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
     }
   };
 
-  const filteredProposals = proposals.filter(p => {
-    if (selectedStatus === 'all') return true;
-    return p.status === selectedStatus;
-  });
+  // PERF: single pass instead of 4 separate filters; memoized so it only recomputes when proposals change
+  const statusCounts = useMemo(() => {
+    const counts = { all: proposals.length, pending: 0, approved: 0, rejected: 0 };
+    for (const p of proposals) {
+      if (p.status === 'pending') counts.pending++;
+      else if (p.status === 'approved') counts.approved++;
+      else if (p.status === 'rejected') counts.rejected++;
+    }
+    return counts;
+  }, [proposals]);
 
-  const statusCounts = {
-    all: proposals.length,
-    pending: proposals.filter(p => p.status === 'pending').length,
-    approved: proposals.filter(p => p.status === 'approved').length,
-    rejected: proposals.filter(p => p.status === 'rejected').length
-  };
+  const filteredProposals = useMemo(() => {
+    if (selectedStatus === 'all') return proposals;
+    return proposals.filter(p => p.status === selectedStatus);
+  }, [proposals, selectedStatus]);
 
   return (
     <div className="space-y-6">

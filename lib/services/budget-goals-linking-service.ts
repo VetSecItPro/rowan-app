@@ -304,6 +304,10 @@ export async function getBudgetProgressWithGoals(spaceId: string): Promise<Budge
 
   if (error) throw error;
 
+  // PERF: pre-index linkedGoals by id so the inner loop is O(1) instead of O(n).
+  // Without this, N categories × M links × K goals = O(N*M*K) per call.
+  const goalById = new Map<string, Goal>(((linkedGoals as Goal[]) ?? []).map((g) => [g.id, g]));
+
   const progress: BudgetProgress[] = [];
 
   for (const category of expenseCategories) {
@@ -319,7 +323,7 @@ export async function getBudgetProgressWithGoals(spaceId: string): Promise<Budge
 
     const categoryLinkedGoals = budgetLinks
       .filter((link: { budget_category: string }) => link.budget_category === category.name)
-      .map((link: { goal_id: string }) => linkedGoals?.find((goal: Goal) => goal.id === link.goal_id))
+      .map((link: { goal_id: string }) => goalById.get(link.goal_id))
       .filter(Boolean) as Goal[];
 
     progress.push({

@@ -22,13 +22,9 @@ const nextConfig = {
     // See .github/workflows/ci.yml → "quality" job.
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // SECURITY NOTE (F-006): ESLint is SKIPPED during `next build`
-    // because of a circular structure error in the ESLint config.
-    // Enforcement: CI runs `pnpm lint` as a REQUIRED check on every PR.
-    // See .github/workflows/ci.yml → "quality" job.
-    ignoreDuringBuilds: true,
-  },
+  // Note: `eslint` config block removed — Next.js 16 dropped the built-in
+  // `next lint` runner. ESLint enforcement is now CI-only via `pnpm lint`
+  // (REQUIRED check in .github/workflows/ci.yml → "quality" job).
   // Workaround for Next.js 15.x Html import bug
   skipTrailingSlashRedirect: true,
   // Note: skipProxyUrlNormalize removed in Next.js 16

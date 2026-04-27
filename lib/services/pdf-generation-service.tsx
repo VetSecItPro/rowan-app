@@ -163,13 +163,14 @@ const styles = StyleSheet.create({
   },
 });
 
-// Format currency
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
+// PERF: cache formatter at module level — Intl.NumberFormat is expensive to construct
+// and a 50-line-item PDF would otherwise create 50 instances.
+const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+});
+
+const formatCurrency = (amount: number): string => CURRENCY_FORMATTER.format(amount);
 
 // Format percentage
 const formatPercentage = (value: number): string => {
