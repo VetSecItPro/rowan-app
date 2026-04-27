@@ -206,3 +206,4 @@ household-balance-*.png
 .test-ship-history.json
 .test-ship-quarantine.json
 .test-audit.json
+.deps-audit.json
