@@ -6,6 +6,7 @@
 
 import { logger } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { sendTaskReminderEmail } from '@/lib/services/email-notification-service';
 
 export async function processTaskReminders() {
   try {
@@ -63,6 +64,30 @@ async function sendPushNotification(reminder: { user_id: string; task_id: string
 }
 
 async function sendEmailReminder(reminder: { user_id: string; task_id: string; task_title: string }) {
-  // TODO: Implement email via Resend or similar
-  logger.info(`Email reminder for task ${reminder.task_id}`, { component: 'task-reminders-job' });
+  // Look up user email + name from auth metadata
+  const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(reminder.user_id);
+  if (userError || !userData?.user?.email) {
+    logger.warn('Cannot send task reminder email — no user email', {
+      component: 'task-reminders-job',
+      userId: reminder.user_id,
+    });
+    return;
+  }
+
+  // Pull due date from the task itself (the reminder context only has the title)
+  const { data: task } = await supabaseAdmin
+    .from('tasks')
+    .select('due_date')
+    .eq('id', reminder.task_id)
+    .single();
+
+  await sendTaskReminderEmail(
+    userData.user.email,
+    userData.user.user_metadata?.name as string | undefined,
+    {
+      id: reminder.task_id,
+      title: reminder.task_title,
+      due_at: task?.due_date,
+    }
+  );
 }

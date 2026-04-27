@@ -13,7 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { getPlanFromProductId } from '@/lib/polar';
+import { getPlanFromProductId, getPeriodFromProductId } from '@/lib/polar';
 import { sendSubscriptionWelcomeEmail, sendSubscriptionCancelledEmail } from '@/lib/services/email-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -403,7 +403,7 @@ export async function POST(request: NextRequest) {
             recipientEmail: userData.email,
             recipientName: userData.full_name || 'there',
             tier: plan as 'pro' | 'family',
-            period: 'monthly', // TODO: detect from product ID
+            period: getPeriodFromProductId(productId),
             dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
           }).catch(err => {
             logger.error('Failed to send welcome email', err, {
