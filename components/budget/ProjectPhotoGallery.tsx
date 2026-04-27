@@ -90,6 +90,18 @@ export function ProjectPhotoGallery({
     setSelectedPhoto(photo);
   };
 
+  const handleDownload = (photo: ProjectPhoto) => {
+    if (!photo.photo_url) return;
+    const link = document.createElement('a');
+    link.href = photo.photo_url;
+    link.download = photo.title || `project-photo-${photo.id}`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handlePrevPhoto = () => {
     if (!selectedPhoto) return;
     const currentIndex = sortedPhotos.findIndex(p => p.id === selectedPhoto.id);
@@ -281,7 +293,7 @@ export function ProjectPhotoGallery({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Implement download
+                      handleDownload(photo);
                     }}
                     className="p-2 text-gray-400 hover:bg-gray-600 rounded-lg transition-colors"
                     title="Download"
@@ -373,9 +385,7 @@ export function ProjectPhotoGallery({
                     Photo {sortedPhotos.findIndex(p => p.id === selectedPhoto.id) + 1} of {sortedPhotos.length}
                   </span>
                   <button
-                    onClick={() => {
-                      // TODO: Implement download
-                    }}
+                    onClick={() => handleDownload(selectedPhoto)}
                     className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors"
                   >
                     <Download className="w-4 h-4" />

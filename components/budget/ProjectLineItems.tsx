@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import {
   Plus,
@@ -15,7 +16,11 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import type { ProjectLineItem } from '@/lib/services/project-tracking-service';
+import {
+  type ProjectLineItem,
+  markLineItemPaid,
+  deleteLineItem,
+} from '@/lib/services/project-tracking-service';
 
 interface CostBreakdownItem {
   category: string;
@@ -35,6 +40,7 @@ interface ProjectLineItemsProps {
 export function ProjectLineItems({
   lineItems,
   costBreakdown,
+  onRefresh,
 }: ProjectLineItemsProps) {
   const [editingItem, setEditingItem] = useState<ProjectLineItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -88,8 +94,14 @@ export function ProjectLineItems({
   });
 
   const handleMarkPaid = async (itemId: string) => {
-    // TODO: Implement mark as paid functionality
-    logger.info('Mark item as paid:', { component: 'ProjectLineItems', data: itemId });
+    try {
+      await markLineItemPaid(itemId);
+      toast.success('Line item marked as paid');
+      onRefresh();
+    } catch (error) {
+      logger.error('Failed to mark line item as paid', error, { component: 'ProjectLineItems' });
+      toast.error('Failed to mark as paid');
+    }
   };
 
   const handleEditItem = (item: ProjectLineItem) => {
@@ -97,9 +109,14 @@ export function ProjectLineItems({
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    if (window.confirm('Are you sure you want to delete this line item?')) {
-      // TODO: Implement delete functionality
-      logger.info('Delete item:', { component: 'ProjectLineItems', data: itemId });
+    if (!window.confirm('Are you sure you want to delete this line item?')) return;
+    try {
+      await deleteLineItem(itemId);
+      toast.success('Line item deleted');
+      onRefresh();
+    } catch (error) {
+      logger.error('Failed to delete line item', error, { component: 'ProjectLineItems' });
+      toast.error('Failed to delete line item');
     }
   };
 
