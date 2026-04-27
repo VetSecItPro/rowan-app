@@ -108,3 +108,33 @@ jobs:
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Note:** Vercel deployments are handled automatically by Vercel GitHub App" >> $GITHUB_STEP_SUMMARY
+
+  drift-check:
+    name: Schema Drift Check
+    runs-on: ubuntu-latest
+    needs: migrations
+    if: always()
+    # Verifies the live DB matches what migrations specify. Runs after every
+    # deploy (success or failure) so out-of-band manual DB changes and silent
+    # migration no-ops surface as warnings. Read-only — won't modify DB.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run advisor invariant check
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:6543/postgres
+        run: |
+          if pnpm check-db-advisors; then
+            echo "## Schema Drift Check" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Live DB matches migrations (all invariants hold)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Schema Drift Check" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ Drift detected — see job logs. Investigate manual DB changes or silent migration failures." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
