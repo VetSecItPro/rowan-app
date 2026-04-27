@@ -30,7 +30,10 @@ import { ProjectDashboard } from '@/components/budget/ProjectDashboard';
 import { ProjectLineItems } from '@/components/budget/ProjectLineItems';
 import { ProjectPhotoGallery } from '@/components/budget/ProjectPhotoGallery';
 import { BudgetVarianceCard } from '@/components/budget/BudgetVarianceCard';
+import { NewProjectModal } from '@/components/projects/NewProjectModal';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { projectsOnlyService } from '@/lib/services/projects-service';
+import type { CreateProjectInput } from '@/lib/services/projects-service';
 
 type CostBreakdownItem = {
   category: string;
@@ -52,6 +55,19 @@ export default function ProjectTrackingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'costs' | 'photos' | 'expenses'>('overview');
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const handleSaveProject = async (data: CreateProjectInput): Promise<Project | null> => {
+    if (!project) return null;
+    try {
+      const updated = await projectsOnlyService.updateProject(project.id, data);
+      setProject(updated);
+      return updated;
+    } catch (err) {
+      logger.error('Failed to update project:', err, { component: 'ProjectTrackingPage', action: 'execution' });
+      return null;
+    }
+  };
 
   useEffect(() => {
     async function loadProjectData() {
@@ -332,6 +348,7 @@ export default function ProjectTrackingPage() {
               costBreakdown={costBreakdown}
               expenses={expenses}
               onRefresh={() => window.location.reload()}
+              onEditProject={() => setEditModalOpen(true)}
             />
           )}
 
@@ -412,6 +429,16 @@ export default function ProjectTrackingPage() {
           </div>
         )}
       </div>
+
+      {spaceId && (
+        <NewProjectModal
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onSave={handleSaveProject}
+          editProject={project}
+          spaceId={spaceId}
+        />
+      )}
     </FeatureLayout>
   );
 }
