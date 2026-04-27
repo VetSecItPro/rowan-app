@@ -306,10 +306,11 @@ export const reminderNotificationsService = {
     type: NotificationType,
     reminder: { title: string; emoji?: string }
   ): Promise<void> {
-    // Look up the recipient's email from user profile
+    // Look up the recipient's email from user profile.
+    // The `users` table is the global tenant table — no space_id column to filter by.
     const supabase = createClient();
     const { data: profile, error } = await supabase
-      .from('users')
+      .from('users') // nosemgrep: supabase-missing-space-id-filter
       .select('email, full_name')
       .eq('id', userId)
       .single();
