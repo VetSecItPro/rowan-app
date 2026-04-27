@@ -309,11 +309,8 @@ export const reminderNotificationsService = {
     // Look up the recipient's email from user profile.
     // The `users` table is the global tenant table — no space_id column to filter by.
     const supabase = createClient();
-    const { data: profile, error } = await supabase
-      .from('users') // nosemgrep: supabase-missing-space-id-filter
-      .select('email, full_name')
-      .eq('id', userId)
-      .single();
+    // Inline single-statement form so semgrep's nosemgrep annotation lands on the offending line.
+    const { data: profile, error } = await supabase.from('users').select('email, full_name').eq('id', userId).single(); // nosemgrep: supabase-missing-space-id-filter
 
     if (error || !profile?.email) {
       logger.warn('Cannot send reminder email — recipient profile/email not found', {
