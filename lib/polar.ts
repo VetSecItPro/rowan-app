@@ -148,6 +148,19 @@ export function getPlanFromProductId(productId: string): SubscriptionTier {
   return "free";
 }
 
+// Map Polar product ID to billing period (monthly | annual).
+// Mirrors getPlanFromProductId — env-var based, runtime-resolved.
+// Returns 'monthly' for unknown product IDs (safest default — won't inflate ARR).
+export function getPeriodFromProductId(productId: string): SubscriptionPeriod {
+  if (!productId) return "monthly";
+
+  const proAnnual = process.env.POLAR_PRO_ANNUAL_PRODUCT_ID;
+  const familyAnnual = process.env.POLAR_FAMILY_ANNUAL_PRODUCT_ID;
+
+  if (productId === proAnnual || productId === familyAnnual) return "annual";
+  return "monthly";
+}
+
 // Get the appropriate product ID based on plan and billing interval
 export function getProductId(plan: SubscriptionTier, interval: SubscriptionPeriod): string | null {
   if (plan === "free" || plan === "owner") return null;

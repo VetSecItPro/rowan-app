@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
 import { notificationQueueService } from './notification-queue-service';
+import { enhancedNotificationService } from './enhanced-notification-service';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
@@ -297,19 +298,48 @@ export const reminderNotificationsService = {
   },
 
   /**
-   * Send email notification
+   * Send email notification — delegates to enhancedNotificationService which posts
+   * to /api/notifications/email (server-side Resend send with auth + rate limiting).
    */
   async sendEmailNotification(
     userId: string,
     type: NotificationType,
     reminder: { title: string; emoji?: string }
   ): Promise<void> {
-    // TODO: Integrate with email service (Resend)
-    logger.info('Sending email notification:', { component: 'lib-reminder-notifications-service', data: {
-      userId,
-      type,
-      reminder,
-    } });
+    // Look up the recipient's email from user profile.
+    // The `users` table is the global tenant table — no space_id column to filter by.
+    const supabase = createClient();
+    // Inline single-statement form so semgrep's nosemgrep annotation lands on the offending line.
+    const { data: profile, error } = await supabase.from('users').select('email, full_name').eq('id', userId).single(); // nosemgrep: supabase-missing-space-id-filter
+
+    if (error || !profile?.email) {
+      logger.warn('Cannot send reminder email — recipient profile/email not found', {
+        component: 'lib-reminder-notifications-service',
+        userId,
+      });
+      return;
+    }
+
+    const emoji = reminder.emoji || '🔔';
+    const result = await enhancedNotificationService.sendEmailNotification(
+      `reminder_${type}`,
+      profile.email,
+      `${emoji} ${reminder.title}`,
+      {
+        userName: profile.full_name,
+        title: reminder.title,
+        type,
+        emoji,
+      }
+    );
+
+    if (!result.success) {
+      logger.warn('Reminder email send failed (non-blocking)', {
+        component: 'lib-reminder-notifications-service',
+        userId,
+        error: result.error,
+      });
+    }
   },
 
   /**

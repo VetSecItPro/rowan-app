@@ -331,3 +331,121 @@ export async function sendPermanentDeletionConfirmationEmail(
     };
   }
 }
+
+// ============================================================================
+// Reminder & Task Email Notifications
+// ============================================================================
+
+/**
+ * Send a task reminder email when a scheduled task reminder fires.
+ * Called by lib/jobs/task-reminders-job.ts.
+ */
+export async function sendTaskReminderEmail(
+  userEmail: string,
+  userName: string | undefined,
+  task: { id: string; title: string; due_at?: string | null }
+): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      logger.warn('Resend API key not configured, skipping task reminder email', { component: 'lib-email-notification-service' });
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const dueLine = task.due_at
+      ? `Due ${new Date(task.due_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}.`
+      : '';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
+
+    const { error } = await resend.emails.send({
+      from: 'Rowan <noreply@rowanapp.com>',
+      to: userEmail,
+      subject: `⏰ Reminder: ${task.title}`,
+      html: `
+        <!DOCTYPE html>
+        <html><body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 24px; border-radius: 10px 10px 0 0; text-align: center;">
+            <h1 style="margin: 0;">⏰ Task Reminder</h1>
+          </div>
+          <div style="background: #f8f9fa; padding: 24px; border-radius: 0 0 10px 10px;">
+            <p>Hi ${userName || 'there'},</p>
+            <p>You have a task reminder:</p>
+            <div style="background: white; border-left: 4px solid #3b82f6; padding: 16px; margin: 16px 0; border-radius: 4px;">
+              <strong style="font-size: 16px;">${task.title}</strong>
+              ${dueLine ? `<br><span style="color: #666; font-size: 14px;">${dueLine}</span>` : ''}
+            </div>
+            <p style="margin-top: 24px;">
+              <a href="${appUrl}/tasks" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Open Rowan</a>
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 24px;">
+              You're receiving this because you set a reminder on this task.
+              Manage your notification preferences in <a href="${appUrl}/settings/notifications" style="color: #3b82f6;">settings</a>.
+            </p>
+          </div>
+        </body></html>
+      `,
+    });
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    logger.error('Error sending task reminder email:', error, { component: 'lib-email-notification-service', action: 'service_call', taskId: task.id });
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to send email' };
+  }
+}
+
+/**
+ * Send a generic reminder email (for the standalone Reminders feature, not task reminders).
+ * Called by lib/services/reminder-notifications-service.ts.
+ */
+export async function sendReminderEmail(
+  userEmail: string,
+  userName: string | undefined,
+  reminder: { title: string; emoji?: string; description?: string | null; remind_at?: string | null }
+): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      logger.warn('Resend API key not configured, skipping reminder email', { component: 'lib-email-notification-service' });
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emoji = reminder.emoji || '🔔';
+    const whenLine = reminder.remind_at
+      ? `Scheduled for ${new Date(reminder.remind_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}.`
+      : '';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
+
+    const { error } = await resend.emails.send({
+      from: 'Rowan <noreply@rowanapp.com>',
+      to: userEmail,
+      subject: `${emoji} ${reminder.title}`,
+      html: `
+        <!DOCTYPE html>
+        <html><body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; padding: 24px; border-radius: 10px 10px 0 0; text-align: center;">
+            <h1 style="margin: 0;">${emoji} Reminder</h1>
+          </div>
+          <div style="background: #f8f9fa; padding: 24px; border-radius: 0 0 10px 10px;">
+            <p>Hi ${userName || 'there'},</p>
+            <div style="background: white; border-left: 4px solid #ec4899; padding: 16px; margin: 16px 0; border-radius: 4px;">
+              <strong style="font-size: 16px;">${reminder.title}</strong>
+              ${reminder.description ? `<br><span style="color: #555; font-size: 14px;">${reminder.description}</span>` : ''}
+              ${whenLine ? `<br><span style="color: #666; font-size: 14px; margin-top: 4px; display: inline-block;">${whenLine}</span>` : ''}
+            </div>
+            <p style="margin-top: 24px;">
+              <a href="${appUrl}/reminders" style="display: inline-block; background: #ec4899; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Open Reminders</a>
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 24px;">
+              Manage your notification preferences in <a href="${appUrl}/settings/notifications" style="color: #ec4899;">settings</a>.
+            </p>
+          </div>
+        </body></html>
+      `,
+    });
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    logger.error('Error sending reminder email:', error, { component: 'lib-email-notification-service', action: 'service_call' });
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to send email' };
+  }
+}
