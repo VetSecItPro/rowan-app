@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from 'react';
 import { goalsService, Goal, Milestone, CreateGoalInput, CreateMilestoneInput, CreateCheckInInput } from '@/lib/services/goals-service';
+import { recurringGoalsService } from '@/lib/services/recurring-goals-service';
 import { toast } from 'sonner';
 import { showSuccess, showError } from '@/lib/utils/toast';
 import { logger } from '@/lib/logger';
@@ -182,11 +183,27 @@ export function useGoalsHandlers(deps: UseGoalsHandlersDeps): UseGoalsHandlersRe
 
   const handleCreateHabit = useCallback(async (habitData: CreateHabitInput) => {
     try {
-      // TODO: Implement habit creation service when backend is ready
-      logger.info('Creating habit:', { component: 'page', data: habitData });
+      // Map the simplified habit form to the recurring-goal-template shape that
+      // recurringGoalsService expects. Habits are recurring goals with is_habit=true.
+      const today = new Date().toISOString().split('T')[0];
+      await recurringGoalsService.createTemplate({
+        space_id: habitData.space_id,
+        title: habitData.title,
+        description: habitData.description,
+        category: habitData.category || 'general',
+        tags: [],
+        target_type: 'completion',
+        target_value: habitData.target_count ?? 1,
+        target_unit: 'times',
+        recurrence_type: habitData.frequency_type,
+        recurrence_pattern: { interval: habitData.frequency_value ?? 1 },
+        start_date: today,
+        is_habit: true,
+        habit_category: habitData.category,
+        ideal_streak_length: 30,
+        allow_partial_completion: false,
+      });
       toast.success('Habit created successfully!');
-
-      // For now, just close the modal
       setEditingHabit(null);
     } catch (error) {
       logger.error('Failed to save habit:', error, { component: 'page', action: 'execution' });
