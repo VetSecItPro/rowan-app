@@ -65,6 +65,7 @@ export async function createReply(
 
   if (error) throw error;
 
+  // nosemgrep: supabase-missing-space-id-filter — scoped by .eq('id', conversation_id); RLS enforces tenant
   await supabase
     .from('conversations')
     .update({ updated_at: new Date().toISOString() })
