@@ -36,6 +36,7 @@ interface ProjectDashboardProps {
   costBreakdown: CostBreakdownItem[];
   expenses: ProjectExpense[];
   onRefresh: () => void;
+  onEditProject?: () => void;
 }
 
 /** Renders a project-specific budget dashboard with expenses and progress. */
@@ -43,6 +44,7 @@ export function ProjectDashboard({
   project,
   lineItems,
   costBreakdown,
+  onEditProject,
 }: ProjectDashboardProps) {
   // Calculate metrics
   const totalEstimated = lineItems.reduce((sum, item) => sum + item.estimated_cost, 0);
@@ -266,13 +268,15 @@ export function ProjectDashboard({
           <h3 className="text-lg font-semibold text-amber-100">
             Project Details
           </h3>
-          <button
-            onClick={() => { /* TODO: Implement edit project modal */ }}
-            className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors text-sm font-medium"
-          >
-            <Edit3 className="w-4 h-4" />
-            Edit Project
-          </button>
+          {onEditProject && (
+            <button
+              onClick={onEditProject}
+              className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors text-sm font-medium"
+            >
+              <Edit3 className="w-4 h-4" />
+              Edit Project
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
