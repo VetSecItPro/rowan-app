@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import JSZip from 'jszip';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import {
@@ -81,31 +82,55 @@ export async function GET(request: NextRequest) {
         break;
 
       case 'all':
-      default:
-        // For 'all', we'll export the first available CSV (expenses by default)
-        // In a real implementation, you'd want to create a ZIP file with all CSVs
+      default: {
+        // Bundle every CSV into a single ZIP — closes GDPR Article 20 (Data
+        // Portability) for users who want a complete export in one download.
         const allCsvs = await exportAllDataToCsv(user.id, supabase);
-        const firstCsvKey = Object.keys(allCsvs)[0];
+        const fileNames = Object.keys(allCsvs);
 
-        if (!firstCsvKey) {
+        if (fileNames.length === 0) {
           return NextResponse.json(
             { error: 'No data available to export' },
             { status: 404 }
           );
         }
 
-        // For now, return a combined response or first file
-        // TODO: Implement ZIP file creation for multiple CSV files
-        csvContent = allCsvs[firstCsvKey];
-        filename = `rowan-data-export-${new Date().toISOString().split('T')[0]}.csv`;
+        const datestamp = new Date().toISOString().split('T')[0];
+        const zip = new JSZip();
+        for (const key of fileNames) {
+          // exportAllDataToCsv returns a map of logical-name → csv string.
+          // File each one with a stable, descriptive filename inside the zip.
+          zip.file(`rowan-${key}-${datestamp}.csv`, allCsvs[key]);
+        }
+        // README so a non-technical user opening the ZIP knows what's in it.
+        zip.file(
+          'README.txt',
+          [
+            `Rowan personal data export — ${datestamp}`,
+            '',
+            'This archive contains all data Rowan stores about your account, exported as',
+            'CSV files for spreadsheet compatibility.',
+            '',
+            'Files included:',
+            ...fileNames.map((k) => `  - rowan-${k}-${datestamp}.csv`),
+            '',
+            'Provided per GDPR Article 20 (Right to Data Portability) and Article 15',
+            '(Right of Access). For questions: support@rowanapp.com',
+          ].join('\n')
+        );
 
-        // Return JSON with all CSV files for now
-        return NextResponse.json({
-          success: true,
-          files: Object.keys(allCsvs),
-          message: 'Use ?type= parameter to download specific data types (expenses, tasks, events, shopping, messages)',
-          csvData: allCsvs,
+        const zipBuffer = await zip.generateAsync({ type: 'arraybuffer' });
+        const zipFilename = `rowan-data-export-${datestamp}.zip`;
+
+        return new NextResponse(zipBuffer as ArrayBuffer, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/zip',
+            'Content-Disposition': `attachment; filename="${zipFilename}"`,
+            'Cache-Control': 'no-store, no-cache, must-revalidate',
+          },
         });
+      }
     }
 
     // Return CSV file as downloadable attachment
