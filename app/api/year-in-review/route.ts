@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { yearInReviewService } from '@/lib/services/year-in-review-service';
+import { generateYearInReviewPdf } from '@/lib/services/year-in-review-pdf';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
@@ -215,14 +216,27 @@ export async function POST(request: NextRequest) {
       targetYear
     );
 
-    // For now, return JSON data (would implement PDF generation later)
-    // TODO: Implement PDF generation using libraries like puppeteer or jsPDF
+    if (format === 'pdf') {
+      const pdfBlob = await generateYearInReviewPdf(yearInReviewData);
+      const pdfBuffer = await pdfBlob.arrayBuffer();
+      const filename = `rowan-year-in-review-${targetYear}.pdf`;
 
+      return new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      });
+    }
+
+    // Fallback: JSON for callers explicitly requesting non-PDF format
     return NextResponse.json({
       success: true,
       message: 'Year in review export prepared',
       data: yearInReviewData,
-      downloadUrl: null, // Would provide actual download URL after PDF generation
+      downloadUrl: null,
     });
   } catch (error) {
     Sentry.captureException(error, {
