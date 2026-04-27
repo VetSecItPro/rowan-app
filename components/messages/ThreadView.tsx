@@ -33,6 +33,7 @@ export function ThreadView({
   const [replyInput, setReplyInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const repliesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
 
@@ -106,39 +107,61 @@ export function ThreadView({
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!replyInput.trim() || sending) return;
+      const trimmed = replyInput.trim();
+      if (!trimmed || sending) return;
 
       setSending(true);
 
       try {
-        await messagesService.createReply({
-          space_id: spaceId,
-          conversation_id: conversationId,
-          sender_id: currentUserId,
-          content: replyInput.trim(),
-          parent_message_id: parentMessage.id,
-        });
+        if (editingMessageId) {
+          const updated = await messagesService.updateMessage(
+            editingMessageId,
+            { content: trimmed },
+            { userId: currentUserId }
+          );
+          setReplies((prev) =>
+            prev.map((m) => (m.id === editingMessageId ? { ...m, ...updated } as MessageWithAttachments : m))
+          );
+          setEditingMessageId(null);
+          toast.success('Reply updated');
+        } else {
+          await messagesService.createReply({
+            space_id: spaceId,
+            conversation_id: conversationId,
+            sender_id: currentUserId,
+            content: trimmed,
+            parent_message_id: parentMessage.id,
+          });
+          setTimeout(scrollToBottom, 100);
+        }
 
         setReplyInput('');
-        setTimeout(scrollToBottom, 100);
       } catch (error) {
-        logger.error('Failed to send reply:', error, { component: 'ThreadView', action: 'component_action' });
-        toast.error('Failed to send reply');
+        logger.error('Failed to send/update reply:', error, { component: 'ThreadView', action: 'component_action' });
+        toast.error(editingMessageId ? 'Failed to update reply' : 'Failed to send reply');
       } finally {
         setSending(false);
       }
     },
-    [replyInput, sending, spaceId, conversationId, currentUserId, parentMessage.id, scrollToBottom]
+    [replyInput, sending, editingMessageId, spaceId, conversationId, currentUserId, parentMessage.id, scrollToBottom]
   );
 
   const handleEditReply = useCallback(
     (message: MessageWithAttachments) => {
+      if (message.sender_id !== currentUserId) {
+        toast.info('Only the sender can edit this reply');
+        return;
+      }
+      setEditingMessageId(message.id);
       setReplyInput(message.content);
-      // TODO: Implement edit mode
-      toast.info('Edit functionality coming soon');
     },
-    []
+    [currentUserId]
   );
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingMessageId(null);
+    setReplyInput('');
+  }, []);
 
   const handleDeleteReply = useCallback(async (messageId: string) => {
     try {
@@ -233,11 +256,23 @@ export function ThreadView({
           onSubmit={handleSendReply}
           className="border-t border-gray-700 p-4 bg-gray-800"
         >
+          {editingMessageId && (
+            <div className="flex items-center justify-between mb-2 px-3 py-2 bg-blue-900/30 border border-blue-700 rounded-lg text-xs">
+              <span className="text-blue-300">Editing reply</span>
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="text-blue-300 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
           <div className="flex items-end gap-2">
             <textarea
               value={replyInput}
               onChange={(e) => setReplyInput(e.target.value)}
-              placeholder="Write a reply..."
+              placeholder={editingMessageId ? 'Edit your reply...' : 'Write a reply...'}
               rows={2}
               disabled={sending}
               className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600 resize-none disabled:opacity-50 disabled:cursor-not-allowed text-sm"
