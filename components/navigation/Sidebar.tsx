@@ -27,7 +27,6 @@ const GRADIENT_GLOW_MAP: Record<string, string> = {
   'bg-gradient-meals': 'rgba(249, 115, 22, 0.15)',        // orange
   'bg-gradient-projects': 'rgba(245, 158, 11, 0.15)',     // amber
   'bg-gradient-goals': 'rgba(99, 102, 241, 0.15)',        // indigo
-  'bg-gradient-location': 'rgba(6, 182, 212, 0.15)',      // cyan
   'bg-gradient-to-r from-amber-500 to-orange-500': 'rgba(245, 158, 11, 0.15)',    // rewards (amber)
   'bg-gradient-to-r from-pink-500 to-purple-500': 'rgba(236, 72, 153, 0.15)',     // check-in (pink)
   'bg-gradient-to-r from-yellow-500 to-amber-500': 'rgba(234, 179, 8, 0.15)',     // year-in-review (yellow)

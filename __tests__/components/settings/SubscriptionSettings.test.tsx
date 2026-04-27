@@ -40,7 +40,6 @@ vi.mock('@/lib/contexts/subscription-context', () => ({
       canUseReminders: true,
       canUseGoals: false,
       canUseHousehold: false,
-      canUseLocation: false,
       canUseAI: false,
       canUseIntegrations: false,
       canUseEventProposals: false,

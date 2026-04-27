@@ -76,7 +76,6 @@ The following services have been analyzed and are ready for testing. Each requir
 
 **Server-only services** (require server client mocking):
 - feature-access-service.ts
-- family-location-service.ts (Zod validation + GPS calculations)
 
 **Mixed services**:
 - file-upload-service.ts (Supabase storage + browser APIs)
@@ -172,8 +171,7 @@ From the user's original request:
 7. ❌ **expense-splitting-service.ts** - NOT STARTED
 8. ❌ **export-service.ts** - NOT STARTED (pdf-export, space-export, task-export exist but not base export-service)
 9. ❌ **external-recipes-service.ts** - NOT STARTED
-10. ❌ **family-location-service.ts** - NOT STARTED
-11. ❌ **feature-access-service.ts** - NOT STARTED
+10. ❌ **feature-access-service.ts** - NOT STARTED
 12. ❌ **file-upload-service.ts** - NOT STARTED
 13. ❌ **financial-reports-service.ts** - NOT STARTED
 14. ❌ **geographic-detection-service.ts** - NOT STARTED

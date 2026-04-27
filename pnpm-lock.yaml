@@ -65,9 +65,6 @@ importers:
       '@capacitor/device':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
-      '@capacitor/geolocation':
-        specifier: ^8.0.0
-        version: 8.0.0(@capacitor/core@8.0.2)
       '@capacitor/haptics':
         specifier: ^8.0.0
         version: 8.0.0(@capacitor/core@8.0.2)
@@ -594,11 +591,6 @@ packages:
 
   '@capacitor/filesystem@8.1.1':
     resolution: {integrity: sha512-g8szun+Nj9O/CIWNJ1c4cTsGchJE3B7080X+eh3hQXKf9UdRDllwVJy6reoI5EngwWh9xUgkI7fwkxg5BONrKw==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
-  '@capacitor/geolocation@8.0.0':
-    resolution: {integrity: sha512-ci6gOWd5/uruC3bRTxI3xFd9g82WnnJbdQxOH3oZOATNuedlaAw5c5/zXEIMYfRB7t2x1v8/N9gXkND6/nOmVQ==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -8024,11 +8016,6 @@ snapshots:
       '@capacitor/core': 8.0.2
 
   '@capacitor/filesystem@8.1.1(@capacitor/core@8.0.2)':
-    dependencies:
-      '@capacitor/core': 8.0.2
-      '@capacitor/synapse': 1.0.4
-
-  '@capacitor/geolocation@8.0.0(@capacitor/core@8.0.2)':
     dependencies:
       '@capacitor/core': 8.0.2
       '@capacitor/synapse': 1.0.4

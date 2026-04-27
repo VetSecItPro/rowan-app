@@ -216,9 +216,6 @@ async function permanentlyDeleteExpiredAccounts() {
         await Promise.allSettled([
           supabase.from('push_tokens').delete().eq('user_id', account.user_id),
           supabase.from('daily_checkins').delete().eq('user_id', account.user_id),
-          supabase.from('user_locations').delete().eq('user_id', account.user_id),
-          supabase.from('location_sharing_settings').delete().eq('user_id', account.user_id),
-          supabase.from('geofence_events').delete().eq('user_id', account.user_id),
           supabase.from('user_privacy_preferences').delete().eq('user_id', account.user_id),
           supabase.from('privacy_preference_history').delete().eq('user_id', account.user_id),
           supabase.from('data_export_requests').delete().eq('user_id', account.user_id),

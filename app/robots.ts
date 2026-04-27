@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/', '/articles/', '/pricing', '/privacy-policy', '/terms', '/security'],
-        disallow: ['/dashboard', '/tasks', '/calendar', '/reminders', '/messages', '/shopping', '/meals', '/household', '/goals', '/settings', '/admin', '/api/', '/checkin', '/expenses', '/budget', '/location', '/rewards', '/achievements', '/year-in-review', '/reports'],
+        disallow: ['/dashboard', '/tasks', '/calendar', '/reminders', '/messages', '/shopping', '/meals', '/household', '/goals', '/settings', '/admin', '/api/', '/checkin', '/expenses', '/budget', '/rewards', '/achievements', '/year-in-review', '/reports'],
       },
     ],
     sitemap: 'https://rowanapp.com/sitemap.xml',

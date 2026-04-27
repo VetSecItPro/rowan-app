@@ -177,7 +177,6 @@ export interface FeatureLimits {
   canUseReminders: boolean;
   canUseGoals: boolean;
   canUseHousehold: boolean;
-  canUseLocation: boolean;
   canUseAI: boolean;
   canUseIntegrations: boolean;
   canUseEventProposals: boolean;

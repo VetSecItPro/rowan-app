@@ -70,9 +70,6 @@ export interface NotificationResult {
  * and for analytics tracking.
  */
 export type NotificationType =
-  | 'location_arrival'
-  | 'location_departure'
-  | 'location_emergency'
   | 'task_assigned'
   | 'task_due_soon'
   | 'task_overdue'
@@ -106,9 +103,6 @@ const sendNotificationSchema = z.object({
     actionUrl: z.string().optional(),
   }),
   type: z.enum([
-    'location_arrival',
-    'location_departure',
-    'location_emergency',
     'task_assigned',
     'task_due_soon',
     'task_overdue',
@@ -643,9 +637,6 @@ function getChannelForType(type: NotificationType): string {
     case 'task_overdue':
     case 'chore_reminder':
       return 'tasks';
-    case 'location_arrival':
-    case 'location_departure':
-      return 'location';
     case 'event_reminder':
       return 'calendar';
     case 'goal_milestone':
@@ -687,64 +678,6 @@ async function deactivateToken(tokenId: string): Promise<void> {
 // ============================================================================
 // Convenience Functions for Common Notifications
 // ============================================================================
-
-/**
- * Notifies space members when a family member arrives at a location.
- *
- * Sends notifications to all space members except the person who arrived.
- *
- * @param spaceId - The unique identifier of the space
- * @param userId - The user ID of the person who arrived (excluded from notifications)
- * @param userName - The display name of the person who arrived
- * @param placeName - The name of the location (e.g., "Home", "School")
- */
-export async function notifyLocationArrival(
-  spaceId: string,
-  userId: string,
-  userName: string,
-  placeName: string
-): Promise<void> {
-  await notifySpaceMembers(
-    spaceId,
-    userId, // Don't notify the person who arrived
-    {
-      title: `${userName} arrived`,
-      body: `${userName} has arrived at ${placeName}`,
-      data: { userId, placeName },
-      actionUrl: '/location',
-    },
-    'location_arrival'
-  );
-}
-
-/**
- * Notifies space members when a family member leaves a location.
- *
- * Sends notifications to all space members except the person who left.
- *
- * @param spaceId - The unique identifier of the space
- * @param userId - The user ID of the person who left (excluded from notifications)
- * @param userName - The display name of the person who left
- * @param placeName - The name of the location (e.g., "Home", "Work")
- */
-export async function notifyLocationDeparture(
-  spaceId: string,
-  userId: string,
-  userName: string,
-  placeName: string
-): Promise<void> {
-  await notifySpaceMembers(
-    spaceId,
-    userId,
-    {
-      title: `${userName} left`,
-      body: `${userName} has left ${placeName}`,
-      data: { userId, placeName },
-      actionUrl: '/location',
-    },
-    'location_departure'
-  );
-}
 
 /**
  * Notifies a user when they are assigned a task.

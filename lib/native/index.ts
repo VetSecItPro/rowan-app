@@ -30,21 +30,6 @@ export {
   type NotificationPayload,
 } from './push-notifications';
 
-// Geolocation / Location tracking
-export {
-  isGeolocationAvailable,
-  checkLocationPermissions,
-  requestLocationPermissions,
-  getCurrentPosition,
-  watchPosition,
-  calculateDistance,
-  isWithinGeofence,
-  formatDistance,
-  getRecommendedUpdateInterval,
-  type LocationData,
-  type LocationPermissionStatus,
-} from './geolocation';
-
 // Barcode scanning
 export {
   isScannerAvailable,

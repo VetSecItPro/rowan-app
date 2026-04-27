@@ -9,5 +9,5 @@ export const PROTECTED_PATHS = [
   '/dashboard', '/tasks', '/calendar', '/messages', '/reminders',
   '/shopping', '/meals', '/projects', '/recipes', '/goals', '/settings',
   '/invitations', '/feedback', '/expenses', '/budget', '/budget-setup',
-  '/location', '/rewards', '/achievements', '/year-in-review', '/reports',
+  '/rewards', '/achievements', '/year-in-review', '/reports',
 ];

@@ -9,7 +9,7 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Bell, MapPin, MessageCircle, CheckSquare, Calendar, Target, Gift } from 'lucide-react';
+import { X, Bell, MessageCircle, CheckSquare, Calendar, Target, Gift } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { cn } from '@/lib/utils';
@@ -173,9 +173,6 @@ function NotificationToast({
  */
 function NotificationIcon({ type }: { type?: string }) {
   switch (type) {
-    case 'location_arrival':
-    case 'location_departure':
-      return <MapPin className="w-5 h-5 text-white" />;
     case 'message_received':
       return <MessageCircle className="w-5 h-5 text-white" />;
     case 'task_assigned':
@@ -196,9 +193,6 @@ function NotificationIcon({ type }: { type?: string }) {
 
 function getColorForType(type?: string): string {
   switch (type) {
-    case 'location_arrival':
-    case 'location_departure':
-      return 'bg-cyan-500';
     case 'message_received':
       return 'bg-green-500';
     case 'task_assigned':

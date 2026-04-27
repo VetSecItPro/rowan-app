@@ -47,7 +47,6 @@ Rowan gives families a **shared brain** so no one has to carry it all alone.
 ### Plus
 
 - **Home Projects** — Track renovations and projects with milestones, line items, vendors, and budgets.
-- **Location Sharing** — See where family members are (when they choose to share).
 - **Year in Review** — Reflect on what your family accomplished together.
 
 ## Rowan AI
