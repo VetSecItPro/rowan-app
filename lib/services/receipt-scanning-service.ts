@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client';
 import { fileUploadService, FileUploadResult } from './file-upload-service';
 import { mapReceiptCategory, getDefaultCategoriesForDomain } from '@/lib/constants/default-categories';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export interface ReceiptData {
   id: string;
@@ -172,30 +173,41 @@ export const receiptScanningService = {
       // Generate expense suggestion
       const suggestion = this.generateExpenseSuggestion(extractedData);
 
-      // Auto-create expense if requested and data is reliable
-      // TODO: Implement auto expense creation when expense service is available
+      // Auto-create expense if requested and data is reliable.
+      // Posts through /api/expenses which handles auth, validation, sanitization,
+      // and rate limiting — keeps this client service from re-implementing those.
       if (options?.auto_create_expense && confidenceScore > 0.7 && suggestion) {
         try {
-          // TODO: Import expense service for auto-creation
-          // const { expenseService } = await import('./expense-service');
-          // await expenseService.createExpense({
-          //   space_id: spaceId,
-          //   title: suggestion.title,
-          //   amount: suggestion.amount,
-          //   category: suggestion.category,
-          //   date: suggestion.date,
-          //   description: suggestion.description,
-          //   payment_method: suggestion.payment_method,
-          //   status: 'paid',
-          //   notes: `Auto-created from receipt scan (Confidence: ${Math.round(confidenceScore * 100)}%)`,
-          // });
+          const response = await csrfFetch('/api/expenses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              space_id: spaceId,
+              title: suggestion.title,
+              amount: suggestion.amount,
+              category: suggestion.category,
+              date: suggestion.date,
+              notes: `${suggestion.description ? suggestion.description + ' — ' : ''}Auto-created from receipt scan (${Math.round(confidenceScore * 100)}% confidence)`,
+              status: 'paid',
+              payment_method: suggestion.payment_method,
+            }),
+          });
 
-          // TODO: Link receipt to expense
-          // await supabase
-          //   .from('receipts')
-          //   .update({ expense_id: 'auto-created' })
-          //   .eq('id', receiptRecord.id);
-
+          if (response.ok) {
+            const { data: expense } = await response.json();
+            // Link receipt to the created expense
+            if (expense?.id) {
+              await supabase
+                .from('receipts')
+                .update({ expense_id: expense.id })
+                .eq('id', receiptRecord.id);
+            }
+          } else {
+            logger.warn('Auto-create expense returned non-OK', {
+              component: 'lib-receipt-scanning-service',
+              status: response.status,
+            });
+          }
         } catch (error) {
           logger.error('Failed to auto-create expense:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
         }
