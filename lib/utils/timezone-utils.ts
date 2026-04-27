@@ -7,6 +7,21 @@ import { format, parseISO } from 'date-fns';
  * Note: Uses browser's built-in Intl API for timezone handling
  */
 
+// PERF: Intl.DateTimeFormat is expensive to construct (~50-200µs each).
+// Cache formatters by their config so repeated rendering of events doesn't
+// recreate them on every call. Calendar pages can render hundreds of events.
+const formatterCache = new Map<string, Intl.DateTimeFormat>();
+
+function getCachedFormatter(opts: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const key = JSON.stringify(opts);
+  let fmt = formatterCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat('en-US', opts);
+    formatterCache.set(key, fmt);
+  }
+  return fmt;
+}
+
 /**
  * Get user's current timezone
  */
@@ -117,7 +132,7 @@ export function formatWithDualTimezone(
 
   // Show both timezones using Intl API
   const date = parseISO(utcISOString);
-  const localTime = new Intl.DateTimeFormat('en-US', {
+  const localTime = getCachedFormatter({
     timeZone: userTz,
     hour: 'numeric',
     minute: '2-digit',
@@ -125,7 +140,7 @@ export function formatWithDualTimezone(
     timeZoneName: 'short',
   }).format(date);
 
-  const eventTime = new Intl.DateTimeFormat('en-US', {
+  const eventTime = getCachedFormatter({
     timeZone: eventTimezone,
     hour: 'numeric',
     minute: '2-digit',
@@ -152,7 +167,7 @@ export function getTimezoneAbbreviation(timezone?: string): string {
   const tz = timezone || getUserTimezone();
   const date = new Date();
 
-  const formatted = new Intl.DateTimeFormat('en-US', {
+  const formatted = getCachedFormatter({
     timeZone: tz,
     timeZoneName: 'short',
   }).format(date);
@@ -169,7 +184,7 @@ export function getTimezoneOffset(timezone?: string): number {
   const tz = timezone || getUserTimezone();
   const date = new Date();
 
-  const tzDate = new Intl.DateTimeFormat('en-US', {
+  const tzDate = getCachedFormatter({
     timeZone: tz,
     year: 'numeric',
     month: '2-digit',
@@ -180,7 +195,7 @@ export function getTimezoneOffset(timezone?: string): number {
     hour12: false,
   }).format(date);
 
-  const utcDate = new Intl.DateTimeFormat('en-US', {
+  const utcDate = getCachedFormatter({
     timeZone: 'UTC',
     year: 'numeric',
     month: '2-digit',
@@ -215,7 +230,7 @@ function formatInTimeZone(date: Date, timezone: string, formatStr: string): stri
       options.timeZoneName = 'short';
     }
 
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+    return getCachedFormatter(options).format(date);
   }
 
   // Fallback to date-fns format

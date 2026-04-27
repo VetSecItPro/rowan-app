@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
+// PERF: build regex once at module level. Captures substring matches like
+// 'progress' inside 'progressing' (preserves the original .includes() semantics).
+const POSITIVE_RE = /great|good|progress|proud|breakthrough|stronger|improvements/g;
+const NEGATIVE_RE = /tough|challenge|blocker|difficult|struggle|overwhelming/g;
+
 export interface VoiceTranscriptionResult {
   transcription: string;
   confidence: number;
@@ -239,13 +244,10 @@ export const voiceTranscriptionService = {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Simple sentiment analysis based on keywords
-    const positiveWords = ['great', 'good', 'progress', 'proud', 'breakthrough', 'stronger', 'improvements'];
-    const negativeWords = ['tough', 'challenge', 'blocker', 'difficult', 'struggle', 'overwhelming'];
-
-    const words = transcription.toLowerCase().split(/\s+/);
-    const positiveCount = words.filter(word => positiveWords.some(pw => word.includes(pw))).length;
-    const negativeCount = words.filter(word => negativeWords.some(nw => word.includes(nw))).length;
+    // PERF: single regex match instead of nested filter().some() per word.
+    // Reduces O(words × keywords) to O(words) regex scan (engine handles alternation).
+    const positiveCount = (transcription.toLowerCase().match(POSITIVE_RE) ?? []).length;
+    const negativeCount = (transcription.toLowerCase().match(NEGATIVE_RE) ?? []).length;
 
     let sentiment: 'positive' | 'negative' | 'neutral' = 'neutral';
     if (positiveCount > negativeCount) sentiment = 'positive';

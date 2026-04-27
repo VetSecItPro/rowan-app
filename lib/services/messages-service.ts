@@ -154,13 +154,14 @@ export const messagesService = {
    * @returns Array of conversations sorted by most recently updated
    * @throws Error if database query fails
    */
-  async getConversations(spaceId: string): Promise<Conversation[]> {
+  async getConversations(spaceId: string, limit = 50): Promise<Conversation[]> {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('conversations')
       .select('id, space_id, title, conversation_type, last_message_preview, last_message_at, is_archived, avatar_url, description, participants, created_at, updated_at')
       .eq('space_id', spaceId)
-      .order('updated_at', { ascending: false });
+      .order('updated_at', { ascending: false })
+      .limit(limit);
 
     if (error) throw error;
     return data || [];

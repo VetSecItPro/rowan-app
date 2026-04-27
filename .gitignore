@@ -211,3 +211,4 @@ household-balance-*.png
 .test-ship-quarantine.json
 .test-audit.json
 .deps-audit.json
+.perf-reports/

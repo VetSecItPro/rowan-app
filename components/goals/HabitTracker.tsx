@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Target,
@@ -128,13 +128,21 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
     return HABIT_CATEGORIES.find(cat => cat.value === category) || HABIT_CATEGORIES[HABIT_CATEGORIES.length - 1];
   };
 
-  // Calculate total stats
-  const totalStats = {
-    total: habits.length,
-    completed: habits.filter(h => h.entry?.completed).length,
-    rate: habits.length > 0 ? Math.round((habits.filter(h => h.entry?.completed).length / habits.length) * 100) : 0,
-    activeStreaks: habits.filter(h => h.streak?.is_active && h.streak.streak_count > 0).length,
-  };
+  // PERF: single pass instead of 3 separate filters; memoized
+  const totalStats = useMemo(() => {
+    let completed = 0;
+    let activeStreaks = 0;
+    for (const h of habits) {
+      if (h.entry?.completed) completed++;
+      if (h.streak?.is_active && h.streak.streak_count > 0) activeStreaks++;
+    }
+    return {
+      total: habits.length,
+      completed,
+      rate: habits.length > 0 ? Math.round((completed / habits.length) * 100) : 0,
+      activeStreaks,
+    };
+  }, [habits]);
 
   if (loading) {
     return (

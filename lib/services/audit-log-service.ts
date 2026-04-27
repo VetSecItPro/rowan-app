@@ -116,14 +116,11 @@ export async function getUserAuditLog(
       query = query.lte('timestamp', options.endDate);
     }
 
-    // Apply pagination
-    if (options?.limit) {
-      query = query.limit(options.limit);
-    }
-
-    if (options?.offset) {
-      query = query.range(options.offset, options.offset + (options.limit || 50) - 1);
-    }
+    // Apply pagination — default to 50 to prevent unbounded fetches.
+    // Audit logs grow continuously; loading "all" can return thousands of rows.
+    const limit = options?.limit ?? 50;
+    const offset = options?.offset ?? 0;
+    query = query.range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;
 
