@@ -72,16 +72,14 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
+  // Run middleware on all routes except static/SEO files. The previous matcher
+  // was a hand-curated list of protected paths, which meant CSP and other
+  // security headers were never applied to public pages (/, /about, /pricing,
+  // legal pages, etc.) — flagged as MON-5-001 by /monitor on 2026-04-27.
+  //
+  // isStaticAsset() in proxy() provides defense-in-depth; a path slipping into
+  // the matcher gets short-circuited there before any heavy work runs.
   matcher: [
-    '/dashboard/:path*', '/tasks/:path*', '/calendar/:path*', '/messages/:path*',
-    '/reminders/:path*', '/shopping/:path*', '/meals/:path*', '/projects/:path*',
-    '/recipes/:path*', '/goals/:path*', '/settings/:path*', '/invitations/:path*',
-    '/feedback/:path*', '/expenses/:path*', '/budget/:path*', '/budget-setup/:path*',
-    '/rewards/:path*', '/achievements/:path*',
-    '/year-in-review/:path*', '/reports/:path*',
-    '/admin/:path*',
-    '/login', '/signup',
-    '/verify-email',
-    '/api/:path*',
+    '/((?!_next/|favicon\\.ico|sitemap\\.xml|robots\\.txt|manifest\\.json|sw\\.js|images/|fonts/).*)',
   ],
 };
