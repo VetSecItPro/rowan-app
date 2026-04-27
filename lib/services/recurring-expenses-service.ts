@@ -430,6 +430,7 @@ export async function ignorePattern(patternId: string): Promise<void> {
  *   recomputing across the group could distort their stated preference.
  */
 export async function mergePatterns(
+  spaceId: string,
   winnerId: string,
   loserIds: string[]
 ): Promise<void> {
@@ -442,20 +443,26 @@ export async function mergePatterns(
 
   interface PatternMergeRow {
     id: string;
+    space_id: string;
     expense_ids: string[] | null;
     occurrence_count: number | null;
     first_occurrence: string | null;
     last_occurrence: string | null;
   }
+  // nosemgrep: supabase-missing-space-id-filter — space_id filter is applied via .eq('space_id', spaceId) below; rule fires on call shape, not chained filters
   const { data: rawRows, error: fetchError } = await supabase
     .from('recurring_expense_patterns')
-    .select('id, expense_ids, occurrence_count, first_occurrence, last_occurrence')
+    .select('id, space_id, expense_ids, occurrence_count, first_occurrence, last_occurrence')
+    .eq('space_id', spaceId)
     .in('id', [winnerId, ...loserIds]);
   const rows = rawRows as PatternMergeRow[] | null;
 
   if (fetchError) throw fetchError;
   if (!rows || rows.length !== loserIds.length + 1) {
-    throw new Error('One or more patterns not found');
+    throw new Error('One or more patterns not found in this space');
+  }
+  if (rows.some((r) => r.space_id !== spaceId)) {
+    throw new Error('Cross-space merge attempt rejected');
   }
 
   const winner = rows.find((r) => r.id === winnerId);
@@ -486,12 +493,14 @@ export async function mergePatterns(
       user_confirmed: true,
       user_ignored: false,
     })
+    .eq('space_id', spaceId)
     .eq('id', winnerId);
   if (winnerErr) throw winnerErr;
 
   const { error: losersErr } = await supabase
     .from('recurring_expense_patterns')
     .update({ user_ignored: true, user_confirmed: false })
+    .eq('space_id', spaceId)
     .in('id', loserIds);
   if (losersErr) throw losersErr;
 }

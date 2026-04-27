@@ -20,6 +20,7 @@ interface DuplicateGroup {
 interface DuplicateReviewModalProps {
   isOpen: boolean;
   group: DuplicateGroup | null;
+  spaceId: string;
   onClose: () => void;
   onMerged: () => void;
 }
@@ -28,6 +29,7 @@ interface DuplicateReviewModalProps {
 export function DuplicateReviewModal({
   isOpen,
   group,
+  spaceId,
   onClose,
   onMerged,
 }: DuplicateReviewModalProps) {
@@ -49,7 +51,7 @@ export function DuplicateReviewModal({
     const loserIds = group.patterns.filter((p) => p.id !== winnerId).map((p) => p.id);
     setMerging(true);
     try {
-      await mergePatterns(winnerId, loserIds);
+      await mergePatterns(spaceId, winnerId, loserIds);
       toast.success(`Merged ${loserIds.length} duplicate${loserIds.length === 1 ? '' : 's'} into the chosen pattern`);
       onMerged();
       onClose();

@@ -232,6 +232,7 @@ export default function RecurringExpensesPage() {
       <DuplicateReviewModal
         isOpen={reviewGroup !== null}
         group={reviewGroup}
+        spaceId={spaceId}
         onClose={() => setReviewGroup(null)}
         onMerged={handleMergedDuplicate}
       />
