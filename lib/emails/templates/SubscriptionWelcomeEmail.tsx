@@ -20,6 +20,8 @@ interface SubscriptionWelcomeEmailProps {
   tier: 'pro' | 'family';
   period: 'monthly' | 'annual';
   dashboardUrl: string;
+  isFoundingMember?: boolean;
+  foundingMemberNumber?: number;
 }
 
 const SubscriptionWelcomeEmail = ({
@@ -28,6 +30,8 @@ const SubscriptionWelcomeEmail = ({
   tier = 'pro',
   period = 'monthly',
   dashboardUrl = 'https://rowanapp.com/dashboard',
+  isFoundingMember = false,
+  foundingMemberNumber,
 }: SubscriptionWelcomeEmailProps) => {
   const tierName = tier === 'family' ? 'Family' : 'Pro';
   const periodLabel = period === 'annual' ? 'annual' : 'monthly';
@@ -78,15 +82,47 @@ const SubscriptionWelcomeEmail = ({
 
           {/* Main Content */}
           <Section style={content}>
-            <Heading style={h1}>Welcome to Rowan {tierName}! 🎉</Heading>
+            {isFoundingMember ? (
+              <>
+                <Heading style={h1}>Welcome, Founding Member! 🌱</Heading>
 
-            <Text style={text}>
-              Hi {recipientName},
-            </Text>
+                <Text style={text}>
+                  Hi {recipientName},
+                </Text>
 
-            <Text style={text}>
-              Thank you for subscribing to <strong>Rowan {tierName}</strong>! Your {periodLabel} subscription is now active, and you have full access to all premium features.
-            </Text>
+                <Section style={foundingBanner}>
+                  <Text style={foundingBannerTitle}>
+                    You&apos;re one of our first 1,000 supporters
+                    {typeof foundingMemberNumber === 'number'
+                      ? ` — Member #${foundingMemberNumber}`
+                      : ''}
+                    .
+                  </Text>
+                  <Text style={foundingBannerText}>
+                    Founding members get the locked-in founding price for as long as
+                    you stay subscribed, plus early access to new features. We&apos;re
+                    building Rowan to make households actually work together — and you&apos;re
+                    the reason we get to keep doing it.
+                  </Text>
+                </Section>
+
+                <Text style={text}>
+                  Your <strong>Rowan {tierName}</strong> {periodLabel} subscription is now active. Below is everything you have access to.
+                </Text>
+              </>
+            ) : (
+              <>
+                <Heading style={h1}>Welcome to Rowan {tierName}! 🎉</Heading>
+
+                <Text style={text}>
+                  Hi {recipientName},
+                </Text>
+
+                <Text style={text}>
+                  Thank you for subscribing to <strong>Rowan {tierName}</strong>! Your {periodLabel} subscription is now active, and you have full access to all premium features.
+                </Text>
+              </>
+            )}
 
             {/* Subscription Card */}
             <Section style={subscriptionCard}>
@@ -231,6 +267,29 @@ const subscriptionCard = {
   borderRadius: '12px',
   padding: '24px',
   margin: '24px 0',
+};
+
+const foundingBanner = {
+  background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+  border: '2px solid #f59e0b',
+  borderRadius: '12px',
+  padding: '20px 24px',
+  margin: '20px 0 24px 0',
+};
+
+const foundingBannerTitle = {
+  color: '#78350f',
+  fontSize: '17px',
+  fontWeight: 'bold',
+  margin: '0 0 10px 0',
+  lineHeight: '24px',
+};
+
+const foundingBannerText = {
+  color: '#92400e',
+  fontSize: '15px',
+  lineHeight: '22px',
+  margin: '0',
 };
 
 const planIconColumn = {

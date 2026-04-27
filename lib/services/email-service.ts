@@ -1085,6 +1085,8 @@ export interface SubscriptionWelcomeData {
   tier: 'pro' | 'family';
   period: 'monthly' | 'annual';
   dashboardUrl: string;
+  isFoundingMember?: boolean;
+  foundingMemberNumber?: number;
 }
 
 export interface PaymentFailedData {
@@ -1123,16 +1125,21 @@ export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData
     const tierName = data.tier === 'family' ? 'Family' : 'Pro';
     const emailHtml = await render(SubscriptionWelcomeEmail(data));
 
+    const subject = data.isFoundingMember
+      ? `Welcome, founding member! Your Rowan ${tierName} subscription is live`
+      : `Welcome to Rowan ${tierName}! Your subscription is active`;
+
     const { data: result, error } = await resend.emails.send({
       from: FROM_NOREPLY,
       to: [data.recipientEmail],
-      subject: `Welcome to Rowan ${tierName}! Your subscription is active`,
+      subject,
       html: emailHtml,
       replyTo: REPLY_TO_EMAIL,
       tags: [
         { name: 'category', value: 'subscription-welcome' },
         { name: 'tier', value: data.tier },
-        { name: 'period', value: data.period }
+        { name: 'period', value: data.period },
+        ...(data.isFoundingMember ? [{ name: 'founding_member', value: 'true' }] : []),
       ]
     });
 

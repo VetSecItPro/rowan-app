@@ -397,14 +397,16 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (userData?.email && !isLikelyDuplicate) {
-          // Send welcome email (non-blocking)
-          // TODO: Send different email for founding members
+          // Send welcome email (non-blocking). Founding members get celebratory
+          // copy + member number; everyone else gets the standard welcome.
           sendSubscriptionWelcomeEmail({
             recipientEmail: userData.email,
             recipientName: userData.full_name || 'there',
             tier: plan as 'pro' | 'family',
             period: getPeriodFromProductId(productId),
             dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+            isFoundingMember,
+            foundingMemberNumber: isFoundingMember && foundingMemberNumber != null ? foundingMemberNumber : undefined,
           }).catch(err => {
             logger.error('Failed to send welcome email', err, {
               component: 'PolarWebhook',
