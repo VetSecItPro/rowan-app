@@ -13,7 +13,6 @@ export type GatedFeature =
   | 'mealPlanning'
   | 'goals'
   | 'household'
-  | 'location'
   | 'photos'
   | 'ai'
   | 'integrations'
@@ -28,7 +27,6 @@ const FEATURE_LIMIT_MAP: Record<GatedFeature, keyof FeatureLimits> = {
   mealPlanning: 'canUseMealPlanning',
   goals: 'canUseGoals',
   household: 'canUseHousehold',
-  location: 'canUseLocation',
   photos: 'canUploadPhotos',
   ai: 'canUseAI',
   integrations: 'canUseIntegrations',
@@ -44,7 +42,6 @@ const FEATURE_TIER_MAP: Record<GatedFeature, SubscriptionTier> = {
   mealPlanning: 'pro',
   goals: 'pro',
   household: 'pro',
-  location: 'pro',
   photos: 'pro',
   ai: 'pro',
   integrations: 'family',
@@ -60,7 +57,6 @@ const FEATURE_NAMES: Record<GatedFeature, string> = {
   mealPlanning: 'Meal Planning',
   goals: 'Goals & Milestones',
   household: 'Household Management',
-  location: 'Family Location',
   photos: 'Photo Uploads',
   ai: 'AI Features',
   integrations: 'External Integrations',

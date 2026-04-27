@@ -10,7 +10,6 @@ import {
   Heart,
   Sparkles,
   Gift,
-  MapPin,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -42,7 +41,6 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
     label: 'Family',
     items: [
       { name: 'Messages', href: '/messages', icon: MessageCircle, gradient: 'bg-gradient-messages', description: 'Chat instantly' },
-      { name: 'Family Location', href: '/location', icon: MapPin, gradient: 'bg-gradient-location', description: 'Stay connected' },
     ],
   },
   {

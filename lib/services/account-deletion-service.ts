@@ -117,7 +117,6 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
     await supabase.from('notification_preferences').delete().eq('user_id', userId);
 
     // User preferences & presence
-    await supabase.from('user_locations').delete().eq('user_id', userId);
     await supabase.from('user_feedback').delete().eq('user_id', userId);
     await supabase.from('user_audit_log').delete().eq('user_id', userId);
 
@@ -141,9 +140,6 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
       // Mentions
       await supabase.from('mentions').delete().in('space_id', spaceIds);
 
-      // Location & geofencing
-      await supabase.from('geofence_events').delete().in('space_id', spaceIds);
-      await supabase.from('location_sharing_settings').delete().in('space_id', spaceIds);
       await supabase.from('availability_blocks').delete().in('space_id', spaceIds);
 
       // Calendar integrations

@@ -36,14 +36,9 @@ const config: CapacitorConfig = {
   },
 
   plugins: {
-    // Push Notifications - Critical for reminders, messages, location alerts
+    // Push Notifications - Critical for reminders and messages
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
-    },
-
-    // Geolocation - For family location tracking feature
-    Geolocation: {
-      // iOS will prompt for background location
     },
 
     // Camera - For receipt scanning (already have), video messages (future)

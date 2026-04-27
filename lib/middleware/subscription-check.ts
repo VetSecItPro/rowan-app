@@ -168,11 +168,6 @@ const UPGRADE_NUDGES: Record<string, { feature: string; requiredTier: Subscripti
     requiredTier: 'pro',
     message: 'Upload and share family photos with Pro.',
   },
-  canUseLocation: {
-    feature: 'location',
-    requiredTier: 'pro',
-    message: 'Keep your family connected with real-time location sharing on Pro.',
-  },
   canUseAI: {
     feature: 'ai',
     requiredTier: 'pro',

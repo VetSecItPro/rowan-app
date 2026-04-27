@@ -77,7 +77,7 @@ export const config = {
     '/reminders/:path*', '/shopping/:path*', '/meals/:path*', '/projects/:path*',
     '/recipes/:path*', '/goals/:path*', '/settings/:path*', '/invitations/:path*',
     '/feedback/:path*', '/expenses/:path*', '/budget/:path*', '/budget-setup/:path*',
-    '/location/:path*', '/rewards/:path*', '/achievements/:path*',
+    '/rewards/:path*', '/achievements/:path*',
     '/year-in-review/:path*', '/reports/:path*',
     '/admin/:path*',
     '/login', '/signup',
