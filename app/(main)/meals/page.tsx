@@ -270,7 +270,7 @@ export default function MealsPage() {
     handlePullToRefresh,
   } = handlers;
 
-  const { handleCloseMealModal, handleCloseRecipeModal, handleOpenRecipeModal, handleOpenMealModal, handleOpenRecipeDiscover } = modals;
+  const { handleCloseMealModal, handleCloseRecipeModal, handleOpenRecipeModal, handleOpenMealModal, handleOpenRecipeDiscover, handleOpenRecipeImport } = modals;
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
@@ -557,8 +557,9 @@ export default function MealsPage() {
                     feature="meals"
                     icon={ChefHat}
                     title="Your recipe collection awaits"
-                    description="Save your favorite recipes to quickly plan meals and generate shopping lists."
+                    description="Save your favorite recipes to quickly plan meals and generate shopping lists. Paste a recipe URL and Rowan will extract it automatically."
                     primaryAction={{ label: 'Add Recipe', onClick: handleOpenRecipeModal }}
+                    secondaryAction={{ label: 'Import from URL', onClick: handleOpenRecipeImport }}
                   />
                 )
               ) : (
@@ -784,8 +785,9 @@ export default function MealsPage() {
                   <EmptyState
                     feature="meals"
                     title="Plan your week of meals"
-                    description="Plan meals ahead of time to eat healthier and reduce stress."
+                    description="Plan meals ahead of time to eat healthier and reduce stress. Need ideas? Browse 5 recipe sources for inspiration."
                     primaryAction={{ label: 'Plan a Meal', onClick: handleOpenMealModal }}
+                    secondaryAction={{ label: 'Discover Recipes', onClick: handleOpenRecipeDiscover }}
                   />
                 )
               ) : (
