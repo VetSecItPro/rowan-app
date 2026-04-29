@@ -106,8 +106,7 @@ export function AICompanionTeaser() {
             </h2>
 
             <p className="text-gray-400 text-base sm:text-lg max-w-md mb-6">
-              Create tasks, check your calendar, plan meals, and manage your household
-              , all through natural conversation. Available on every plan.
+              Rowan AI <span className="text-white font-semibold">creates tasks, adds events, sets reminders, plans meals,</span> and <span className="text-white font-semibold">updates your shopping list</span>, not just chat. Available on every plan.
             </p>
 
             <Link
