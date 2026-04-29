@@ -46,6 +46,109 @@ function getGenAI(): GoogleGenerativeAI {
 // SECURITY: Input size limits to prevent abuse and excessive API costs
 const MAX_TEXT_LENGTH = 50000; // ~50KB text
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB base64 encoded
+const MAX_URL_FETCH_BYTES = 5 * 1024 * 1024; // 5MB upper bound on fetched HTML
+const URL_FETCH_TIMEOUT_MS = 10_000; // 10 seconds
+
+/**
+ * SSRF guard: only allow http/https public URLs.
+ * Blocks: non-http(s) schemes, localhost, private IP ranges, link-local.
+ */
+function validateImportUrl(url: string): { ok: true; parsed: URL } | { ok: false; reason: string } {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return { ok: false, reason: 'Not a valid URL.' };
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    return { ok: false, reason: 'Only http(s) URLs are supported.' };
+  }
+  const host = parsed.hostname.toLowerCase();
+  // Block localhost / loopback / link-local / unspecified
+  if (
+    host === 'localhost' ||
+    host === '0.0.0.0' ||
+    host.endsWith('.local') ||
+    host.endsWith('.localhost')
+  ) {
+    return { ok: false, reason: 'Private/local URLs are not allowed.' };
+  }
+  // Block private IPv4 ranges
+  const ipv4 = host.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (ipv4) {
+    const [a, b] = [parseInt(ipv4[1], 10), parseInt(ipv4[2], 10)];
+    if (
+      a === 10 ||
+      a === 127 ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168)
+    ) {
+      return { ok: false, reason: 'Private IP addresses are not allowed.' };
+    }
+  }
+  // Block IPv6 loopback / link-local / unique-local
+  if (host === '::1' || host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
+    return { ok: false, reason: 'Private IPv6 addresses are not allowed.' };
+  }
+  return { ok: true, parsed };
+}
+
+/**
+ * Fetch a URL and return its body as plain text (HTML stripped).
+ * Returns null if the fetch fails or response isn't text-shaped.
+ */
+async function fetchUrlAsText(url: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), URL_FETCH_TIMEOUT_MS);
+    const response = await fetch(url, {
+      signal: controller.signal,
+      redirect: 'follow',
+      headers: {
+        // Identify ourselves so cooking sites can apply their public-content policies
+        'User-Agent': 'Mozilla/5.0 (compatible; RowanRecipeBot/1.0; +https://rowanapp.com)',
+        'Accept': 'text/html,application/xhtml+xml',
+      },
+    });
+    clearTimeout(timer);
+    if (!response.ok) return null;
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('xhtml')) {
+      return null;
+    }
+    // Read up to MAX_URL_FETCH_BYTES then bail
+    const reader = response.body?.getReader();
+    if (!reader) {
+      const txt = await response.text();
+      return txt.slice(0, MAX_URL_FETCH_BYTES);
+    }
+    const decoder = new TextDecoder();
+    let total = 0;
+    let acc = '';
+     
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      acc += decoder.decode(value, { stream: true });
+      if (total >= MAX_URL_FETCH_BYTES) break;
+    }
+    acc += decoder.decode();
+    // Strip script/style entirely (their text content is noise), then collapse tags to spaces.
+    const stripped = acc
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    // Cap output to keep Gemini prompt reasonable
+    return stripped.slice(0, MAX_TEXT_LENGTH);
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -81,30 +184,43 @@ export async function POST(req: NextRequest) {
     setSentryUser(user);
 
     const body = await req.json();
-    const { text, imageBase64 } = body;
+    const { text: providedText, imageBase64, url } = body;
+    let text: string | undefined = providedText;
 
-    // SECURITY: Input validation
-    if (!text && !imageBase64) {
+    // SECURITY: Input validation — at least one input mode required
+    if (!text && !imageBase64 && !url) {
       return NextResponse.json(
-        { error: 'Please provide either text or an image' },
+        { error: 'Please provide a URL, recipe text, or an image.' },
         { status: 400 }
       );
     }
-
 
     // SECURITY: Validate input types
     if (text && typeof text !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid text format' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid text format' }, { status: 400 });
+    }
+    if (imageBase64 && typeof imageBase64 !== 'string') {
+      return NextResponse.json({ error: 'Invalid image format' }, { status: 400 });
+    }
+    if (url && typeof url !== 'string') {
+      return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
     }
 
-    if (imageBase64 && typeof imageBase64 !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid image format' },
-        { status: 400 }
-      );
+    // URL mode: SSRF-safe fetch then strip HTML to plain text and feed
+    // the same Gemini path as the text-mode flow.
+    if (url && !text && !imageBase64) {
+      const validation = validateImportUrl(url);
+      if (!validation.ok) {
+        return NextResponse.json({ error: validation.reason }, { status: 400 });
+      }
+      const fetched = await fetchUrlAsText(validation.parsed.toString());
+      if (!fetched || fetched.length < 200) {
+        return NextResponse.json(
+          { error: "Couldn't extract a recipe from that page. Try copying the recipe text instead." },
+          { status: 400 }
+        );
+      }
+      text = fetched;
     }
 
     // SECURITY: Input size limits to prevent DoS and excessive API costs
