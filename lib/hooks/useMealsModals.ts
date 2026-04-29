@@ -28,6 +28,7 @@ export interface UseMealsModalsReturn {
   handleOpenRecipeModal: () => void;
   handleCloseRecipeModal: () => void;
   handleOpenRecipeDiscover: () => void;
+  handleOpenRecipeImport: () => void;
 
   // Ingredient review modal
   isIngredientReviewOpen: boolean;
@@ -98,6 +99,12 @@ export function useMealsModals(): UseMealsModalsReturn {
     setIsRecipeModalOpen(true);
   }, []);
 
+  /** Opens NewRecipeModal in the AI-import tab — entry point for URL/text/image import. */
+  const handleOpenRecipeImport = useCallback(() => {
+    setRecipeModalInitialTab('ai');
+    setIsRecipeModalOpen(true);
+  }, []);
+
   // Escape key handler: close whichever modal is open
   const handleEscapeClose = useCallback(() => {
     if (isModalOpen) {
@@ -136,6 +143,7 @@ export function useMealsModals(): UseMealsModalsReturn {
     handleOpenRecipeModal,
     handleCloseRecipeModal,
     handleOpenRecipeDiscover,
+    handleOpenRecipeImport,
 
     // Ingredient review modal
     isIngredientReviewOpen,
