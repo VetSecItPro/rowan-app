@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   Sparkles,
   ChevronRight,
+  Sunrise,
   X,
 } from 'lucide-react';
 
@@ -46,6 +47,13 @@ const CAPABILITIES = [
     description: '"Add milk and eggs to the grocery list." Rowan handles it instantly.',
     color: 'text-emerald-400',
     bg: 'bg-emerald-500/10',
+  },
+  {
+    icon: Sunrise,
+    title: 'Tomorrow at 7am',
+    description: "I'll send a daily summary of what's on, what got done, and what you spent. Turn it off in Settings if you'd rather not.",
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10',
   },
 ];
 
