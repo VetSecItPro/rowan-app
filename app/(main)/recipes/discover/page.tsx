@@ -219,6 +219,56 @@ export default function DiscoverRecipesPage() {
     }
   }, [notifySpaceIssue, planningRecipe, spaceId]);
 
+  /**
+   * Send a discovered recipe's ingredients straight to a new shopping list,
+   * without going through "Plan a meal." Phase 7.4 — closes the gap where the
+   * only path to shopping was Save → navigate to /recipes/[id] → click button.
+   */
+  const handleAddToShoppingList = useCallback(async (externalRecipe: ExternalRecipe) => {
+    if (!spaceId) {
+      notifySpaceIssue();
+      return;
+    }
+
+    if (!externalRecipe.ingredients || externalRecipe.ingredients.length === 0) {
+      showError('This recipe has no ingredients listed.');
+      return;
+    }
+
+    try {
+      const { shoppingService } = await import('@/lib/services/shopping-service');
+
+      const list = await shoppingService.createList({
+        space_id: spaceId,
+        title: `${externalRecipe.name} Ingredients`,
+        description: `Ingredients for ${externalRecipe.name}`,
+        status: 'active',
+      });
+
+      await Promise.all(
+        externalRecipe.ingredients.map((ing) => {
+          const itemName = [ing.amount, ing.unit, ing.name].filter(Boolean).join(' ');
+          return shoppingService.createItem({
+            list_id: list.id,
+            name: itemName,
+            quantity: 1,
+          });
+        })
+      );
+
+      showSuccess(
+        `Added ${externalRecipe.ingredients.length} ingredients to your shopping list!`,
+        {
+          label: 'View Shopping',
+          onClick: () => window.location.href = '/shopping',
+        }
+      );
+    } catch (error) {
+      logger.error('Failed to add to shopping list:', error, { component: 'page', action: 'execution' });
+      showError('Failed to add ingredients to shopping list.');
+    }
+  }, [spaceId, notifySpaceIssue]);
+
   const handleAddToLibrary = useCallback(async (externalRecipe: ExternalRecipe) => {
     if (!spaceId) {
       notifySpaceIssue();
@@ -596,6 +646,11 @@ export default function DiscoverRecipesPage() {
           setPreviewRecipe(null);
           setIsPreviewOpen(false);
           handleAddToLibrary(recipe);
+        }}
+        onAddToShoppingList={(recipe) => {
+          setPreviewRecipe(null);
+          setIsPreviewOpen(false);
+          handleAddToShoppingList(recipe);
         }}
       />
     </div>
