@@ -44,6 +44,11 @@ const OnboardingWidget = nextDynamic(
   { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-32" /> }
 );
 
+const HouseholdActivityWidget = nextDynamic(
+  () => import('@/components/dashboard/HouseholdActivityWidget').then(mod => ({ default: mod.HouseholdActivityWidget })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-48" /> }
+);
+
 // ─── Dashboard Page ──────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -204,6 +209,11 @@ export default function DashboardPage() {
                   />
                 </div>
               )}
+
+              {/* Household Activity — surfaces multi-user moments (partner completed
+                  a chore, added an event, etc.) with realtime updates. Sourced from
+                  the activity_logs audit table via the universal ActivityFeed. */}
+              {spaceId && <HouseholdActivityWidget spaceId={spaceId} />}
 
               {/* Daily Check-In & Activity Feed */}
               {spaceId && <CheckInSection userId={user.id} spaceId={spaceId} />}
