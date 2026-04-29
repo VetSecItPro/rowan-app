@@ -25,6 +25,14 @@ import { useShoppingData } from '@/lib/hooks/useShoppingData';
 import { useShoppingModals } from '@/lib/hooks/useShoppingModals';
 import { useShoppingHandlers } from '@/lib/hooks/useShoppingHandlers';
 
+const STARTER_ESSENTIALS_ITEMS = [
+  { name: 'Milk', quantity: 1 },
+  { name: 'Eggs', quantity: 1 },
+  { name: 'Bread', quantity: 1 },
+  { name: 'Coffee', quantity: 1 },
+  { name: 'Bananas', quantity: 1 },
+];
+
 export default function ShoppingPage() {
   // ─── Hooks ─────────────────────────────────────────────────────────────────
   const data = useShoppingData();
@@ -304,8 +312,20 @@ export default function ShoppingPage() {
                   <EmptyState
                     feature="shopping"
                     title="Time to stock up!"
-                    description="Create your first shopping list to keep track of what you need."
+                    description="Create your first shopping list — or jump-start with a weekly essentials list you can edit in one tap."
                     primaryAction={{ label: 'Create Shopping List', onClick: handleOpenNewListModal }}
+                    secondaryAction={{
+                      label: 'Quick Start: Weekly Essentials',
+                      onClick: () => {
+                        if (!currentSpace) return;
+                        handleCreateList({
+                          space_id: currentSpace.id,
+                          title: 'Weekly Essentials',
+                          status: 'active',
+                          items: STARTER_ESSENTIALS_ITEMS,
+                        });
+                      },
+                    }}
                   />
                   <AIContextualHint
                     featureKey="shopping"
