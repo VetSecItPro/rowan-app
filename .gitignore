@@ -194,9 +194,9 @@ docs/CI-CD-SETUP.md
 .docs-reports/
 .docs-audit.json
 
-# Root-level screenshots (session artifacts)
-dashboard-*.png
-session-state-screenshot.png
+# Root-level screenshots (session artifacts) — anchored to repo root only
+/dashboard-*.png
+/session-state-screenshot.png
 
 # Debug API routes (never ship)
 app/api/debug/
