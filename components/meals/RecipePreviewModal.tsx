@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Clock, Users, ChefHat, ExternalLink, Plus, Calendar } from 'lucide-react';
+import { X, Clock, Users, ChefHat, ExternalLink, Plus, Calendar, ShoppingCart } from 'lucide-react';
 import { ExternalRecipe } from '@/lib/services/external-recipes-service';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
 import { sanitizeUrl } from '@/lib/sanitize';
@@ -12,6 +12,12 @@ interface RecipePreviewModalProps {
   recipe: ExternalRecipe | null;
   onPlanMeal: (recipe: ExternalRecipe) => void;
   onAddToLibrary: (recipe: ExternalRecipe) => void;
+  /**
+   * Optional: send the recipe's ingredients to the shopping list directly,
+   * without going through "Plan a meal." When provided, a "Shop" button
+   * appears in the footer alongside Add/Plan. Phase 7.4.
+   */
+  onAddToShoppingList?: (recipe: ExternalRecipe) => void;
 }
 
 /** Displays a detailed recipe preview with ingredients and instructions. */
@@ -20,7 +26,8 @@ export function RecipePreviewModal({
   onClose,
   recipe,
   onPlanMeal,
-  onAddToLibrary
+  onAddToLibrary,
+  onAddToShoppingList,
 }: RecipePreviewModalProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -337,16 +344,31 @@ export function RecipePreviewModal({
                 onClose();
               }}
               className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+              title="Save recipe to your library"
             >
               <Plus className="w-4 h-4" />
               <span>Add</span>
             </button>
+            {onAddToShoppingList && (
+              <button
+                onClick={() => {
+                  onAddToShoppingList(recipe);
+                  onClose();
+                }}
+                className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+                title="Send ingredients to a new shopping list"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>Shop</span>
+              </button>
+            )}
             <button
               onClick={() => {
                 onPlanMeal(recipe);
                 onClose();
               }}
               className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+              title="Schedule this recipe as a meal"
             >
               <Calendar className="w-4 h-4" />
               <span>Plan</span>
