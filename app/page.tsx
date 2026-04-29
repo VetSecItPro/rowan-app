@@ -75,13 +75,13 @@ export default function HomePage() {
           onPricingClick={() => router.push('/pricing')}
         />
 
+        <HouseholdBalanceTeaser />
+
         <PainPointsSection />
 
         <HowItWorksSection />
 
         <FeatureShowcase />
-
-        <HouseholdBalanceTeaser />
 
         <AICompanionTeaser />
 
