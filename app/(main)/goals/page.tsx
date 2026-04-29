@@ -102,7 +102,8 @@ export default function GoalsPage() {
     isHabitModalOpen, isCheckInModalOpen, isHistoryTimelineOpen,
     isFrequencyModalOpen, editingGoal, editingMilestone, editingHabit,
     selectedTemplate, checkInGoal, historyGoal, frequencyGoal, confirmDialog,
-    setConfirmDialog, handleCloseGoalModal, handleOpenGoalModal,
+    setConfirmDialog, setIsTemplateModalOpen,
+    handleCloseGoalModal, handleOpenGoalModal,
     handleEditGoal, handleCloseMilestoneModal, handleEditMilestone,
     handleCloseHabitModal, handleSelectTemplate, handleCloseTemplateModal,
     handleCreateFromScratch, handleOpenCheckInModal, handleCloseCheckInModal,
@@ -543,8 +544,9 @@ export default function GoalsPage() {
                   <EmptyState
                     feature="goals"
                     title="Every journey starts with a goal"
-                    description="Set your first goal and start tracking your progress."
-                    primaryAction={{ label: 'Set a Goal', onClick: handleOpenGoalModal }}
+                    description="Pick a household-tested template (emergency fund, vacation savings, healthier habits) or set your own from scratch."
+                    primaryAction={{ label: 'Browse Templates', onClick: () => setIsTemplateModalOpen(true) }}
+                    secondaryAction={{ label: 'Start From Scratch', onClick: handleOpenGoalModal }}
                   />
                 )
               ) : (
