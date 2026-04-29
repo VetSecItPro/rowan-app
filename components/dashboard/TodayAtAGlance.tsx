@@ -347,11 +347,15 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
               </p>
             </div>
           </div>
-          {/* Weather + Time display - right side of header */}
+          {/* Weather + Time display - right side of header.
+              Location intentionally omitted: WeatherBadge auto-detects the user's
+              city via IP geolocation (/api/weather/user-location). The previous
+              hardcoded "Wylie, Texas, United States" was a dev-time placeholder
+              that ended up shipping — every user saw Texas weather regardless of
+              actual location. */}
           <div className="hidden sm:flex items-center gap-4">
             <WeatherBadge
               eventTime={new Date().toISOString()}
-              location="Wylie, Texas, United States"
               display="header"
             />
             <div className="flex items-center gap-1.5 text-sm text-gray-400 border-l border-gray-700 pl-4">
