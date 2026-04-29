@@ -44,6 +44,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
   // AI Import state
   const [recipeText, setRecipeText] = useState('');
+  const [recipeUrl, setRecipeUrl] = useState('');
   const [recipeImage, setRecipeImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [parsing, setParsing] = useState(false);
@@ -88,6 +89,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
     // Reset AI import fields when modal opens/closes
     setActiveTab(initialTab);
     setRecipeText('');
+    setRecipeUrl('');
     setRecipeImage(null);
     setImagePreview(null);
     setParsing(false);
@@ -122,8 +124,8 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   };
 
   const handleParseRecipe = async () => {
-    if (!recipeText && !recipeImage) {
-      showWarning('Please provide either recipe text or an image');
+    if (!recipeText && !recipeImage && !recipeUrl) {
+      showWarning('Please provide a recipe URL, paste recipe text, or upload an image');
       return;
     }
 
@@ -146,7 +148,9 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: recipeText,
+          // URL takes precedence; if absent, fall back to text/image (existing flow)
+          url: recipeUrl || undefined,
+          text: recipeText || undefined,
           imageBase64,
         }),
       });
@@ -409,11 +413,44 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 <div className="text-sm text-blue-200">
                   <p className="font-semibold mb-1">How AI Import Works</p>
                   <ul className="list-disc list-inside space-y-1">
+                    <li>Paste a recipe URL (cooking blog, NYT Cooking, AllRecipes, etc.)</li>
                     <li>Paste recipe text from a website, blog, or document</li>
                     <li>Or upload a screenshot/photo of a recipe</li>
                     <li>AI will extract ingredients, instructions, and cooking details</li>
                     <li>Review and edit the parsed data before saving</li>
                   </ul>
+                </div>
+              </div>
+
+              {/* URL Input */}
+              <div>
+                <label htmlFor="field-url" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
+                  Recipe URL
+                </label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <input
+                    id="field-url"
+                    type="url"
+                    value={recipeUrl}
+                    onChange={(e) => setRecipeUrl(e.target.value)}
+                    placeholder="https://www.example.com/your-recipe"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-500"
+                    autoComplete="url"
+                  />
+                </div>
+                <p className="mt-1 text-xs text-gray-400">
+                  Paste a public URL — Rowan will fetch the page and extract the recipe.
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-gray-800 text-gray-400">OR</span>
                 </div>
               </div>
 
@@ -495,7 +532,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               {/* Parse Button */}
               <button
                 onClick={handleParseRecipe}
-                disabled={parsing || (!recipeText && !recipeImage)}
+                disabled={parsing || (!recipeText && !recipeImage && !recipeUrl)}
                 className="btn-touch w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {parsing ? (
