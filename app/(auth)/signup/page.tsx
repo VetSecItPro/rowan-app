@@ -511,7 +511,8 @@ export default function SignUpPage() {
               </div>
             </motion.div>
 
-            {/* Space Name */}
+            {/* Space Name - hidden for invited users (they join the inviter's space; their auto-derived personal space is fine) */}
+            {!inviteToken && (
             <motion.div variants={itemVariants}>
               <label htmlFor="spaceName" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Space Name <span className="text-red-500">*</span>
@@ -535,6 +536,7 @@ export default function SignUpPage() {
                 />
               </div>
             </motion.div>
+            )}
 
             {/* Color Theme Selector — optional, collapsed by default */}
             <motion.div variants={itemVariants}>
