@@ -50,6 +50,7 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const [emailOptIn, setEmailOptIn] = useState(false);
 
   // Smooth fade-in animation on mount
@@ -535,8 +536,19 @@ export default function SignUpPage() {
               </div>
             </motion.div>
 
-            {/* Color Theme Selector */}
+            {/* Color Theme Selector — optional, collapsed by default */}
             <motion.div variants={itemVariants}>
+              {!showColorPicker ? (
+                <button
+                  type="button"
+                  onClick={() => setShowColorPicker(true)}
+                  disabled={isLoading}
+                  className="text-sm text-gray-400 hover:text-emerald-400 transition-colors ml-1"
+                >
+                  Customize accent color (optional)
+                </button>
+              ) : (
+                <>
               <label htmlFor="colorTheme" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Choose your color theme
               </label>
@@ -589,6 +601,8 @@ export default function SignUpPage() {
                   </motion.div>
                 )}
               </div>
+                </>
+              )}
             </motion.div>
 
             {/* Email Opt-in */}
