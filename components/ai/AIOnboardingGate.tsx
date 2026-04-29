@@ -1,11 +1,17 @@
 'use client';
 
 /**
- * AIOnboardingGate — Shows the AI welcome modal on first visit
+ * AIOnboardingGate — Renders the AI welcome modal.
  *
- * Uses localStorage as the primary guard (survives remounts, navigation,
- * and API failures). Also persists to the server via AI settings so it
- * syncs across devices.
+ * Two trigger paths:
+ *   1. First visit (auto): localStorage flag + server-synced AI settings.
+ *      Fires once after 800ms delay; dismissal marks seen everywhere.
+ *   2. Re-open by user (event): listens for `rowan:openAIWelcome` custom
+ *      event on window. The Header sparkle button dispatches it. Lets users
+ *      revisit the AI tour at any time after dismissing it.
+ *
+ * Always mounted (no early return) so the event-listener path works
+ * regardless of dismissal state. The closed modal renders nothing.
  */
 
 import { useState, useEffect } from 'react';
@@ -15,6 +21,9 @@ import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import { AIWelcomeModal } from './AIWelcomeModal';
 
 const STORAGE_KEY = 'rowan_ai_onboarding_seen';
+
+/** Custom event the Header (or anywhere else) dispatches to re-open the modal. */
+export const AI_WELCOME_REOPEN_EVENT = 'rowan:openAIWelcome';
 
 function isOnboardingSeen(): boolean {
   try {
@@ -50,13 +59,22 @@ export function AIOnboardingGate() {
     }
   }, [isLoading, settings.ai_onboarding_seen]);
 
-  // Show modal when settings are loaded and onboarding hasn't been seen
+  // Show modal automatically on first visit (settings loaded, not yet seen)
   useEffect(() => {
     if (!isLoading && enabled && !settings.ai_onboarding_seen && !dismissed) {
       const timer = setTimeout(() => setShowModal(true), 800);
       return () => clearTimeout(timer);
     }
   }, [isLoading, enabled, settings.ai_onboarding_seen, dismissed]);
+
+  // Re-open trigger: listen for custom event dispatched from anywhere
+  // (typically Header sparkle button). Works regardless of dismissal state.
+  useEffect(() => {
+    if (!enabled) return;
+    const handler = () => setShowModal(true);
+    window.addEventListener(AI_WELCOME_REOPEN_EVENT, handler);
+    return () => window.removeEventListener(AI_WELCOME_REOPEN_EVENT, handler);
+  }, [enabled]);
 
   const markSeen = () => {
     setDismissed(true);
@@ -66,18 +84,25 @@ export function AIOnboardingGate() {
 
   const handleClose = () => {
     setShowModal(false);
-    markSeen();
+    // Only mark as seen if first-visit (haven't been seen before).
+    // Re-opens after dismissal shouldn't re-trigger any "seen" tracking.
+    if (!settings.ai_onboarding_seen && !dismissed) {
+      markSeen();
+    }
   };
 
   const handleTryIt = () => {
     setShowModal(false);
-    markSeen();
+    if (!settings.ai_onboarding_seen && !dismissed) {
+      markSeen();
+    }
     chatCtx?.openChat();
   };
 
-  // Don't render anything if: not enabled, still loading,
-  // onboarding already seen, or already dismissed
-  if (!enabled || isLoading || settings.ai_onboarding_seen || dismissed) {
+  // Don't render the modal if AI is disabled (feature flag off or no access).
+  // Still render the wrapper so the event listener stays attached for users
+  // whose access status flips at runtime — though in practice that's rare.
+  if (!enabled || isLoading) {
     return null;
   }
 
