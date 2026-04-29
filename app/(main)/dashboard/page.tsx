@@ -49,6 +49,11 @@ const HouseholdActivityWidget = nextDynamic(
   { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-48" /> }
 );
 
+const HouseholdBalanceWidget = nextDynamic(
+  () => import('@/components/dashboard/HouseholdBalanceWidget').then(mod => ({ default: mod.HouseholdBalanceWidget })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" /> }
+);
+
 // ─── Dashboard Page ──────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -198,6 +203,12 @@ export default function DashboardPage() {
               <StatCardGrid stats={stats} loading={statsLoading} />
 
 
+              {/* Household Balance — fairness donut + member contribution bars.
+                  Lifted out of CheckInSection's hidden right column so the workload-
+                  fairness signal is above the fold. The component renders an empty-state
+                  message when there's not enough data yet (no misleading donut). */}
+              {spaceId && <HouseholdBalanceWidget spaceId={spaceId} userId={user.id} />}
+
               {/* Countdown Widget */}
               {spaceId && (
                 <div className="mb-6">
@@ -215,7 +226,7 @@ export default function DashboardPage() {
                   the activity_logs audit table via the universal ActivityFeed. */}
               {spaceId && <HouseholdActivityWidget spaceId={spaceId} />}
 
-              {/* Daily Check-In & Activity Feed */}
+              {/* Daily Check-In */}
               {spaceId && <CheckInSection userId={user.id} spaceId={spaceId} />}
 
             </div>
