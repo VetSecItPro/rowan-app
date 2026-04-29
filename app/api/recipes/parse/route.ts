@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
@@ -152,13 +152,17 @@ async function fetchUrlAsText(url: string): Promise<string | null> {
 
 export async function POST(req: NextRequest) {
   try {
-    // SECURITY: Rate limiting to prevent API quota abuse
+    // SECURITY: Tighter rate limit than the general one — every successful
+    // request is a Gemini call (~$0.001) plus, for the URL flow, an outbound
+    // HTTP fetch up to 5MB. Using the expensive-operation limit (5 req/hour)
+    // caps cost in the worst case and prevents the URL fetch endpoint from
+    // becoming a free SSRF probe.
     const ip = extractIP(req.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkExpensiveOperationRateLimit(ip);
 
     if (!rateLimitSuccess) {
       return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
+        { error: 'Too many recipe imports. Please try again in a bit.' },
         { status: 429 }
       );
     }
