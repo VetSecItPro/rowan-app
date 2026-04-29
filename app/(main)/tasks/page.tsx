@@ -353,8 +353,9 @@ export default function TasksPage() {
                       <EmptyState
                         feature="tasks"
                         title="Ready to get organized?"
-                        description="Create your first task to start conquering your to-do list."
-                        primaryAction={{ label: 'Add Task', onClick: () => openCreateModal('task') }}
+                        description="Start with a quick template (weekly chores, meal prep, deep clean) or build your own from scratch."
+                        primaryAction={{ label: 'Browse Templates', onClick: () => modals.openTemplatePicker() }}
+                        secondaryAction={{ label: 'Add From Scratch', onClick: () => openCreateModal('task') }}
                       />
                       <AIContextualHint
                         featureKey="tasks"
