@@ -21,7 +21,10 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
-import { AIOnboardingModal } from '@/components/ai/AIOnboardingModal';
+// AIOnboardingModal removed — the canonical AI welcome modal is rendered by
+// AIOnboardingGate in app/(main)/layout.tsx (uses AIWelcomeModal). The previous
+// dashboard-local modal was dead code: it fired at 1500ms but the gate fires
+// at 800ms and marks seen, so the dashboard one never actually showed.
 
 // Lazy-load below-fold heavy components
 const CountdownWidget = nextDynamic(
@@ -81,7 +84,8 @@ export default function DashboardPage() {
   const chatCtx = useChatContextSafe();
   const [refreshing, setRefreshing] = useState(false);
   const [memberCount, setMemberCount] = useState<number>(0);
-  const [showAIOnboarding, setShowAIOnboarding] = useState(false);
+  // showAIOnboarding state removed — AI welcome modal is now owned by
+  // AIOnboardingGate at the layout level (app/(main)/layout.tsx).
 
   // Auto-refresh dashboard stats when Rowan AI completes a tool action
   const lastToolAction = chatCtx?.lastToolAction ?? 0;
@@ -113,22 +117,9 @@ export default function DashboardPage() {
     fetchMemberCount();
   }, [spaceId]);
 
-  // Show AI onboarding modal on first visit
-  useEffect(() => {
-    // Only show if user is authenticated and we have a space
-    if (!user || !spaceId) return;
-
-    // Check if user has seen the AI onboarding modal
-    const hasSeenOnboarding = localStorage.getItem('rowan_ai_onboarding_seen');
-
-    if (!hasSeenOnboarding) {
-      // Delay slightly to let the dashboard load first
-      const timer = setTimeout(() => {
-        setShowAIOnboarding(true);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [user, spaceId]);
+  // First-visit AI welcome modal effect removed — AIOnboardingGate
+  // (rendered in app/(main)/layout.tsx) now handles this with the same
+  // localStorage key plus server-synced AISettings.
 
   const handleRefreshCards = async () => {
     setRefreshing(true);
@@ -251,19 +242,6 @@ export default function DashboardPage() {
             />
           )}
 
-          {/* AI Onboarding Modal - shown once on first visit */}
-          <AIOnboardingModal
-            isOpen={showAIOnboarding}
-            onClose={() => {
-              setShowAIOnboarding(false);
-              localStorage.setItem('rowan_ai_onboarding_seen', 'true');
-            }}
-            onOpenChat={() => {
-              setShowAIOnboarding(false);
-              localStorage.setItem('rowan_ai_onboarding_seen', 'true');
-              chatCtx?.openChat();
-            }}
-          />
         </PullToRefresh>
       </FeatureLayout>
     </PageErrorBoundary>
