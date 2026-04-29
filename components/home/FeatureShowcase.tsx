@@ -50,6 +50,7 @@ const featureGroups = [
       'Shared family calendar syncs everyone\u2019s schedule automatically in real time',
       'Smart reminders notify the right person at exactly the right time',
       'Rotating chore assignments keep the workload fair for everyone',
+      'Daily 7am digest summarizes who did what, what\u2019s coming, and what you spent',
       'Track completion with streaks and points to keep the family motivated',
     ],
   },
