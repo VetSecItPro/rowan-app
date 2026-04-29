@@ -17,7 +17,6 @@ import {
   List,
   ChevronLeft,
   ChevronRight,
-  Scale,
 } from 'lucide-react';
 import type { DailyCheckIn } from '@/lib/services/checkins-service';
 
@@ -32,10 +31,9 @@ const CheckInSuccess = nextDynamic(
   { ssr: false }
 );
 
-const HouseholdBalance = nextDynamic(
-  () => import('@/components/household-balance/HouseholdBalance').then(mod => ({ default: mod.HouseholdBalance })),
-  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" />, ssr: false }
-);
+// HouseholdBalance moved to its own top-level dashboard widget
+// (components/dashboard/HouseholdBalanceWidget.tsx) to surface the workload-
+// fairness signal above the fold instead of buried in this section's right column.
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -835,9 +833,10 @@ export const CheckInSection = memo(function CheckInSection({
       variants={scaleIn}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-1 lg:grid-cols-2 gap-6"
     >
-      {/* Left: Daily Check-In */}
+      {/* Daily Check-In — household balance moved to its own top-level dashboard
+          widget (HouseholdBalanceWidget) so it's above the fold rather than
+          buried in a 2-column right slot. */}
       <div
         id="daily-checkin"
         className="group bg-gradient-to-br from-pink-900/30 via-purple-900/30 to-blue-900/30 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-500/20 hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24"
@@ -986,17 +985,6 @@ export const CheckInSection = memo(function CheckInSection({
             )}
           </div>
         )}
-      </div>
-
-      {/* Right: Household Balance */}
-      <div className="group bg-gradient-to-br from-slate-900/30 via-gray-900/20 to-stone-900/10 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-500/20 hover:border-gray-400/50 transition-all duration-300 flex flex-col">
-        <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-          <Scale className="w-5 h-5 text-teal-400" />
-          <h2 className="text-lg sm:text-xl font-bold text-white">Household Balance</h2>
-        </div>
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <HouseholdBalance spaceId={spaceId} userId={userId} />
-        </div>
       </div>
 
       {/* Check-In Success Modal */}
