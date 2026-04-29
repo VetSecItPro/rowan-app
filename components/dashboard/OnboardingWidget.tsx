@@ -46,9 +46,9 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: 'setup-chore',
-    title: 'Set up a chore rotation',
+    title: 'Set up a recurring chore',
     description: 'Share the household workload',
-    link: '/chores',
+    link: '/tasks',
     icon: RotateCcw,
     color: 'amber',
   },
