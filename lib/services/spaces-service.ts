@@ -3,6 +3,29 @@ import { z } from 'zod';
 import type { Space } from '@/lib/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { calendarService } from '@/lib/services/calendar-service';
+
+function nextDayAt9am(): { start: string; end: string } {
+  const start = new Date();
+  start.setDate(start.getDate() + 1);
+  start.setHours(9, 0, 0, 0);
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + 30);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
+async function seedWelcomeEvent(spaceId: string, supabase?: SupabaseClient): Promise<void> {
+  const { start, end } = nextDayAt9am();
+  await calendarService.createEvent({
+    space_id: spaceId,
+    title: 'Welcome to Rowan — set your first goal today',
+    description: 'Your household calendar starts here. Open Rowan, pick a goal template, and you are off.',
+    start_time: start,
+    end_time: end,
+    event_type: 'reminder',
+    category: 'family',
+  }, supabase);
+}
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
@@ -97,6 +120,14 @@ export async function createSpace(
       // Cleanup: delete the space if member creation failed
       await supabase.from('spaces').delete().eq('id', space.id);
       throw memberError;
+    }
+
+    // Best-effort: seed a welcome calendar event so the new space has a non-empty calendar.
+    // Failures here MUST NOT fail space creation.
+    try {
+      await seedWelcomeEvent(space.id, supabaseClient);
+    } catch (seedError) {
+      logger.warn('createSpace welcome-event seed failed (non-fatal)', { component: 'lib-spaces-service', action: 'service_call', details: { spaceId: space.id, error: seedError instanceof Error ? seedError.message : String(seedError) } });
     }
 
     return { success: true, data: space };
