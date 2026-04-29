@@ -1,6 +1,21 @@
 /**
  * External Recipe APIs Service
- * Aggregates recipes from multiple free APIs
+ *
+ * Aggregates recipe search across 5 sources. Each source returns [] if its
+ * API key is missing — no exceptions thrown. Discovery degrades gracefully:
+ * if only TheMealDB is configured, results come from there alone.
+ *
+ * Source / required env / behavior when unconfigured:
+ *
+ *   1. TheMealDB    | (none)                            | always live
+ *   2. Spoonacular  | SPOONACULAR_API_KEY               | route returns []
+ *   3. Edamam       | EDAMAM_APP_ID + EDAMAM_APP_KEY    | service returns []
+ *   4. Tasty        | RAPIDAPI_KEY                      | route returns []
+ *   5. API Ninjas   | API_NINJAS_KEY                    | route returns []
+ *
+ * Hit GET /api/recipes/external/status (auth required) for a runtime report
+ * of which sources are configured in the current environment. The endpoint
+ * never returns key values — only `configured: boolean` per source.
  */
 
 import { logger } from '@/lib/logger';
