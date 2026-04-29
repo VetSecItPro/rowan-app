@@ -41,3 +41,8 @@ yarn.lock
 # Environment files (should never be committed anyway)
 .env*
 !.env.example
+
+# Admin/seed/cleanup scripts run as service_role outside the app's space-scoped
+# request context. They legitimately operate cross-space and don't need
+# space_id filters. App code (not in scripts/) still needs them.
+scripts/
