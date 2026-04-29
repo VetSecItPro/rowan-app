@@ -331,7 +331,11 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                         sender: lastMessage.sender_id === user.id ? 'You' : 'Partner',
                         created_at: lastMessage.created_at,
                     } : null,
-                    mostActive: 'Personal chat',
+                    // mostActive is a phantom field — defined in the type, never
+                    // rendered in any component. Match the initial state ('') instead
+                    // of shipping a dev placeholder ('Personal chat') that would surface
+                    // if a future renderer is added.
+                    mostActive: '',
                     trend: msgs.trend || 0,
                 },
                 shopping: {
