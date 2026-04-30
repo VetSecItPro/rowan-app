@@ -3,7 +3,7 @@
   "devCommand": "npm run dev",
   "installCommand": "pnpm install",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ':(exclude)public/marketing/' ':(exclude)public/screenshots/' ':(exclude)**/*.md' ':(exclude)docs/' ':(exclude)supabase/migrations/'",
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then echo 'Skipping preview deploy (branch != main)'; exit 0; fi; git diff --quiet HEAD^ HEAD -- ':(exclude)public/marketing/' ':(exclude)public/screenshots/' ':(exclude)**/*.md' ':(exclude)docs/' ':(exclude)supabase/migrations/'",
   "regions": ["iad1"],
   "git": {
     "deploymentEnabled": {
