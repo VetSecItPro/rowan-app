@@ -38,6 +38,7 @@ async function shouldRedirectToWelcome(): Promise<boolean> {
     } = await supabase.auth.getUser();
     if (!user) return false;
 
+    // nosemgrep: supabase-missing-space-id-filter — `users` is global per-user table; .eq('id', user.id) is canonical
     const { data: profile } = await supabase
       .from('users')
       .select('welcome_completed_at')

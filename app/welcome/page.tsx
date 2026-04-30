@@ -29,6 +29,7 @@ export default async function WelcomePage() {
     redirect('/login');
   }
 
+  // nosemgrep: supabase-missing-space-id-filter — `users` is a global per-user table; .eq('id', authUser.id) is the canonical access pattern (rule lists profiles/spaces/etc. as global-table exceptions; users is in the same class)
   const { data: profile } = await supabase
     .from('users')
     .select('id, name, welcome_completed_at')

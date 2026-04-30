@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Path 1 — user clicked "Skip". Mark complete with no edits.
     if ('skip' in parsed.data) {
+      // nosemgrep: supabase-missing-space-id-filter — `users` is global per-user table; .eq('id', user.id) is canonical
       const { error: stampError } = await supabase
         .from('users')
         .update({ welcome_completed_at: nowIso, updated_at: nowIso })
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update display name + welcome stamp in a single users row touch.
+    // nosemgrep: supabase-missing-space-id-filter — `users` is global per-user table; .eq('id', user.id) is canonical
     const { error: userUpdateError } = await supabase
       .from('users')
       .update({
