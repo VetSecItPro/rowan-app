@@ -543,7 +543,7 @@ async function syncICSFeed(
         provider_config: updatedConfig,
         last_sync_at: new Date().toISOString(),
         sync_status: 'active',
-        last_error: null,
+        last_error_message: null,
       })
       .eq('id', connectionId);
 

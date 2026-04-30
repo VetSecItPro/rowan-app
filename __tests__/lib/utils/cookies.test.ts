@@ -375,12 +375,12 @@ describe('privacyToCookiePreferences', () => {
     expect(privacyToCookiePreferences(base).necessary).toBe(true);
   });
 
-  it('should map third_party_analytics_enabled=true to analytics=true', () => {
+  it('should map analytics_cookies_enabled=true to analytics=true', () => {
     const result = privacyToCookiePreferences({ ...base, analytics_cookies_enabled: true });
     expect(result.analytics).toBe(true);
   });
 
-  it('should set analytics=false when third_party_analytics_enabled is false', () => {
+  it('should set analytics=false when analytics_cookies_enabled is false', () => {
     const result = privacyToCookiePreferences({ ...base, analytics_cookies_enabled: false });
     expect(result.analytics).toBe(false);
   });
@@ -407,7 +407,7 @@ describe('privacyToCookiePreferences', () => {
 // ---------------------------------------------------------------------------
 
 describe('cookieToPrivacyUpdates', () => {
-  it('should map analytics cookie pref to third_party_analytics_enabled', () => {
+  it('should map analytics cookie pref to analytics_cookies_enabled', () => {
     const result = cookieToPrivacyUpdates({ necessary: true, analytics: true, marketing: false, functional: true, preferences: true });
     expect(result.analytics_cookies_enabled).toBe(true);
   });

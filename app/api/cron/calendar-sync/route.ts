@@ -130,7 +130,7 @@ export async function GET(request: Request) {
             sync_status: syncResult.success ? 'active' : 'error',
             last_sync_at: new Date().toISOString(),
             next_sync_at: nextSync.toISOString(),
-            last_error: syncResult.success ? null : syncResult.errors?.[0]?.error_message,
+            last_error_message: syncResult.success ? null : syncResult.errors?.[0]?.error_message,
           })
           .eq('id', connection.id);
 
@@ -152,7 +152,7 @@ export async function GET(request: Request) {
           .from('calendar_connections')
           .update({
             sync_status: 'error',
-            last_error: errorMessage,
+            last_error_message: errorMessage,
             // Still set next sync so it will retry
             next_sync_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
           })

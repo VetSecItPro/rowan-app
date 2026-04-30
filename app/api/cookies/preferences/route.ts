@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Get privacy preferences from database
     const { data: privacy, error: privacyError } = await supabase
       .from('user_privacy_preferences')
-      .select('third_party_analytics_enabled, share_data_with_partners, ccpa_do_not_sell')
+      .select('analytics_cookies_enabled, ccpa_do_not_sell')
       .eq('user_id', userId)
       .single();
 
@@ -59,11 +59,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Convert privacy preferences to cookie preferences
+    // Convert privacy preferences to cookie preferences.
+    // Marketing cookies are gated solely by ccpa_do_not_sell (master partner-sharing toggle).
     const cookiePreferences = {
       necessary: true, // Always true
-      analytics: privacy.third_party_analytics_enabled,
-      marketing: privacy.share_data_with_partners && !privacy.ccpa_do_not_sell,
+      analytics: privacy.analytics_cookies_enabled,
+      marketing: !privacy.ccpa_do_not_sell,
       functional: true, // Default to true for better UX
       preferences: true, // Default to true for personalization
     };
@@ -129,10 +130,10 @@ export async function POST(request: NextRequest) {
     // Ensure necessary cookies are always true
     validatedPreferences.necessary = true;
 
-    // Convert cookie preferences to privacy preference updates
+    // Convert cookie preferences to privacy preference updates.
+    // Marketing cookie pref maps directly to ccpa_do_not_sell (master partner-sharing toggle).
     const privacyUpdates = {
-      third_party_analytics_enabled: validatedPreferences.analytics,
-      share_data_with_partners: validatedPreferences.marketing,
+      analytics_cookies_enabled: validatedPreferences.analytics,
       ccpa_do_not_sell: !validatedPreferences.marketing,
       updated_at: new Date().toISOString(),
     };
@@ -259,8 +260,7 @@ export async function DELETE(request: NextRequest) {
 
     // Convert to privacy updates
     const privacyUpdates = {
-      third_party_analytics_enabled: false,
-      share_data_with_partners: false,
+      analytics_cookies_enabled: false,
       ccpa_do_not_sell: true,
       updated_at: new Date().toISOString(),
     };

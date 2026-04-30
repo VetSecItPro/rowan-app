@@ -71,9 +71,7 @@ export async function POST(request: NextRequest) {
         .insert({
           user_id: userId,
           marketing_emails_enabled: false,
-          marketing_sms_enabled: false,
-          third_party_analytics_enabled: false,
-          share_data_with_partners: false,
+          analytics_cookies_enabled: false,
           ccpa_do_not_sell: true,
         })
         .select('*')

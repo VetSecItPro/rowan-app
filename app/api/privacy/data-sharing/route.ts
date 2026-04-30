@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     // Get current privacy preferences (only the columns needed for this CCPA update)
     const { data: currentPrefs, error: prefsError } = await supabase
       .from('user_privacy_preferences')
-      .select('share_data_with_partners')
+      .select('ccpa_do_not_sell')
       .eq('user_id', userId)
       .single();
 
@@ -65,14 +65,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update CCPA Do Not Sell preference
+    // Update CCPA Do Not Sell preference (master toggle for partner sharing)
     const newCCPAValue = !validatedData.allowSharing; // Invert because "Do Not Sell" = true means no sharing
 
     const { error: updateError } = await supabase
       .from('user_privacy_preferences')
       .update({
         ccpa_do_not_sell: newCCPAValue,
-        share_data_with_partners: validatedData.allowSharing,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', userId);
@@ -87,8 +86,8 @@ export async function POST(request: NextRequest) {
     // Apply the data sharing changes to external services
     await applyDataSharingChanges(userId, validatedData.allowSharing, currentPrefs);
 
-    // Log the preference change
-    await logDataSharingChange(userId, currentPrefs.share_data_with_partners, validatedData.allowSharing);
+    // Log the preference change (old value derived: ccpa_do_not_sell=true means sharing was disabled)
+    await logDataSharingChange(userId, !currentPrefs.ccpa_do_not_sell, validatedData.allowSharing);
 
     return NextResponse.json({
       success: true,
@@ -230,7 +229,7 @@ export async function GET() {
     // Get current preferences
     const { data: preferences, error: prefsError } = await supabase
       .from('user_privacy_preferences')
-      .select('ccpa_do_not_sell, share_data_with_partners, third_party_analytics_enabled')
+      .select('ccpa_do_not_sell, analytics_cookies_enabled')
       .eq('user_id', userId)
       .single();
 
@@ -241,6 +240,11 @@ export async function GET() {
       );
     }
 
+    // ccpa_do_not_sell is the master toggle for partner sharing.
+    // Analytics enablement is gated by both the analytics cookie pref AND CCPA opt-out.
+    const allowPartnerSharing = !preferences.ccpa_do_not_sell;
+    const allowAnalytics = preferences.analytics_cookies_enabled && allowPartnerSharing;
+
     // List of data sharing partners (for transparency)
     const dataSharingPartners = [
       {
@@ -248,28 +252,28 @@ export async function GET() {
         category: 'Analytics',
         purpose: 'Website usage analytics and improvement',
         dataTypes: ['Usage patterns', 'Device information', 'Geographic location'],
-        enabled: preferences.third_party_analytics_enabled && !preferences.ccpa_do_not_sell,
+        enabled: allowAnalytics,
       },
       {
         name: 'Google Ads',
         category: 'Advertising',
         purpose: 'Targeted advertising and remarketing',
         dataTypes: ['Email address', 'Usage patterns', 'Interests'],
-        enabled: preferences.share_data_with_partners && !preferences.ccpa_do_not_sell,
+        enabled: allowPartnerSharing,
       },
       {
         name: 'Facebook Pixel',
         category: 'Advertising',
         purpose: 'Social media advertising and conversion tracking',
         dataTypes: ['Email address', 'Website interactions', 'Purchase behavior'],
-        enabled: preferences.share_data_with_partners && !preferences.ccpa_do_not_sell,
+        enabled: allowPartnerSharing,
       },
       {
         name: 'Marketing Attribution Services',
         category: 'Attribution',
         purpose: 'Cross-platform marketing performance measurement',
         dataTypes: ['Device identifiers', 'Campaign interactions', 'Conversion events'],
-        enabled: preferences.share_data_with_partners && !preferences.ccpa_do_not_sell,
+        enabled: allowPartnerSharing,
       },
     ];
 
@@ -277,11 +281,10 @@ export async function GET() {
       success: true,
       data: {
         ccpaDoNotSell: preferences.ccpa_do_not_sell,
-        shareDataWithPartners: preferences.share_data_with_partners,
-        thirdPartyAnalytics: preferences.third_party_analytics_enabled,
+        analyticsCookiesEnabled: preferences.analytics_cookies_enabled,
         dataSharingPartners,
         complianceStatus: {
-          ccpaCompliant: preferences.ccpa_do_not_sell || !preferences.share_data_with_partners,
+          ccpaCompliant: preferences.ccpa_do_not_sell,
           lastUpdated: new Date().toISOString(),
         },
       },

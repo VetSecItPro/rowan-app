@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       .upsert(
         {
           user_id: targetUserId,
-          third_party_analytics_enabled: parsed.data.enabled,
+          analytics_cookies_enabled: parsed.data.enabled,
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'user_id' }
