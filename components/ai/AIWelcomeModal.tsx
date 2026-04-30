@@ -182,12 +182,6 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
               </div>
             </div>
 
-            {/* Daily digest heads-up — surfaces the cron-driven email so users
-                aren't surprised by it and know how to turn it off. */}
-            <p className="px-6 pb-2 text-[11px] text-gray-300 leading-relaxed text-center">
-              I&apos;ll also send you a daily summary at 7am unless you turn it off.
-            </p>
-
             {/* Privacy notice */}
             <p className="px-6 text-[11px] text-gray-400 leading-relaxed text-center">
               Rowan AI uses Google Gemini. First names and household data (tasks, events, lists) are shared with Google to personalize responses. Passwords and financial accounts are never shared.
