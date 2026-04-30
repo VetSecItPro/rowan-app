@@ -40,19 +40,21 @@ describe('extractIP', () => {
     expect(extractIP(headers)).toBe('9.10.11.12');
   });
 
-  it('should use LAST IP from x-forwarded-for (anti-spoofing)', () => {
+  it('should REFUSE x-forwarded-for entirely without trusted proxy header (anti-spoofing)', () => {
+    // SECURITY: x-forwarded-for is fully client-controllable when no platform header
+    // (vercel/cloudflare/x-real-ip) is present. Production code returns "anonymous"
+    // rather than parse a spoofable header. This test asserts that hardened posture.
     const headers = makeHeaders({
       'x-forwarded-for': '1.1.1.1, 2.2.2.2, 3.3.3.3',
     });
-    // Last IP is most trusted (set by our proxy)
-    expect(extractIP(headers)).toBe('3.3.3.3');
+    expect(extractIP(headers)).toBe('anonymous');
   });
 
-  it('should handle single IP in x-forwarded-for', () => {
+  it('should REFUSE single-IP x-forwarded-for without trusted proxy header', () => {
     const headers = makeHeaders({
       'x-forwarded-for': '10.0.0.1',
     });
-    expect(extractIP(headers)).toBe('10.0.0.1');
+    expect(extractIP(headers)).toBe('anonymous');
   });
 
   it('should use first IP from x-vercel-forwarded-for (comma-separated)', () => {

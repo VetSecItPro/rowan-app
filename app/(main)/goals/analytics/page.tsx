@@ -79,7 +79,7 @@ export default function GoalsAnalyticsPage() {
 
   const handleExport = () => {
     // TODO: Implement export functionality (PNG/PDF)
-    showInfo('Export functionality coming soon!');
+    showInfo('Export is not yet available for this view.');
   };
 
   if (!spaceId) {

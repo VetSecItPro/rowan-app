@@ -355,11 +355,11 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               Week of {format(startOfWeek(selectedDate, { weekStartsOn: 1 }), 'MMM d, yyyy')}
             </h3>
             <div className="flex items-center gap-2">
-              <button
+              <button aria-label="Previous"
                 onClick={() => setSelectedDate(addDays(selectedDate, -7))}
                 className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft aria-hidden="true" className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setSelectedDate(new Date())}
@@ -367,11 +367,11 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               >
                 Today
               </button>
-              <button
+              <button aria-label="Next"
                 onClick={() => setSelectedDate(addDays(selectedDate, 7))}
                 className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight aria-hidden="true" className="w-4 h-4" />
               </button>
             </div>
           </div>

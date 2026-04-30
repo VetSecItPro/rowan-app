@@ -52,6 +52,8 @@ export default function SignUpPage() {
   const [showColorDropdown, setShowColorDropdown] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [emailOptIn, setEmailOptIn] = useState(false);
+  // Age gate (COPPA): user must affirm 13+ to submit. Persists nothing; gate-only.
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
 
   // Smooth fade-in animation on mount
   useEffect(() => {
@@ -175,6 +177,12 @@ export default function SignUpPage() {
     // Check password confirmation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+
+    // Age gate: must affirm 13+ before submitting (COPPA posture)
+    if (!ageConfirmed) {
+      setError('You must confirm you are 13 years of age or older to create an account.');
       return;
     }
 
@@ -631,12 +639,40 @@ export default function SignUpPage() {
               </label>
             </motion.div>
 
+            {/* Age Gate (13+) — COPPA posture, required */}
+            <motion.div
+              variants={itemVariants}
+              className="flex items-start gap-4 p-5 bg-gray-800/40 border border-gray-700/60 rounded-2xl"
+            >
+              <input
+                type="checkbox"
+                id="ageConfirmed"
+                data-testid="signup-age-checkbox"
+                checked={ageConfirmed}
+                onChange={(e) => setAgeConfirmed(e.target.checked)}
+                disabled={isLoading}
+                required
+                className="w-5 h-5 text-emerald-600 bg-gray-100 border-gray-300 rounded-lg focus:ring-emerald-500/50 transition-all duration-200 mt-1 cursor-pointer"
+              />
+              <label htmlFor="ageConfirmed" className="text-sm text-gray-200 cursor-pointer leading-relaxed">
+                <span className="font-bold">I am 13 years of age or older</span>
+                <p className="text-gray-400 mt-1.5">
+                  Rowan is intended for users 13+. Parents and guardians may create child sub-profiles within their
+                  household. See our{' '}
+                  <Link href="/privacy#childrens-privacy" className="text-emerald-400 hover:underline">
+                    Privacy Policy
+                  </Link>{' '}
+                  for details.
+                </p>
+              </label>
+            </motion.div>
+
             {/* Submit Button */}
             <motion.button
               variants={itemVariants}
               type="submit"
               data-testid="signup-submit-button"
-              disabled={isLoading}
+              disabled={isLoading || !ageConfirmed}
               className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
             >
               {isLoading ? (

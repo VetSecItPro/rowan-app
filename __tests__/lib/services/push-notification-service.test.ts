@@ -13,8 +13,8 @@ const mockSupabase = vi.hoisted(() => {
   return chainable;
 });
 
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn(async () => mockSupabase),
+vi.mock('@/lib/supabase/admin', () => ({
+  supabaseAdmin: mockSupabase,
 }));
 
 vi.mock('@/lib/logger', () => ({
@@ -37,14 +37,13 @@ describe('push-notification-service', () => {
     it('should register a new push token', async () => {
       const mockToken = { id: 'token-1', user_id: 'user-1', token: 'abc123', platform: 'ios' };
 
-      // Check existing token: .from('push_tokens').select('id').eq('user_id').eq('token').single()
-      // Returns null (no existing token)
+      // Check existing token: returns null (PGRST116 = no rows)
       mockSupabase.single.mockResolvedValueOnce({ data: null, error: { code: 'PGRST116' } });
 
-      // Insert new token: .from('push_tokens').insert({...}).select('id').single()
+      // Insert new token: .insert({...}).select('id').single()
       mockSupabase.single.mockResolvedValueOnce({ data: mockToken, error: null });
 
-      const result = await registerPushToken('user-1', 'space-1', {
+      const result = await registerPushToken('user-1', {
         token: 'abc123',
         platform: 'ios',
       });
@@ -54,16 +53,15 @@ describe('push-notification-service', () => {
     });
 
     it('should update existing token', async () => {
-      // Check existing token returns a result: .select('id').eq('user_id').eq('token').single()
+      // Check existing token returns a result
       mockSupabase.single.mockResolvedValueOnce({ data: { id: 'token-1' }, error: null });
 
-      // update({...}).eq('id', existingToken.id) — use separate chain so eq.mockResolvedValueOnce
-      // doesn't get consumed by the check chain's eq calls
+      // update({...}).eq('id', existingToken.id) — final eq resolves
       mockSupabase.update.mockReturnValueOnce({
         eq: vi.fn().mockResolvedValue({ error: null }),
       });
 
-      const result = await registerPushToken('user-1', 'space-1', {
+      const result = await registerPushToken('user-1', {
         token: 'abc123',
         platform: 'ios',
       });
@@ -72,7 +70,7 @@ describe('push-notification-service', () => {
     });
 
     it('should handle validation errors', async () => {
-      const result = await registerPushToken('user-1', 'space-1', {
+      const result = await registerPushToken('user-1', {
         token: '',
         platform: 'ios',
       });
@@ -95,11 +93,10 @@ describe('push-notification-service', () => {
   describe('getActiveTokensForUsers', () => {
     it('should fetch active tokens', async () => {
       const mockTokens = [{ id: '1', token: 'abc', platform: 'ios', is_active: true }];
-      // .from('push_tokens').select(...).in('user_id', userIds).eq('space_id', spaceId).eq('is_active', true)
-      mockSupabase.eq.mockReturnValueOnce(mockSupabase); // first eq
-      mockSupabase.eq.mockResolvedValueOnce({ data: mockTokens, error: null }); // second eq
+      // .from('push_tokens').select(...).in('user_id', userIds).eq('is_active', true)
+      mockSupabase.eq.mockResolvedValueOnce({ data: mockTokens, error: null });
 
-      const result = await getActiveTokensForUsers(['user-1'], 'space-1');
+      const result = await getActiveTokensForUsers(['user-1']);
       expect(result).toEqual(mockTokens);
     });
   });

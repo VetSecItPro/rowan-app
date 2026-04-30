@@ -164,7 +164,7 @@ describe('checkCsrf', () => {
     expect(newCookie?.value).toBe('new-rotated-token');
   });
 
-  it('skips CSRF for Bearer-authenticated API requests', () => {
+  it('does NOT skip CSRF for Bearer-authenticated API requests (Bearer no longer bypasses CSRF)', () => {
     const req = makeRequest('https://example.com/api/tasks', 'POST', {
       headers: {
         origin: 'https://example.com',
@@ -172,7 +172,8 @@ describe('checkCsrf', () => {
         authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.test',
       },
     });
-    expect(checkCsrf(req, response)).toBeNull();
+    // CSRF still required even with Bearer auth — should return a 403 Response
+    expect(checkCsrf(req, response)).not.toBeNull();
   });
 
   it('skips CSRF for cron routes', () => {

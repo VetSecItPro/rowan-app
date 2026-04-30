@@ -690,12 +690,12 @@ export const ProfileTab = memo(function ProfileTab({
 
                         {/* Remove member button */}
                         {!member.isCurrentUser && member.role !== 'Admin' && currentSpace?.role === 'owner' && (
-                          <button
+                          <button aria-label="Delete"
                             onClick={() => handleRemoveMember(member.id)}
                             className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-900/20 rounded-lg transition-colors"
                             title="Remove member"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
                           </button>
                         )}
                       </div>

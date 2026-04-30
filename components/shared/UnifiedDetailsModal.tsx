@@ -365,12 +365,12 @@ function DetailsModalContent({
                   className="flex-1 px-3 py-2 text-sm border border-gray-700 rounded-lg focus:ring-2 bg-gray-800"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
                 />
-                <button
+                <button aria-label="Send"
                   onClick={handleAddComment}
                   disabled={!newComment.trim()}
                   className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send aria-hidden="true" className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -403,11 +403,11 @@ function DetailsModalContent({
                           {(file.size / 1024).toFixed(0)} KB
                         </span>
                       </div>
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => setAttachments(prev => prev.filter(a => a.id !== file.id))}
                         className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 aria-hidden="true" className="w-4 h-4" />
                       </button>
                     </div>
                   ))}

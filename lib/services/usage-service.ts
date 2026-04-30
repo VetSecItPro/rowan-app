@@ -61,7 +61,6 @@ export async function incrementUsage(
   amount: number = 1
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
-  const today = new Date().toISOString().split('T')[0];
 
   // Map UsageType to the actual database column name
   const columnMap: Record<UsageType, string> = {

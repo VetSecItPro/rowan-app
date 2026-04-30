@@ -60,6 +60,7 @@ describe('geolocation-service', () => {
 
       expect(result).toEqual(mockLocation);
       expect(global.fetch).toHaveBeenCalledWith('/api/geolocation', {
+        credentials: 'same-origin',
         headers: { Accept: 'application/json' },
       });
     });

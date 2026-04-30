@@ -1211,7 +1211,7 @@ export default function HouseholdDocumentationPage() {
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
-                    <strong>Coming Soon:</strong> Check our roadmap for upcoming smart home integrations. We prioritize based on user requests, so let us know what you&apos;d find most valuable.
+                    <strong>On the roadmap:</strong> Smart home integrations are prioritized by user requests — let us know what you&apos;d find most valuable.
                   </p>
                 </div>
               </div>

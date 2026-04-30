@@ -11,6 +11,35 @@ const mockAuthValue = vi.hoisted(() => ({
   signOut: vi.fn(),
 }));
 
+const mockAuthWithSpacesValue = vi.hoisted(() => ({
+  user: { id: 'user-1', email: 'test@example.com' },
+  session: { access_token: 'test-token' },
+  profile: null,
+  spaces: [{ id: 'space-1', name: 'Test Space' }],
+  currentSpace: { id: 'space-1', name: 'Test Space' },
+  hasZeroSpaces: false,
+  authLoading: false,
+  profileLoading: false,
+  spacesLoading: false,
+  loading: false,
+  isReady: true,
+  authError: null,
+  spacesError: null,
+  error: null,
+  signUp: vi.fn(),
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+  refreshProfile: vi.fn(),
+  switchSpace: vi.fn(),
+  refreshSpaces: vi.fn(),
+  createSpace: vi.fn(),
+  deleteSpace: vi.fn(),
+}));
+
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => mockAuthWithSpacesValue),
+}));
+
 vi.mock('@/lib/contexts/auth-context', () => ({
   useAuth: vi.fn(() => mockAuthValue),
 }));

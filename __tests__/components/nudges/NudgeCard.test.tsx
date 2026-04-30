@@ -5,6 +5,33 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NudgeCard } from '@/components/nudges/NudgeCard';
 import type { SmartNudge } from '@/lib/services/smart-nudges-service';
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => ({
+    user: { id: 'user-1', email: 'test@example.com' },
+    session: { access_token: 'test-token' },
+    profile: null,
+    spaces: [{ id: 'space-1', name: 'Test Space' }],
+    currentSpace: { id: 'space-1', name: 'Test Space' },
+    hasZeroSpaces: false,
+    authLoading: false,
+    profileLoading: false,
+    spacesLoading: false,
+    loading: false,
+    isReady: true,
+    authError: null,
+    spacesError: null,
+    error: null,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshProfile: vi.fn(),
+    switchSpace: vi.fn(),
+    refreshSpaces: vi.fn(),
+    createSpace: vi.fn(),
+    deleteSpace: vi.fn(),
+  })),
+}));
+
 vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
@@ -66,7 +93,7 @@ describe('NudgeCard', () => {
   it('calls onAction with dismissed when dismiss is clicked', () => {
     const onAction = vi.fn();
     render(<NudgeCard nudge={baseNudge} onAction={onAction} />);
-    const menuBtn = screen.getByRole('button', { name: '' });
+    const menuBtn = screen.getByRole('button', { name: /More options/i });
     fireEvent.click(menuBtn);
     const dismissBtn = screen.getByText('Dismiss');
     fireEvent.click(dismissBtn);
@@ -76,7 +103,7 @@ describe('NudgeCard', () => {
   it('calls onAction with snoozed when snooze is clicked', () => {
     const onAction = vi.fn();
     render(<NudgeCard nudge={baseNudge} onAction={onAction} />);
-    const menuBtn = screen.getByRole('button', { name: '' });
+    const menuBtn = screen.getByRole('button', { name: /More options/i });
     fireEvent.click(menuBtn);
     const snoozeBtn = screen.getByText('Snooze');
     fireEvent.click(snoozeBtn);

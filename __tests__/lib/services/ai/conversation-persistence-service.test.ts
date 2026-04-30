@@ -54,21 +54,21 @@ describe('calculateCostUsd', () => {
   });
 
   it('calculates input token cost correctly', () => {
-    // 1M input tokens = $0.30
+    // 1M input tokens = $0.15 (OpenRouter Gemini 2.5 Flash)
     const cost = calculateCostUsd(1_000_000, 0);
-    expect(cost).toBeCloseTo(0.3, 4);
+    expect(cost).toBeCloseTo(0.15, 4);
   });
 
   it('calculates output token cost correctly', () => {
-    // 1M output tokens = $2.50
+    // 1M output tokens = $0.60 (OpenRouter Gemini 2.5 Flash)
     const cost = calculateCostUsd(0, 1_000_000);
-    expect(cost).toBeCloseTo(2.5, 4);
+    expect(cost).toBeCloseTo(0.6, 4);
   });
 
   it('combines input and output token costs', () => {
     const cost = calculateCostUsd(300_000, 80_000);
-    // 300k input = 0.09, 80k output = 0.20
-    expect(cost).toBeCloseTo(0.09 + 0.2, 4);
+    // 300k input = 0.045, 80k output = 0.048
+    expect(cost).toBeCloseTo(0.045 + 0.048, 4);
   });
 
   it('rounds to 6 decimal places', () => {

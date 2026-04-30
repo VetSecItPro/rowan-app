@@ -323,19 +323,19 @@ export function RewardsManagement({
                       {reward.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                     <Tooltip content="Edit reward" position="top">
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => openEditModal(reward)}
                         className="p-1.5 text-gray-400 hover:text-blue-400 transition-colors"
                       >
-                        <Pencil className="w-4 h-4" />
+                        <Pencil aria-hidden="true" className="w-4 h-4" />
                       </button>
                     </Tooltip>
                     <Tooltip content="Delete reward" position="top">
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => setDeleteConfirm(reward.id)}
                         className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 aria-hidden="true" className="w-4 h-4" />
                       </button>
                     </Tooltip>
                   </div>

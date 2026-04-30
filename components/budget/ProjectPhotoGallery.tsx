@@ -165,7 +165,7 @@ export function ProjectPhotoGallery({
           </select>
 
           <div className="flex items-center bg-gray-700 rounded-lg p-1">
-            <button
+            <button aria-label="Grid view"
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded ${
                 viewMode === 'grid'
@@ -173,9 +173,9 @@ export function ProjectPhotoGallery({
                   : 'hover:bg-gray-600'
               } transition-colors`}
             >
-              <Grid3X3 className="w-4 h-4" />
+              <Grid3X3 aria-hidden="true" className="w-4 h-4" />
             </button>
-            <button
+            <button aria-label="List view"
               onClick={() => setViewMode('list')}
               className={`p-2 rounded ${
                 viewMode === 'list'
@@ -183,7 +183,7 @@ export function ProjectPhotoGallery({
                   : 'hover:bg-gray-600'
               } transition-colors`}
             >
-              <List className="w-4 h-4" />
+              <List aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -290,7 +290,7 @@ export function ProjectPhotoGallery({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
+                  <button aria-label="Download"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDownload(photo);
@@ -298,9 +298,9 @@ export function ProjectPhotoGallery({
                     className="p-2 text-gray-400 hover:bg-gray-600 rounded-lg transition-colors"
                     title="Download"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download aria-hidden="true" className="w-4 h-4" />
                   </button>
-                  <button
+                  <button aria-label="View"
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePhotoClick(photo);
@@ -308,7 +308,7 @@ export function ProjectPhotoGallery({
                     className="p-2 text-amber-400 hover:bg-amber-900/30 rounded-lg transition-colors"
                     title="View"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye aria-hidden="true" className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -354,17 +354,17 @@ export function ProjectPhotoGallery({
                 </div>
 
                 {/* Navigation */}
-                <button
+                <button aria-label="Previous photo"
                   onClick={handlePrevPhoto}
                   className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft aria-hidden="true" className="w-5 h-5" />
                 </button>
-                <button
+                <button aria-label="Next photo"
                   onClick={handleNextPhoto}
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight aria-hidden="true" className="w-5 h-5" />
                 </button>
               </div>
 

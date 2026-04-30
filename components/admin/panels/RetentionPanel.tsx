@@ -333,12 +333,12 @@ const DauMauPanel = memo(function DauMauPanel() {
       <div className="bg-gray-800 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-white">Daily Active Users (Last 7 Days)</h3>
-          <button
+          <button aria-label="Refresh"
             onClick={() => refetch()}
             disabled={isFetching}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
         {(weeklyData?.length ?? 0) > 0 ? (
@@ -420,12 +420,12 @@ const CohortsPanel = memo(function CohortsPanel() {
             <Calendar className="w-5 h-5 text-indigo-500" />
             <h3 className="text-lg font-semibold text-white">Cohort Retention Analysis</h3>
           </div>
-          <button
+          <button aria-label="Refresh"
             onClick={() => refetch()}
             disabled={isFetching}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
@@ -570,12 +570,12 @@ const ChurnPanel = memo(function ChurnPanel() {
         <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-white">Retention Overview</h3>
-            <button
+            <button aria-label="Refresh"
               onClick={() => refetch()}
               disabled={isFetching}
               className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
             </button>
           </div>
           <div className="h-8 bg-gray-700 rounded-full overflow-hidden flex">

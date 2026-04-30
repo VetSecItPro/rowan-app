@@ -429,7 +429,7 @@ export function EventProposalModal({
 
                       {/* Vote Buttons */}
                       <div className="flex gap-2 mb-3">
-                        <button
+                        <button aria-label="Confirm"
                           onClick={() => handleVote(index, 'available')}
                           className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                             userVote === 'available'
@@ -437,9 +437,9 @@ export function EventProposalModal({
                               : 'bg-gray-800 text-gray-300 hover:bg-green-900/30 border border-gray-600'
                           }`}
                         >
-                          <CheckCircle2 className="w-4 h-4 mx-auto" />
+                          <CheckCircle2 aria-hidden="true" className="w-4 h-4 mx-auto" />
                         </button>
-                        <button
+                        <button aria-label="Favorite"
                           onClick={() => handleVote(index, 'preferred')}
                           className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                             userVote === 'preferred'
@@ -447,9 +447,9 @@ export function EventProposalModal({
                               : 'bg-gray-800 text-gray-300 hover:bg-yellow-900/30 border border-gray-600'
                           }`}
                         >
-                          <Star className="w-4 h-4 mx-auto" />
+                          <Star aria-hidden="true" className="w-4 h-4 mx-auto" />
                         </button>
-                        <button
+                        <button aria-label="Cancel"
                           onClick={() => handleVote(index, 'unavailable')}
                           className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                             userVote === 'unavailable'
@@ -457,7 +457,7 @@ export function EventProposalModal({
                               : 'bg-gray-800 text-gray-300 hover:bg-red-900/30 border border-gray-600'
                           }`}
                         >
-                          <XCircle className="w-4 h-4 mx-auto" />
+                          <XCircle aria-hidden="true" className="w-4 h-4 mx-auto" />
                         </button>
                       </div>
 

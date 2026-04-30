@@ -32,6 +32,8 @@ const footerColumns = [
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
       { label: 'Cookies', href: '/cookies' },
+      { label: 'Accessibility', href: '/accessibility' },
+      { label: 'Do Not Sell My Info', href: '/do-not-sell' },
     ],
   },
 ];

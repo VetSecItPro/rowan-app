@@ -108,6 +108,56 @@ function generateFilePath(userId: string, fileName: string): string {
 }
 
 /**
+ * SECURITY (SRV-002): Verify file's magic-byte signature matches its declared
+ * MIME type. This catches extension-confusion attacks where a file is named
+ * `evil.png` but actually contains an HTML/JS payload, or where the browser-
+ * supplied `file.type` is spoofed.
+ *
+ * Allowed image formats:
+ *   - JPEG: FF D8 FF
+ *   - PNG:  89 50 4E 47 0D 0A 1A 0A
+ *   - GIF:  47 49 46 38 (GIF8)
+ *   - WEBP: 52 49 46 46 .. .. .. .. 57 45 42 50 (RIFF...WEBP)
+ *
+ * Returns true if the magic bytes match the declared MIME type.
+ */
+async function verifyMagicBytes(file: File, declaredMime: string): Promise<boolean> {
+  try {
+    const headerBuf = await file.slice(0, 12).arrayBuffer();
+    const bytes = new Uint8Array(headerBuf);
+    if (bytes.length < 4) return false;
+
+    const isJPEG = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    const isPNG =
+      bytes[0] === 0x89 &&
+      bytes[1] === 0x50 &&
+      bytes[2] === 0x4e &&
+      bytes[3] === 0x47;
+    const isGIF =
+      bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x38;
+    const isWEBP =
+      bytes.length >= 12 &&
+      bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
+
+    switch (declaredMime) {
+      case 'image/jpeg':
+        return isJPEG;
+      case 'image/png':
+        return isPNG;
+      case 'image/gif':
+        return isGIF;
+      case 'image/webp':
+        return isWEBP;
+      default:
+        return false;
+    }
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Uploads a file to a Supabase storage bucket.
  *
  * Validates the file against bucket constraints before uploading. Files are
@@ -128,6 +178,19 @@ export async function uploadFile(
     const validation = validateFile(file, bucket);
     if (!validation.valid) {
       return { success: false, error: validation.error };
+    }
+
+    // SECURITY (SRV-002): Magic-byte verification — second check, on top of
+    // MIME-type check above. Catches files where the declared type doesn't
+    // match the actual content (extension confusion / MIME spoofing).
+    const magicOk = await verifyMagicBytes(file, file.type);
+    if (!magicOk) {
+      logger.warn('[storage-service] Magic-byte mismatch — rejected upload', {
+        component: 'lib-storage-service',
+        bucket,
+        declaredType: file.type,
+      });
+      return { success: false, error: 'File contents do not match declared type' };
     }
 
     const supabase = await createClient();

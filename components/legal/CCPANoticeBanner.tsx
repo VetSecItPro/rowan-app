@@ -77,7 +77,7 @@ export function CCPANoticeBanner({ onDismiss, autoDetect = true }: CCPANoticeBan
   };
 
   const handleLearnMore = () => {
-    window.open('/privacy-policy', '_blank');
+    window.open('/privacy', '_blank');
   };
 
   const handleOptOut = () => {

@@ -264,13 +264,13 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
 
               {/* Emoji Picker Button */}
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <button
+                <button aria-label="Insert emoji"
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
                   className="p-1.5 rounded-md hover:bg-gray-700 transition-colors"
                 >
-                  <Smile className="w-5 h-5 text-gray-400" />
+                  <Smile aria-hidden="true" className="w-5 h-5 text-gray-400" />
                 </button>
 
                 {/* Emoji Picker Popup */}

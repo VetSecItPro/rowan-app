@@ -253,23 +253,24 @@ describe('/api/admin/user-lifecycle', () => {
       expect(data.error).toContain('Failed to fetch user lifecycle data');
     });
 
-    it('handles pagination correctly by fetching multiple pages of users', async () => {
+    it('returns total count from profiles table query', async () => {
       const { GET } = await import('@/app/api/admin/user-lifecycle/route');
       await setupAuth(true);
       const { supabaseAdmin } = await import('@/lib/supabase/admin');
 
-      // Return a full page of 1000 users (triggers pagination), then empty page to stop
-      const page1Users = Array.from({ length: 1000 }, (_, i) => ({
+      const profileUsers = Array.from({ length: 1000 }, (_, i) => ({
         id: `550e8400-e29b-41d4-a716-${String(i).padStart(12, '0')}`,
         email: `user${i}@example.com`,
         created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
       }));
 
-      vi.mocked(supabaseAdmin.auth.admin.listUsers)
-        .mockResolvedValueOnce({ data: { users: page1Users }, error: null } as any)
-        .mockResolvedValueOnce({ data: { users: [] }, error: null } as any);
-
-      vi.mocked(supabaseAdmin.from).mockImplementation(() => {
+      vi.mocked(supabaseAdmin.from).mockImplementation((table: string) => {
+        if (table === 'profiles') {
+          const limitMock = vi.fn().mockResolvedValue({ data: profileUsers, error: null });
+          const orderMock = vi.fn().mockReturnValue({ limit: limitMock });
+          const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+          return { select: selectMock } as any;
+        }
         return { select: vi.fn(() => buildChain([])) } as any;
       });
 
@@ -279,7 +280,6 @@ describe('/api/admin/user-lifecycle', () => {
 
       expect(res.status).toBe(200);
       expect(data.lifecycle.total).toBe(1000);
-      expect(vi.mocked(supabaseAdmin.auth.admin.listUsers)).toHaveBeenCalledTimes(2);
     });
 
     it('uses cache for repeated requests', async () => {

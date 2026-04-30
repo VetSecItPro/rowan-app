@@ -11,6 +11,7 @@ vi.mock('@/lib/services/bulk-operations-service', () => ({
 vi.mock('@/lib/ratelimit', () => ({ checkExpensiveOperationRateLimit: vi.fn() }));
 vi.mock('@/lib/ratelimit-fallback', () => ({ extractIP: vi.fn(() => '127.0.0.1') }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
+vi.mock('@/lib/security/csrf-validation', () => ({ validateCsrfRequest: vi.fn(() => null) }));
 
 function makeRateLimit(success: boolean) {
   return { success, limit: 5, remaining: success ? 4 : 0, reset: Date.now() + 3600000 };

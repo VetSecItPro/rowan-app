@@ -4,8 +4,37 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => ({
+    user: { id: 'user-1', email: 'test@example.com' },
+    session: { access_token: 'test-token' },
+    profile: null,
+    spaces: [{ id: 'space-1', name: 'Test Space' }],
+    currentSpace: { id: 'space-1', name: 'Test Space' },
+    hasZeroSpaces: false,
+    authLoading: false,
+    profileLoading: false,
+    spacesLoading: false,
+    loading: false,
+    isReady: true,
+    authError: null,
+    spacesError: null,
+    error: null,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshProfile: vi.fn(),
+    switchSpace: vi.fn(),
+    refreshSpaces: vi.fn(),
+    createSpace: vi.fn(),
+    deleteSpace: vi.fn(),
+  })),
+}));
+
 vi.mock('@tanstack/react-query', () => ({
   useQuery: vi.fn(() => ({ data: undefined, isLoading: false, refetch: vi.fn(), isFetching: false })),
+  QueryClient: class { constructor() {} },
+  QueryClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 import { ConversionFunnelPanel } from '@/components/admin/panels/ConversionFunnelPanel';

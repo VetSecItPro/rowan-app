@@ -211,12 +211,12 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
             </p>
           </div>
         </div>
-        <button
+        <button aria-label="Refresh"
           onClick={fetchData}
           disabled={isFetching}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
         </button>
       </div>
 

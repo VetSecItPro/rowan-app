@@ -39,6 +39,26 @@ vi.mock('@/lib/utils/cache-headers', () => ({
   withUserDataCache: vi.fn((response) => response),
 }));
 
+vi.mock('@/lib/services/push-notification-service', () => ({
+  notifyNewCalendarEvent: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/utils/fire-and-forget-push', () => ({
+  fireAndForgetPush: vi.fn(),
+}));
+
+vi.mock('@/lib/supabase/admin', () => ({
+  supabaseAdmin: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn().mockResolvedValue({ data: { display_name: 'Test User' }, error: null }),
+        })),
+      })),
+    })),
+  },
+}));
+
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
@@ -236,7 +256,11 @@ describe('/api/calendar', () => {
 
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(mockRateLimitOk());
       vi.mocked(createClient).mockResolvedValue(mockAuthUser() as any);
-      vi.mocked(createCalendarEventSchema.parse).mockReturnValue(undefined);
+      vi.mocked(createCalendarEventSchema.parse).mockReturnValue({
+        space_id: SPACE_ID,
+        title: 'New Event',
+        start_date: '2026-02-22T10:00:00Z',
+      } as any);
       vi.mocked(verifySpaceAccess).mockRejectedValue(new Error('Access denied'));
 
       const request = new NextRequest('http://localhost/api/calendar', {
@@ -266,7 +290,11 @@ describe('/api/calendar', () => {
 
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(mockRateLimitOk());
       vi.mocked(createClient).mockResolvedValue(mockAuthUser() as any);
-      vi.mocked(createCalendarEventSchema.parse).mockReturnValue(undefined);
+      vi.mocked(createCalendarEventSchema.parse).mockReturnValue({
+        space_id: SPACE_ID,
+        title: 'Team Meeting',
+        start_date: '2026-02-22T10:00:00Z',
+      } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
       vi.mocked(calendarService.createEvent).mockResolvedValue(mockEvent as any);
 
@@ -292,7 +320,13 @@ describe('/api/calendar', () => {
 
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(mockRateLimitOk());
       vi.mocked(createClient).mockResolvedValue(mockAuthUser() as any);
-      vi.mocked(createCalendarEventSchema.parse).mockReturnValue(undefined);
+      vi.mocked(createCalendarEventSchema.parse).mockReturnValue({
+        space_id: SPACE_ID,
+        title: 'Team Meeting',
+        description: 'Discuss Q1 goals',
+        location: 'Conference Room A',
+        start_date: '2026-02-22T10:00:00Z',
+      } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
       vi.mocked(calendarService.createEvent).mockResolvedValue({ id: 'event-1' } as any);
 

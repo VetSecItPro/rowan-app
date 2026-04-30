@@ -205,7 +205,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
+                    <button aria-label="Remove"
                       onClick={() =>
                         updateSetting(
                           'default_penalty_points',
@@ -214,12 +214,12 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                       }
                       className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus aria-hidden="true" className="w-4 h-4" />
                     </button>
                     <span className="w-12 text-center font-semibold text-white">
                       {settings.default_penalty_points}
                     </span>
-                    <button
+                    <button aria-label="Add"
                       onClick={() =>
                         updateSetting(
                           'default_penalty_points',
@@ -228,7 +228,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                       }
                       className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus aria-hidden="true" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
+                    <button aria-label="Remove"
                       onClick={() =>
                         updateSetting(
                           'default_grace_period_hours',
@@ -254,12 +254,12 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                       }
                       className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus aria-hidden="true" className="w-4 h-4" />
                     </button>
                     <span className="w-12 text-center font-semibold text-white">
                       {settings.default_grace_period_hours}h
                     </span>
-                    <button
+                    <button aria-label="Add"
                       onClick={() =>
                         updateSetting(
                           'default_grace_period_hours',
@@ -268,7 +268,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                       }
                       className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus aria-hidden="true" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
+                    <button aria-label="Remove"
                       onClick={() =>
                         updateSetting(
                           'max_penalty_per_chore',
@@ -294,12 +294,12 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                       }
                       className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus aria-hidden="true" className="w-4 h-4" />
                     </button>
                     <span className="w-12 text-center font-semibold text-white">
                       {settings.max_penalty_per_chore}
                     </span>
-                    <button
+                    <button aria-label="Add"
                       onClick={() =>
                         updateSetting(
                           'max_penalty_per_chore',
@@ -308,7 +308,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                       }
                       className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus aria-hidden="true" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -382,7 +382,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                           Daily multiplier
                         </p>
                         <div className="flex items-center gap-2">
-                          <button
+                          <button aria-label="Remove"
                             onClick={() =>
                               updateSetting(
                                 'penalty_multiplier_per_day',
@@ -391,12 +391,12 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                             }
                             className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus aria-hidden="true" className="w-3 h-3" />
                           </button>
                           <span className="w-12 text-center font-medium text-white">
                             {settings.penalty_multiplier_per_day.toFixed(1)}x
                           </span>
-                          <button
+                          <button aria-label="Add"
                             onClick={() =>
                               updateSetting(
                                 'penalty_multiplier_per_day',
@@ -405,7 +405,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                             }
                             className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 transition-colors"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus aria-hidden="true" className="w-3 h-3" />
                           </button>
                         </div>
                       </div>

@@ -4,6 +4,33 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => ({
+    user: { id: 'user-1', email: 'test@example.com' },
+    session: { access_token: 'test-token' },
+    profile: null,
+    spaces: [{ id: 'space-1', name: 'Test Space' }],
+    currentSpace: { id: 'space-1', name: 'Test Space' },
+    hasZeroSpaces: false,
+    authLoading: false,
+    profileLoading: false,
+    spacesLoading: false,
+    loading: false,
+    isReady: true,
+    authError: null,
+    spacesError: null,
+    error: null,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshProfile: vi.fn(),
+    switchSpace: vi.fn(),
+    refreshSpaces: vi.fn(),
+    createSpace: vi.fn(),
+    deleteSpace: vi.fn(),
+  })),
+}));
+
 vi.mock('@tanstack/react-query', () => ({
   useQuery: vi.fn(() => ({ data: undefined, isLoading: false, refetch: vi.fn(), isFetching: false })),
 }));
@@ -81,9 +108,9 @@ describe('AnalyticsPanel', () => {
     expect(screen.getByText('Devices')).toBeTruthy();
   });
 
-  it('renders beta program summary', () => {
+  it('renders traffic overview section', () => {
     render(<AnalyticsPanel />);
-    expect(screen.getByText('Beta Program Summary')).toBeTruthy();
+    expect(screen.getByText('Traffic Overview')).toBeTruthy();
   });
 
   it('shows loading state when fetching', () => {

@@ -382,19 +382,19 @@ function ConversationItem({
                   autoFocus
                   className="flex-1 text-sm font-semibold bg-gray-800 border border-green-500 rounded px-2 py-1 text-white focus:outline-none"
                 />
-                <button
+                <button aria-label="Save name"
                   onClick={onSaveRename}
                   className="p-1 hover:bg-green-900/30 rounded transition-colors"
                   title="Save"
                 >
-                  <Check className="w-3 h-3 text-green-400" />
+                  <Check aria-hidden="true" className="w-3 h-3 text-green-400" />
                 </button>
-                <button
+                <button aria-label="Cancel rename"
                   onClick={onCancelRename}
                   className="p-1 hover:bg-red-900/30 rounded transition-colors"
                   title="Cancel"
                 >
-                  <XIcon className="w-3 h-3 text-red-400" />
+                  <XIcon aria-hidden="true" className="w-3 h-3 text-red-400" />
                 </button>
               </div>
             ) : (

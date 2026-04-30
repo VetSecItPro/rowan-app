@@ -130,11 +130,11 @@ export function SwipeableMessageCard({
       {onEdit && isOwn && (
         <div className="absolute inset-y-0 left-0 w-16 flex items-center justify-start pl-2 z-20">
           <div className={`transition-all duration-300 ${offsetX > EDIT_THRESHOLD / 3 ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
-            <button
+            <button aria-label="Edit"
               onClick={handleEdit}
               className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all duration-150 border-2 border-white/20"
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -144,11 +144,11 @@ export function SwipeableMessageCard({
       {onDelete && (
         <div className="absolute inset-y-0 right-0 w-20 flex items-center justify-end pr-2 z-20">
           <div className={`transition-all duration-300 ${offsetX < DELETE_THRESHOLD / 3 ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
-            <button
+            <button aria-label="Delete"
               onClick={handleDelete}
               className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all duration-150 border-2 border-white/20"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </div>

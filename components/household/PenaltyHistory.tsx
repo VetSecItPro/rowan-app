@@ -184,11 +184,11 @@ export function PenaltyHistory({ className, userId, limit = 20 }: PenaltyHistory
             </button>
 
             {/* Refresh */}
-            <button
+            <button aria-label="Refresh"
               onClick={fetchPenalties}
               className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
             >
-              <RefreshCw className="w-4 h-4 text-gray-400" />
+              <RefreshCw aria-hidden="true" className="w-4 h-4 text-gray-400" />
             </button>
           </div>
         </div>

@@ -348,7 +348,7 @@ export default function MessagesPage() {
 
                 {/* Header Actions */}
                 <div className="flex items-center gap-1">
-                  <button
+                  <button aria-label="View members"
                     onClick={toggleMembersPanel}
                     className={`p-2 rounded-full transition-colors ${
                       showMembersPanel
@@ -357,10 +357,10 @@ export default function MessagesPage() {
                     }`}
                     title="View members"
                   >
-                    <Users className="w-5 h-5" />
+                    <Users aria-hidden="true" className="w-5 h-5" />
                   </button>
-                  <button className="hidden sm:flex p-2 hover:bg-gray-700 rounded-full transition-colors">
-                    <Search className="w-5 h-5 text-gray-400" />
+                  <button aria-label="Search messages" className="hidden sm:flex p-2 hover:bg-gray-700 rounded-full transition-colors">
+                    <Search aria-hidden="true" className="w-5 h-5 text-gray-400" />
                   </button>
                 </div>
               </div>
@@ -544,12 +544,12 @@ export default function MessagesPage() {
                 <div className="flex-1 flex items-center bg-[#2a3942] rounded-3xl shadow-sm relative">
                   {/* Emoji Button - Inside Input */}
                   <div className="relative flex-shrink-0">
-                    <button
+                    <button aria-label="Insert emoji"
                       type="button"
                       onClick={toggleEmojiPicker}
                       className="p-2.5 hover:bg-gray-700/50 rounded-full transition-colors ml-1"
                     >
-                      <Smile className="w-5 h-5 text-gray-400" />
+                      <Smile aria-hidden="true" className="w-5 h-5 text-gray-400" />
                     </button>
                     {/* Emoji Picker */}
                     {showEmojiPicker && (
@@ -586,12 +586,12 @@ export default function MessagesPage() {
                   )}
 
                   {/* Attachment Button - Inside Input on right */}
-                  <button
+                  <button aria-label="Attach file"
                     type="button"
                     onClick={handleFileClick}
                     className="p-2.5 hover:bg-gray-700/50 rounded-full transition-colors mr-1 flex-shrink-0"
                   >
-                    <Paperclip className="w-5 h-5 text-gray-400" />
+                    <Paperclip aria-hidden="true" className="w-5 h-5 text-gray-400" />
                   </button>
                 </div>
 

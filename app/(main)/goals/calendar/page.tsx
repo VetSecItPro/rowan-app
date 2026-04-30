@@ -310,11 +310,11 @@ export default function GoalsCalendarPage() {
                 {format(currentDate, 'MMMM yyyy')}
               </h2>
               <div className="flex items-center gap-2">
-                <button
+                <button aria-label="Previous"
                   onClick={() => navigateMonth('prev')}
                   className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-400" />
+                  <ChevronLeft aria-hidden="true" className="w-5 h-5 text-gray-400" />
                 </button>
                 <button
                   onClick={() => setCurrentDate(new Date())}
@@ -322,11 +322,11 @@ export default function GoalsCalendarPage() {
                 >
                   Today
                 </button>
-                <button
+                <button aria-label="Next"
                   onClick={() => navigateMonth('next')}
                   className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight aria-hidden="true" className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
             </div>

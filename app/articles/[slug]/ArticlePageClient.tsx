@@ -144,7 +144,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
           </section>
         )}
 
-        {/* Article Content or Coming Soon */}
+        {/* Article Content or in-progress placeholder */}
         <section className="px-4 sm:px-6 lg:px-8 pb-20">
           <div className="max-w-3xl mx-auto">
             {hasContent ? (
@@ -168,12 +168,12 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
                 </div>
 
                 <h2 className="text-2xl font-bold text-white mb-4">
-                  Full Article Coming Soon
+                  Article in progress
                 </h2>
 
                 <p className="text-gray-400 mb-8 max-w-md mx-auto">
-                  We&apos;re working on creating comprehensive guides and tutorials to help you get the most out of Rowan.
-                  Check back soon for the full article!
+                  We&apos;re writing comprehensive guides and tutorials to help you get the most out of Rowan.
+                  More content publishes regularly.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

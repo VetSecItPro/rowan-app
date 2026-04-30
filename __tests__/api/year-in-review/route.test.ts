@@ -197,9 +197,11 @@ describe('/api/year-in-review', () => {
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
       vi.mocked(yearInReviewService.generateYearInReview).mockResolvedValue(mockYearInReviewData as any);
 
+      // Use 'json' format to exercise the JSON response branch; 'pdf' returns
+      // a binary PDF body and would require mocking @react-pdf renderer.
       const res = await POST(new NextRequest('http://localhost/api/year-in-review', {
         method: 'POST',
-        body: JSON.stringify({ space_id: validSpaceId, year: 2025, format: 'pdf' }),
+        body: JSON.stringify({ space_id: validSpaceId, year: 2025, format: 'json' }),
       }));
       const data = await res.json();
       expect(res.status).toBe(200);

@@ -433,19 +433,19 @@ export function BulkEventManager({
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
-                          <button
+                          <button aria-label="Reset"
                             onClick={() => handleRestoreEvent(event.id)}
                             className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-colors"
                             title="Restore event"
                           >
-                            <RotateCcw className="w-4 h-4" />
+                            <RotateCcw aria-hidden="true" className="w-4 h-4" />
                           </button>
-                          <button
+                          <button aria-label="Delete"
                             onClick={() => handlePermanentDelete(event.id)}
                             className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                             title="Delete permanently"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
                           </button>
                         </div>
                       </div>

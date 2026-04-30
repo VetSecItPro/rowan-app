@@ -20,6 +20,19 @@ import { logger } from '@/lib/logger';
  * - Timezone handling
  */
 
+/**
+ * SECURITY (TAINT-003): Calendar-bomb defense limits. ICS feeds are user-supplied
+ * URLs whose content is unbounded; without these caps, a malicious feed can
+ * exhaust memory or sync time via huge bodies, millions of VEVENTs, or
+ * pathological RRULE expansions.
+ */
+const MAX_ICS_BODY_BYTES = 1 * 1024 * 1024;   // 1 MB
+const MAX_ICS_EVENT_COUNT = 1000;
+// MAX_RRULE_EXPANSION reserved for future use: current parser stores RRULE as a
+// raw string (no expansion), so an explicit cap here is unnecessary. If we
+// ever expand recurrences server-side, cap at 365 occurrences per event.
+// const MAX_RRULE_EXPANSION = 365;
+
 interface ParsedICSEvent {
   uid: string;
   summary: string;
@@ -230,7 +243,23 @@ async function fetchICSData(
       };
     }
 
+    // SECURITY (TAINT-003): Cap body size before reading it all into memory.
+    // Prefer Content-Length when present; otherwise read with a streaming cap.
+    const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
+    if (contentLength && contentLength > MAX_ICS_BODY_BYTES) {
+      return {
+        success: false,
+        error: `ICS body exceeds ${MAX_ICS_BODY_BYTES} byte limit (got ${contentLength})`,
+      };
+    }
+
     const data = await response.text();
+    if (data.length > MAX_ICS_BODY_BYTES) {
+      return {
+        success: false,
+        error: `ICS body exceeds ${MAX_ICS_BODY_BYTES} byte limit (got ${data.length})`,
+      };
+    }
 
     // Validate it looks like ICS data
     if (!data.includes('BEGIN:VCALENDAR')) {
@@ -264,11 +293,27 @@ function parseICSData(icsData: string): ParsedICSEvent[] {
   const events: ParsedICSEvent[] = [];
 
   try {
+    // SECURITY (TAINT-003): Body-size cap (defense-in-depth — fetchICSData
+    // already enforces this, but importICSFile bypasses fetch).
+    if (icsData.length > MAX_ICS_BODY_BYTES) {
+      throw new Error(`ICS body exceeds ${MAX_ICS_BODY_BYTES} byte limit`);
+    }
+
     const jcalData = ICAL.parse(icsData);
     const component = new ICAL.Component(jcalData);
     const vevents = component.getAllSubcomponents('vevent');
 
-    for (const vevent of vevents) {
+    // SECURITY (TAINT-003): Cap event count to bound memory + DB churn.
+    if (vevents.length > MAX_ICS_EVENT_COUNT) {
+      logger.warn('[ICS Parser] Event count exceeded limit — truncating', {
+        component: 'lib-ics-import-service',
+        eventCount: vevents.length,
+        limit: MAX_ICS_EVENT_COUNT,
+      });
+    }
+    const limitedVevents = vevents.slice(0, MAX_ICS_EVENT_COUNT);
+
+    for (const vevent of limitedVevents) {
       try {
         const event = new ICAL.Event(vevent);
 

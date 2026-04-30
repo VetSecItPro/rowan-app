@@ -374,12 +374,12 @@ const MrrPanel = memo(function MrrPanel() {
       <div className="bg-gray-800 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-white">MRR Movement</h3>
-          <button
+          <button aria-label="Refresh"
             onClick={() => refetch()}
             disabled={isFetching}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -785,12 +785,12 @@ const ConversionsPanel = memo(function ConversionsPanel() {
         <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-white">Subscription Events This Month</h3>
-            <button
+            <button aria-label="Refresh"
               onClick={() => refetch()}
               disabled={isFetching}
               className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

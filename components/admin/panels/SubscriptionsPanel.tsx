@@ -256,11 +256,11 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
               </button>
             ))}
           </div>
-          <button
+          <button aria-label="Refresh"
             onClick={fetchData}
             className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
       </div>

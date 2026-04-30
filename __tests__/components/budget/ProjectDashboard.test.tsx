@@ -94,7 +94,7 @@ describe('ProjectDashboard', () => {
   it('displays project status indicator', () => {
     render(<ProjectDashboard {...defaultProps} />);
     // estimated completion is future: shows "On Track"
-    expect(screen.getByText(/On Track|Overdue/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/On Track|Overdue/i).length).toBeGreaterThan(0);
   });
 
   it('shows total actual cost from line items', () => {

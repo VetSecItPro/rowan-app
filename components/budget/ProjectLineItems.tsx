@@ -364,27 +364,27 @@ export function ProjectLineItems({
 
                     <div className="flex items-center gap-2">
                       {!item.is_paid && (
-                        <button
+                        <button aria-label="Confirm"
                           onClick={() => handleMarkPaid(item.id)}
                           className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-colors"
                           title="Mark as paid"
                         >
-                          <CheckCircle className="w-4 h-4" />
+                          <CheckCircle aria-hidden="true" className="w-4 h-4" />
                         </button>
                       )}
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => handleEditItem(item)}
                         className="p-2 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
                         title="Edit item"
                       >
-                        <Edit3 className="w-4 h-4" />
+                        <Edit3 aria-hidden="true" className="w-4 h-4" />
                       </button>
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDeleteItem(item.id)}
                         className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                         title="Delete item"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 aria-hidden="true" className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

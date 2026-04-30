@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       .update({ status: 'processing' })
       .eq('id', exportId);
 
-    logger.info(`🔄 Starting data export for user ${userId}, format: ${format}`, { component: 'api-route' });
+    logger.info('Starting data export', { component: 'api-route', userId, format });
 
     try {
       // Gather all user data
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       // Send email notification with download link
       await sendExportCompletionEmail(userId, fileUrl, fileName, format, expiresAt);
 
-      logger.info(`✅ Data export completed for user ${userId}, file: ${fileName}`, { component: 'api-route' });
+      logger.info('Data export completed', { component: 'api-route', userId, fileName });
 
       return NextResponse.json({
         success: true,
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
 async function gatherUserData(userId: string) {
   const supabase = await createClient();
 
-  logger.info(`📊 Gathering data for user ${userId}...`, { component: 'api-route' });
+  logger.info('Gathering user data for export', { component: 'api-route', userId });
 
   // User profile and account information
   const { data: profile } = await supabase
@@ -272,7 +272,7 @@ async function gatherUserData(userId: string) {
     },
   };
 
-  logger.info(`✅ Data gathered: ${Object.keys(userData).length} categories`, { component: 'api-route' });
+  logger.info('Data gathered for export', { component: 'api-route', categoryCount: Object.keys(userData).length });
   return userData;
 }
 
@@ -423,7 +423,7 @@ async function uploadExportFile(fileName: string, fileBuffer: Buffer): Promise<s
   const baseUrl = getAppUrl();
   const fileUrl = `${baseUrl}/api/privacy/download-export?file=${encodeURIComponent(fileName)}`;
 
-  logger.info(`📁 Mock upload: ${fileName} (${fileBuffer.length} bytes)`, { component: 'api-route' });
+  logger.info('Mock upload', { component: 'api-route', fileName, sizeBytes: fileBuffer.length });
 
   // In production, you would:
   // 1. Upload to cloud storage
@@ -528,7 +528,7 @@ async function sendExportCompletionEmail(
         email_address: profile.email,
       });
 
-    logger.info(`📧 Export completion email sent to ${profile.email}`, { component: 'api-route' });
+    logger.info('Export completion email sent', { component: 'api-route', email: profile.email });
   } catch (error) {
     logger.error('Error sending export completion email:', error, { component: 'api-route', action: 'api_request' });
   }
@@ -607,7 +607,7 @@ async function sendExportFailureEmail(userId: string) {
         email_address: profile.email,
       });
 
-    logger.info(`📧 Export failure email sent to ${profile.email}`, { component: 'api-route' });
+    logger.info('Export failure email sent', { component: 'api-route', email: profile.email });
   } catch (error) {
     logger.error('Error sending export failure email:', error, { component: 'api-route', action: 'api_request' });
   }

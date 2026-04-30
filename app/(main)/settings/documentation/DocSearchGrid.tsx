@@ -113,7 +113,7 @@ export function DocSearchGrid({ features }: { features: DocFeature[] }) {
                   {feature.description}
                 </p>
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400">
-                  Coming Soon
+                  In development
                 </div>
               </div>
             );

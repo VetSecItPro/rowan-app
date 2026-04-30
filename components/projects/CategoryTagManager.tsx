@@ -359,7 +359,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                       {POPULAR_ICONS.map((iconName) => {
                         const IconComponent = getIconComponent(iconName);
                         return (
-                          <button
+                          <button aria-label="Action"
                             key={iconName}
                             onClick={() => setCategoryIcon(iconName)}
                             className={`p-2 rounded-lg transition-colors ${
@@ -368,7 +368,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                                 : 'hover:bg-gray-700 text-gray-400'
                             }`}
                           >
-                            <IconComponent className="w-5 h-5" />
+                            <IconComponent aria-hidden="true" className="w-5 h-5" />
                           </button>
                         );
                       })}
@@ -458,17 +458,17 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button
+                        <button aria-label="Edit"
                           onClick={() => handleEditCategory(category)}
                           className="p-2 text-blue-600 hover:bg-blue-900/20 rounded-lg transition-colors"
                         >
-                          <Edit2 className="w-5 h-5" />
+                          <Edit2 aria-hidden="true" className="w-5 h-5" />
                         </button>
-                        <button
+                        <button aria-label="Delete"
                           onClick={() => handleDeleteCategory(category.id)}
                           className="p-2 text-red-600 hover:bg-red-900/20 rounded-lg transition-colors"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 aria-hidden="true" className="w-5 h-5" />
                         </button>
                       </div>
                     </div>
@@ -575,17 +575,17 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                       {tag.name}
                     </span>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => handleEditTag(tag)}
                         className="p-1 text-blue-600 hover:bg-blue-900/20 rounded"
                       >
-                        <Edit2 className="w-3 h-3" />
+                        <Edit2 aria-hidden="true" className="w-3 h-3" />
                       </button>
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDeleteTag(tag.id)}
                         className="p-1 text-red-600 hover:bg-red-900/20 rounded"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 aria-hidden="true" className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

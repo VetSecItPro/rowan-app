@@ -18,6 +18,33 @@ const { mockUseAuth } = vi.hoisted(() => {
   return { mockUseAuth };
 });
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: () => {
+    const auth = mockUseAuth();
+    return {
+      ...auth,
+      profile: null,
+      spaces: auth.user ? [{ id: 'space-1', name: 'Test Space' }] : [],
+      currentSpace: auth.user ? { id: 'space-1', name: 'Test Space' } : null,
+      hasZeroSpaces: !auth.user,
+      authLoading: false,
+      profileLoading: false,
+      spacesLoading: false,
+      isReady: true,
+      authError: null,
+      spacesError: null,
+      error: null,
+      signUp: vi.fn(),
+      signIn: vi.fn(),
+      refreshProfile: vi.fn(),
+      switchSpace: vi.fn(),
+      refreshSpaces: vi.fn(),
+      createSpace: vi.fn(),
+      deleteSpace: vi.fn(),
+    };
+  },
+}));
+
 vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));

@@ -161,7 +161,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
                 {formatDate(user.last_sign_in_at)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
+                <button aria-label="View"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedUser(user);
@@ -169,7 +169,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
                   className="text-blue-400 hover:text-blue-300 transition-colors"
                   title="Manage user"
                 >
-                  <Eye className="w-4 h-4" />
+                  <Eye aria-hidden="true" className="w-4 h-4" />
                 </button>
               </td>
             </tr>

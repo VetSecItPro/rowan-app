@@ -163,11 +163,11 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <button
+          <button aria-label="Close report"
             onClick={onClose}
             className="mr-4 p-2 text-gray-400 hover:text-gray-300"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft aria-hidden="true" className="h-5 w-5" />
           </button>
           <div>
             <h3 className="text-lg font-medium text-white">

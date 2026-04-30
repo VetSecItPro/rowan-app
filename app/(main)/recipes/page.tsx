@@ -490,13 +490,13 @@ export default function RecipesPage() {
                         <ExternalLink className="w-5 h-5" />
                       </a>
                     )}
-                    <button
+                    <button aria-label="Delete"
                       onClick={() => handleDelete(recipe.id)}
                       disabled={deletingId === recipe.id}
                       className="p-2 bg-red-900/30 text-red-400 rounded-lg hover:bg-red-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Delete recipe"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 aria-hidden="true" className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

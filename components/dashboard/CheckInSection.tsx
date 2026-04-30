@@ -561,20 +561,20 @@ const JournalCalendarView = memo(function JournalCalendarView({
     <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
       {/* Month Navigation */}
       <div className="flex items-center justify-between px-2">
-        <button
+        <button aria-label="Previous"
           onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
           className="p-2 hover:bg-pink-900/30 rounded-lg transition-colors"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-300" />
+          <ChevronLeft aria-hidden="true" className="w-5 h-5 text-gray-300" />
         </button>
         <h3 className="text-lg font-semibold text-white">
           {format(calendarMonth, 'MMMM yyyy')}
         </h3>
-        <button
+        <button aria-label="Next"
           onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
           className="p-2 hover:bg-pink-900/30 rounded-lg transition-colors"
         >
-          <ChevronRight className="w-5 h-5 text-gray-300" />
+          <ChevronRight aria-hidden="true" className="w-5 h-5 text-gray-300" />
         </button>
       </div>
 

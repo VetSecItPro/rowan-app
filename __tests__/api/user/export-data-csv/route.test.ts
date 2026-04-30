@@ -75,11 +75,11 @@ describe('/api/user/export-data-csv GET', () => {
 
     const request = new NextRequest('http://localhost/api/user/export-data-csv?type=all');
     const response = await GET(request);
-    const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.success).toBe(true);
-    expect(data.files).toContain('expenses');
+    // Production now returns a ZIP archive for type=all (not JSON)
+    const contentType = response.headers.get('Content-Type') || '';
+    expect(contentType).toMatch(/zip|octet-stream/);
   });
 
   it('should return a CSV file attachment for type=expenses', async () => {

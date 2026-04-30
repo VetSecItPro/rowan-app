@@ -323,11 +323,11 @@ const SessionsPanel = memo(function SessionsPanel() {
             <Clock className="w-4 h-4 text-purple-500" />
             <h3 className="text-sm font-semibold text-white">Activity by Hour (UTC)</h3>
           </div>
-          <button
+          <button aria-label="Refresh"
             onClick={() => refetch()}
             className="text-gray-400 hover:text-gray-300"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
 

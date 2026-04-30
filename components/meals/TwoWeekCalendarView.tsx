@@ -136,11 +136,11 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
               <span className="px-2 py-1 bg-orange-500 text-white text-xs font-medium rounded-full">Today</span>
             )}
           </div>
-          <button
+          <button aria-label="Add"
             onClick={() => onAddMeal(day)}
             className="p-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
           >
-            <Plus className="w-5 h-5" />
+            <Plus aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
 
@@ -214,22 +214,22 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
       {/* Week Navigation Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center justify-center sm:justify-start gap-2">
-          <button
+          <button aria-label="Previous week"
             onClick={handlePreviousWeek}
             className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
             title="Previous 2 weeks"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-400" />
+            <ChevronLeft aria-hidden="true" className="w-5 h-5 text-gray-400" />
           </button>
           <h3 className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">
             {format(firstWeekStart, 'MMM d')} - {format(secondWeekEnd, 'MMM d, yyyy')}
           </h3>
-          <button
+          <button aria-label="Next week"
             onClick={handleNextWeek}
             className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
             title="Next 2 weeks"
           >
-            <ChevronRight className="w-5 h-5 text-gray-400" />
+            <ChevronRight aria-hidden="true" className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 

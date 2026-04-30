@@ -75,9 +75,13 @@ describe('storage-service', () => {
     mockBucket.getPublicUrl.mockReturnValue({ data: { publicUrl: 'https://example.com/file.jpg' } });
   });
 
+  // SRV-002: storage-service now verifies magic bytes match declared MIME.
+  // Tests that exercise the success path must use real JPEG magic bytes (FF D8 FF).
+  const jpegMagicBytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01]);
+
   describe('uploadFile', () => {
     it('should upload file successfully', async () => {
-      const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+      const file = new File([jpegMagicBytes], 'test.jpg', { type: 'image/jpeg' });
 
       mockBucket.upload.mockResolvedValueOnce({
         data: { path: 'user1/12345-test.jpg' },
@@ -138,7 +142,7 @@ describe('storage-service', () => {
 
   describe('uploadAvatar', () => {
     it('should upload avatar and update user profile', async () => {
-      const file = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
+      const file = new File([jpegMagicBytes], 'avatar.jpg', { type: 'image/jpeg' });
 
       // 1. Get current avatar: .from('users').select('avatar_url').eq('id', userId).single()
       mockSupabaseClient.single.mockResolvedValueOnce({ data: { avatar_url: null }, error: null });
@@ -163,7 +167,7 @@ describe('storage-service', () => {
 
   describe('uploadRecipeImage', () => {
     it('should upload recipe image successfully', async () => {
-      const file = new File(['content'], 'recipe.jpg', { type: 'image/jpeg' });
+      const file = new File([jpegMagicBytes], 'recipe.jpg', { type: 'image/jpeg' });
 
       mockBucket.upload.mockResolvedValueOnce({
         data: { path: 'user1/recipe.jpg' },

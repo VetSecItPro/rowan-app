@@ -173,19 +173,19 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button
+                        <button aria-label="Download"
                           onClick={() => handleDownload(attachment)}
                           className="p-2 text-blue-600 hover:bg-blue-900 rounded-lg"
                           title="Download"
                         >
-                          <Download className="w-4 h-4" />
+                          <Download aria-hidden="true" className="w-4 h-4" />
                         </button>
-                        <button
+                        <button aria-label="Delete"
                           onClick={() => handleDeleteClick(attachment.id)}
                           className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
                           title="Delete"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 aria-hidden="true" className="w-4 h-4" />
                         </button>
                       </div>
                     </div>

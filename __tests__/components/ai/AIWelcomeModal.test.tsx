@@ -3,6 +3,33 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => ({
+    user: { id: 'user-1', email: 'test@example.com' },
+    session: { access_token: 'test-token' },
+    profile: null,
+    spaces: [{ id: 'space-1', name: 'Test Space' }],
+    currentSpace: { id: 'space-1', name: 'Test Space' },
+    hasZeroSpaces: false,
+    authLoading: false,
+    profileLoading: false,
+    spacesLoading: false,
+    loading: false,
+    isReady: true,
+    authError: null,
+    spacesError: null,
+    error: null,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshProfile: vi.fn(),
+    switchSpace: vi.fn(),
+    refreshSpaces: vi.fn(),
+    createSpace: vi.fn(),
+    deleteSpace: vi.fn(),
+  })),
+}));
+
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
     get: (_: unknown, tag: string) =>
@@ -81,10 +108,11 @@ describe('AIWelcomeModal', () => {
     expect(screen.getByText('Manage Your Schedule')).toBeTruthy();
   });
 
-  it('advances to third capability and shows Try It Now', () => {
+  it('advances to last capability and shows Try It Now', () => {
     render(
       <AIWelcomeModal isOpen={true} onClose={vi.fn()} onTryIt={vi.fn()} />
     );
+    fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Next'));
     expect(screen.getByText('Try It Now')).toBeTruthy();
@@ -97,16 +125,17 @@ describe('AIWelcomeModal', () => {
     );
     fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Next'));
+    fireEvent.click(screen.getByText('Next'));
     fireEvent.click(screen.getByText('Try It Now'));
     expect(onTryIt).toHaveBeenCalledTimes(1);
   });
 
-  it('renders 3 step indicator dots', () => {
+  it('renders step indicator dots for each capability', () => {
     render(
       <AIWelcomeModal isOpen={true} onClose={vi.fn()} onTryIt={vi.fn()} />
     );
     const stepDots = screen.getAllByLabelText(/Step/);
-    expect(stepDots).toHaveLength(3);
+    expect(stepDots).toHaveLength(4);
   });
 
   it('navigates to step when dot is clicked', () => {

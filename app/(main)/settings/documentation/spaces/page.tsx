@@ -1307,8 +1307,7 @@ export default function SpacesDocumentationPage() {
                   Owners cannot leave their space directly. If you&apos;re the Owner and want to leave:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Transfer ownership to another member (feature coming soon)</li>
-                  <li>Or delete the space entirely if no longer needed</li>
+                  <li>Delete the space entirely if no longer needed</li>
                 </ul>
 
                 <div className="p-4 bg-amber-900/30 border border-amber-800 rounded-lg mt-6">

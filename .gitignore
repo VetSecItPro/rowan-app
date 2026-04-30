@@ -187,6 +187,9 @@ docs/CI-CD-SETUP.md
 # Launch readiness reports
 .launch-reports/
 
+# Compliance audit reports (may contain sensitive findings)
+.compliance-reports/
+
 # Compliance documentation (confidential enterprise docs)
 .compliance-docs-reports/
 
@@ -213,3 +216,4 @@ household-balance-*.png
 .deps-audit.json
 .perf-reports/
 .monitor-reports/
+.a11y-reports/

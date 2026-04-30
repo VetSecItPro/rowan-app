@@ -440,19 +440,19 @@ function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <button
+          <button aria-label="Edit"
             onClick={() => onEdit(vendor)}
             className="p-2 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
             title="Edit vendor"
           >
-            <Edit3 className="w-4 h-4" />
+            <Edit3 aria-hidden="true" className="w-4 h-4" />
           </button>
-          <button
+          <button aria-label="Delete"
             onClick={() => onDelete(vendor.id)}
             className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
             title="Delete vendor"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
       </div>

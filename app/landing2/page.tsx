@@ -1,5 +1,16 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Rowan — Family life, organized',
+  description: 'Privacy-first family organizer for tasks, calendar, meals, budgets, and goals. Designed for households broadly.',
+  openGraph: {
+    title: 'Rowan — Family life, organized',
+    description: 'Privacy-first family organizer for tasks, calendar, meals, budgets, and goals.',
+    type: 'website',
+  },
+};
 
 const trustBadges = ['Privacy-first defaults', 'Real-time sync', 'Designed for mobile', 'Polished dark mode'];
 

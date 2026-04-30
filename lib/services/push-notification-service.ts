@@ -8,6 +8,16 @@
  * Supported providers:
  * - Firebase Cloud Messaging (FCM v1 API) - requires FIREBASE_SERVICE_ACCOUNT env var
  * - Expo Push Notifications - requires EXPO_ACCESS_TOKEN env var
+ *
+ * SECURITY (supabaseAdmin justification):
+ * This service uses the service-role client (bypasses RLS) by design.
+ * - `notifySpaceMembers` must read OTHER users' push_tokens within the same space —
+ *   the calling user's RLS context can't see peers' device rows.
+ * - Auto-deactivating invalid tokens (FCM 404 / Expo DeviceNotRegistered) requires
+ *   writing to push_tokens rows that don't belong to the request's authenticated user.
+ * - Background notifiers (cron, webhooks) often have no user session at all.
+ * Caller MUST scope by `space_id` / `user_id` explicitly — there is no RLS net here.
+ * Never expose this module's functions to the client; they are internal-only.
  */
 
 import { supabaseAdmin } from '@/lib/supabase/admin';

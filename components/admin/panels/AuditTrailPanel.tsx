@@ -192,12 +192,12 @@ const AuditTrailContent = memo(function AuditTrailContent() {
             <option value="signup">Signups</option>
           </select>
         </div>
-        <button
+        <button aria-label="Refresh"
           onClick={() => refetch()}
           disabled={isFetching}
           className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-400 hover:text-amber-400 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
         </button>
       </div>
 

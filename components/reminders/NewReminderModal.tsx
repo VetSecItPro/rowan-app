@@ -269,12 +269,12 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                 placeholder="Enter reminder title..."
                 className="w-full px-4 pr-12 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-white"
               />
-              <button
+              <button aria-label="Insert emoji"
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-700 rounded transition-colors z-10"
               >
-                <Smile className="w-5 h-5 text-gray-400" />
+                <Smile aria-hidden="true" className="w-5 h-5 text-gray-400" />
               </button>
 
               {/* Custom Emoji Picker */}

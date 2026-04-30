@@ -349,8 +349,8 @@ export default function BudgetAnalyticsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {report.pdf_url && (
-                        <button className="p-1 text-gray-400 hover:text-gray-300">
-                          <Download className="w-4 h-4" />
+                        <button aria-label="Download" className="p-1 text-gray-400 hover:text-gray-300">
+                          <Download aria-hidden="true" className="w-4 h-4" />
                         </button>
                       )}
                       <button

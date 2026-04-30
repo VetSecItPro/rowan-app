@@ -174,11 +174,11 @@ export function NudgeCard({
 
         {/* Actions menu */}
         <div className="relative">
-          <button
+          <button aria-label="More options"
             onClick={() => setShowMenu(!showMenu)}
             className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
           >
-            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+            <MoreHorizontal aria-hidden="true" className="w-4 h-4 text-gray-400" />
           </button>
 
           {showMenu && (

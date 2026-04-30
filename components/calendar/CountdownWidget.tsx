@@ -147,11 +147,11 @@ export function CountdownWidget({
           </div>
           {onAddCountdown && (
             <div className="relative group">
-              <button
+              <button aria-label="Add countdown"
                 onClick={onAddCountdown}
                 className="flex items-center gap-1 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-800 hover:text-purple-400"
               >
-                <CalendarPlus className="h-4 w-4" />
+                <CalendarPlus aria-hidden="true" className="h-4 w-4" />
               </button>
               <span className="absolute right-0 top-full mt-1 px-2 py-1 text-xs font-medium text-white bg-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                 Add countdown

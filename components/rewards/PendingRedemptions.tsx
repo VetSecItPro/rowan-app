@@ -191,12 +191,12 @@ export function PendingRedemptions({
             )}
           </h3>
         </Tooltip>
-        <button
+        <button aria-label="Refresh"
           onClick={loadRedemptions}
           disabled={loading}
           className="p-1.5 text-gray-400 hover:text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw aria-hidden="true" className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
