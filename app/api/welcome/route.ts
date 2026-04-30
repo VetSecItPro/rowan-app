@@ -156,6 +156,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (ownedMembership?.space_id) {
+      // nosemgrep: supabase-missing-space-id-filter — `spaces` IS the tenant root; .eq('id', spaceId) is canonical (same pattern as seed-first-day-service.ts merged in PR #324)
       const { error: spaceUpdateError } = await supabase
         .from('spaces')
         .update({ name: cleanSpaceName, updated_at: nowIso })
