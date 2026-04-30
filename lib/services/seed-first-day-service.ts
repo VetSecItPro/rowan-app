@@ -86,6 +86,7 @@ export async function seedFirstDayContent(
   // Idempotency: read current settings, bail if already seeded.
   // We must not double-seed if createSpace ever runs twice for the same space.
   try {
+    // nosemgrep: supabase-missing-space-id-filter — `spaces` IS the tenant root table; filter is .eq('id', spaceId) which is the space identity itself
     const { data: spaceRow, error: spaceErr } = await supabase
       .from('spaces')
       .select('settings')
@@ -207,6 +208,7 @@ export async function seedFirstDayContent(
         current_value: 0,
         completed: false,
       }));
+      // nosemgrep: supabase-missing-space-id-filter — goal_milestones is space-scoped via FK to goals.id (RLS on goal_milestones requires the parent goal to belong to a space the user is in)
       const { data: milestones, error: msErr } = await supabase
         .from('goal_milestones')
         .insert(rows)
@@ -226,6 +228,7 @@ export async function seedFirstDayContent(
   // Persist idempotency flag + provenance on the space, so a future
   // "remove all seeded content" Settings action can clean these up by ID.
   try {
+    // nosemgrep: supabase-missing-space-id-filter — re-read of `spaces` settings before update; `spaces` IS the tenant root, filter is .eq('id', spaceId)
     const { data: currentRow } = await supabase
       .from('spaces')
       .select('settings')
@@ -238,6 +241,7 @@ export async function seedFirstDayContent(
       seeded_first_day_items: created,
       seeded_first_day_for_user: userId,
     };
+    // nosemgrep: supabase-missing-space-id-filter — updating `spaces` by id is the canonical pattern for the tenant root; RLS enforces user is owner/member
     const { error: updErr } = await supabase
       .from('spaces')
       .update({ settings: newSettings })
