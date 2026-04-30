@@ -1,13 +1,10 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useRef } from 'react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
-const Player = dynamic(() => import('@remotion/player').then(m => ({ default: m.Player })), { ssr: false });
-import { HeroShowcase } from '@/remotion/compositions/HeroShowcase';
 
 interface HeroSectionProps {
   onSignupClick: () => void;
@@ -117,20 +114,13 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
               className="flex justify-center lg:justify-end"
             >
               <div className="w-full max-w-[680px] rounded-2xl overflow-hidden border border-gray-800/40 bg-black shadow-2xl shadow-black/40">
-                <Player
-                  component={HeroShowcase}
-                  durationInFrames={300}
-                  fps={30}
-                  compositionWidth={1280}
-                  compositionHeight={720}
-                  style={{ width: '100%' }}
-                  loop
-                  autoPlay
-                  controls={false}
-                  showVolumeControls={false}
-                  clickToPlay={false}
-                  numberOfSharedAudioTags={0}
-                  acknowledgeRemotionLicense
+                <Image
+                  src="/marketing/dashboard-desktop.webp"
+                  alt="Rowan dashboard showing today's tasks, calendar, and AI assistant"
+                  width={1440}
+                  height={900}
+                  priority
+                  className="w-full h-auto"
                 />
               </div>
             </motion.div>
