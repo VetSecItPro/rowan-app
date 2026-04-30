@@ -1,3 +1,17 @@
+/**
+ * Rate Limiting (Upstash Redis primary + in-memory fallback)
+ *
+ * Redis is the source of truth — only it gives us correct cross-instance counts
+ * across Vercel's serverless fan-out. The in-memory fallback in ratelimit-fallback.ts
+ * triggers ONLY when Redis env vars are absent (local dev) OR when a Redis call
+ * throws (Upstash outage). Fallback counts are per-instance, so during outages
+ * the effective limit scales with concurrent serverless instances — accepted as
+ * graceful degradation vs blocking all traffic.
+ *
+ * Tier-specific limiters (AI chat Pro vs Family) are keyed by userId, not IP,
+ * because abuse targets per-account spend, not per-IP throughput.
+ */
+
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { fallbackRateLimit } from './ratelimit-fallback';
@@ -123,8 +137,12 @@ export async function checkAISuggestionsRateLimit(
 }
 
 /**
- * Helper function to check rate limits with automatic fallback
- * Uses Redis if available, otherwise falls back to in-memory rate limiting
+ * Check a rate limit with Redis-then-fallback semantics.
+ *
+ * Returns `{ success: true }` even on Redis errors (we degrade to per-instance
+ * in-memory counts) — the only failure mode that returns `success: false` is
+ * the user actually exceeding the limit. Callers must NOT treat a thrown
+ * exception as "rate limited"; this function never throws.
  */
 export async function checkRateLimit(
   ip: string,

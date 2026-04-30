@@ -10,7 +10,7 @@ import { ComprehensiveNotificationCenter } from '@/components/notifications/Comp
 
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus, Sparkles } from 'lucide-react';
+import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus, HelpCircle } from 'lucide-react';
 import { useAdminStatus } from '@/lib/hooks/useAdminStatus';
 import { AI_WELCOME_REOPEN_EVENT } from '@/components/ai/AIOnboardingGate';
 import { useChatContextSafe } from '@/lib/contexts/chat-context';
@@ -139,17 +139,17 @@ export function Header() {
               </div>
             )}
 
-            {/* AI Welcome re-open button — fires the AIOnboardingGate's modal
+            {/* AI Welcome re-open button - fires the AIOnboardingGate's modal
                 from anywhere via custom event. Users who dismissed the first-visit
                 modal can revisit the AI tour without resetting localStorage. */}
             {user && aiAvailable && (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent(AI_WELCOME_REOPEN_EVENT))}
                 className="hidden sm:flex items-center justify-center w-10 h-10 hover:bg-gray-700 rounded-md transition-colors active:scale-95"
-                aria-label="Show Rowan AI tour"
-                title="Show Rowan AI tour"
+                aria-label="Open AI assistant guide"
+                title="Open AI assistant guide"
               >
-                <Sparkles className="w-5 h-5 text-blue-400 hover:text-blue-300 transition-colors" />
+                <HelpCircle className="w-5 h-5 text-blue-400 hover:text-blue-300 transition-colors" />
               </button>
             )}
 

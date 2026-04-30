@@ -3,8 +3,11 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { CheckSquare, Search, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X } from 'lucide-react';
+import { CheckSquare, Search, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X, CalendarCheck, Trash2, Wallet } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { StarterSuggestions, type StarterSuggestion } from '@/components/shared/StarterSuggestions';
+import { tasksService } from '@/lib/services/tasks-service';
+import { choresService } from '@/lib/services/chores-service';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -27,6 +30,23 @@ import { PointsDisplay } from '@/components/rewards';
 import { useTasksData } from '@/lib/hooks/useTasksData';
 import { useTasksModals } from '@/lib/hooks/useTasksModals';
 import { useTasksHandlers } from '@/lib/hooks/useTasksHandlers';
+
+// Starter suggestions shown in the empty state — tuned to common household items.
+type TaskStarter =
+  | { kind: 'chore'; title: string; frequency: 'weekly' | 'monthly' | 'daily' }
+  | { kind: 'task'; title: string };
+
+const TASKS_STARTERS_DATA: Record<string, TaskStarter> = {
+  trash: { kind: 'chore', title: 'Take out the trash', frequency: 'weekly' },
+  meals: { kind: 'task', title: "Plan this week's meals" },
+  rent: { kind: 'chore', title: 'Pay rent / mortgage', frequency: 'monthly' },
+};
+
+const TASKS_STARTERS: StarterSuggestion[] = [
+  { id: 'trash', label: 'Take out the trash', hint: 'Recurring weekly chore', icon: Trash2 },
+  { id: 'meals', label: "Plan this week's meals", hint: 'One-time task', icon: CalendarCheck },
+  { id: 'rent', label: 'Pay rent / mortgage', hint: 'Recurring monthly chore', icon: Wallet },
+];
 
 export default function TasksPage() {
   // --- Hook wiring ---
@@ -357,6 +377,41 @@ export default function TasksPage() {
                         primaryAction={{ label: 'Browse Templates', onClick: () => modals.openTemplatePicker() }}
                         secondaryAction={{ label: 'Add From Scratch', onClick: () => openCreateModal('task') }}
                       />
+                      {currentSpace && user && (
+                        <StarterSuggestions
+                          tone="blue"
+                          suggestions={TASKS_STARTERS}
+                          onPick={async (id) => {
+                            const starter = TASKS_STARTERS_DATA[id];
+                            if (!starter) return;
+                            if (starter.kind === 'chore') {
+                              await choresService.createChore({
+                                space_id: currentSpace.id,
+                                title: starter.title,
+                                frequency: starter.frequency,
+                                created_by: user.id,
+                              });
+                              data.refreshChores();
+                            } else {
+                              await tasksService.createTask({
+                                space_id: currentSpace.id,
+                                title: starter.title,
+                                created_by: user.id,
+                                status: 'pending',
+                                priority: 'medium',
+                                description: null,
+                                assigned_to: null,
+                                due_date: null,
+                                category: null,
+                                quick_note: null,
+                                tags: null,
+                                calendar_sync: false,
+                              });
+                              data.refreshTasks();
+                            }
+                          }}
+                        />
+                      )}
                       <AIContextualHint
                         featureKey="tasks"
                         prompt="Add 'clean kitchen' to my tasks for today"

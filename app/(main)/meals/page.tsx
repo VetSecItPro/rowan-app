@@ -4,8 +4,9 @@
 export const dynamic = 'force-dynamic';
 
 import { memo } from 'react';
-import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, X, CheckSquare } from 'lucide-react';
+import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, X, CheckSquare, Soup, Beef, Sandwich } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { StarterSuggestions, type StarterSuggestion } from '@/components/shared/StarterSuggestions';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import Link from 'next/link';
@@ -30,6 +31,53 @@ import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper
 import { useMealsData } from '@/lib/hooks/useMealsData';
 import { useMealsHandlers } from '@/lib/hooks/useMealsHandlers';
 import { useMealsModals } from '@/lib/hooks/useMealsModals';
+
+// Starter recipes: each click creates one saved recipe so the user has something to plan against.
+interface MealStarterRecipe {
+  name: string;
+  description: string;
+  ingredients: string[];
+  instructions: string;
+  prep_time: number;
+  cook_time: number;
+  servings: number;
+}
+
+const MEAL_STARTERS_DATA: Record<string, MealStarterRecipe> = {
+  pasta: {
+    name: 'Pasta with marinara',
+    description: 'Quick weeknight pasta with marinara sauce.',
+    ingredients: ['Pasta (1 lb)', 'Marinara sauce (24 oz)', 'Olive oil (2 tbsp)', 'Garlic (2 cloves)', 'Parmesan (to taste)'],
+    instructions: 'Boil pasta until al dente. Warm sauce with garlic and olive oil. Toss together. Top with parmesan.',
+    prep_time: 5,
+    cook_time: 15,
+    servings: 4,
+  },
+  stirfry: {
+    name: 'Stir-fry',
+    description: 'Vegetable stir-fry over rice.',
+    ingredients: ['Rice (2 cups)', 'Mixed vegetables (4 cups)', 'Soy sauce (3 tbsp)', 'Sesame oil (1 tbsp)', 'Garlic (2 cloves)', 'Ginger (1 tsp)', 'Protein of choice (1 lb)'],
+    instructions: 'Cook rice. Heat oil in wok, sear protein, add vegetables and aromatics, finish with soy sauce. Serve over rice.',
+    prep_time: 10,
+    cook_time: 15,
+    servings: 4,
+  },
+  tacos: {
+    name: 'Tacos',
+    description: 'Weeknight tacos with simple toppings.',
+    ingredients: ['Tortillas (8)', 'Ground beef or beans (1 lb)', 'Taco seasoning (1 packet)', 'Lettuce (1 cup)', 'Cheese (1 cup)', 'Salsa', 'Lime (1)'],
+    instructions: 'Brown protein with seasoning. Warm tortillas. Assemble with toppings and a squeeze of lime.',
+    prep_time: 10,
+    cook_time: 15,
+    servings: 4,
+  },
+};
+
+const MEAL_STARTERS: StarterSuggestion[] = [
+  { id: 'pasta', label: 'Pasta with marinara', hint: '4 servings · 20 min', icon: Soup },
+  { id: 'stirfry', label: 'Stir-fry', hint: '4 servings · 25 min', icon: Beef },
+  { id: 'tacos', label: 'Tacos', hint: '4 servings · 25 min', icon: Sandwich },
+];
 
 // Memoized meal card component with meal planning orange color
 const MemoizedMealCardWithColors = memo(({
@@ -553,14 +601,27 @@ export default function MealsPage() {
                     </p>
                   </div>
                 ) : (
-                  <EmptyState
-                    feature="meals"
-                    icon={ChefHat}
-                    title="Your recipe collection awaits"
-                    description="Save your favorite recipes to quickly plan meals and generate shopping lists. Paste a recipe URL and Rowan will extract it automatically."
-                    primaryAction={{ label: 'Add Recipe', onClick: handleOpenRecipeModal }}
-                    secondaryAction={{ label: 'Import from URL', onClick: handleOpenRecipeImport }}
-                  />
+                  <>
+                    <EmptyState
+                      feature="meals"
+                      icon={ChefHat}
+                      title="Your recipe collection awaits"
+                      description="Save your favorite recipes to quickly plan meals and generate shopping lists. Paste a recipe URL and Rowan will extract it automatically."
+                      primaryAction={{ label: 'Add Recipe', onClick: handleOpenRecipeModal }}
+                      secondaryAction={{ label: 'Import from URL', onClick: handleOpenRecipeImport }}
+                    />
+                    {spaceId && (
+                      <StarterSuggestions
+                        tone="orange"
+                        suggestions={MEAL_STARTERS}
+                        onPick={async (id) => {
+                          const starter = MEAL_STARTERS_DATA[id];
+                          if (!starter) return;
+                          await handleCreateRecipe({ space_id: spaceId, ...starter });
+                        }}
+                      />
+                    )}
+                  </>
                 )
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
@@ -782,13 +843,27 @@ export default function MealsPage() {
                     </p>
                   </div>
                 ) : (
-                  <EmptyState
-                    feature="meals"
-                    title="Plan your week of meals"
-                    description="Plan meals ahead of time to eat healthier and reduce stress. Need ideas? Browse 5 recipe sources for inspiration."
-                    primaryAction={{ label: 'Plan a Meal', onClick: handleOpenMealModal }}
-                    secondaryAction={{ label: 'Discover Recipes', onClick: handleOpenRecipeDiscover }}
-                  />
+                  <>
+                    <EmptyState
+                      feature="meals"
+                      title="Plan your week of meals"
+                      description="Plan meals ahead of time to eat healthier and reduce stress. Need ideas? Browse 5 recipe sources for inspiration."
+                      primaryAction={{ label: 'Plan a Meal', onClick: handleOpenMealModal }}
+                      secondaryAction={{ label: 'Discover Recipes', onClick: handleOpenRecipeDiscover }}
+                    />
+                    {spaceId && (
+                      <StarterSuggestions
+                        heading="Save a starter recipe:"
+                        tone="orange"
+                        suggestions={MEAL_STARTERS}
+                        onPick={async (id) => {
+                          const starter = MEAL_STARTERS_DATA[id];
+                          if (!starter) return;
+                          await handleCreateRecipe({ space_id: spaceId, ...starter });
+                        }}
+                      />
+                    )}
+                  </>
                 )
               ) : (
                 <div className="space-y-4">

@@ -879,6 +879,35 @@ export async function sendDailyDigestEmail(data: DailyDigestData): Promise<Email
 }
 
 /**
+ * Renders the AI Daily Digest email template to HTML without sending.
+ *
+ * Used by the in-app preview UI so users can see what their morning briefing
+ * will look like before opting in. Shares the exact same template that the
+ * cron-driven send path uses, so preview === actual email.
+ *
+ * @param data - Same digest payload accepted by sendAIDailyDigestEmail
+ * @returns Rendered HTML string
+ */
+export async function renderAIDailyDigestHTML(data: AIDailyDigestData): Promise<string> {
+  const AIDailyDigestEmail = (await import('@/lib/emails/templates/AIDailyDigestEmail')).default;
+
+  return render(AIDailyDigestEmail({
+    recipientName: data.recipientName,
+    date: data.date,
+    spaceName: data.spaceName,
+    spaceId: data.spaceId,
+    events: data.events,
+    tasksDue: data.tasksDue,
+    overdueTasks: data.overdueTasks,
+    meals: data.meals,
+    reminders: data.reminders,
+    narrativeIntro: data.narrativeIntro,
+    closingMessage: data.closingMessage,
+    aiGenerated: data.aiGenerated,
+  }));
+}
+
+/**
  * Sends an AI-enhanced daily digest email with personalized narrative content.
  *
  * Similar to the standard daily digest but includes AI-generated introduction

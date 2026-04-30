@@ -3,8 +3,9 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
+import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp, Milk, Egg, Wheat } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { StarterSuggestions, type StarterSuggestion } from '@/components/shared/StarterSuggestions';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
@@ -31,6 +32,19 @@ const STARTER_ESSENTIALS_ITEMS = [
   { name: 'Bread', quantity: 1 },
   { name: 'Coffee', quantity: 1 },
   { name: 'Bananas', quantity: 1 },
+];
+
+// One-tap starter items: each creates a tiny shopping list seeded with that staple.
+const SHOPPING_STARTERS_DATA: Record<string, { listTitle: string; itemName: string }> = {
+  milk: { listTitle: 'Quick pickup: Milk', itemName: 'Milk' },
+  eggs: { listTitle: 'Quick pickup: Eggs', itemName: 'Eggs' },
+  bread: { listTitle: 'Quick pickup: Bread', itemName: 'Bread' },
+};
+
+const SHOPPING_STARTERS: StarterSuggestion[] = [
+  { id: 'milk', label: 'Milk', hint: 'Single-item list', icon: Milk },
+  { id: 'eggs', label: 'Eggs', hint: 'Single-item list', icon: Egg },
+  { id: 'bread', label: 'Bread', hint: 'Single-item list', icon: Wheat },
 ];
 
 export default function ShoppingPage() {
@@ -327,6 +341,22 @@ export default function ShoppingPage() {
                       },
                     }}
                   />
+                  {currentSpace && (
+                    <StarterSuggestions
+                      tone="emerald"
+                      suggestions={SHOPPING_STARTERS}
+                      onPick={async (id) => {
+                        const starter = SHOPPING_STARTERS_DATA[id];
+                        if (!starter) return;
+                        await handleCreateList({
+                          space_id: currentSpace.id,
+                          title: starter.listTitle,
+                          status: 'active',
+                          items: [{ name: starter.itemName, quantity: 1 }],
+                        });
+                      }}
+                    />
+                  )}
                   <AIContextualHint
                     featureKey="shopping"
                     prompt="Add milk, eggs, and bread to my grocery list"

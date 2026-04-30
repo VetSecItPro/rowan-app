@@ -318,9 +318,11 @@ export const calendarService = {
   },
 
   /**
-   * Permanently deletes all soft-deleted events in a space (admin function).
-   * @param spaceId - The space ID
-   * @returns Object with deleted count and any errors encountered
+   * Permanently purge all soft-deleted events in a space (irreversible).
+   *
+   * Bypasses the 30-day retention window — call only from explicit user-initiated
+   * "empty trash" actions or scheduled retention cleanup. RLS still enforces
+   * space membership; nothing here grants cross-space access.
    */
   async purgeDeletedEvents(spaceId: string): Promise<{ deleted: number; errors: string[] }> {
     const supabase = createClient();
@@ -363,10 +365,11 @@ export const calendarService = {
   },
 
   /**
-   * Retrieves soft-deleted events within the 30-day retention period.
-   * @param spaceId - The space ID
-   * @returns Array of deleted events sorted by deletion date descending
-   * @throws Error if the database query fails
+   * List soft-deleted events still inside the 30-day restore window.
+   *
+   * Older deletes are intentionally hidden from the UI (they're eligible for
+   * permanent purge) so users don't try to restore data we may have already
+   * cleaned up. Pair with `restoreEvent` to bring an event back.
    */
   async getDeletedEvents(spaceId: string): Promise<CalendarEvent[]> {
     const supabase = createClient();
@@ -786,9 +789,14 @@ export const calendarService = {
   // ==========================================
 
   /**
-   * Get events with enhanced recurring event support
-   * This method generates recurring event occurrences dynamically
-   * and can be used as a drop-in replacement for getEvents when you need recurring support
+   * Get events with recurring occurrences expanded at READ time (no materialization).
+   *
+   * We expand RRULE on-demand into virtual occurrences rather than persisting
+   * each occurrence row, so RRULE edits apply retroactively without a backfill
+   * job and we don't bloat the events table with thousands of generated rows.
+   * Trade-off: every range query pays an in-memory expansion cost; the default
+   * 2-month window keeps that bounded. Virtual occurrences carry `series_id`
+   * and `occurrence_date` — use `isRecurringOccurrence` to detect them.
    */
   async getEventsWithRecurring(
     spaceId: string,
