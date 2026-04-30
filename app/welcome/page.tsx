@@ -43,6 +43,7 @@ export default async function WelcomePage() {
   // Find the user's primary owned space — that's the household name we let
   // them edit. If they don't own a space (invited partner who somehow landed
   // here), we still render but pass null so the form hides the household field.
+  // nosemgrep: supabase-missing-space-id-filter — space_members is user-scoped via .eq('user_id', authUser.id); RLS enforces user can only see own membership rows
   const { data: ownedSpace } = await supabase
     .from('space_members')
     .select('spaces:space_id ( id, name )')

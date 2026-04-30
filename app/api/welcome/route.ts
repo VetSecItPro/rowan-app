@@ -146,6 +146,7 @@ export async function POST(request: NextRequest) {
     // Invited partners hit /welcome only as a fallback; they shouldn't be
     // editing the inviter's household name. RLS would reject the update
     // anyway, but the ownership check lets us short-circuit cleanly.
+    // nosemgrep: supabase-missing-space-id-filter — space_members is user-scoped via .eq('user_id', user.id); RLS enforces user can only see own membership rows
     const { data: ownedMembership } = await supabase
       .from('space_members')
       .select('space_id, role')
