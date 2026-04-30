@@ -441,13 +441,13 @@ export const ExecutiveSummaryPanel = memo(function ExecutiveSummaryPanel() {
                     </>
                   )}
                   {!token.is_revoked && (
-                    <button
+                    <button aria-label="Delete"
                       onClick={() => handleRevokeToken(token.id, token.label)}
                       disabled={revokeMutation.isPending}
                       className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
                       title="Revoke access"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 aria-hidden="true" className="w-4 h-4" />
                     </button>
                   )}
                 </div>

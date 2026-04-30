@@ -154,12 +154,12 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
                       </div>
                     )}
                   </div>
-                  <button
+                  <button aria-label="Delete"
                     onClick={() => handleDelete(receipt.id)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-900/30 text-red-400 transition-colors"
                     title="Delete receipt"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 aria-hidden="true" className="w-4 h-4" />
                   </button>
                 </div>
 

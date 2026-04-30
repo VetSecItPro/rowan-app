@@ -13,6 +13,23 @@ vi.mock('@/lib/contexts/auth-context', () => ({
   })),
 }));
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => ({
+    user: { id: 'user-1' },
+    currentSpace: { id: 'space-1', name: 'Test Space' },
+    spaces: [{ id: 'space-1', name: 'Test Space' }],
+    hasZeroSpaces: false,
+    authLoading: false,
+    profileLoading: false,
+    spacesLoading: false,
+    loading: false,
+    isReady: true,
+    authError: null,
+    spacesError: null,
+    error: null,
+  })),
+}));
+
 vi.mock('@/lib/services/budget-goals-linking-service', () => ({
   BUDGET_GOAL_TEMPLATES: {
     emergency_fund: {

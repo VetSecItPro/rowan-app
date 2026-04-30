@@ -354,12 +354,12 @@ export function GoalCheckInModal({
                       </div>
                     </div>
                   </div>
-                  <button
+                  <button aria-label="Remove voice note"
                     type="button"
                     onClick={removeVoiceNote}
                     className="btn-touch p-2 text-red-600 hover:bg-red-900/30 rounded-lg transition-colors active-press"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 aria-hidden="true" className="w-4 h-4" />
                   </button>
                 </div>
 

@@ -17,6 +17,7 @@ vi.mock('@/lib/supabase/admin', () => ({
         listUsers: vi.fn(),
       },
     },
+    from: vi.fn(),
   },
 }));
 
@@ -129,25 +130,24 @@ describe('/api/admin/users', () => {
 
       vi.mocked(verifyAdminAuth).mockResolvedValue({ isValid: true, adminId: 'admin-1' });
 
-      vi.mocked(supabaseAdmin.auth.admin.listUsers).mockResolvedValue({
-        data: {
-          users: [
-            {
-              id: 'user-1',
-              email: 'user1@example.com',
-              created_at: '2024-01-01T00:00:00Z',
-              last_sign_in_at: '2024-01-15T00:00:00Z',
-              email_confirmed_at: '2024-01-01T00:00:00Z',
-              user_metadata: { name: 'User One' },
-            },
-          ],
-          total: 1,
-          nextPage: null,
-          lastPage: 1,
-          aud: '',
-        },
+      // Production now queries .from('profiles').select(...).order(...).range(...)
+      const rangeMock = vi.fn().mockResolvedValue({
+        data: [
+          {
+            id: 'user-1',
+            email: 'user1@example.com',
+            full_name: 'User One',
+            avatar_url: null,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-15T00:00:00Z',
+          },
+        ],
         error: null,
-      } as any);
+        count: 1,
+      });
+      const orderMock = vi.fn().mockReturnValue({ range: rangeMock });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      vi.mocked(supabaseAdmin.from).mockReturnValue({ select: selectMock } as any);
 
       const request = new NextRequest('http://localhost/api/admin/users', {
         method: 'GET',

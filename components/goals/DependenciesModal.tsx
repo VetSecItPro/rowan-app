@@ -469,20 +469,20 @@ export function DependenciesModal({
                         {/* Actions */}
                         <div className="flex items-center gap-2">
                           {dependency.status === 'pending' && (
-                            <button
+                            <button aria-label="Security"
                               onClick={() => handleBypassDependency(dependency.id)}
                               className="p-2 text-orange-400 hover:bg-orange-900/30 rounded-lg transition-colors"
                               title="Bypass dependency"
                             >
-                              <Shield className="w-4 h-4" />
+                              <Shield aria-hidden="true" className="w-4 h-4" />
                             </button>
                           )}
-                          <button
+                          <button aria-label="Delete"
                             onClick={() => handleDeleteDependency(dependency.id)}
                             className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                             title="Remove dependency"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
                           </button>
                         </div>
                       </div>

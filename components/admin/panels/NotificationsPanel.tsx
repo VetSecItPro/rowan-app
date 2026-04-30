@@ -196,11 +196,11 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
               className="w-48 pl-9 pr-3 py-1.5 text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white"
             />
           </div>
-          <button
+          <button aria-label="Refresh"
             onClick={fetchData}
             className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
       </div>

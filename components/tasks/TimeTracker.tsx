@@ -97,19 +97,19 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
       {isTracking ? (
         <div className="flex items-center gap-2">
           <span className="text-sm font-mono text-blue-600">{formatTime(elapsed)}</span>
-          <button
+          <button aria-label="Pause timer"
             onClick={stopTimer}
             className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
           >
-            <Pause className="w-4 h-4" />
+            <Pause aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
       ) : (
-        <button
+        <button aria-label="Start timer"
           onClick={startTimer}
           className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
         >
-          <Play className="w-4 h-4" />
+          <Play aria-hidden="true" className="w-4 h-4" />
         </button>
       )}
     </div>

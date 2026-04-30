@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           </Link>
 
           <h1 className="text-4xl font-bold text-white mb-4">Privacy Policy</h1>
-          <p className="text-gray-400 mb-8">Last updated: January 2026</p>
+          <p className="text-gray-400 mb-8">Last updated: April 29, 2026</p>
 
           <div className="prose prose-invert max-w-none">
             {/* Data Controller Section - GDPR Required */}
@@ -233,6 +233,40 @@ export default function PrivacyPage() {
             </section>
 
             {/* Third-Party Processors - GDPR Required */}
+            {/* Subprocessor List - per industry standard (Atlassian/Notion-style) */}
+            <section className="mb-8" id="subprocessors">
+              <h2 className="text-2xl font-semibold text-white mb-4">Subprocessors</h2>
+              <p className="text-gray-300 mb-4">
+                We use the following subprocessors to deliver our service. Each operates under a Data Processing
+                Agreement requiring confidentiality, security, and use of data only on our instructions.
+              </p>
+              <div className="overflow-x-auto mb-4">
+                <table className="min-w-full text-sm border border-gray-700 rounded-lg overflow-hidden">
+                  <thead className="bg-gray-800">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-white">Subprocessor</th>
+                      <th className="px-4 py-2 text-left text-white">Purpose</th>
+                      <th className="px-4 py-2 text-left text-white">Data Categories</th>
+                      <th className="px-4 py-2 text-left text-white">Location</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700">
+                    <tr className="bg-gray-900"><td className="px-4 py-2 text-gray-300">Supabase</td><td className="px-4 py-2 text-gray-300">Database, auth</td><td className="px-4 py-2 text-gray-300">Account data, app content</td><td className="px-4 py-2 text-gray-300">US/EU</td></tr>
+                    <tr className="bg-gray-800"><td className="px-4 py-2 text-gray-300">Polar</td><td className="px-4 py-2 text-gray-300">Payment processing</td><td className="px-4 py-2 text-gray-300">Billing email, transaction metadata</td><td className="px-4 py-2 text-gray-300">EU</td></tr>
+                    <tr className="bg-gray-900"><td className="px-4 py-2 text-gray-300">Resend</td><td className="px-4 py-2 text-gray-300">Transactional email</td><td className="px-4 py-2 text-gray-300">Email address, message content</td><td className="px-4 py-2 text-gray-300">US</td></tr>
+                    <tr className="bg-gray-800"><td className="px-4 py-2 text-gray-300">Sentry</td><td className="px-4 py-2 text-gray-300">Error tracking</td><td className="px-4 py-2 text-gray-300">Error stack traces, browser metadata</td><td className="px-4 py-2 text-gray-300">US</td></tr>
+                    <tr className="bg-gray-900"><td className="px-4 py-2 text-gray-300">Upstash Redis</td><td className="px-4 py-2 text-gray-300">Rate limiting</td><td className="px-4 py-2 text-gray-300">IP address (hashed)</td><td className="px-4 py-2 text-gray-300">Multi-region</td></tr>
+                    <tr className="bg-gray-800"><td className="px-4 py-2 text-gray-300">OpenRouter</td><td className="px-4 py-2 text-gray-300">AI features (Gemini 2.5 Flash + Llama-4-Maverick fallback)</td><td className="px-4 py-2 text-gray-300">Prompt content during AI tool use</td><td className="px-4 py-2 text-gray-300">US</td></tr>
+                    <tr className="bg-gray-900"><td className="px-4 py-2 text-gray-300">Vercel</td><td className="px-4 py-2 text-gray-300">Hosting</td><td className="px-4 py-2 text-gray-300">All request data</td><td className="px-4 py-2 text-gray-300">US/global edge</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-gray-400 text-sm">
+                We will update this list when subprocessors change. Material changes are also announced via the channels
+                described in &quot;Changes to This Policy&quot; below.
+              </p>
+            </section>
+
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">Third-Party Service Providers (Data Processors)</h2>
               <p className="text-gray-300 mb-4">
@@ -416,6 +450,21 @@ export default function PrivacyPage() {
                       <td className="px-4 py-2 text-gray-300">Until withdrawal + 3 years</td>
                       <td className="px-4 py-2 text-gray-300">Compliance proof</td>
                     </tr>
+                    <tr className="bg-gray-800">
+                      <td className="px-4 py-2 text-gray-300">AI Conversation History</td>
+                      <td className="px-4 py-2 text-gray-300">30 days from creation</td>
+                      <td className="px-4 py-2 text-gray-300">In-product context, then auto-deleted</td>
+                    </tr>
+                    <tr className="bg-gray-900">
+                      <td className="px-4 py-2 text-gray-300">Backups</td>
+                      <td className="px-4 py-2 text-gray-300">30 days rolling</td>
+                      <td className="px-4 py-2 text-gray-300">Disaster recovery</td>
+                    </tr>
+                    <tr className="bg-gray-800">
+                      <td className="px-4 py-2 text-gray-300">Deleted Accounts (soft-delete window)</td>
+                      <td className="px-4 py-2 text-gray-300">30 days, then permanent erasure</td>
+                      <td className="px-4 py-2 text-gray-300">Recovery period before purge</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -540,6 +589,33 @@ export default function PrivacyPage() {
               </ul>
               <p className="text-gray-300">
                 To exercise your CCPA rights, contact us at{' '}
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
+              </p>
+            </section>
+
+            {/* Children's Privacy - 13+ COPPA posture */}
+            <section className="mb-8" id="childrens-privacy">
+              <h2 className="text-2xl font-semibold text-white mb-4">Children&apos;s Privacy</h2>
+              <p className="text-gray-300 mb-4">
+                Rowan is intended for users 13 years of age or older. Parents and guardians may create child sub-profiles
+                within their household to track shared chores, schedules, and rewards, but the account holder must be 13+.
+              </p>
+              <p className="text-gray-300 mb-4">
+                We do not knowingly collect personal information from children under 13. If we learn that we have collected
+                personal information from a child under 13 without verified parental consent, we will delete it promptly.
+                Parents who believe their child under 13 has provided us with personal information may contact us at{' '}
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>{' '}
+                to request deletion.
+              </p>
+            </section>
+
+            {/* EU/UK geo-disclaimer (Art. 27 representative path) */}
+            <section className="mb-8" id="eu-uk-residents">
+              <h2 className="text-2xl font-semibold text-white mb-4">EU and UK Residents</h2>
+              <p className="text-gray-300 mb-4">
+                Rowan is operated from the United States by VetSecItPro. We do not currently target users in the European
+                Union or the United Kingdom. EU/UK residents access this service at their own discretion and may have rights
+                under the GDPR or UK GDPR. To exercise any data subject rights, contact us at{' '}
                 <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
               </p>
             </section>

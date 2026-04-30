@@ -300,19 +300,19 @@ export function EnhancedDayView({
 
                     {/* Action buttons - shown on hover */}
                     <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
+                      <button aria-label="View"
                         onClick={() => onViewDetails(event)}
                         className="p-1 hover:bg-gray-700/50 rounded transition-colors"
                         title="View Details"
                       >
-                        <Eye className="w-3.5 h-3.5 text-gray-400" />
+                        <Eye aria-hidden="true" className="w-3.5 h-3.5 text-gray-400" />
                       </button>
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => onEditEvent(event)}
                         className="p-1 hover:bg-gray-700/50 rounded transition-colors"
                         title="Edit Event"
                       >
-                        <Edit className="w-3.5 h-3.5 text-gray-400" />
+                        <Edit aria-hidden="true" className="w-3.5 h-3.5 text-gray-400" />
                       </button>
                     </div>
                   </div>

@@ -115,12 +115,12 @@ const AIFeedbackPanel = memo(function AIFeedbackPanel() {
             <TrendingUp className="w-5 h-5 text-rose-400" />
             <h3 className="text-sm font-semibold text-white">Engagement Health Distribution</h3>
           </div>
-          <button
+          <button aria-label="Refresh"
             onClick={() => refetch()}
             disabled={isFetching}
             className="text-gray-400 hover:text-gray-300 disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
@@ -369,12 +369,12 @@ const EngagementHealthPanel = memo(function EngagementHealthPanel() {
             <TrendingUp className="w-5 h-5 text-rose-400" />
             <h3 className="text-sm font-semibold text-white">Score Distribution</h3>
           </div>
-          <button
+          <button aria-label="Refresh"
             onClick={() => refetch()}
             disabled={isFetching}
             className="text-gray-400 hover:text-gray-300 disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
 

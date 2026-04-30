@@ -209,10 +209,33 @@ describe('AIContextService', () => {
 
   describe('buildFullContext()', () => {
     it('should return minimal context on error', async () => {
+      // Build a chainable query mock whose terminal awaits resolve to an error
+      // payload. Returning a thenable keeps Promise.all clean (no unhandled
+      // rejections) while still triggering buildFullContext's catch fallback,
+      // because the production code expects { data, error } shapes.
+      const makeFailingChain = () => {
+        const error = new Error('DB unavailable');
+        const chain: Record<string, unknown> = {
+          then: (resolve: (v: { data: null; error: Error }) => void) =>
+            resolve({ data: null, error }),
+        };
+        for (const m of [
+          'select',
+          'eq',
+          'in',
+          'lt',
+          'gte',
+          'limit',
+          'order',
+          'single',
+          'maybeSingle',
+        ]) {
+          chain[m] = vi.fn(() => chain);
+        }
+        return chain;
+      };
       const supabase = {
-        from: vi.fn().mockImplementation(() => {
-          throw new Error('DB unavailable');
-        }),
+        from: vi.fn(() => makeFailingChain()),
       };
 
       const user = { id: 'user-1', email: 'alice@example.com' };
@@ -230,10 +253,33 @@ describe('AIContextService', () => {
     });
 
     it('should use user_metadata.name when available', async () => {
+      // Build a chainable query mock whose terminal awaits resolve to an error
+      // payload. Returning a thenable keeps Promise.all clean (no unhandled
+      // rejections) while still triggering buildFullContext's catch fallback,
+      // because the production code expects { data, error } shapes.
+      const makeFailingChain = () => {
+        const error = new Error('DB unavailable');
+        const chain: Record<string, unknown> = {
+          then: (resolve: (v: { data: null; error: Error }) => void) =>
+            resolve({ data: null, error }),
+        };
+        for (const m of [
+          'select',
+          'eq',
+          'in',
+          'lt',
+          'gte',
+          'limit',
+          'order',
+          'single',
+          'maybeSingle',
+        ]) {
+          chain[m] = vi.fn(() => chain);
+        }
+        return chain;
+      };
       const supabase = {
-        from: vi.fn().mockImplementation(() => {
-          throw new Error('DB unavailable');
-        }),
+        from: vi.fn(() => makeFailingChain()),
       };
 
       const user = {
@@ -252,10 +298,33 @@ describe('AIContextService', () => {
     });
 
     it('should fallback to generic greeting when no name available (F-036: never expose email)', async () => {
+      // Build a chainable query mock whose terminal awaits resolve to an error
+      // payload. Returning a thenable keeps Promise.all clean (no unhandled
+      // rejections) while still triggering buildFullContext's catch fallback,
+      // because the production code expects { data, error } shapes.
+      const makeFailingChain = () => {
+        const error = new Error('DB unavailable');
+        const chain: Record<string, unknown> = {
+          then: (resolve: (v: { data: null; error: Error }) => void) =>
+            resolve({ data: null, error }),
+        };
+        for (const m of [
+          'select',
+          'eq',
+          'in',
+          'lt',
+          'gte',
+          'limit',
+          'order',
+          'single',
+          'maybeSingle',
+        ]) {
+          chain[m] = vi.fn(() => chain);
+        }
+        return chain;
+      };
       const supabase = {
-        from: vi.fn().mockImplementation(() => {
-          throw new Error('DB unavailable');
-        }),
+        from: vi.fn(() => makeFailingChain()),
       };
 
       const user = { id: 'user-1', email: 'john.doe@example.com' };

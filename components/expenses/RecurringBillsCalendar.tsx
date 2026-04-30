@@ -167,22 +167,22 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
 
         {/* Month Navigation */}
         <div className="flex items-center justify-between">
-          <button
+          <button aria-label="Previous month"
             onClick={handlePreviousMonth}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft aria-hidden="true" className="w-5 h-5" />
           </button>
 
           <h3 className="text-xl font-semibold">
             {format(currentMonth, 'MMMM yyyy')}
           </h3>
 
-          <button
+          <button aria-label="Next month"
             onClick={handleNextMonth}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
 

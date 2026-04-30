@@ -361,12 +361,12 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                     >
                       {milestone.title}
                     </span>
-                    <button
+                    <button aria-label="Delete"
                       type="button"
                       onClick={() => handleDeleteMilestone(actualIndex)}
                       className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 aria-hidden="true" className="w-4 h-4" />
                     </button>
                   </div>
                 );
@@ -389,13 +389,13 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
               placeholder="Add a step..."
               className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900 text-white placeholder:text-gray-500"
             />
-            <button
+            <button aria-label="Add milestone"
               type="button"
               onClick={handleAddMilestone}
               disabled={!newMilestoneTitle.trim()}
               className="p-2 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-700 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
             >
-              <Plus className="w-5 h-5" />
+              <Plus aria-hidden="true" className="w-5 h-5" />
             </button>
           </div>
 

@@ -1193,19 +1193,19 @@ export default function CalendarPage() {
                                       </div>
 
                                       <div className="flex gap-2">
-                                        <button
+                                        <button aria-label="View"
                                           onClick={() => handleViewDetails(event)}
                                           className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
                                           title="View Details"
                                         >
-                                          <Eye className="w-4 h-4 text-gray-400" />
+                                          <Eye aria-hidden="true" className="w-4 h-4 text-gray-400" />
                                         </button>
-                                        <button
+                                        <button aria-label="Edit"
                                           onClick={() => handleEditEvent(event)}
                                           className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
                                           title="Edit Event"
                                         >
-                                          <Edit className="w-4 h-4 text-gray-400" />
+                                          <Edit aria-hidden="true" className="w-4 h-4 text-gray-400" />
                                         </button>
                                       </div>
                                     </div>

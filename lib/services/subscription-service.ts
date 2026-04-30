@@ -283,7 +283,8 @@ export async function getUserTier(
 }
 
 /**
- * Check if user has an active subscription
+ * Inherits the throw-on-DB-error behavior of getUserSubscription.
+ * Callers should treat infra failures as 500, not as "no subscription."
  */
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   const subscription = await getUserSubscription(userId);
@@ -291,7 +292,9 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
 }
 
 /**
- * Check if user has a specific tier or higher
+ * Tier hierarchy gate: free < pro < family < owner.
+ * `owner` is staff/internal — granted manually, never via Polar — so it must
+ * remain strictly above paid tiers to short-circuit upgrade nudges.
  */
 export async function hasTierAccess(
   userId: string,
@@ -361,8 +364,10 @@ export async function isSubscriptionExpiringSoon(
 }
 
 /**
- * Create or update subscription
- * Invalidates subscription cache on success
+ * Cache invalidation is best-effort (fire-and-forget). A stale cache here
+ * is bounded by CACHE_TTL.SHORT (~2 min) — acceptable because tier writes
+ * are rare and the next read will refresh. Webhooks should also call this
+ * to keep client-visible tier in sync after Polar events.
  */
 export async function upsertSubscription(
   userId: string,
@@ -390,8 +395,10 @@ export async function upsertSubscription(
 }
 
 /**
- * Cancel subscription (mark as canceled, keep active until period end)
- * Invalidates subscription cache on success
+ * Soft-cancel: status='canceled' but access continues until subscription_ends_at.
+ * Polar bills the customer through period end; downgrading immediately would be
+ * a refund/chargeback risk. Re-check expiration in tier resolution to actually
+ * downgrade. Also writes a subscription_events audit row (compliance trail).
  */
 export async function cancelSubscription(
   userId: string
@@ -460,10 +467,16 @@ export async function reactivateSubscription(
 }
 
 /**
- * Get subscription status with detailed info
+ * Get subscription status with detailed info.
+ *
+ * NOTE: Issues 3 separate calls (`getUserSubscription`, `getSubscriptionExpirationDate`,
+ * `getUserTier`). Calls 2 + 3 hit the cache populated by call 1, so DB cost is one
+ * query in steady state. The pre-authenticated `supabaseClient` is forwarded to
+ * avoid JWT refresh races — passing the request's client guarantees a single auth
+ * context across all three lookups.
  *
  * @param userId - The user ID to fetch subscription status for
- * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
+ * @param supabaseClient - Optional pre-authenticated Supabase client
  */
 export async function getSubscriptionStatus(
   userId: string,

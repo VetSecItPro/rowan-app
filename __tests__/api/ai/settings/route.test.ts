@@ -155,7 +155,8 @@ describe('/api/ai/settings', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('No valid fields provided');
+      // Schema is .strict() so unknown fields are rejected at parse time
+      expect(data.error).toBe('Invalid request data');
     });
 
     it('should update settings successfully with allowed fields', async () => {
@@ -195,7 +196,7 @@ describe('/api/ai/settings', () => {
       );
     });
 
-    it('should strip unknown fields and only update allowed fields', async () => {
+    it('should reject unknown fields under strict schema (no partial accept)', async () => {
       const { featureFlags } = await import('@/lib/constants/feature-flags');
       const { createClient } = await import('@/lib/supabase/server');
       const { updateSettings } = await import('@/lib/services/ai/conversation-persistence-service');
@@ -212,14 +213,9 @@ describe('/api/ai/settings', () => {
         method: 'PUT',
         body: JSON.stringify({ ai_enabled: true, admin_override: true, evil_field: 'hack' }),
       });
-      await PUT(request);
-
-      // Should only pass ai_enabled, not the unknown fields
-      expect(updateSettings).toHaveBeenCalledWith(
-        expect.anything(),
-        USER_ID,
-        { ai_enabled: true }
-      );
+      const response = await PUT(request);
+      expect(response.status).toBe(400);
+      expect(updateSettings).not.toHaveBeenCalled();
     });
   });
 });

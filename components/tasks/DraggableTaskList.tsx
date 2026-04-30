@@ -226,14 +226,14 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
 
       {/* More Menu */}
       <div className="relative">
-        <button
+        <button aria-label="More options"
           onClick={(e) => {
             e.stopPropagation();
             setShowMenu(!showMenu);
           }}
           className="p-1 rounded"
         >
-          <MoreVertical className="w-4 h-4 text-gray-400" />
+          <MoreVertical aria-hidden="true" className="w-4 h-4 text-gray-400" />
         </button>
 
         {showMenu && (

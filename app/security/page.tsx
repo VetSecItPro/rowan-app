@@ -119,7 +119,7 @@ export default function SecurityPage() {
 
             <h3 className="text-xl font-semibold text-white mb-3 mt-6">User Authentication</h3>
             <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-              <li><strong>Multi-Factor Authentication (MFA):</strong> Available for all accounts (coming soon: required for all users)</li>
+              <li><strong>Multi-Factor Authentication (MFA):</strong> Available for all accounts</li>
               <li><strong>Session Management:</strong> Secure session tokens with automatic expiration</li>
               <li><strong>Login Monitoring:</strong> Alerts for suspicious login attempts or new device access</li>
               <li><strong>Forced Logout:</strong> Ability to remotely sign out of all sessions</li>

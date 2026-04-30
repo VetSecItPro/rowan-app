@@ -25,6 +25,20 @@ export function isStaticAsset(pathname: string): boolean {
  * Returns a 403 response on failure, null if validation passes or is not required.
  *
  * Skips validation for: cron routes, webhook routes, CSRF-exempt routes.
+ *
+ * SECURITY (no Bearer exemption): unlike many SPA setups, requests carrying an
+ * Authorization: Bearer header are NOT exempt here. Browser-initiated fetch
+ * still attaches our auth cookie automatically, so a bearer-only carve-out
+ * would let CSRF attackers ride the cookie. Native/server callers must opt
+ * into CSRF_EXEMPT_ROUTES explicitly. Tightened after the cluster B audit.
+ *
+ * SECURITY (origin check): origin is validated before CSRF token comparison.
+ * Vercel preview origins are whitelisted by prefix because preview URLs change
+ * per branch — the prefix `rowan-app-` ensures we don't accept arbitrary
+ * `*.vercel.app` origins.
+ *
+ * Token rotation on every state change defeats fixation: a leaked token from
+ * one request can't be replayed for the next.
  */
 export function checkCsrf(req: NextRequest, response: NextResponse): NextResponse | null {
   const { pathname } = req.nextUrl;

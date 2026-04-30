@@ -3,6 +3,33 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: vi.fn(() => ({
+    user: { id: 'user-1', email: 'test@example.com' },
+    session: { access_token: 'test-token' },
+    profile: null,
+    spaces: [{ id: 'space-1', name: 'Test Space' }],
+    currentSpace: { id: 'space-1', name: 'Test Space' },
+    hasZeroSpaces: false,
+    authLoading: false,
+    profileLoading: false,
+    spacesLoading: false,
+    loading: false,
+    isReady: true,
+    authError: null,
+    spacesError: null,
+    error: null,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshProfile: vi.fn(),
+    switchSpace: vi.fn(),
+    refreshSpaces: vi.fn(),
+    createSpace: vi.fn(),
+    deleteSpace: vi.fn(),
+  })),
+}));
+
 vi.mock('next/link', () => ({
   default: ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) =>
     React.createElement('a', { href, onClick }, children),
@@ -89,9 +116,9 @@ describe('OnboardingWidget', () => {
     expect(screen.getByText('Create a shopping list')).toBeTruthy();
   });
 
-  it('shows set up chore rotation step', () => {
+  it('shows set up recurring chore step', () => {
     render(<OnboardingWidget />);
-    expect(screen.getByText('Set up a chore rotation')).toBeTruthy();
+    expect(screen.getByText('Set up a recurring chore')).toBeTruthy();
   });
 
   it('marks step as completed on link click', () => {

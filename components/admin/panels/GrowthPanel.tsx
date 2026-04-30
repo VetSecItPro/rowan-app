@@ -153,12 +153,12 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
             </button>
           ))}
         </div>
-        <button
+        <button aria-label="Refresh"
           onClick={() => refetch()}
           disabled={isFetching}
           className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
@@ -669,12 +669,12 @@ const TrafficPanel = memo(function TrafficPanel() {
             </button>
           ))}
         </div>
-        <button
+        <button aria-label="Refresh"
           onClick={() => refetch()}
           disabled={isFetching}
           className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
         </button>
       </div>
 

@@ -39,11 +39,11 @@ vi.mock('@/lib/ratelimit-fallback', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn(),
-  },
+  logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
+}));
+
+vi.mock('isomorphic-dompurify', () => ({
+  default: { sanitize: vi.fn((html: string) => html) },
 }));
 
 const USER_ID = '00000000-0000-4000-8000-000000000001';

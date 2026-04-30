@@ -14,6 +14,14 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
+vi.mock('@/lib/ratelimit', () => ({
+  checkGeneralRateLimit: vi.fn().mockResolvedValue({ success: true }),
+}));
+
+vi.mock('@/lib/ratelimit-fallback', () => ({
+  extractIP: vi.fn().mockReturnValue('127.0.0.1'),
+}));
+
 const USER_ID = '00000000-0000-4000-8000-000000000001';
 const CONV_ID_1 = '00000000-0000-4000-8000-000000000050';
 const CONV_ID_2 = '00000000-0000-4000-8000-000000000051';
@@ -59,14 +67,16 @@ describe('/api/ai/data', () => {
         if (table === 'ai_conversations') {
           return {
             select: vi.fn().mockReturnThis(),
-            order: vi.fn().mockResolvedValue({ data: mockConversations, error: null }),
+            order: vi.fn().mockReturnThis(),
+            limit: vi.fn().mockResolvedValue({ data: mockConversations, error: null }),
           };
         }
         if (table === 'ai_messages') {
           return {
             select: vi.fn().mockReturnThis(),
             in: vi.fn().mockReturnThis(),
-            order: vi.fn().mockResolvedValue({ data: mockMessages, error: null }),
+            order: vi.fn().mockReturnThis(),
+            limit: vi.fn().mockResolvedValue({ data: mockMessages, error: null }),
           };
         }
         if (table === 'ai_user_settings') {
@@ -120,7 +130,8 @@ describe('/api/ai/data', () => {
         },
         from: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnThis(),
-          order: vi.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } }),
+          order: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } }),
         }),
       } as any);
 

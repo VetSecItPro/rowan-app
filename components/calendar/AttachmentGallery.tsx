@@ -226,20 +226,20 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
 
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
+                    <button aria-label="Download"
                       onClick={() => handleDownload(attachment)}
                       className="p-2 bg-white/90 hover:bg-white rounded-lg transition-colors"
                       title="Download"
                     >
-                      <Download className="w-4 h-4 text-gray-800" />
+                      <Download aria-hidden="true" className="w-4 h-4 text-gray-800" />
                     </button>
                     {canDelete && attachment.uploaded_by === user?.id && (
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDelete(attachment.id)}
                         className="p-2 bg-red-500/90 hover:bg-red-500 rounded-lg transition-colors"
                         title="Delete"
                       >
-                        <Trash2 className="w-4 h-4 text-white" />
+                        <Trash2 aria-hidden="true" className="w-4 h-4 text-white" />
                       </button>
                     )}
                   </div>
@@ -286,20 +286,20 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
-                    <button
+                    <button aria-label="Download"
                       onClick={() => handleDownload(attachment)}
                       className="p-2 text-gray-400 hover:text-purple-400 rounded-lg hover:bg-gray-800 transition-colors"
                       title="Download"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download aria-hidden="true" className="w-4 h-4" />
                     </button>
                     {canDelete && attachment.uploaded_by === user?.id && (
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDelete(attachment.id)}
                         className="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-gray-800 transition-colors"
                         title="Delete"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 aria-hidden="true" className="w-4 h-4" />
                       </button>
                     )}
                   </div>

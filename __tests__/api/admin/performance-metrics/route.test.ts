@@ -145,38 +145,13 @@ describe('/api/admin/performance-metrics', () => {
       expect(data.error).toContain('Invalid session');
     });
 
-    it('returns 200 with health source metrics when Vercel is not configured', async () => {
+    it('returns 200 with configured=false when Vercel env vars not set', async () => {
       const { GET } = await import('@/app/api/admin/performance-metrics/route');
       await setupAuth(true);
-      const { supabaseAdmin } = await import('@/lib/supabase/admin');
 
-      // Mock the health check: .from('users').select('id').limit(1) => resolves
-      const limitMock = vi.fn().mockResolvedValue({ data: [{ id: 'test-id' }], error: null });
-      const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
-      vi.mocked(supabaseAdmin.from).mockReturnValue({ select: selectMock } as any);
-
-      const req = new NextRequest('http://localhost/api/admin/performance-metrics');
-      const res = await GET(req);
-      const data = await res.json();
-
-      expect(res.status).toBe(200);
-      expect(data.configured).toBe(true);
-      expect(data.source).toBe('health');
-      expect(data.metrics).toBeDefined();
-      expect(typeof data.metrics.p50).toBe('number');
-      expect(typeof data.metrics.p95).toBe('number');
-      expect(typeof data.metrics.p99).toBe('number');
-    });
-
-    it('returns 200 with placeholder when health check fails', async () => {
-      const { GET } = await import('@/app/api/admin/performance-metrics/route');
-      await setupAuth(true);
-      const { supabaseAdmin } = await import('@/lib/supabase/admin');
-
-      // Make the health check throw
-      const limitMock = vi.fn().mockRejectedValue(new Error('DB unavailable'));
-      const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
-      vi.mocked(supabaseAdmin.from).mockReturnValue({ select: selectMock } as any);
+      delete process.env.VERCEL_API_TOKEN;
+      delete process.env.VERCEL_TEAM_ID;
+      delete process.env.VERCEL_PROJECT_ID;
 
       const req = new NextRequest('http://localhost/api/admin/performance-metrics');
       const res = await GET(req);
@@ -184,7 +159,23 @@ describe('/api/admin/performance-metrics', () => {
 
       expect(res.status).toBe(200);
       expect(data.configured).toBe(false);
-      expect(data.source).toBe('placeholder');
+      expect(data.timestamp).toBeDefined();
+    });
+
+    it('returns 200 with configured=false when Vercel env vars missing (no DB health fallback)', async () => {
+      const { GET } = await import('@/app/api/admin/performance-metrics/route');
+      await setupAuth(true);
+
+      delete process.env.VERCEL_API_TOKEN;
+      delete process.env.VERCEL_TEAM_ID;
+      delete process.env.VERCEL_PROJECT_ID;
+
+      const req = new NextRequest('http://localhost/api/admin/performance-metrics');
+      const res = await GET(req);
+      const data = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(data.configured).toBe(false);
       expect(data.timestamp).toBeDefined();
     });
 
@@ -215,10 +206,9 @@ describe('/api/admin/performance-metrics', () => {
       vi.unstubAllGlobals();
     });
 
-    it('falls back to health source when Vercel API call fails', async () => {
+    it('falls back to configured=false when Vercel API call fails', async () => {
       const { GET } = await import('@/app/api/admin/performance-metrics/route');
       await setupAuth(true);
-      const { supabaseAdmin } = await import('@/lib/supabase/admin');
 
       process.env.VERCEL_API_TOKEN = 'test-token';
       process.env.VERCEL_TEAM_ID = 'test-team';
@@ -228,17 +218,13 @@ describe('/api/admin/performance-metrics', () => {
       const mockFetch = vi.fn().mockRejectedValue(new Error('Network error'));
       vi.stubGlobal('fetch', mockFetch);
 
-      // Mock health check to succeed
-      const limitMock = vi.fn().mockResolvedValue({ data: [{ id: 'x' }], error: null });
-      const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
-      vi.mocked(supabaseAdmin.from).mockReturnValue({ select: selectMock } as any);
-
       const req = new NextRequest('http://localhost/api/admin/performance-metrics');
       const res = await GET(req);
       const data = await res.json();
 
       expect(res.status).toBe(200);
-      expect(data.source).toBe('health');
+      // Production no longer falls back to a 'health' source — it returns configured:false
+      expect(data.configured).toBe(false);
 
       vi.unstubAllGlobals();
     });

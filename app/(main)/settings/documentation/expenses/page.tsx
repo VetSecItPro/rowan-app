@@ -1073,9 +1073,9 @@ export default function ExpensesDocumentationPage() {
                 <p className="text-gray-400 leading-relaxed mb-4">
                   Set up approval workflows to review large expenses before they&apos;re recorded, helping maintain budget discipline.
                 </p>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Coming Soon</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Current behavior</h3>
                 <p className="text-gray-400">
-                  Approval workflows are an upcoming feature. Currently, all space members can add expenses directly. Stay tuned for updates!
+                  All space members can add expenses directly. Approval workflows are tracked on our roadmap.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-red-400 hover:underline text-sm font-medium">

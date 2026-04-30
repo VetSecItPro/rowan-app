@@ -188,13 +188,13 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
       <div className="flex items-center gap-2">
         {/* Emoji Picker Button */}
         <div className="relative">
-          <button
+          <button aria-label="Insert emoji"
             type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             title="Add emoji"
             className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
           >
-            <Smile className="w-5 h-5 text-gray-400" />
+            <Smile aria-hidden="true" className="w-5 h-5 text-gray-400" />
           </button>
 
           {/* Emoji Picker Popup */}
@@ -219,23 +219,23 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
         </div>
 
         {/* Image Attachment Button */}
-        <button
+        <button aria-label="Insert image"
           type="button"
           onClick={() => imageInputRef.current?.click()}
           title="Attach image"
           className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
         >
-          <ImageIcon className="w-5 h-5 text-gray-400" />
+          <ImageIcon aria-hidden="true" className="w-5 h-5 text-gray-400" />
         </button>
 
         {/* File Attachment Button */}
-        <button
+        <button aria-label="Attach file"
           type="button"
           onClick={() => fileInputRef.current?.click()}
           title="Attach file"
           className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
         >
-          <Paperclip className="w-5 h-5 text-gray-400" />
+          <Paperclip aria-hidden="true" className="w-5 h-5 text-gray-400" />
         </button>
       </div>
 

@@ -263,13 +263,13 @@ export function DateTimePicker({
               <X className="w-4 h-4 text-gray-400" />
             </button>
           )}
-          <button
+          <button aria-label="Open calendar"
             type="button"
             onClick={() => !disabled && setIsOpen(!isOpen)}
             className="p-1 hover:bg-gray-700 rounded transition-colors"
             title="Open calendar"
           >
-            <Calendar className="w-4 h-4 text-gray-400" />
+            <Calendar aria-hidden="true" className="w-4 h-4 text-gray-400" />
           </button>
         </div>
       </div>
@@ -312,7 +312,7 @@ export function DateTimePicker({
               <div>
                 {/* Month Navigation Header */}
                 <div className="flex items-center justify-between mb-3">
-                  <button
+                  <button aria-label="Previous month"
                     type="button"
                     onClick={goToPreviousMonth}
                     className={`hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
@@ -320,7 +320,7 @@ export function DateTimePicker({
                     }`}
                     title="Previous month"
                   >
-                    <ChevronLeft className={`text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                    <ChevronLeft aria-hidden="true" className={`text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
                   </button>
 
                   <div className={`font-medium text-gray-300 ${isMobile ? 'text-base' : 'text-sm'}`}>
@@ -330,7 +330,7 @@ export function DateTimePicker({
                     })}
                   </div>
 
-                  <button
+                  <button aria-label="Next month"
                     type="button"
                     onClick={goToNextMonth}
                     className={`hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
@@ -338,7 +338,7 @@ export function DateTimePicker({
                     }`}
                     title="Next month"
                   >
-                    <ChevronRight className={`text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                    <ChevronRight aria-hidden="true" className={`text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
                   </button>
                 </div>
 

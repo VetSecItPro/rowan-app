@@ -309,12 +309,12 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
                     <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-500' : 'text-gray-300'}`}>
                       {item.name}
                     </span>
-                    <button
+                    <button aria-label="Delete"
                       type="button"
                       onClick={() => handleRemoveItem(index)}
                       className="p-1 text-red-500 hover:bg-red-900/20 rounded transition-colors"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 aria-hidden="true" className="w-4 h-4" />
                     </button>
                   </div>
                 ))}

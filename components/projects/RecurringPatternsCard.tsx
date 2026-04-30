@@ -252,12 +252,12 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
                     </div>
                     <div className="flex gap-2">
                       {!pattern.user_confirmed && (
-                        <button
+                        <button aria-label="Confirm"
                           onClick={() => handleConfirm(pattern.id)}
                           className="p-2 text-green-600 hover:bg-green-900/20 rounded-lg transition-colors"
                           title="Confirm pattern"
                         >
-                          <Check className="w-5 h-5" />
+                          <Check aria-hidden="true" className="w-5 h-5" />
                         </button>
                       )}
                       <button
@@ -312,12 +312,12 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
                         </div>
                       </div>
                     </div>
-                    <button
+                    <button aria-label="Add"
                       onClick={() => handleCreateExpense(pattern.id)}
                       className="p-2 text-purple-600 hover:bg-purple-900/20 rounded-lg transition-colors"
                       title="Create expense now"
                     >
-                      <Plus className="w-5 h-5" />
+                      <Plus aria-hidden="true" className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

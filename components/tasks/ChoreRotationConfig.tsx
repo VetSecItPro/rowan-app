@@ -190,17 +190,17 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
             >
               {rotation.is_active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
-            <button
+            <button aria-label="Settings"
               onClick={() => setEditing(true)}
               className="p-2 text-gray-600 hover:bg-gray-700 rounded-lg"
             >
-              <Settings className="w-4 h-4" />
+              <Settings aria-hidden="true" className="w-4 h-4" />
             </button>
-            <button
+            <button aria-label="Delete"
               onClick={() => setShowDeleteConfirm(true)}
               className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         )}

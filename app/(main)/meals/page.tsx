@@ -645,20 +645,20 @@ export default function MealsPage() {
                   <div className="w-full space-y-4">
                     {/* Month Navigation */}
                     <div className="flex items-center justify-center gap-2">
-                      <button
+                      <button aria-label="Previous month"
                         onClick={handlePreviousMonth}
                         className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <ChevronLeft className="w-5 h-5 text-gray-400" />
+                        <ChevronLeft aria-hidden="true" className="w-5 h-5 text-gray-400" />
                       </button>
                       <h3 className="text-lg sm:text-xl font-bold text-white">
                         {format(currentMonth, 'MMMM yyyy')}
                       </h3>
-                      <button
+                      <button aria-label="Next month"
                         onClick={handleNextMonth}
                         className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <ChevronRight className="w-5 h-5 text-gray-400" />
+                        <ChevronRight aria-hidden="true" className="w-5 h-5 text-gray-400" />
                       </button>
                     </div>
 
@@ -704,11 +704,11 @@ export default function MealsPage() {
                                           <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-medium rounded-full">Today</span>
                                         )}
                                       </div>
-                                      <button
+                                      <button aria-label="Add meal"
                                         onClick={handleAddMealClick}
                                         className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
                                       >
-                                        <Plus className="w-4 h-4" />
+                                        <Plus aria-hidden="true" className="w-4 h-4" />
                                       </button>
                                     </div>
 

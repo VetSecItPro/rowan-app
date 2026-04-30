@@ -421,13 +421,13 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
 
               {/* Emoji Picker Button */}
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <button
+                <button aria-label="Insert emoji"
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
                   className="p-1.5 rounded-md hover:bg-gray-700 transition-colors"
                 >
-                  <Smile className="w-5 h-5 text-gray-400" />
+                  <Smile aria-hidden="true" className="w-5 h-5 text-gray-400" />
                 </button>
 
                 {/* Emoji Picker Popup */}
@@ -466,23 +466,23 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             />
             <div className="flex items-center gap-2 mt-2">
               {/* Image Attachment Button */}
-              <button
+              <button aria-label="Insert image"
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
                 className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
                 title="Attach images"
               >
-                <ImageIcon className="w-5 h-5 text-gray-400" />
+                <ImageIcon aria-hidden="true" className="w-5 h-5 text-gray-400" />
               </button>
 
               {/* File Attachment Button */}
-              <button
+              <button aria-label="Attach file"
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
                 title="Attach files"
               >
-                <Paperclip className="w-5 h-5 text-gray-400" />
+                <Paperclip aria-hidden="true" className="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>

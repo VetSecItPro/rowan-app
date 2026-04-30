@@ -3,6 +3,8 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
+// useAuthWithSpaces is mocked below to delegate to mockUseAuth so per-test overrides work.
+
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({ push: vi.fn(), back: vi.fn() })),
   usePathname: vi.fn(() => '/'),
@@ -36,6 +38,33 @@ const mockUseAuth = vi.fn(() => ({
 
 vi.mock('@/lib/contexts/auth-context', () => ({
   useAuth: () => mockUseAuth(),
+}));
+
+vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
+  useAuthWithSpaces: () => {
+    const auth = mockUseAuth();
+    return {
+      ...auth,
+      profile: null,
+      spaces: [],
+      currentSpace: null,
+      hasZeroSpaces: true,
+      authLoading: false,
+      profileLoading: false,
+      spacesLoading: false,
+      isReady: true,
+      authError: null,
+      spacesError: null,
+      error: null,
+      signUp: vi.fn(),
+      signIn: vi.fn(),
+      refreshProfile: vi.fn(),
+      switchSpace: vi.fn(),
+      refreshSpaces: vi.fn(),
+      createSpace: vi.fn(),
+      deleteSpace: vi.fn(),
+    };
+  },
 }));
 
 import { PublicHeader } from '@/components/layout/PublicHeader';

@@ -235,11 +235,11 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                             This task blocks the dependent task
                           </p>
                         </div>
-                        <button
+                        <button aria-label="Delete"
                           onClick={() => removeDependency(dep.id)}
                           className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 aria-hidden="true" className="w-4 h-4" />
                         </button>
                       </div>
                     ))}
@@ -267,11 +267,11 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                             Related to this task
                           </p>
                         </div>
-                        <button
+                        <button aria-label="Delete"
                           onClick={() => removeDependency(dep.id)}
                           className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 aria-hidden="true" className="w-4 h-4" />
                         </button>
                       </div>
                     ))}

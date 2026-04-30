@@ -367,7 +367,7 @@ export function EnhancedWeekView({
 
                         {/* Action buttons - shown on hover */}
                         <div className="flex-shrink-0 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
+                          <button aria-label="View"
                             onClick={(e) => {
                               e.stopPropagation();
                               onViewDetails(event);
@@ -375,9 +375,9 @@ export function EnhancedWeekView({
                             className="p-0.5 hover:bg-gray-700/50 rounded transition-colors"
                             title="View Details"
                           >
-                            <Eye className="w-3 h-3 text-gray-400" />
+                            <Eye aria-hidden="true" className="w-3 h-3 text-gray-400" />
                           </button>
-                          <button
+                          <button aria-label="Edit"
                             onClick={(e) => {
                               e.stopPropagation();
                               onEditEvent(event);
@@ -385,7 +385,7 @@ export function EnhancedWeekView({
                             className="p-0.5 hover:bg-gray-700/50 rounded transition-colors"
                             title="Edit Event"
                           >
-                            <Edit className="w-3 h-3 text-gray-400" />
+                            <Edit aria-hidden="true" className="w-3 h-3 text-gray-400" />
                           </button>
                         </div>
                       </div>

@@ -80,11 +80,11 @@ export function SwipeableConversationItem({
     <div className="relative overflow-hidden">
       {/* Delete Button Background */}
       <div className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center">
-        <button
+        <button aria-label="Delete"
           onClick={handleDelete}
           className="w-full h-full flex items-center justify-center text-white active:bg-red-600"
         >
-          <Trash2 className="w-5 h-5" />
+          <Trash2 aria-hidden="true" className="w-5 h-5" />
         </button>
       </div>
 

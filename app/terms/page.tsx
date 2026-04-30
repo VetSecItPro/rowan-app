@@ -110,7 +110,16 @@ export default function TermsPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">Eligibility</h3>
               <p className="text-gray-300 mb-4">
-                You must be at least 18 years old to create an account. By registering, you represent that you meet this requirement.
+                Rowan is intended for users 13 years of age or older. By registering, you represent that you are at
+                least 13. Parents and guardians may create child sub-profiles within their household for shared chores,
+                schedules, and rewards, but the account holder must be 13+. We do not knowingly collect personal
+                information from children under 13. If we learn we have, we will delete it. To request deletion of a
+                child&apos;s data, contact{' '}
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
+              </p>
+              <p className="text-gray-300 mb-4">
+                If you are under 18, you represent that you have your parent or legal guardian&apos;s permission to use Rowan
+                and that they have reviewed and agreed to these Terms on your behalf.
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">Account Security</h3>

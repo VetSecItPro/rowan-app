@@ -49,8 +49,11 @@ class Logger {
     }
 
     if (typeof data === 'string') {
-      // Don't modify strings (might contain legitimate data)
-      return data;
+      // Strip CRLF + other ASCII control chars to prevent log injection (CRLF splitting).
+      // Tab (\t) is preserved; everything else in 0x00-0x1F and 0x7F is replaced with a space.
+      // Truncate overly long strings to bound log size.
+      const stripped = data.replace(/[\x00-\x08\x0B-\x1F\x7F]/g, ' ');
+      return stripped.length > 4096 ? `${stripped.slice(0, 4096)}...[truncated]` : stripped;
     }
 
     if (Array.isArray(data)) {

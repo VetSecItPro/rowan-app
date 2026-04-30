@@ -6,6 +6,14 @@ vi.mock('@/lib/ratelimit', () => ({
   checkGeneralRateLimit: vi.fn(),
 }));
 
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'test-user' } }, error: null }),
+    },
+  }),
+}));
+
 vi.mock('@/lib/ratelimit-fallback', () => ({
   extractIP: vi.fn(() => '127.0.0.1'),
 }));

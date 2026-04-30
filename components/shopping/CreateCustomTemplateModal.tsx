@@ -183,13 +183,13 @@ export function CreateCustomTemplateModal({ isOpen, onClose, onSave, spaceId }: 
                 onChange={(e) => setNewItemQuantity(parseInt(e.target.value) || 1)}
                 className="w-16 px-2 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white text-sm text-center"
               />
-              <button
+              <button aria-label="Add item"
                 type="button"
                 onClick={handleAddItem}
                 disabled={!newItemName.trim()}
                 className="px-4 py-2 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Plus className="w-4 h-4" />
+                <Plus aria-hidden="true" className="w-4 h-4" />
               </button>
             </div>
             <input
@@ -234,12 +234,12 @@ export function CreateCustomTemplateModal({ isOpen, onClose, onSave, spaceId }: 
                         {item.category}
                       </span>
                     )}
-                    <button
+                    <button aria-label="Delete"
                       type="button"
                       onClick={() => handleRemoveItem(index)}
                       className="p-1 text-red-500 hover:bg-red-900/20 rounded transition-colors"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}

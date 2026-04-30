@@ -158,7 +158,7 @@ export default function DoNotSellPage() {
                 </p>
                 <div className="flex items-center gap-2 text-blue-300">
                   <ExternalLink className="w-4 h-4" />
-                  <a href="/privacy-policy" className="hover:underline">
+                  <a href="/privacy" className="hover:underline">
                     Learn more in our Privacy Policy
                   </a>
                 </div>
@@ -343,7 +343,7 @@ export default function DoNotSellPage() {
                         As a non-California resident, you may have other privacy rights under applicable laws in your jurisdiction.
                       </p>
                       <a
-                        href="/privacy-policy"
+                        href="/privacy"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -372,7 +372,7 @@ export default function DoNotSellPage() {
                 <div className="p-4 bg-gray-700 rounded-lg">
                   <h4 className="font-medium text-white mb-2">Additional Resources</h4>
                   <div className="text-sm text-gray-400 space-y-1">
-                    <a href="/privacy-policy" className="block hover:text-blue-400">Privacy Policy</a>
+                    <a href="/privacy" className="block hover:text-blue-400">Privacy Policy</a>
                     <a href="/terms" className="block hover:text-blue-400">Terms of Service</a>
                     <a href="/settings/privacy" className="block hover:text-blue-400">Privacy Settings</a>
                   </div>

@@ -224,12 +224,12 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
 
         {/* Menu button */}
         <div className="flex-shrink-0">
-          <button
+          <button aria-label="More options"
             ref={menuButtonRef}
             onClick={handleMenuToggle}
             className="p-1 text-gray-400 hover:text-gray-300 rounded"
           >
-            <MoreVertical className="w-4 h-4" />
+            <MoreVertical aria-hidden="true" className="w-4 h-4" />
           </button>
 
           {showMenu && typeof document !== 'undefined' && createPortal(

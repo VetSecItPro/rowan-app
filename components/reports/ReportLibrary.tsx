@@ -202,11 +202,11 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                         </p>
                       )}
                     </div>
-                    <button
+                    <button aria-label="Favorite"
                       onClick={() => handleToggleFavorite(report)}
                       className="text-gray-400 hover:text-red-500"
                     >
-                      <Heart className={`h-5 w-5 ${report.is_favorite ? 'text-red-500 fill-red-500' : ''}`} />
+                      <Heart aria-hidden="true" className={`h-5 w-5 ${report.is_favorite ? 'text-red-500 fill-red-500' : ''}`} />
                     </button>
                   </div>
 

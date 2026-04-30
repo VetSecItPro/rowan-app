@@ -101,6 +101,13 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-black text-white`} style={{ scrollbarGutter: 'stable' }}>
+        {/* Skip-to-content link for keyboard / screen-reader users (WCAG 2.4.1 Bypass Blocks) */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Skip to main content
+        </a>
         <MotionProvider>
           <AppQueryProvider>
             <DeviceProvider>

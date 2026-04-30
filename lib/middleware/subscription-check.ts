@@ -70,6 +70,12 @@ export function getFeatureKey(feature: string): FeatureAccessKey | null {
  * );
  * ```
  */
+/**
+ * Feature key takes precedence over tier check. WHY: the canonical truth is
+ * the `getFeatureLimits` table per tier — checking just `requiredTier` would
+ * miss future tier-table changes (e.g. moving a feature from Pro to Family).
+ * Falls back to plain tier comparison only when `feature` doesn't map to a key.
+ */
 export function withSubscriptionCheck(
   handler: RouteHandler,
   requiredTier: SubscriptionTier,

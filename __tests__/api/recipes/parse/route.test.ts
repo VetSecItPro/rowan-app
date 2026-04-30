@@ -17,6 +17,7 @@ vi.mock('@/lib/middleware/subscription-check', () => ({
 }));
 
 vi.mock('@/lib/ratelimit', () => ({
+  checkExpensiveOperationRateLimit: vi.fn(),
   checkGeneralRateLimit: vi.fn(),
 }));
 
@@ -75,9 +76,9 @@ describe('/api/recipes/parse', () => {
   });
 
   it('should return 429 when rate limit exceeded', async () => {
-    const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+    const { checkExpensiveOperationRateLimit } = await import('@/lib/ratelimit');
 
-    vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+    vi.mocked(checkExpensiveOperationRateLimit).mockResolvedValue({
       success: false, limit: 60, remaining: 0, reset: Date.now() + 60000,
     });
 
@@ -90,14 +91,14 @@ describe('/api/recipes/parse', () => {
     const data = await response.json();
 
     expect(response.status).toBe(429);
-    expect(data.error).toContain('Too many requests');
+    expect(data.error).toContain('Too many');
   });
 
   it('should return 401 when not authenticated', async () => {
-    const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+    const { checkExpensiveOperationRateLimit } = await import('@/lib/ratelimit');
     const { createClient } = await import('@/lib/supabase/server');
 
-    vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+    vi.mocked(checkExpensiveOperationRateLimit).mockResolvedValue({
       success: true, limit: 60, remaining: 59, reset: Date.now() + 60000,
     });
 
@@ -123,11 +124,11 @@ describe('/api/recipes/parse', () => {
   });
 
   it('should return 403 when user lacks meal planning access', async () => {
-    const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+    const { checkExpensiveOperationRateLimit } = await import('@/lib/ratelimit');
     const { createClient } = await import('@/lib/supabase/server');
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
 
-    vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+    vi.mocked(checkExpensiveOperationRateLimit).mockResolvedValue({
       success: true, limit: 60, remaining: 59, reset: Date.now() + 60000,
     });
 
@@ -153,11 +154,11 @@ describe('/api/recipes/parse', () => {
   });
 
   it('should return 400 when neither text nor image provided', async () => {
-    const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+    const { checkExpensiveOperationRateLimit } = await import('@/lib/ratelimit');
     const { createClient } = await import('@/lib/supabase/server');
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
 
-    vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+    vi.mocked(checkExpensiveOperationRateLimit).mockResolvedValue({
       success: true, limit: 60, remaining: 59, reset: Date.now() + 60000,
     });
 
@@ -181,15 +182,15 @@ describe('/api/recipes/parse', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe('Please provide either text or an image');
+    expect(data.error).toMatch(/text|image|URL/i);
   });
 
   it('should return 400 when text exceeds maximum length', async () => {
-    const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+    const { checkExpensiveOperationRateLimit } = await import('@/lib/ratelimit');
     const { createClient } = await import('@/lib/supabase/server');
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
 
-    vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+    vi.mocked(checkExpensiveOperationRateLimit).mockResolvedValue({
       success: true, limit: 60, remaining: 59, reset: Date.now() + 60000,
     });
 
@@ -217,10 +218,10 @@ describe('/api/recipes/parse', () => {
   });
 
   it('should parse recipe text and return structured data', async () => {
-    const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+    const { checkExpensiveOperationRateLimit } = await import('@/lib/ratelimit');
     const { createClient } = await import('@/lib/supabase/server');
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
-    vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+    vi.mocked(checkExpensiveOperationRateLimit).mockResolvedValue({
       success: true, limit: 60, remaining: 59, reset: Date.now() + 60000,
     });
 

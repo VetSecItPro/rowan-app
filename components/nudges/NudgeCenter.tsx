@@ -226,35 +226,35 @@ export function NudgeCenter({
           </div>
 
           <div className="flex items-center space-x-2">
-            <button
+            <button aria-label="Refresh"
               onClick={handleRefresh}
               disabled={refreshing}
               className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
               title="Refresh nudges"
             >
-              <RefreshCw className={cn(
+              <RefreshCw aria-hidden="true" className={cn(
                 'w-4 h-4 text-gray-400',
                 refreshing && 'animate-spin'
               )} />
             </button>
 
             {showAnalytics && (
-              <button
+              <button aria-label="View chart"
                 onClick={() => setShowAnalyticsModal(true)}
                 className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
                 title="View analytics"
               >
-                <BarChart3 className="w-4 h-4 text-gray-400" />
+                <BarChart3 aria-hidden="true" className="w-4 h-4 text-gray-400" />
               </button>
             )}
 
             {showSettings && (
-              <button
+              <button aria-label="Settings"
                 onClick={() => setShowSettingsModal(true)}
                 className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
                 title="Nudge settings"
               >
-                <Settings className="w-4 h-4 text-gray-400" />
+                <Settings aria-hidden="true" className="w-4 h-4 text-gray-400" />
               </button>
             )}
           </div>

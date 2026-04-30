@@ -113,11 +113,11 @@ const MemberListItem = memo(function MemberListItem({
       {/* Actions Menu */}
       {showActions && canManageMembers && !isCurrentUser && (
         <div className="relative">
-          <button
+          <button aria-label="More options"
             onClick={() => setShowMenu(!showMenu)}
             className="btn-icon-mobile hover:bg-gray-700 rounded transition-colors flex items-center justify-center"
           >
-            <MoreVertical className="w-4 h-4" />
+            <MoreVertical aria-hidden="true" className="w-4 h-4" />
           </button>
 
           {showMenu && (

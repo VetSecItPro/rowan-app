@@ -406,16 +406,25 @@ class ChatOrchestratorService {
 
   // -- History management --------------------------------------------------
 
-  private getHistory(conversationId: string): ChatCompletionMessageParam[] {
-    return historyCache.get(conversationId) ?? [];
+  /**
+   * SECURITY (TAINT-006): Cache key composed of `userId:conversationId` so cross-user
+   * collisions on the same conversationId are impossible at the cache layer.
+   * RLS already enforces this at the DB layer; this is defense-in-depth.
+   */
+  private cacheKey(conversationId: string, userId: string): string {
+    return `${userId}:${conversationId}`;
   }
 
-  private saveHistory(conversationId: string, history: ChatCompletionMessageParam[]): void {
+  private getHistory(conversationId: string, userId: string): ChatCompletionMessageParam[] {
+    return historyCache.get(this.cacheKey(conversationId, userId)) ?? [];
+  }
+
+  private saveHistory(conversationId: string, userId: string, history: ChatCompletionMessageParam[]): void {
     const trimmed =
       history.length > MAX_HISTORY_ENTRIES
         ? history.slice(history.length - MAX_HISTORY_ENTRIES)
         : history;
-    historyCache.set(conversationId, trimmed);
+    historyCache.set(this.cacheKey(conversationId, userId), trimmed);
   }
 
   // -- Main entry point ----------------------------------------------------
@@ -446,7 +455,7 @@ class ChatOrchestratorService {
         // User confirmed — execute the stored destructive action now
         pendingConfirmations.delete(conversationId);
 
-        const history = this.getHistory(conversationId);
+        const history = this.getHistory(conversationId, context.userId);
         history.push({ role: 'user', content: message });
 
         yield {
@@ -463,7 +472,7 @@ class ChatOrchestratorService {
         history.push({
           role: 'tool',
           tool_call_id: pending.id,
-          content: JSON.stringify(toolResult),
+          content: this.wrapToolResult(toolResult),
         });
 
         yield {
@@ -483,7 +492,7 @@ class ChatOrchestratorService {
           : `Sorry, I wasn't able to complete that action: ${toolResult.message}`;
 
         history.push({ role: 'assistant', content: confirmText });
-        this.saveHistory(conversationId, history);
+        this.saveHistory(conversationId, context.userId, history);
 
         yield { type: 'text', data: confirmText };
         yield { type: 'done', data: '' };
@@ -502,7 +511,7 @@ class ChatOrchestratorService {
         : buildMinimalSystemPrompt(context.userId, 'America/New_York');
 
       const client = this.getClient();
-      const history = this.getHistory(conversationId);
+      const history = this.getHistory(conversationId, context.userId);
 
       // Add user message to history
       history.push({ role: 'user', content: message });
@@ -564,7 +573,7 @@ class ChatOrchestratorService {
         history.push({ role: 'assistant', content: result.text });
       }
 
-      this.saveHistory(conversationId, history);
+      this.saveHistory(conversationId, context.userId, history);
       yield { type: 'done', data: '' };
     } catch (error) {
       logger.error('[ChatOrchestrator] Error processing message:', error, {
@@ -667,6 +676,24 @@ class ChatOrchestratorService {
   private static readonly MAX_TOOL_ROUNDS = 5;
 
   /**
+   * SECURITY (LLM-M-03): Cumulative token cap across all tool-call rounds for
+   * a single user message. Each round can request up to 4096 tokens, but the
+   * total over MAX_TOOL_ROUNDS rounds × N parallel tools could spike costs.
+   * If usage_estimate exceeds this cap mid-loop, we abort further rounds.
+   */
+  private static readonly MAX_CUMULATIVE_TOKENS = 16384;
+
+  /**
+   * SECURITY (LLM-M-04): Wrap untrusted tool result content in delimiter tags
+   * so the model can clearly distinguish system instructions from tool data
+   * and resist indirect prompt injection from tool outputs.
+   */
+  private wrapToolResult(toolResult: unknown): string {
+    const json = JSON.stringify(toolResult);
+    return `<tool_output>\n${json}\n</tool_output>`;
+  }
+
+  /**
    * Process function calls in a multi-turn loop.
    *
    * Non-destructive tools auto-execute immediately and their results are sent
@@ -692,9 +719,28 @@ class ChatOrchestratorService {
   ): AsyncGenerator<ChatStreamEvent> {
     let currentCalls = calls;
     let round = 0;
+    let cumulativeTokens = 0;
 
     while (currentCalls.length > 0 && round < ChatOrchestratorService.MAX_TOOL_ROUNDS) {
       round++;
+
+      // SECURITY (LLM-M-03): Cumulative token circuit breaker. We approximate
+      // tokens by char-length / 4 for tool result payloads (cheap, no extra
+      // API call). If the running total exceeds MAX_CUMULATIVE_TOKENS, abort
+      // further rounds to bound cost on adversarial / runaway tool loops.
+      if (cumulativeTokens > ChatOrchestratorService.MAX_CUMULATIVE_TOKENS) {
+        logger.warn('[ChatOrchestrator] Tool-call token budget exceeded — aborting loop', {
+          component: 'ai-chat-orchestrator',
+          action: 'token_circuit_breaker',
+          cumulativeTokens,
+          round,
+        });
+        yield {
+          type: 'text',
+          data: "I've reached my processing limit for this request. Please try a more specific question.",
+        };
+        return;
+      }
 
       // Separate destructive calls (need confirmation) from safe calls (auto-execute)
       const safeCalls: typeof currentCalls = [];
@@ -757,12 +803,15 @@ class ChatOrchestratorService {
         };
 
         const toolResult = await executeTool(fc.name, fc.args, context);
+        const wrappedResult = this.wrapToolResult(toolResult);
+        cumulativeTokens += Math.ceil(wrappedResult.length / 4);
 
-        // Add tool result to history
+        // Add tool result to history (LLM-M-04: wrapped so model treats tool
+        // output as untrusted data, not as instructions)
         history.push({
           role: 'tool',
           tool_call_id: fc.id,
-          content: JSON.stringify(toolResult),
+          content: wrappedResult,
         });
 
         yield {
@@ -836,6 +885,8 @@ class ChatOrchestratorService {
         }
       }
 
+      cumulativeTokens += Math.ceil(followUpText.length / 4);
+
       // Record follow-up in history
       if (followUpText && nextToolCalls.length === 0) {
         history.push({ role: 'assistant', content: followUpText });
@@ -882,8 +933,8 @@ class ChatOrchestratorService {
   // -- Utilities -----------------------------------------------------------
 
   /** Clear a conversation's history and any pending confirmation from memory */
-  clearConversation(conversationId: string): void {
-    historyCache.delete(conversationId);
+  clearConversation(conversationId: string, userId: string): void {
+    historyCache.delete(this.cacheKey(conversationId, userId));
     pendingConfirmations.delete(conversationId);
   }
 }

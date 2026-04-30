@@ -46,7 +46,10 @@ export async function canAccessFeature(
 }
 
 /**
- * Check if user can perform a usage-limited action
+ * Daily-counter gate (e.g. "max 50 task creations per day on free").
+ * Distinct from `canAccessFeature` (boolean tier gate) — this one increments
+ * and checks usage_records, so calling it on every request is fine but the
+ * caller is responsible for recording usage AFTER the action succeeds.
  */
 export async function canPerformUsageAction(
   userId: string,
@@ -62,7 +65,9 @@ export async function canPerformUsageAction(
 }
 
 /**
- * Check if user can access a numeric-limited feature
+ * Caller passes `currentCount` because counting (e.g. active tasks) requires
+ * a space-scoped query the caller already has. Avoids a second round-trip and
+ * keeps this function pure-ish. Sentinel `-1` from feature-limits = unlimited.
  */
 export async function canUseNumericFeature(
   userId: string,
@@ -97,7 +102,9 @@ export async function canUseNumericFeature(
 }
 
 /**
- * Get comprehensive feature access summary for a user
+ * Bulk snapshot for the settings/billing UI. Issues 4 parallel usage queries
+ * via Promise.all — do NOT call this on every API request (it's expensive
+ * vs. a single `canAccessFeature` check). Intended for the dashboard surface.
  */
 export async function getUserFeatureAccess(userId: string): Promise<{
   tier: SubscriptionTier;
