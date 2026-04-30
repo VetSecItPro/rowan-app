@@ -97,21 +97,49 @@ function validateImportUrl(url: string): { ok: true; parsed: URL } | { ok: false
 /**
  * Fetch a URL and return its body as plain text (HTML stripped).
  * Returns null if the fetch fails or response isn't text-shaped.
+ *
+ * SSRF defense: redirects are followed manually with each hop's URL re-validated
+ * through validateImportUrl. A public hostname can otherwise 302 to AWS IMDS
+ * (169.254.169.254) or RFC1918 hosts; auto-follow with redirect:'follow' bypasses
+ * the one-time validation.
  */
 async function fetchUrlAsText(url: string): Promise<string | null> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), URL_FETCH_TIMEOUT_MS);
-    const response = await fetch(url, {
-      signal: controller.signal,
-      redirect: 'follow',
-      headers: {
-        // Identify ourselves so cooking sites can apply their public-content policies
-        'User-Agent': 'Mozilla/5.0 (compatible; RowanRecipeBot/1.0; +https://rowanapp.com)',
-        'Accept': 'text/html,application/xhtml+xml',
-      },
-    });
+
+    let currentUrl = url;
+    let response: Response | null = null;
+    const MAX_REDIRECTS = 3;
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      response = await fetch(currentUrl, {
+        signal: controller.signal,
+        redirect: 'manual',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; RowanRecipeBot/1.0; +https://rowanapp.com)',
+          'Accept': 'text/html,application/xhtml+xml',
+        },
+      });
+      const status = response.status;
+      if (status >= 300 && status < 400) {
+        const location = response.headers.get('location');
+        if (!location || hop === MAX_REDIRECTS) {
+          clearTimeout(timer);
+          return null;
+        }
+        const nextUrl = new URL(location, currentUrl).toString();
+        const recheck = validateImportUrl(nextUrl);
+        if (!recheck.ok) {
+          clearTimeout(timer);
+          return null;
+        }
+        currentUrl = nextUrl;
+        continue;
+      }
+      break;
+    }
     clearTimeout(timer);
+    if (!response) return null;
     if (!response.ok) return null;
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('xhtml')) {

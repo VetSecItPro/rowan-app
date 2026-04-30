@@ -189,12 +189,34 @@ async function fetchICSData(
       headers['If-Modified-Since'] = previousLastModified;
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      // 30 second timeout
-      signal: AbortSignal.timeout(30000),
-    });
+    // SSRF defense: follow redirects manually so each hop is re-validated via
+    // validateICSUrl. A feed host can otherwise 302 to AWS IMDS / RFC1918, and
+    // DNS rebinding could swap A records between the initial validate and fetch.
+    let currentUrl = url;
+    let response: Response;
+    const MAX_REDIRECTS = 3;
+    for (let hop = 0; ; hop++) {
+      response = await fetch(currentUrl, {
+        method: 'GET',
+        headers,
+        redirect: 'manual',
+        signal: AbortSignal.timeout(30000),
+      });
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get('location');
+        if (!location || hop >= MAX_REDIRECTS) {
+          return { success: false, error: 'Too many redirects or missing Location header' };
+        }
+        const nextUrl = new URL(location, currentUrl).toString();
+        const recheck = validateICSUrl(nextUrl);
+        if (!recheck.valid) {
+          return { success: false, error: `Redirect target rejected: ${recheck.error}` };
+        }
+        currentUrl = recheck.normalizedUrl;
+        continue;
+      }
+      break;
+    }
 
     // Handle 304 Not Modified
     if (response.status === 304) {
