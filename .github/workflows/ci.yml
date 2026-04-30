@@ -3,6 +3,15 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    # Skip CI for asset / docs / backlog-only PRs. Build cost saver — these
+    # files can't change runtime behavior so build + lighthouse + bundle
+    # checks are wasted minutes. Note: scripts/ is intentionally NOT here
+    # because admin scripts run as service_role and need the security audit.
+    paths-ignore:
+      - 'public/marketing/**'
+      - 'public/screenshots/**'
+      - '**/*.md'
+      - 'docs/**'
 
 # F-019: Minimal token permissions — prevents supply-chain attacks from
 # exfiltrating the GITHUB_TOKEN with write access.
