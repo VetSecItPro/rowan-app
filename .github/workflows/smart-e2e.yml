@@ -70,7 +70,11 @@ jobs:
     name: Run E2E Tests
     needs: seed-users
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Playwright config has retries=2 in CI; with the current test count
+    # the suite consistently lands in the 25-45 min range. 60 min keeps
+    # headroom for a third retry on a flaky individual spec without
+    # cancelling the whole job.
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
