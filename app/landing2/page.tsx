@@ -18,19 +18,19 @@ const logoStrip = ['Households', 'Couples', 'Parents', 'Busy pros', 'Organizers'
 
 const highlights = [
   {
-    title: 'Everything in one place',
+    title: 'AI that creates tasks, events & reminders by chat',
     description:
-      'Tasks, calendar, shopping, meals, reminders, goals, and budgets — designed as one coherent system.',
+      "Tell Rowan in plain language: 'remind me to take out trash on Tuesdays' - and it just does it. Real natural-language scheduling, not autocomplete.",
   },
   {
-    title: 'Made for couples + families',
+    title: 'See if it’s fair',
     description:
-      'Share responsibility without the chaos. Assign, comment, track progress, and stay in sync automatically.',
+      'A live fairness donut shows how household work splits across members. Stop the “is it fair?” arguments - see the actual data.',
   },
   {
-    title: 'Fast, private, dependable',
+    title: 'Daily digest, every morning',
     description:
-      'A premium experience that respects your time and your data — with security-minded defaults.',
+      'Get one email at 7am with what’s coming, what’s done, and what each member did. The morning briefing, not the inbox firehose.',
   },
 ];
 

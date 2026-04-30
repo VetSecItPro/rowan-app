@@ -20,7 +20,8 @@ import {
   BellOff,
   Send,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Eye
 } from 'lucide-react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { notificationPreferencesService } from '@/lib/services/notification-preferences-service';
@@ -275,6 +276,12 @@ export const NotificationSettings = memo(function NotificationSettings() {
   const [pushError, setPushError] = useState<string | null>(null);
   const [pushTestSuccess, setPushTestSuccess] = useState(false);
 
+  // Daily digest preview state — renders the actual email template inline
+  // so the user can see exactly what they'd get at their delivery time.
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
   // Load preferences
   useEffect(() => {
     async function loadPreferences() {
@@ -363,6 +370,29 @@ export const NotificationSettings = memo(function NotificationSettings() {
       setPushLoading(false);
     }
   }, [pushSubscribed]);
+
+  // Load a render-only preview of today's digest from the server. Re-uses
+  // the exact email template the cron uses, so what the user sees here is
+  // what they'd get at 7am.
+  const handlePreviewDigest = useCallback(async () => {
+    setPreviewLoading(true);
+    setPreviewError(null);
+    try {
+      const res = await fetch('/api/notifications/digest-preview');
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setPreviewError(data.error || 'Failed to load preview');
+        setPreviewHtml(null);
+      } else {
+        setPreviewHtml(data.html as string);
+      }
+    } catch (err) {
+      logger.error('Digest preview error:', err, { component: 'NotificationSettings', action: 'component_action' });
+      setPreviewError(err instanceof Error ? err.message : 'Failed to load preview');
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, []);
 
   // Send test push notification
   const handleTestPush = useCallback(async () => {
@@ -730,6 +760,58 @@ export const NotificationSettings = memo(function NotificationSettings() {
               disabled={!preferences.digest_enabled}
             />
           </SettingRow>
+        </div>
+
+        {/* Preview today's digest — server-renders the actual email template
+            so users can see exactly what shows up at delivery time. */}
+        <div className="pt-4 border-t border-gray-700">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white">Preview today&apos;s digest</p>
+              <p className="text-xs text-gray-400">
+                See exactly what you&apos;d get in your inbox right now.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handlePreviewDigest}
+              disabled={previewLoading}
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-purple-900/30 text-purple-300 hover:bg-purple-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {previewLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Rendering...
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  Preview today&apos;s digest
+                </>
+              )}
+            </button>
+          </div>
+
+          {previewError && (
+            <div className="mt-3 p-3 bg-red-900/20 border border-red-800 rounded-lg text-sm text-red-300 flex items-center gap-2">
+              <AlertCircle aria-hidden="true" className="w-4 h-4 flex-shrink-0" />
+              {previewError}
+            </div>
+          )}
+
+          {previewHtml && (
+            <div className="mt-4 rounded-lg overflow-hidden border border-gray-700 bg-white">
+              {/* Email HTML is rendered in a sandboxed iframe to isolate its
+                  styles from the app shell and to prevent script execution. */}
+              <iframe
+                title="Daily digest preview"
+                srcDoc={previewHtml}
+                sandbox=""
+                className="w-full"
+                style={{ height: '720px', border: 0 }}
+              />
+            </div>
+          )}
         </div>
       </Section>
 

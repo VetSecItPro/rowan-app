@@ -1,4 +1,4 @@
-import { sendAIDailyDigestEmail, AIDailyDigestData, DailyDigestData } from '@/lib/services/email-service';
+import { sendAIDailyDigestEmail, renderAIDailyDigestHTML, AIDailyDigestData, DailyDigestData } from '@/lib/services/email-service';
 import { digestGeneratorService, DigestInput } from '@/lib/services/ai/digest-generator-service';
 import { logger } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase/admin';
@@ -437,4 +437,110 @@ async function fetchDigestData(
       reminder_time: r.reminder_time,
     })),
   };
+}
+
+/**
+ * Render the AI Daily Digest as HTML for a single user, using the same data
+ * fetching and AI generation pipeline as the scheduled send. Does not send
+ * the email. Used by the in-app preview UI in Settings -> Notifications so
+ * users can see exactly what their morning briefing will look like.
+ *
+ * Throws if the user has no profile or no space membership yet.
+ */
+export async function renderDigestForUser(userId: string): Promise<{
+  html: string;
+  aiGenerated: boolean;
+}> {
+  // Load user's notification preferences (timezone + digest_time drive AI tone)
+  const { data: pref } = await supabaseAdmin
+    .from('user_notification_preferences')
+    .select('digest_time, digest_timezone')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  const digestTime = pref?.digest_time || '07:00';
+  const digestTimezone = pref?.digest_timezone || 'America/Chicago';
+
+  // Profile (for name/email)
+  const { data: profile, error: profileError } = await supabaseAdmin
+    .from('profiles')
+    .select('id, email, name')
+    .eq('id', userId)
+    .single();
+
+  if (profileError || !profile) {
+    throw new Error('User profile not found');
+  }
+
+  // First space membership (matches send-path behavior)
+  const { data: membership } = await supabaseAdmin
+    .from('space_members')
+    .select('space_id, spaces(id, name)')
+    .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
+
+  const spaceRow = membership as unknown as SpaceMember | null;
+  if (!spaceRow || !spaceRow.spaces) {
+    throw new Error('No space found for user');
+  }
+
+  const spaceId = spaceRow.spaces.id;
+  const spaceName = spaceRow.spaces.name;
+
+  const now = new Date();
+  const digestData = await fetchDigestData(userId, spaceId, digestTimezone);
+
+  const timeOfDay = getTimeOfDay(digestTime);
+  const dayOfWeek = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    timeZone: digestTimezone,
+  }).format(now);
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: digestTimezone,
+  }).format(now);
+
+  const aiInput: DigestInput = {
+    recipientName: profile.name || 'there',
+    date: formattedDate,
+    dayOfWeek,
+    timeOfDay,
+    events: digestData.events,
+    tasksDue: digestData.tasksDue,
+    overdueTasks: digestData.overdueTasks,
+    meals: digestData.meals,
+    reminders: digestData.reminders,
+    timezone: digestTimezone,
+  };
+
+  let aiContent;
+  const aiResult = await digestGeneratorService.generateDigest(aiInput);
+  if (aiResult.success) {
+    aiContent = aiResult.data;
+  } else {
+    aiContent = digestGeneratorService.generateFallbackDigest(aiInput);
+  }
+
+  const emailData: AIDailyDigestData = {
+    recipientEmail: profile.email,
+    recipientName: profile.name || 'there',
+    date: formattedDate,
+    spaceName,
+    spaceId,
+    events: digestData.events,
+    tasksDue: digestData.tasksDue,
+    overdueTasks: digestData.overdueTasks,
+    meals: digestData.meals,
+    reminders: digestData.reminders,
+    narrativeIntro: aiContent.narrativeIntro,
+    closingMessage: aiContent.closingMessage,
+    aiGenerated: aiContent.aiGenerated,
+  };
+
+  const html = await renderAIDailyDigestHTML(emailData);
+  return { html, aiGenerated: aiContent.aiGenerated };
 }

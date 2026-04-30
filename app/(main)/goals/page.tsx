@@ -3,8 +3,9 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, X } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, X, PiggyBank, BookOpen as BookOpenIcon, Dumbbell } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { StarterSuggestions, type StarterSuggestion } from '@/components/shared/StarterSuggestions';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -61,6 +62,37 @@ import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { useGoalsData } from '@/lib/hooks/useGoalsData';
 import { useGoalsModals } from '@/lib/hooks/useGoalsModals';
 import { useGoalsHandlers } from '@/lib/hooks/useGoalsHandlers';
+
+// Starter goals shown in the empty state — common household goals to remove blank-canvas friction.
+interface GoalStarter {
+  title: string;
+  description: string;
+  category: string;
+}
+
+const GOAL_STARTERS_DATA: Record<string, GoalStarter> = {
+  emergency: {
+    title: 'Save $500 for emergency fund',
+    description: 'Build a small cash buffer for unexpected expenses.',
+    category: 'finance',
+  },
+  reading: {
+    title: 'Read 12 books this year',
+    description: 'One book a month — track progress as milestones.',
+    category: 'personal',
+  },
+  gym: {
+    title: 'Go to the gym 3x per week',
+    description: 'Build a consistent workout routine.',
+    category: 'health',
+  },
+};
+
+const GOAL_STARTERS: StarterSuggestion[] = [
+  { id: 'emergency', label: 'Save $500 for emergency fund', hint: 'Finance', icon: PiggyBank },
+  { id: 'reading', label: 'Read 12 books this year', hint: 'Personal', icon: BookOpenIcon },
+  { id: 'gym', label: 'Go to gym 3x per week', hint: 'Health', icon: Dumbbell },
+];
 
 export default function GoalsPage() {
   // ─── Hooks ─────────────────────────────────────────────────────────────────
@@ -541,13 +573,33 @@ export default function GoalsPage() {
                     </p>
                   </div>
                 ) : (
-                  <EmptyState
-                    feature="goals"
-                    title="Every journey starts with a goal"
-                    description="Pick a household-tested template (emergency fund, vacation savings, healthier habits) or set your own from scratch."
-                    primaryAction={{ label: 'Browse Templates', onClick: () => setIsTemplateModalOpen(true) }}
-                    secondaryAction={{ label: 'Start From Scratch', onClick: handleOpenGoalModal }}
-                  />
+                  <>
+                    <EmptyState
+                      feature="goals"
+                      title="Every journey starts with a goal"
+                      description="Pick a household-tested template (emergency fund, vacation savings, healthier habits) or set your own from scratch."
+                      primaryAction={{ label: 'Browse Templates', onClick: () => setIsTemplateModalOpen(true) }}
+                      secondaryAction={{ label: 'Start From Scratch', onClick: handleOpenGoalModal }}
+                    />
+                    {spaceId && (
+                      <StarterSuggestions
+                        tone="indigo"
+                        suggestions={GOAL_STARTERS}
+                        onPick={async (id) => {
+                          const starter = GOAL_STARTERS_DATA[id];
+                          if (!starter) return;
+                          await handleCreateGoal({
+                            space_id: spaceId,
+                            title: starter.title,
+                            description: starter.description,
+                            category: starter.category,
+                            status: 'active',
+                            visibility: 'shared',
+                          });
+                        }}
+                      />
+                    )}
+                  </>
                 )
               ) : (
                 <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
