@@ -138,6 +138,10 @@ jobs:
       - name: Run advisor invariant check
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:6543/postgres
+          # GitHub Actions runners are IPv4-only; Supabase pooler hostnames
+          # resolve to IPv6 first, causing ENETUNREACH. Force ipv4first DNS
+          # ordering to keep the drift check working on CI.
+          NODE_OPTIONS: --dns-result-order=ipv4first
         run: |
           if pnpm check-db-advisors; then
             echo "## Schema Drift Check" >> $GITHUB_STEP_SUMMARY
