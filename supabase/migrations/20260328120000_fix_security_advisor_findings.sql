@@ -30,19 +30,19 @@ ALTER VIEW automation.daily_stats SET (security_invoker = on);
 
 ALTER TABLE automation.workflow_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON automation.workflow_logs
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 ALTER TABLE automation.reddit_monitoring ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON automation.reddit_monitoring
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 ALTER TABLE automation.subreddit_config ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON automation.subreddit_config
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 ALTER TABLE automation.product_context ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON automation.product_context
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 -- =============================================================================
 -- SECTION 3: RLS Disabled — sm_* shared SteelMotion CRM tables (ERROR)
@@ -51,28 +51,29 @@ CREATE POLICY "Service role only" ON automation.product_context
 
 ALTER TABLE public.sm_leads ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON public.sm_leads
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 ALTER TABLE public.sm_activities ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON public.sm_activities
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 ALTER TABLE public.sm_deals ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON public.sm_deals
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 ALTER TABLE public.sm_proposals ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON public.sm_proposals
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 -- =============================================================================
 -- SECTION 4: RLS Disabled — public.spatial_ref_sys (ERROR)
 -- PostGIS system table — enable RLS with read-only access for all
 -- =============================================================================
 
-ALTER TABLE public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow read access" ON public.spatial_ref_sys
-  FOR SELECT USING (true);
+-- spatial_ref_sys: owned by supabase_admin, cannot enable RLS directly.
+-- Restrict access via REVOKE/GRANT instead (same effect).
+REVOKE ALL ON public.spatial_ref_sys FROM anon, authenticated;
+GRANT SELECT ON public.spatial_ref_sys TO anon, authenticated;
 
 -- =============================================================================
 -- SECTION 5: RLS Disabled — public.site_visits (ERROR)
@@ -81,7 +82,7 @@ CREATE POLICY "Allow read access" ON public.spatial_ref_sys
 
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role only" ON public.site_visits
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING ((select auth.role()) = 'service_role');
 
 -- =============================================================================
 -- SECTION 6: Function Search Path Mutable (WARNING)
@@ -125,7 +126,7 @@ CREATE POLICY "Service role full access" ON public.sm_service_templates
 -- =============================================================================
 
 DROP POLICY IF EXISTS "Service role full access" ON public.user_feedback;
-CREATE POLICY "Service role full access" ON public.user_feedback
+CREATE POLICY "Service role full access" ON public.user_feedback AS RESTRICTIVE
   FOR ALL USING ((select auth.role()) = 'service_role')
   WITH CHECK ((select auth.role()) = 'service_role');
 
