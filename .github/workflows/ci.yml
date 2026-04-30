@@ -3,6 +3,15 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    # Skip CI for asset / docs / backlog-only PRs. Build cost saver — these
+    # files can't change runtime behavior so build + lighthouse + bundle
+    # checks are wasted minutes. Note: scripts/ is intentionally NOT here
+    # because admin scripts run as service_role and need the security audit.
+    paths-ignore:
+      - 'public/marketing/**'
+      - 'public/screenshots/**'
+      - '**/*.md'
+      - 'docs/**'
 
 # F-019: Minimal token permissions — prevents supply-chain attacks from
 # exfiltrating the GITHUB_TOKEN with write access.
@@ -155,11 +164,21 @@ jobs:
             exit 1
           fi
 
+      # Share the built output with the lighthouse job so it doesn't have to
+      # rebuild from scratch (saves ~3-5 min of compile time per PR).
+      - name: Upload .next build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+          retention-days: 1
+          include-hidden-files: true
+
   # ─── E2E tests removed — run locally via /smoketest skill ───
   # Flaky test user auth in CI wasted 70+ hours of debugging.
   # Local skills (/smoketest, /sec-ship) provide better coverage on demand.
 
-  # ─── Lighthouse (builds and starts prod server) ───
+  # ─── Lighthouse (reuses build artifact from `build` job) ───
   lighthouse:
     name: Lighthouse Audit
     runs-on: ubuntu-latest
@@ -177,15 +196,13 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
-      - name: Cache Next.js build
-        uses: actions/cache@v4
+      # Reuse the .next output produced by the `build` job — saves a full
+      # Next.js recompile that this job used to do (~3-5 min).
+      - name: Download .next build output
+        uses: actions/download-artifact@v4
         with:
-          path: .next/cache
-          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-
-      - run: pnpm build
+          name: next-build
+          path: .next
 
       - name: Start server
         run: pnpm start &
