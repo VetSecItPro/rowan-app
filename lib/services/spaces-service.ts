@@ -108,6 +108,7 @@ export async function createSpace(
       // Best-effort fetch of the user's display name for the greeting.
       let userName: string | null = null;
       try {
+        // nosemgrep: supabase-missing-space-id-filter — `users` is a global per-user table; .eq('id', userId) is the canonical access pattern (rule message itself lists `profiles`, `spaces`, etc. as global-table exceptions)
         const { data: userRow } = await supabase
           .from('users')
           .select('name')
