@@ -43,20 +43,25 @@ jobs:
         run: |
           npx supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
 
-          # Extract ALL local migration versions
-          LOCAL_VERSIONS=$(ls supabase/migrations/*.sql \
-            | sed 's|.*/||; s|_.*||' \
-            | sort -u \
-            | tr '\n' ' ')
+          # Validate: no duplicate timestamps in committed migration files.
+          # Per ADR 0019, every migration must have a unique 14-digit
+          # timestamp. Same-timestamp files trip Postgres PK constraints
+          # on supabase_migrations.schema_migrations and were the root cause
+          # of the 2026-04-30 ghost-migration incident.
+          DUPES=$(git ls-files supabase/migrations/*.sql \
+            | sed 's|.*/||; s|_.*\.sql$||' \
+            | sort | uniq -d)
+          if [ -n "$DUPES" ]; then
+            echo "::error::Duplicate migration timestamps detected: $DUPES"
+            echo "Each migration must have a unique 14-digit timestamp."
+            exit 1
+          fi
 
-          # Mark ALL local versions as "applied" so db push skips them
-          echo "Marking all local versions as applied..."
-          npx supabase migration repair --status applied $LOCAL_VERSIONS || true
-
-          # Get remote-only versions and mark them as reverted
+          # Detect remote-only versions (rare, but handle if they appear).
+          # No proactive "mark all applied" — that step created ghost
+          # migrations (metadata recorded without SQL running).
           PUSH_OUTPUT=$(npx supabase db push --linked --dry-run 2>&1 || true)
           echo "$PUSH_OUTPUT"
-
           REMOTE_ONLY=$(echo "$PUSH_OUTPUT" \
             | grep -oE 'repair --status reverted [0-9 ]+' \
             | sed 's/repair --status reverted //' || true)
@@ -66,12 +71,11 @@ jobs:
           fi
 
           # Check if there are genuinely new migrations to apply
-          # (local files with SQL content beyond stub comments)
+          # (local files with SQL content beyond stub comments).
           NEW_MIGRATIONS=$(git diff --name-only HEAD~1 HEAD -- supabase/migrations/ 2>/dev/null || echo "")
           HAS_REAL_SQL=false
           for f in $NEW_MIGRATIONS; do
             if [ -f "$f" ]; then
-              # Check if file has real SQL (not just stub comments)
               REAL_LINES=$(grep -v '^--' "$f" | grep -v '^$' | wc -l | xargs)
               if [ "$REAL_LINES" -gt 0 ]; then
                 HAS_REAL_SQL=true
@@ -83,8 +87,13 @@ jobs:
           done
 
           if [ "$HAS_REAL_SQL" = "true" ]; then
+            # Push without --include-all. Supabase CLI compares local
+            # files vs schema_migrations and pushes only genuinely new
+            # ones. --include-all was the root cause of the 2026-04-30
+            # incident: it forced re-application of already-applied
+            # migrations, hitting the PK constraint on schema_migrations.
             echo "Pushing new migrations..."
-            npx supabase db push --linked --include-all
+            npx supabase db push --linked
           else
             echo "No new executable migrations to push (stubs only)"
           fi

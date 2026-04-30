@@ -1,12 +1,24 @@
 # Database Migrations
 
-This directory holds the canonical record of every schema change applied to the Rowan Supabase project. Migrations are timestamp-ordered SQL files (`<YYYYMMDDHHMMSS>_<description>.sql`) and run forward-only via `supabase db push --include-all` from CI.
+This directory holds the canonical record of every schema change applied to the Rowan Supabase project. Migrations are timestamp-ordered SQL files (`<YYYYMMDDHHMMSS>_<description>.sql`) and run forward-only via `supabase db push --linked` from CI.
 
 ## Policy
 
 **1. Migration files are the source of truth, not the live DB.**
 
 If you need a schema change, write a migration. Don't change the live DB through the dashboard, `psql`, or any one-off script and "fix the migration later" — that's how drift starts.
+
+**1a. Every migration MUST have a unique 14-digit timestamp prefix.**
+
+Format: `YYYYMMDDHHMMSS_descriptive_name.sql`. Same-prefix files are forbidden — they cause Postgres PK constraint violations on `supabase_migrations.schema_migrations` and corrupt deploys. Shorter (8-digit) or differently-formatted prefixes are forbidden too. The deploy workflow validates this on every push and fails fast if violated. See ADR 0018.
+
+**1b. Every migration MUST be idempotent.**
+
+Use `IF NOT EXISTS`, `IF EXISTS`, `DROP POLICY IF EXISTS` + `CREATE POLICY`, etc. This makes migrations safe to re-run if the live DB and metadata table ever diverge — and lets you recover from drift via `psql -f path/to/migration.sql` without breaking anything. See ADR 0020 for the recovery methodology.
+
+**1c. Don't use `migration repair --status applied` proactively.**
+
+The deploy workflow used to mark all local versions as applied before pushing — that was the root cause of "ghost migrations" (metadata recorded, SQL never ran). Use `migration repair` only as a manual escape hatch when a specific known-applied migration needs its metadata synced. See ADR 0019.
 
 **2. Drift is detected automatically.**
 
