@@ -31,6 +31,18 @@ export async function proxy(req: NextRequest) {
   if (sizeBlock) return sizeBlock;
 
   const sanitizedHeaders = getSanitizedHeaders(req);
+
+  // Generate the per-request CSP nonce up-front and stamp it on REQUEST
+  // headers so Next.js's SSR pipeline reads it (via headers().get('x-nonce'))
+  // and auto-injects nonce= attributes onto every <script> tag it emits.
+  // Without this, CSP `'strict-dynamic'` blocks every chunk and the page
+  // hydrates to a blank screen — the SEV-1 we hit on 2026-05-01.
+  // The same nonce value is then echoed into the response Content-Security-
+  // Policy header so the policy and the script tags agree.
+  const nonce =
+    process.env.NODE_ENV !== 'development' ? generateNonce() : null;
+  if (nonce) sanitizedHeaders.set('x-nonce', nonce);
+
   const { response, session, supabase } = await initAuth(req, sanitizedHeaders);
 
   // Admin SSO + session management (reuses the auth-layer Supabase client
@@ -63,9 +75,11 @@ export async function proxy(req: NextRequest) {
   const csrfBlock = checkCsrf(req, response);
   if (csrfBlock) return csrfBlock;
 
-  // Security headers (skipped in development to match next.config.mjs)
-  if (process.env.NODE_ENV !== 'development') {
-    applySecurityHeaders(response, generateNonce());
+  // Security headers (skipped in development to match next.config.mjs).
+  // Reuse the nonce that was already set on request headers above so the
+  // CSP policy matches what Next.js stamped onto each <script> tag.
+  if (nonce) {
+    applySecurityHeaders(response, nonce);
   }
 
   return response;
