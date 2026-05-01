@@ -15,6 +15,7 @@ import { adminGoalsService } from '@/lib/services/admin-goals-service';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -53,6 +54,12 @@ const deleteGoalSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
+    // CSRF first on all mutating handlers (POST/PUT/DELETE).
+    if (req.method !== 'GET') {
+      const csrfError = validateCsrfRequest(req);
+      if (csrfError) return csrfError;
+    }
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -103,6 +110,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF first on all mutating handlers (POST/PUT/DELETE).
+    if (req.method !== 'GET') {
+      const csrfError = validateCsrfRequest(req);
+      if (csrfError) return csrfError;
+    }
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -162,6 +175,12 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    // CSRF first on all mutating handlers (POST/PUT/DELETE).
+    if (req.method !== 'GET') {
+      const csrfError = validateCsrfRequest(req);
+      if (csrfError) return csrfError;
+    }
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -220,6 +239,12 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    // CSRF first on all mutating handlers (POST/PUT/DELETE).
+    if (req.method !== 'GET') {
+      const csrfError = validateCsrfRequest(req);
+      if (csrfError) return csrfError;
+    }
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);

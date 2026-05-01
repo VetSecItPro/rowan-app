@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
+import { isActiveUser } from '@/lib/services/active-user-service';
 import { z } from 'zod';
 
 // Query parameter validation schema
@@ -80,9 +81,8 @@ export async function GET(req: NextRequest) {
 
         const profileRecords = (profiles || []) as ProfileRecord[];
 
-        // Determine active status: updated within the last 30 days
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-
+        // Active status uses the canonical isActiveUser predicate so this
+        // panel agrees with dashboard/stats and retention.
         const users = profileRecords.map((profile) => ({
           id: profile.id,
           email: profile.email || '',
@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
           avatar_url: profile.avatar_url || '',
           created_at: profile.created_at,
           last_sign_in_at: profile.updated_at,
-          status: profile.updated_at >= thirtyDaysAgo ? 'active' : 'inactive',
+          status: isActiveUser({ updated_at: profile.updated_at }) ? 'active' : 'inactive',
         }));
 
         return {
