@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get privacy preferences from database
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { data: privacy, error: privacyError } = await supabase
       .from('user_privacy_preferences')
       .select('analytics_cookies_enabled, ccpa_do_not_sell')
@@ -139,6 +140,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Update privacy preferences in database
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { error: updateError } = await supabase
       .from('user_privacy_preferences')
       .update(privacyUpdates)
@@ -266,6 +268,7 @@ export async function DELETE(request: NextRequest) {
     };
 
     // Update database
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { error: updateError } = await supabase
       .from('user_privacy_preferences')
       .update(privacyUpdates)

@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current privacy preferences (only the columns needed for this CCPA update)
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { data: currentPrefs, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('ccpa_do_not_sell')
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
     // Update CCPA Do Not Sell preference (master toggle for partner sharing)
     const newCCPAValue = !validatedData.allowSharing; // Invert because "Do Not Sell" = true means no sharing
 
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { error: updateError } = await supabase
       .from('user_privacy_preferences')
       .update({
@@ -227,6 +229,7 @@ export async function GET() {
     const userId = user.id;
 
     // Get current preferences
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { data: preferences, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('ccpa_do_not_sell, analytics_cookies_enabled')

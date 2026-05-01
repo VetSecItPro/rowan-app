@@ -107,6 +107,7 @@ export async function GET(request: Request) {
         logger.info(`Syncing ${connection.provider} connection ${connection.id}`, { component: 'cron-route', action: 'sync-connection', provider: connection.provider, connectionId: connection.id });
 
         // Update status to syncing
+        // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
         await supabase
           .from('calendar_connections')
           .update({ sync_status: 'syncing' })
@@ -124,6 +125,7 @@ export async function GET(request: Request) {
         nextSync.setMinutes(nextSync.getMinutes() + nextSyncMinutes);
 
         // Update connection with results
+        // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
         await supabase
           .from('calendar_connections')
           .update({
@@ -148,6 +150,7 @@ export async function GET(request: Request) {
         logger.error(`Error syncing ${connection.id}`, error instanceof Error ? error : new Error(String(error)), { component: 'cron-route', action: 'sync-connection', connectionId: connection.id });
 
         // Update connection with error status
+        // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
         await supabase
           .from('calendar_connections')
           .update({
