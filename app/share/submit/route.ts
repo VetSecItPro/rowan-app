@@ -26,8 +26,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const FILE_PARK_HEADER_KEY = 'x-shared-file-meta';
-
 export async function POST(req: NextRequest) {
   let title: string | null = null;
   let text: string | null = null;

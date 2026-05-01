@@ -1,8 +1,8 @@
 /**
  * Share landing page for the PWA Web Share Target.
  *
- * Reached via redirect from /share/route.ts after the OS hands a
- * shared payload off to Rowan via the system share sheet.
+ * Reached via redirect from /share/submit/route.ts after the OS hands
+ * a shared payload off to Rowan via the system share sheet.
  *
  * The route handler decides a `destination` (recipe / calendar /
  * task / unknown) and forwards us here with the shared content
