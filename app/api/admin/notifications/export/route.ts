@@ -8,6 +8,7 @@ import { decryptSessionData, validateSessionData } from '@/lib/utils/session-cry
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { logAdminAction } from '@/lib/utils/admin-audit';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 type NotificationRecord = {
   id: string;
@@ -34,6 +35,11 @@ const ExportRequestSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    // CSRF first — POST exports trigger expensive queries; protect against
+    // forgery even though the response is a download.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);

@@ -8,6 +8,7 @@ import { decryptSessionData, validateSessionData } from '@/lib/utils/session-cry
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { logAdminAction } from '@/lib/utils/admin-audit';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 const BulkUnsubscribeSchema = z.object({
   ids: z.array(z.string().uuid()).min(1).max(1000),
@@ -19,6 +20,10 @@ const BulkUnsubscribeSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    // CSRF first — cookie-only admin auth + bulk state mutation = CSRF target.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);

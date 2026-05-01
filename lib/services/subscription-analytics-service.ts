@@ -117,9 +117,14 @@ interface SubscriptionEventRow {
 // ============================================================================
 
 /**
- * Calculate MRR for a subscription based on tier and period
+ * Calculate MRR for a subscription based on tier and period.
+ *
+ * Single source of truth for MRR pricing across the admin domain.
+ * Imported by `app/api/admin/business-metrics/route.ts` so the Revenue panel
+ * and Business Metrics scorecard always agree. Pricing comes from
+ * POLAR_PLANS in `lib/polar.ts`.
  */
-function calculateMRR(tier: string, period: string): number {
+export function calculateMRR(tier: string, period: string): number {
   if (tier === 'free' || tier === 'owner' || !tier) return 0;
 
   const tierKey = tier as 'pro' | 'family';
@@ -132,6 +137,40 @@ function calculateMRR(tier: string, period: string): number {
     // Monthly subscribers contribute their monthly price to MRR
     return POLAR_PLANS[tierKey].price;
   }
+}
+
+/**
+ * Count all auth.users by paginating through `auth.admin.listUsers`.
+ *
+ * `listUsers({ perPage: 1000, page: 1 })` silently caps at 1000 rows. Once the
+ * tenant grows past 1000 users, MRR/ARPU/freeUsers all drift downward. This
+ * helper paginates to completion so the count is accurate at any scale.
+ *
+ * Uses the standard "page until short page" termination — the API has no
+ * total-count field, so we walk pages until one returns < perPage.
+ */
+const AUTH_USERS_PAGE_SIZE = 1000;
+async function countAllAuthUsers(): Promise<number> {
+  let total = 0;
+  let page = 1;
+  // Hard upper bound to defend against an infinite loop if the API ever
+  // misbehaves. 1M users is well past any realistic horizon for this app.
+  const MAX_PAGES = 1_000;
+  while (page <= MAX_PAGES) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      perPage: AUTH_USERS_PAGE_SIZE,
+      page,
+    });
+    if (error) {
+      logger.error('Error paginating auth.users:', error, { component: 'lib-subscription-analytics-service', action: 'service_call' });
+      return total;
+    }
+    const fetched = data?.users?.length ?? 0;
+    total += fetched;
+    if (fetched < AUTH_USERS_PAGE_SIZE) break;
+    page++;
+  }
+  return total;
 }
 
 // ============================================================================
@@ -166,9 +205,10 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     logger.error('Error fetching subscription events:', eventsError, { component: 'lib-subscription-analytics-service', action: 'service_call' });
   }
 
-  // Fetch total REAL users from auth.users (public.users has stale/orphaned rows)
-  const { data: authUsersData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000, page: 1 });
-  const totalUsersCount = authUsersData?.users?.length ?? 0;
+  // Fetch total REAL users from auth.users (public.users has stale/orphaned rows).
+  // Paginate to avoid the silent 1000-user cap of a single listUsers call —
+  // at 1001+ users freeUsers/ARPU/conversionRate would otherwise drift.
+  const totalUsersCount = await countAllAuthUsers();
 
   const activeSubscriptions: SubscriptionRow[] = subscriptions || [];
   const subscriptionEvents: SubscriptionEventRow[] = events || [];

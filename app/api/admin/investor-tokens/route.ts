@@ -15,6 +15,7 @@ import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 import crypto from 'crypto';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -76,6 +77,10 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    // CSRF first — token creation is a state mutation.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -157,6 +162,10 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
+    // CSRF first — token revocation is a state mutation.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);

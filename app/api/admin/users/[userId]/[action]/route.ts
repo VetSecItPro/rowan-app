@@ -7,6 +7,8 @@ import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logAdminAction } from '@/lib/utils/admin-audit';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -19,6 +21,12 @@ const AdminUserActionParamsSchema = z.object({
 /**
  * POST /api/admin/users/[userId]/[action]
  * Perform admin actions on users (ban, delete)
+ *
+ * Order of gates is intentional: CSRF first (cheapest, blocks cross-site
+ * forgery), rate limit next (protects auth check from brute force), then
+ * admin auth, then the action. Audit log is written ONLY after the auth.admin
+ * call succeeds — failed attempts are captured by Sentry, not the audit
+ * trail (the audit trail is for "what actually happened to user data").
  */
 export async function POST(
   req: NextRequest,
@@ -26,6 +34,11 @@ export async function POST(
 ) {
   const params = await props.params;
   try {
+    // CSRF validation FIRST — cookie-only auth + state-changing POST is the
+    // classic CSRF target. Ban/delete is the most destructive admin action.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -69,7 +82,9 @@ export async function POST(
 
     const { userId, action } = AdminUserActionParamsSchema.parse(params);
 
-    // Perform action based on type
+    // Perform action based on type. Note: deleting from auth.users cascades
+    // via FK ON DELETE CASCADE relationships, NOT via RLS (RLS doesn't
+    // cascade — corrected from the previous comment which was wrong).
     switch (action) {
       case 'ban': {
         // Suspend user by updating user metadata
@@ -89,7 +104,7 @@ export async function POST(
       }
 
       case 'delete': {
-        // Delete user from auth.users (cascades to related tables via RLS)
+        // Delete user from auth.users (cascades to related tables via FK ON DELETE CASCADE)
         const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
         if (deleteError) {
@@ -99,6 +114,19 @@ export async function POST(
 
         break;
       }
+    }
+
+    // Audit log AFTER success — only record actions that actually happened.
+    // Best-effort: failure to log must not roll back the (already-completed)
+    // user mutation. logAdminAction swallows its own errors.
+    if (sessionData.adminId) {
+      logAdminAction({
+        adminUserId: sessionData.adminId,
+        action: action === 'ban' ? 'user_banned' : 'user_deleted',
+        targetResource: `user:${userId}`,
+        metadata: { targetUserId: userId, performedBy: sessionData.email },
+        ipAddress: ip,
+      });
     }
 
     return NextResponse.json({

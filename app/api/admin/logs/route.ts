@@ -23,6 +23,7 @@ import { getErrorStats } from '@/lib/utils/error-alerting';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -215,6 +216,11 @@ export async function GET(request: NextRequest) {
 /** Exports monetization logs to CSV or JSON format */
 export async function POST(request: NextRequest) {
   try {
+    // CSRF first — log export endpoint runs an expensive query and returns
+    // PII; treat it as state-changing for safety.
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(request.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
