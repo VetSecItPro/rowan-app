@@ -385,7 +385,7 @@ describe('privacyToCookiePreferences', () => {
     expect(result.analytics).toBe(false);
   });
 
-  it('should set marketing=true when share_data_with_partners=true and ccpa_do_not_sell=false', () => {
+  it('should set marketing=true when ccpa_do_not_sell=false (post-share_data_with_partners removal)', () => {
     const result = privacyToCookiePreferences({ ...base, ccpa_do_not_sell: false });
     expect(result.marketing).toBe(true);
   });
@@ -412,7 +412,7 @@ describe('cookieToPrivacyUpdates', () => {
     expect(result.analytics_cookies_enabled).toBe(true);
   });
 
-  it('should map marketing=true to share_data_with_partners=true and ccpa_do_not_sell=false', () => {
+  it('should map marketing=true to ccpa_do_not_sell=false (master toggle, partners column removed)', () => {
     const result = cookieToPrivacyUpdates({ necessary: true, analytics: false, marketing: true, functional: true, preferences: true });
     expect(result.ccpa_do_not_sell).toBe(false);
   });

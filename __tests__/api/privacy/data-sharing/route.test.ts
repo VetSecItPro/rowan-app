@@ -111,7 +111,7 @@ describe('/api/privacy/data-sharing', () => {
 
       vi.mocked(checkGeneralRateLimit).mockResolvedValue({ success: true } as never);
 
-      const fetchChain = createChainMock({ data: { share_data_with_partners: true }, error: null });
+      const fetchChain = createChainMock({ data: { ccpa_do_not_sell: false }, error: null });
       const updateChain = createChainMock({ data: null, error: null });
       const insertChain = createChainMock({ data: null, error: null });
 
@@ -159,7 +159,6 @@ describe('/api/privacy/data-sharing', () => {
       const chain = createChainMock({
         data: {
           ccpa_do_not_sell: true,
-          share_data_with_partners: false,
           analytics_cookies_enabled: false,
         },
         error: null,

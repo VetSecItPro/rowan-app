@@ -57,7 +57,7 @@ describe('/api/cookies/preferences', () => {
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
 
       const privacyChain = makeChainMock({
-        data: { analytics_cookies_enabled: false, share_data_with_partners: false, ccpa_do_not_sell: true },
+        data: { analytics_cookies_enabled: false, ccpa_do_not_sell: true },
         error: null,
       });
       const historyChain = makeChainMock({ data: [], error: null });
