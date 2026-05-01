@@ -18,9 +18,16 @@
  * Exit code 0 = all invariants hold (no drift). Non-zero = drift detected.
  */
 
+import { setDefaultResultOrder } from 'dns';
 import { Client } from 'pg';
 import { config } from 'dotenv';
 import { resolve } from 'path';
+
+// GitHub Actions runners are IPv4-only; Supabase pooler hostnames resolve
+// to IPv6 first, causing ENETUNREACH 2600:1f18:... NODE_OPTIONS via env
+// var doesn't reach pg's connection logic, so set programmatically here
+// before the Client is created.
+setDefaultResultOrder('ipv4first');
 
 config({ path: resolve(process.cwd(), '.env.local') });
 
