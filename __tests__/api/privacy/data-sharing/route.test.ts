@@ -160,7 +160,7 @@ describe('/api/privacy/data-sharing', () => {
         data: {
           ccpa_do_not_sell: true,
           share_data_with_partners: false,
-          third_party_analytics_enabled: false,
+          analytics_cookies_enabled: false,
         },
         error: null,
       });

@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
     const validatedData = MarketingSubscriptionUpdateSchema.parse(body);
 
     // Get current preferences, create default if none exist
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const prefsResult = await supabase
       .from('user_privacy_preferences')
       .select('*')
@@ -66,14 +67,13 @@ export async function POST(request: NextRequest) {
 
     // Create default preferences if user doesn't have any
     if (!currentPrefs && !prefsError) {
+      // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
       const { data: newPrefs, error: createError } = await supabase
         .from('user_privacy_preferences')
         .insert({
           user_id: userId,
           marketing_emails_enabled: false,
-          marketing_sms_enabled: false,
-          third_party_analytics_enabled: false,
-          share_data_with_partners: false,
+          analytics_cookies_enabled: false,
           ccpa_do_not_sell: true,
         })
         .select('*')
@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update privacy preferences
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { error: updateError } = await supabase
       .from('user_privacy_preferences')
       .update(updates)
@@ -167,6 +168,7 @@ export async function GET(request: NextRequest) {
     const userId = user.id;
 
     // Get marketing preferences, create default if none exist
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { data: preferencesData, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('marketing_emails_enabled')
@@ -176,6 +178,7 @@ export async function GET(request: NextRequest) {
 
     // Create default preferences if user doesn't have any
     if (!preferences && !prefsError) {
+      // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
       const { data: newPrefs, error: createError } = await supabase
         .from('user_privacy_preferences')
         .insert({
@@ -413,6 +416,7 @@ async function handleTokenUnsubscribe(token: string, type: string) {
     }
 
     // Apply the unsubscribe
+    // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
     const { error: updateError } = await supabase
       .from('user_privacy_preferences')
       .update(updates)

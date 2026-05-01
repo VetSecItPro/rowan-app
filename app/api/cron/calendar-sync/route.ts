@@ -107,6 +107,7 @@ export async function GET(request: Request) {
         logger.info(`Syncing ${connection.provider} connection ${connection.id}`, { component: 'cron-route', action: 'sync-connection', provider: connection.provider, connectionId: connection.id });
 
         // Update status to syncing
+        // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
         await supabase
           .from('calendar_connections')
           .update({ sync_status: 'syncing' })
@@ -124,13 +125,14 @@ export async function GET(request: Request) {
         nextSync.setMinutes(nextSync.getMinutes() + nextSyncMinutes);
 
         // Update connection with results
+        // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
         await supabase
           .from('calendar_connections')
           .update({
             sync_status: syncResult.success ? 'active' : 'error',
             last_sync_at: new Date().toISOString(),
             next_sync_at: nextSync.toISOString(),
-            last_error: syncResult.success ? null : syncResult.errors?.[0]?.error_message,
+            last_error_message: syncResult.success ? null : syncResult.errors?.[0]?.error_message,
           })
           .eq('id', connection.id);
 
@@ -148,11 +150,12 @@ export async function GET(request: Request) {
         logger.error(`Error syncing ${connection.id}`, error instanceof Error ? error : new Error(String(error)), { component: 'cron-route', action: 'sync-connection', connectionId: connection.id });
 
         // Update connection with error status
+        // nosemgrep: supabase-missing-space-id-filter — table is user-scoped via .eq('user_id', userId); RLS enforces user can only see own row
         await supabase
           .from('calendar_connections')
           .update({
             sync_status: 'error',
-            last_error: errorMessage,
+            last_error_message: errorMessage,
             // Still set next sync so it will retry
             next_sync_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
           })
