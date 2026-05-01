@@ -162,6 +162,7 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
     mauResult,
     totalUsersResult,
     authUsersResult,
+    testUserIdsResult,
   ] = await Promise.allSettled([
     // 1. All active subscriptions (for current MRR, cohort revenue, NRR)
     supabaseAdmin
@@ -200,18 +201,37 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
       .from('subscriptions')
       .select('user_id, tier, period, status, created_at')
       .eq('status', 'active'),
+
+    // 7. Test-user IDs to exclude from MRR / revenue counts.
+    //    The Smart E2E workflow seeds accounts at @rowan-test.app against
+    //    the prod DB; without this filter, a test 'pro' subscriber injects
+    //    $18 of phantom MRR into the business dashboard after every CI run.
+    supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .like('email', '%@rowan-test.app'),
   ]);
 
   // -----------------------------------------------------------------------
   // Extract results with safe defaults
   // -----------------------------------------------------------------------
-  const activeSubs = activeSubsResult.status === 'fulfilled'
-    ? (activeSubsResult.value.data || [])
-    : [];
+  const testUserIds = new Set<string>(
+    testUserIdsResult.status === 'fulfilled'
+      ? (testUserIdsResult.value.data || []).map((p: { id: string }) => p.id)
+      : []
+  );
 
-  const subEvents = subEventsResult.status === 'fulfilled'
-    ? (subEventsResult.value.data || [])
-    : [];
+  const activeSubs = (
+    activeSubsResult.status === 'fulfilled'
+      ? (activeSubsResult.value.data || [])
+      : []
+  ).filter((s: { user_id: string }) => !testUserIds.has(s.user_id));
+
+  const subEvents = (
+    subEventsResult.status === 'fulfilled'
+      ? (subEventsResult.value.data || [])
+      : []
+  ).filter((e: { user_id: string }) => !testUserIds.has(e.user_id));
 
   // DAU — count distinct user_ids
   const dauEvents = dauResult.status === 'fulfilled'
@@ -312,9 +332,11 @@ async function computeBusinessMetrics(): Promise<BusinessMetricsPayload> {
   // -----------------------------------------------------------------------
   // 10. Revenue by Cohort
   // -----------------------------------------------------------------------
-  const authSubsData = authUsersResult.status === 'fulfilled'
-    ? (authUsersResult.value.data || [])
-    : activeSubs;
+  const authSubsData = (
+    authUsersResult.status === 'fulfilled'
+      ? (authUsersResult.value.data || [])
+      : activeSubs
+  ).filter((s: { user_id: string }) => !testUserIds.has(s.user_id));
   const revenueByCohort = buildRevenueByCohort(authSubsData);
 
   // -----------------------------------------------------------------------

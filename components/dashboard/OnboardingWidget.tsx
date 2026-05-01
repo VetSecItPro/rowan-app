@@ -11,9 +11,10 @@ import {
   ShoppingCart,
   Users,
   X,
-  Sparkles,
+  Wand2,
   RotateCcw,
 } from 'lucide-react';
+import { useSubscription } from '@/lib/contexts/subscription-context';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -173,6 +174,7 @@ const itemVariants = {
 export function OnboardingWidget() {
   const [progress, setProgress] = useState<OnboardingProgress>(() => loadProgress());
   const [isClient, setIsClient] = useState(false);
+  const { tier } = useSubscription();
 
   // Hydration safety — one-time mount flag
   useEffect(() => {
@@ -183,13 +185,20 @@ export function OnboardingWidget() {
   const totalSteps = ONBOARDING_STEPS.length;
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
+  // The "14-day Pro trial" banner only makes sense for users who are actually
+  // on a trial. Owner/pro/family tiers should never see trial messaging —
+  // owner accounts are staff/internal (never expire, no Polar billing) and
+  // paid accounts already have full access.
+  const isOnTrial = tier === 'free';
+
   // Only show if:
   // 1. Not dismissed
   // 2. Client-side rendered (avoids hydration mismatch)
   // 3. User has completed fewer than 3 steps
+  // 4. User is actually on a trial (not owner/pro/family)
   const shouldShow = useMemo(
-    () => isClient && !progress.dismissed && completedCount < 3,
-    [isClient, progress.dismissed, completedCount]
+    () => isClient && !progress.dismissed && completedCount < 3 && isOnTrial,
+    [isClient, progress.dismissed, completedCount, isOnTrial]
   );
 
   const handleDismiss = () => {
@@ -225,7 +234,7 @@ export function OnboardingWidget() {
         {/* Trial Banner */}
         <div className="bg-gradient-to-r from-purple-600/80 to-blue-600/80 px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-yellow-300 flex-shrink-0" />
+            <Wand2 className="w-5 h-5 text-yellow-300 flex-shrink-0" aria-hidden="true" />
             <p className="text-sm sm:text-base font-semibold text-white">
               You&apos;re on your 14-day Pro trial! Explore all features.
             </p>
