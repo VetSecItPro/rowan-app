@@ -20,7 +20,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -46,6 +46,25 @@ interface SharedPayload {
 }
 
 export default function SharePage() {
+  return (
+    <Suspense fallback={<ShareFallback />}>
+      <ShareInner />
+    </Suspense>
+  );
+}
+
+function ShareFallback() {
+  return (
+    <main className="min-h-screen bg-black text-white px-4 py-10 flex items-start justify-center">
+      <div className="w-full max-w-lg">
+        <div className="h-6 w-32 rounded bg-gray-800 animate-pulse mb-6" />
+        <div className="h-24 rounded-xl border border-gray-800 bg-gray-900/60 animate-pulse" />
+      </div>
+    </main>
+  );
+}
+
+function ShareInner() {
   const router = useRouter();
   const params = useSearchParams();
 
