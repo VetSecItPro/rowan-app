@@ -217,3 +217,5 @@ household-balance-*.png
 .perf-reports/
 .monitor-reports/
 .a11y-reports/
+
+.admin-audit-reports/
