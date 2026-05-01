@@ -17,7 +17,23 @@ export function applySecurityHeaders(response: NextResponse, nonce: string): voi
   response.headers.set(
     'Content-Security-Policy',
     "default-src 'self'; " +
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com;` +
+    // SEV-1 fix (2026-05-01): dropped 'nonce-X' + 'strict-dynamic'.
+    // Next.js statically prerenders most public pages at build time; their
+    // <script> tags are baked into HTML without any request-time nonce.
+    // 'strict-dynamic' then blocked every chunk and the homepage hydrated
+    // to a blank screen for every visitor. 'self' + the explicit CDN
+    // allowlist still blocks all cross-origin script injection, which is
+    // the primary XSS-mitigation goal here. The nonce stays exported (and
+    // x-nonce header set) so any future request-rendered route can opt in
+    // by reading headers().get('x-nonce'), but the policy no longer
+    // depends on every page being able to inject one.
+    // 'unsafe-inline' is required because Next.js's hydration bootstrap is
+    // emitted as inline <script>{...}</script> that pushes onto self.__next_f.
+    // Without it React never hydrates. Modern browsers honor a nonce over
+    // 'unsafe-inline' when both are present, so this is fine to combine if
+    // we ever add nonces back for dynamic routes; for now the trade-off is
+    // 'self' + explicit CDN allowlist to keep cross-origin injection blocked.
+    `script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com;` +
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
     "img-src 'self' data: https: blob:; " +
     "font-src 'self' data: https:; " +
