@@ -119,5 +119,26 @@
     }
   ],
   "related_applications": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "file",
+          "accept": [
+            "text/calendar",
+            ".ics",
+            "image/*",
+            "text/plain"
+          ]
+        }
+      ]
+    }
+  }
 }
