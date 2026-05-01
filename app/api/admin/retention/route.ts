@@ -17,6 +17,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
+import { isActiveUser, DEFAULT_ACTIVE_WINDOW_DAYS } from '@/lib/services/active-user-service';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
@@ -282,17 +283,19 @@ export async function GET(req: NextRequest) {
           });
         }
 
-        // Calculate churn (users who haven't been active in 30 days but were active before)
-        const inactiveThreshold = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        const activeThreshold = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+        // Churn rate uses the canonical active-user predicate. A user is
+        // "churned" if they signed up >60d ago AND are NOT currently active
+        // by the canonical 30d window. Keeping this aligned with the
+        // active-user definition prevents the same panel from saying DAU=0
+        // while cohort/churn show healthy retention (the prior bug).
+        const activeThreshold = new Date(now.getTime() - 2 * DEFAULT_ACTIVE_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
         const totalUsersEver = allUsers.length;
         const churned = allUsers.filter((user: { updated_at: string | null; created_at: string }) => {
-          if (!user.updated_at) return false;
-          const lastActive = new Date(user.updated_at);
           const createdAt = new Date(user.created_at);
-          // User was active (created before 30 days ago) but hasn't been seen in 30 days
-          return createdAt < activeThreshold && lastActive < inactiveThreshold;
+          // Must have been around long enough to count as churned, and must
+          // not currently meet the canonical active threshold.
+          return createdAt < activeThreshold && !isActiveUser({ updated_at: user.updated_at });
         }).length;
 
         const retained = totalUsersEver - churned;

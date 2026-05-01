@@ -16,6 +16,7 @@ import { decryptSessionData, validateSessionData } from '@/lib/utils/session-cry
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -351,6 +352,10 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    // CSRF first — feature-usage POST runs heavy aggregation; protect it.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);

@@ -17,28 +17,23 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
+import { calculateMRR } from '@/lib/services/subscription-analytics-service';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
-// ---------------------------------------------------------------------------
-// Pricing constants (monthly effective rate)
-// ---------------------------------------------------------------------------
-const TIER_PRICES = {
-  pro: { monthly: 18, annual: 16 },
-  family: { monthly: 29, annual: 27 },
-  free: { monthly: 0, annual: 0 },
-  owner: { monthly: 0, annual: 0 },
-} as const;
-
 /**
  * Calculate the effective monthly revenue for a subscription.
+ *
+ * Delegates to the shared `calculateMRR` helper which reads from POLAR_PLANS.
+ * This route previously hardcoded $16 / $27 for annual which silently
+ * disagreed with the Revenue panel's $15 / $24.17 (annualPrice / 12). The
+ * shared helper is now the single source of truth — both panels stay in sync.
  */
 function getUserMrr(tier: string, period: string): number {
-  const prices = TIER_PRICES[tier as keyof typeof TIER_PRICES] || TIER_PRICES.free;
-  return period === 'annual' ? prices.annual : prices.monthly;
+  return calculateMRR(tier, period);
 }
 
 // ---------------------------------------------------------------------------

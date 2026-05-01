@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('@/lib/security/csrf-validation', () => ({ validateCsrfRequest: vi.fn(() => null) }));
 import { NextRequest } from 'next/server';
 import { GET, POST } from '@/app/api/admin/logs/route';
 

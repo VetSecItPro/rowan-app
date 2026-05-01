@@ -13,6 +13,7 @@ import { getAllFeedback, updateFeedbackStatus, getFeedbackStats } from '@/lib/se
 import * as Sentry from '@sentry/nextjs';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,6 +103,10 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    // CSRF first — feedback status updates are state mutations.
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);

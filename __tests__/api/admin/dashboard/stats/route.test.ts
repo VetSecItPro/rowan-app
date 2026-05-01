@@ -135,12 +135,16 @@ describe('/api/admin/dashboard/stats', () => {
       const mockEq = vi.fn().mockReturnValue({ then: mockCountQuery });
       const mockSelect = vi.fn().mockReturnValue({ eq: mockEq, gte: mockGte });
 
-      // Use Promise.allSettled format
+      // Use Promise.allSettled format. Now uses CT day boundaries via
+      // getAdminStartOfDayIso/getAdminEndOfDayIso, so the chain is
+      // .gte(start).lte(end) (was .gte().lt()) for the signups-today query.
       vi.mocked(supabaseAdmin.from).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockResolvedValue({ count: 5, error: null }),
           gte: vi.fn().mockReturnValue({
             lt: vi.fn().mockResolvedValue({ count: 2, error: null }),
+            lte: vi.fn().mockResolvedValue({ count: 2, error: null }),
+            then: undefined,
           }),
         }),
       } as any);

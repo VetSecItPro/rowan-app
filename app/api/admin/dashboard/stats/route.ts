@@ -5,6 +5,8 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
+import { getActiveUserCutoffIso } from '@/lib/services/active-user-service';
+import { getAdminStartOfDayIso, getAdminEndOfDayIso } from '@/lib/utils/admin-timezone';
 import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for admin authentication
@@ -50,20 +52,25 @@ export async function GET(req: NextRequest) {
     const stats = await withCache(
       ADMIN_CACHE_KEYS.dashboardStats,
       async () => {
-        // Get current date for today's stats
-        const today = new Date().toISOString().split('T')[0];
+        // "Today" boundaries are computed in America/Chicago per CLAUDE.md.
+        // Without this, after 7pm CT the dashboard rolls "today" to UTC tomorrow.
+        const todayStart = getAdminStartOfDayIso();
+        const todayEnd = getAdminEndOfDayIso();
 
-        // Fetch user counts from profiles table (source of truth)
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        // Active-user cutoff comes from the canonical helper to keep the
+        // dashboard, users panel, and retention panel in sync.
+        const activeCutoffIso = getActiveUserCutoffIso();
 
         const [totalUsersResult, activeUsersResult] = await Promise.allSettled([
+          // nosemgrep: supabase-missing-space-id-filter — admin global metric, profiles is global
           supabaseAdmin
             .from('profiles')
             .select('id', { count: 'exact', head: true }),
+          // nosemgrep: supabase-missing-space-id-filter — admin global metric, profiles is global
           supabaseAdmin
             .from('profiles')
             .select('id', { count: 'exact', head: true })
-            .gte('updated_at', thirtyDaysAgo.toISOString()),
+            .gte('updated_at', activeCutoffIso),
         ]);
 
         const totalUsers = totalUsersResult.status === 'fulfilled'
@@ -82,12 +89,12 @@ export async function GET(req: NextRequest) {
             .select('*', { count: 'exact', head: true })
             .eq('subscribed', true),
 
-          // Launch signups today
+          // Launch signups today (CT day boundaries, not UTC)
           supabaseAdmin
             .from('launch_notifications')
             .select('*', { count: 'exact', head: true })
-            .gte('created_at', `${today}T00:00:00.000Z`)
-            .lt('created_at', `${today}T23:59:59.999Z`),
+            .gte('created_at', todayStart)
+            .lte('created_at', todayEnd),
         ]);
 
         // Extract counts from results (handle errors gracefully)
