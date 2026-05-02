@@ -35,21 +35,49 @@ import type {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Gemini 2.5 Flash pricing (per 1M tokens)
+// Per-model pricing (OpenRouter, USD per 1M tokens)
 // ---------------------------------------------------------------------------
 
-// Pricing from: https://openrouter.ai/google/gemini-2.5-flash
-// Last verified: 2026-02-28
-// Update if model or provider changes
-const GEMINI_PRICING = {
-  input_per_million: 0.15,   // $0.15 / 1M input tokens (OpenRouter Gemini 2.5 Flash)
-  output_per_million: 0.60,  // $0.60 / 1M output tokens (OpenRouter Gemini 2.5 Flash)
+// Re-verify quarterly via:
+//   curl -s https://openrouter.ai/api/v1/models \
+//     | jq '.data[] | select(.id|startswith("google/gemini-2.5-flash")) | {id, pricing}'
+// (multiply prompt/completion by 1_000_000 to get per-1M-token rates)
+//
+// Last verified: 2026-05-01.
+// History: Gemini 2.5 Flash repriced upward between 2026-02-28 and
+// 2026-05-01 (input 0.15→0.30, output 0.60→2.50, ~3.3x effective).
+//
+// Both slots stay in the Gemini family (chat-orchestrator-service.ts);
+// when fallback fires, rows are billed at Flash Lite rates so admin
+// dashboards get the right $ per turn. Unknown model IDs fall back to
+// PRIMARY pricing — fail-safe overestimate rather than missing data.
+type ModelPricing = { input_per_million: number; output_per_million: number };
+
+const MODEL_PRICING: Record<string, ModelPricing> = {
+  'google/gemini-2.5-flash':       { input_per_million: 0.30, output_per_million: 2.50 },
+  'google/gemini-2.5-flash-lite':  { input_per_million: 0.10, output_per_million: 0.40 },
 };
 
-/** Calculate estimated cost in USD for a token usage record */
-export function calculateCostUsd(inputTokens: number, outputTokens: number): number {
-  const inputCost = (inputTokens / 1_000_000) * GEMINI_PRICING.input_per_million;
-  const outputCost = (outputTokens / 1_000_000) * GEMINI_PRICING.output_per_million;
+const DEFAULT_MODEL_ID = 'google/gemini-2.5-flash';
+
+/**
+ * Calculate estimated cost in USD for a token usage record.
+ *
+ * @param inputTokens  prompt token count
+ * @param outputTokens completion token count
+ * @param modelId      OpenRouter model id (e.g. "google/gemini-2.5-flash").
+ *                     Defaults to PRIMARY when unknown so existing call
+ *                     sites keep working; pass the actual model when the
+ *                     caller knows it (e.g. orchestrator after fallback).
+ */
+export function calculateCostUsd(
+  inputTokens: number,
+  outputTokens: number,
+  modelId: string = DEFAULT_MODEL_ID,
+): number {
+  const pricing = MODEL_PRICING[modelId] ?? MODEL_PRICING[DEFAULT_MODEL_ID];
+  const inputCost = (inputTokens / 1_000_000) * pricing.input_per_million;
+  const outputCost = (outputTokens / 1_000_000) * pricing.output_per_million;
   return Math.round((inputCost + outputCost) * 1_000_000) / 1_000_000; // 6 decimal places
 }
 
@@ -383,7 +411,9 @@ export async function recordUsage(
   const featureSource: AIFeatureSource = data.feature_source ?? 'chat';
   const inputTokens = data.input_tokens ?? 0;
   const outputTokens = data.output_tokens ?? 0;
-  const costUsd = calculateCostUsd(inputTokens, outputTokens);
+  // Pass model id through so Flash vs Flash Lite turns are billed at
+  // their actual rates. Unknown/missing model defaults to primary.
+  const costUsd = calculateCostUsd(inputTokens, outputTokens, data.model_used);
 
   // Check if a row exists for today + feature_source
   const { data: existing } = await supabase
