@@ -174,6 +174,10 @@ export interface AIUsageDailyUpsert {
   conversation_count?: number;
   tool_calls_count?: number;
   feature_source?: AIFeatureSource;
+  /** OpenRouter model id used for this turn — drives cost calculation
+   *  when primary vs fallback differ in price. Defaults to primary
+   *  if omitted (most common case). */
+  model_used?: string;
 }
 
 // =============================================

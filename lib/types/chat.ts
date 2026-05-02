@@ -6,8 +6,11 @@
 // Chat message roles
 export type ChatRole = 'user' | 'assistant' | 'system';
 
-// The types of events that can stream from the server
-export type ChatStreamEventType = 'text' | 'tool_call' | 'result' | 'error' | 'done' | 'conversation_id';
+// The types of events that can stream from the server.
+// `model_used` carries the OpenRouter model id resolved by the orchestrator
+// (primary on success, fallback after primary fails). The API route uses it
+// to bill turns at Flash vs Flash Lite rates so admin cost cards stay honest.
+export type ChatStreamEventType = 'text' | 'tool_call' | 'result' | 'error' | 'done' | 'conversation_id' | 'model_used';
 
 // A single streamed event from the server
 export interface ChatStreamEvent {

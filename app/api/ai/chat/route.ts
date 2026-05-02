@@ -154,6 +154,12 @@ export async function POST(req: NextRequest) {
         let fullAssistantText = '';
         const toolCalls: AIToolCall[] = [];
         const toolResults: AIToolResult[] = [];
+        // Captured from the orchestrator's `model_used` event so the
+        // persisted message + recorded usage are billed at the actual
+        // model's rate (matters when fallback to Flash Lite fires).
+        // Stays undefined until the event lands — recordUsage and
+        // calculateCostUsd default to primary if not provided.
+        let modelUsed: string | undefined;
 
         try {
           // Send conversation ID as first event so client knows it
@@ -180,8 +186,12 @@ export async function POST(req: NextRequest) {
           });
 
           for await (const event of events) {
-            const sseData = `data: ${JSON.stringify(event)}\n\n`;
-            controller.enqueue(encoder.encode(sseData));
+            // Don't pipe the model_used event to the client — it's a
+            // server-side bookkeeping signal, not user-visible state.
+            if (event.type !== 'model_used') {
+              const sseData = `data: ${JSON.stringify(event)}\n\n`;
+              controller.enqueue(encoder.encode(sseData));
+            }
 
             // Collect data for persistence
             if (event.type === 'text' && typeof event.data === 'string') {
@@ -192,6 +202,8 @@ export async function POST(req: NextRequest) {
             } else if (event.type === 'result' && typeof event.data === 'object') {
               const tr = event.data as { id: string; toolName: string; success: boolean; data?: Record<string, unknown>; message: string };
               toolResults.push({ id: tr.id, name: tr.toolName, success: tr.success, data: tr.data });
+            } else if (event.type === 'model_used' && typeof event.data === 'string') {
+              modelUsed = event.data;
             }
           }
 
@@ -207,7 +219,8 @@ export async function POST(req: NextRequest) {
             toolCalls,
             toolResults,
             latencyMs,
-            voiceDurationSeconds
+            voiceDurationSeconds,
+            modelUsed
           ).catch((err) => {
             logger.warn('[API] Failed to persist AI messages', {
               component: 'api-route',
@@ -273,8 +286,13 @@ async function persistMessages(
   toolCalls: AIToolCall[],
   toolResults: AIToolResult[],
   latencyMs: number,
-  voiceDurationSeconds?: number
+  voiceDurationSeconds?: number,
+  modelUsed?: string,
 ): Promise<void> {
+  // Default to primary if the orchestrator didn't surface the model
+  // (legacy code paths or test stubs). Cost rows then bill at primary
+  // rates — overestimates relative to Flash Lite but never underbills.
+  const resolvedModel = modelUsed ?? 'google/gemini-2.5-flash';
   // Estimate tokens (~4 chars per token as rough approximation)
   const estimatedInputTokens = Math.ceil(userMessage.length / 4);
   const estimatedOutputTokens = Math.ceil(assistantText.length / 4);
@@ -297,7 +315,7 @@ async function persistMessages(
       tool_calls_json: toolCalls.length > 0 ? toolCalls : null,
       tool_results_json: toolResults.length > 0 ? toolResults : null,
       output_tokens: estimatedOutputTokens,
-      model_used: 'gemini-2.5-flash',
+      model_used: resolvedModel,
       latency_ms: latencyMs,
     });
   }
@@ -313,5 +331,6 @@ async function persistMessages(
     conversation_count: 0, // Only count 1 for new conversations
     tool_calls_count: toolCalls.length,
     feature_source: 'chat',
+    model_used: resolvedModel,
   });
 }
