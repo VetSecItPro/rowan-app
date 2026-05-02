@@ -551,6 +551,11 @@ class ChatOrchestratorService {
         result = yield* this.streamModelResponse(client, history, systemPrompt, FALLBACK_MODEL);
       }
 
+      // Surface the resolved model id so the API route can pass it into
+      // recordUsage / message persistence — without this, fallback turns
+      // get billed at primary rates and admin cost dashboards drift.
+      yield { type: 'model_used', data: usedModel };
+
       // -- SECURITY: Check for system prompt leakage in AI output ----------
       if (result.text && containsSystemPromptLeakage(result.text)) {
         logger.warn('[ChatOrchestrator] System prompt leakage detected, sanitizing response', {
