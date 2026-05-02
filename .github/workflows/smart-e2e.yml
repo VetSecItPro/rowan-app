@@ -7,12 +7,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Shared concurrency group prevents parallel E2E runs across workflows
-# Both CI and Smart E2E share the same Supabase test users — concurrent
-# seed scripts delete/recreate users, invalidating each other's sessions
+# Concurrency cancels superseded runs on the same ref. There's no shared
+# resource anymore (every run spins up its own local Supabase), so
+# cancel-in-progress is safe and saves CI minutes.
 concurrency:
-  group: e2e-supabase-shared
-  cancel-in-progress: false
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -20,60 +20,20 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Seed test users ONCE before all E2E tests
-  seed-users:
-    name: Seed Test Users
+  # Single consolidated job: previously seed-users + e2e + cleanup-users
+  # ran across three separate runners against the production database.
+  # Now each run boots its own Docker-based Supabase, so they all live
+  # together in one job. Test data is destroyed when the runner is
+  # cleaned up — production never sees any of it.
+  e2e:
+    name: Run E2E Tests
     runs-on: ubuntu-latest
-    # Skip if commit message or PR title contains [skip-e2e] (saves CI minutes when iterating)
+    # Skip if commit message or PR title contains [skip-e2e].
     if: >-
       !contains(github.event.head_commit.message || '', '[skip-e2e]') &&
       !contains(github.event.pull_request.title || '', '[skip-e2e]')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Seed E2E test users
-        run: pnpm tsx tests/e2e/setup/seed-test-users.ts
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
-
-  # E2E test execution. Inlined (was: uses: VetSecItPro/e2e-intelligence/...)
-  # because that template repo doesn't exist (HTTP 404). Self-contained flow
-  # avoids cross-repo dependencies and keeps the workflow shippable.
-  e2e:
-    name: Run E2E Tests
-    needs: seed-users
-    runs-on: ubuntu-latest
-    # Playwright config has retries=2 in CI; with the current test count
-    # the suite consistently lands in the 25-45 min range. 60 min keeps
-    # headroom for a third retry on a flaky individual spec without
-    # cancelling the whole job.
+    # Local Supabase boot adds ~60-90s; build + 25-45min test suite is
+    # the bulk of the time. 60 min total leaves headroom for retries.
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -116,20 +76,50 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      - name: Build app
+      # ─────────────────────────────────────────────────────────────────
+      # Local Supabase: every run gets its own isolated database.
+      # `supabase start` boots Postgres + Auth + Storage in Docker
+      # containers using github-hosted runner Docker. All migrations in
+      # supabase/migrations/ apply automatically on boot, so the schema
+      # matches production without touching the prod DB.
+      # ─────────────────────────────────────────────────────────────────
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Export Supabase env to workflow
+        run: |
+          # `supabase status -o env` emits KEY="value" pairs for each
+          # service URL/key. Append to GITHUB_ENV so subsequent steps
+          # see them as env vars without us hand-listing every one.
+          supabase status -o env >> $GITHUB_ENV
+
+      - name: Seed E2E test users
+        run: pnpm tsx tests/e2e/setup/seed-test-users.ts
+        env:
+          # API_URL / SERVICE_ROLE_KEY come from `supabase status -o env`.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.API_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SERVICE_ROLE_KEY }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+
+      - name: Build app (pointed at local Supabase)
         run: pnpm build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.API_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.ANON_KEY }}
           NEXT_PUBLIC_ENABLE_MONETIZATION: 'true'
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests (against local Supabase)
         run: npx playwright test --project=chromium
         env:
           CI: 'true'
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.API_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_ENABLE_MONETIZATION: 'true'
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
 
@@ -149,42 +139,6 @@ jobs:
           path: test-results/
           retention-days: 7
 
-  # Cleanup test users after all E2E tests (runs even if tests fail)
-  cleanup-users:
-    name: Cleanup Test Users
-    needs: [seed-users, e2e]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Cleanup E2E test users
-        run: pnpm tsx tests/e2e/setup/cleanup-test-users.ts
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup || true
