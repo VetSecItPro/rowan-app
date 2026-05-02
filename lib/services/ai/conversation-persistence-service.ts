@@ -39,11 +39,19 @@ import type {
 // ---------------------------------------------------------------------------
 
 // Pricing from: https://openrouter.ai/google/gemini-2.5-flash
-// Last verified: 2026-02-28
-// Update if model or provider changes
+// Re-verify quarterly via:
+//   curl -s https://openrouter.ai/api/v1/models | jq '.data[] | select(.id=="google/gemini-2.5-flash") | .pricing'
+// (multiply prompt/completion by 1_000_000 to get per-1M-token rates)
+//
+// Last verified: 2026-05-01 — repriced upward since 2026-02-28:
+//   input  $0.15 → $0.30 (2x)
+//   output $0.60 → $2.50 (4.17x)
+// Effective per-turn cost is ~3.3x the prior figure for typical chat
+// workloads. If model identifier changes or output cost trends > $5/1M,
+// reconsider primary; see README discussion in chat-orchestrator-service.ts.
 const GEMINI_PRICING = {
-  input_per_million: 0.15,   // $0.15 / 1M input tokens (OpenRouter Gemini 2.5 Flash)
-  output_per_million: 0.60,  // $0.60 / 1M output tokens (OpenRouter Gemini 2.5 Flash)
+  input_per_million: 0.30,   // $0.30 / 1M input tokens (OpenRouter Gemini 2.5 Flash)
+  output_per_million: 2.50,  // $2.50 / 1M output tokens (OpenRouter Gemini 2.5 Flash)
 };
 
 /** Calculate estimated cost in USD for a token usage record */
