@@ -3,18 +3,20 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    # Skip CI for asset / docs / backlog / SQL-migration-only PRs. Build cost
-    # saver — none of these change the JS bundle, so build + lighthouse +
-    # bundle checks are wasted minutes. Note: scripts/ is intentionally NOT
-    # here because admin scripts run as service_role and need the security
-    # audit. Migrations are gated separately by the deploy.yml drift-check
-    # job, which fires on push to main and validates schema integrity.
+    # Skip CI for asset / docs / backlog PRs. Build cost saver — none of
+    # these change the JS bundle, so build + lighthouse + bundle checks
+    # are wasted minutes. Note: scripts/ is intentionally NOT here because
+    # admin scripts run as service_role and need the security audit.
+    # Migrations also stay in CI: branch protection requires the same 3
+    # checks (Lint, Build, Security Audit) on every PR, and skipping CI
+    # for a migration-only PR creates an unmerge-able PR. Drift check in
+    # deploy.yml is still the authoritative integrity gate; CI on
+    # migration PRs just satisfies branch protection cheaply.
     paths-ignore:
       - 'public/marketing/**'
       - 'public/screenshots/**'
       - '**/*.md'
       - 'docs/**'
-      - 'supabase/migrations/**'
 
 # F-019: Minimal token permissions — prevents supply-chain attacks from
 # exfiltrating the GITHUB_TOKEN with write access.
