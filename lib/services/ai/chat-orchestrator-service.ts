@@ -233,9 +233,21 @@ function containsSystemPromptLeakage(text: string): boolean {
 /** Max conversation turns to keep */
 const MAX_HISTORY_ENTRIES = 60;
 
-/** OpenRouter models — primary with automatic fallback */
+/** OpenRouter models — primary with automatic fallback.
+ *
+ * Both slots stay in the Gemini 2.5 Flash family so cost-tracking stays
+ * within a single vendor's pricing surface and we don't get surprised by
+ * a third-party (Llama 4 Maverick was the fallback until 2026-05-01,
+ * but its tool-call accuracy regressed and OpenRouter raised Flash
+ * pricing 3.3x — keeping both slots Google means cost dashboards
+ * compute correctly on either model).
+ *
+ * Pricing is tracked in conversation-persistence-service.ts MODEL_PRICING.
+ * Both models support 1M context, so context-window mismatch isn't a
+ * concern when fallback fires.
+ */
 const PRIMARY_MODEL = 'google/gemini-2.5-flash';
-const FALLBACK_MODEL = 'meta-llama/llama-4-maverick';
+const FALLBACK_MODEL = 'google/gemini-2.5-flash-lite';
 
 // ---------------------------------------------------------------------------
 // In-memory stores (session-scoped, acceptable for MVP)
