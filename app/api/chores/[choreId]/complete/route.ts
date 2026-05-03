@@ -80,7 +80,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Check if already completed
+    // Quick fast-path check (UX) — if already completed, return 400 without
+    // attempting the update. This is NOT the race-safe guard; the actual
+    // race-safe guard is the conditional UPDATE below.
     if (chore.status === 'completed') {
       return NextResponse.json(
         { error: 'Chore is already completed' },
@@ -91,7 +93,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const completionDate = new Date();
     const completionDateISO = completionDate.toISOString();
 
-    // Update the chore status to completed
+    // Race-safe atomic state transition: only succeed if the row's status
+    // is still NOT 'completed' at update time. Postgres serializes UPDATEs
+    // on the same row — exactly one of N concurrent requests will match
+    // and flip the status; the others will see zero rows updated and
+    // bail out with the already-completed error.
+    //
+    // RT-302 (red-team 2026-05-03): without this guard, 10 concurrent
+    // POSTs all passed the line-84 check, all UPDATEd successfully, and
+    // all called complete_chore_award_points — awarding ~7x the intended
+    // points for a single completion. The .neq('status','completed')
+    // predicate is the canonical "compare-and-swap" fix.
     const { data: updatedChore, error: updateError } = await supabase
       .from('chores')
       .update({
@@ -99,10 +111,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         completed_at: completionDateISO,
       })
       .eq('id', choreId)
+      .neq('status', 'completed')
       .select()
       .single();
 
     if (updateError) {
+      // PGRST116 = "no rows returned" → another concurrent request won
+      // the race and already marked this chore completed. Return 400
+      // (matching the fast-path response) so the caller sees consistent
+      // behavior regardless of which path detected the duplicate.
+      if (updateError.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: 'Chore is already completed' },
+          { status: 400 }
+        );
+      }
       throw updateError;
     }
 
