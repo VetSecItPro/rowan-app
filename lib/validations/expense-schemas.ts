@@ -20,23 +20,39 @@ const recurringFrequencyEnum = z.enum(['weekly', 'biweekly', 'monthly', 'quarter
 export const expenseBaseSchema = z.object({
   space_id: z.string().uuid('Invalid space ID'),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters').trim(),
+  // RT-304 (red-team 2026-05-03): the previous .min(0) accepted 0 despite
+  // the "must be positive" message. Use .gt(0) so the validator and the
+  // error message agree. Zero-amount expenses don't make sense and tend
+  // to indicate a UI bug or a probe.
   amount: z.union([
-    z.number().min(0, 'Amount must be positive').max(99999999.99, 'Amount too large'),
+    z.number().gt(0, 'Amount must be positive').max(99999999.99, 'Amount too large'),
     z.string().transform(val => {
       const parsed = parseFloat(val);
       if (isNaN(parsed)) throw new Error('Invalid amount');
       return parsed;
     })
-  ]).refine(val => typeof val === 'number' && val >= 0, 'Amount must be a positive number'),
+  ]).refine(val => typeof val === 'number' && val > 0, 'Amount must be a positive number'),
   category: expenseCategoryEnum.optional().nullable(),
   payment_method: paymentMethodEnum.optional().nullable(),
   paid_by: z.string().uuid('Invalid user ID').optional().nullable(),
   status: expenseStatusEnum.default('pending'),
   date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val),
+  // RT-303 (red-team 2026-05-03): previous validator only checked format,
+  // accepting `1970-01-01` and `9999-12-31`. Bound to a reasonable window
+  // (year 2000 .. now+10y) so probes / UI bugs don't write nonsense dates
+  // that break downstream date-arithmetic / reminder logic.
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
-    .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format'),
+    .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format')
+    .refine(val => {
+      if (val === null || val === undefined) return true;
+      const d = new Date(val);
+      if (Number.isNaN(d.getTime())) return false;
+      const minYear = new Date('2000-01-01').getTime();
+      const maxYear = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).getTime();
+      return d.getTime() >= minYear && d.getTime() <= maxYear;
+    }, 'Due date must be between 2000 and 10 years in the future'),
   recurring: z.boolean().default(false),
   recurring_frequency: recurringFrequencyEnum.optional().nullable(),
   description: z.string().max(2000, 'Description must be less than 2000 characters').trim().optional().nullable()
