@@ -49,50 +49,12 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB base64 encoded
 const MAX_URL_FETCH_BYTES = 5 * 1024 * 1024; // 5MB upper bound on fetched HTML
 const URL_FETCH_TIMEOUT_MS = 10_000; // 10 seconds
 
-/**
- * SSRF guard: only allow http/https public URLs.
- * Blocks: non-http(s) schemes, localhost, private IP ranges, link-local.
- */
-function validateImportUrl(url: string): { ok: true; parsed: URL } | { ok: false; reason: string } {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return { ok: false, reason: 'Not a valid URL.' };
-  }
-  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-    return { ok: false, reason: 'Only http(s) URLs are supported.' };
-  }
-  const host = parsed.hostname.toLowerCase();
-  // Block localhost / loopback / link-local / unspecified
-  if (
-    host === 'localhost' ||
-    host === '0.0.0.0' ||
-    host.endsWith('.local') ||
-    host.endsWith('.localhost')
-  ) {
-    return { ok: false, reason: 'Private/local URLs are not allowed.' };
-  }
-  // Block private IPv4 ranges
-  const ipv4 = host.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-  if (ipv4) {
-    const [a, b] = [parseInt(ipv4[1], 10), parseInt(ipv4[2], 10)];
-    if (
-      a === 10 ||
-      a === 127 ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168)
-    ) {
-      return { ok: false, reason: 'Private IP addresses are not allowed.' };
-    }
-  }
-  // Block IPv6 loopback / link-local / unique-local
-  if (host === '::1' || host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
-    return { ok: false, reason: 'Private IPv6 addresses are not allowed.' };
-  }
-  return { ok: true, parsed };
-}
+// SSRF guard delegated to lib/security/url-validator.ts (RT-201 fix).
+// Local string-only checks were bypassed by DNS rebinding (localtest.me,
+// *.nip.io) and encoded IPs (octal/decimal/hex/IPv4-mapped IPv6) — the
+// shared validator resolves DNS at validation time and checks the
+// resolved address against private ranges.
+import { validatePublicUrl } from '@/lib/security/url-validator';
 
 /**
  * Fetch a URL and return its body as plain text (HTML stripped).
@@ -128,7 +90,10 @@ async function fetchUrlAsText(url: string): Promise<string | null> {
           return null;
         }
         const nextUrl = new URL(location, currentUrl).toString();
-        const recheck = validateImportUrl(nextUrl);
+        // Re-validate every redirect hop with DNS resolution; a public-
+        // looking host can 302 to AWS IMDS / RFC1918, and the new
+        // validator catches that even when the encoding is exotic.
+        const recheck = await validatePublicUrl(nextUrl);
         if (!recheck.ok) {
           clearTimeout(timer);
           return null;
@@ -241,7 +206,7 @@ export async function POST(req: NextRequest) {
     // URL mode: SSRF-safe fetch then strip HTML to plain text and feed
     // the same Gemini path as the text-mode flow.
     if (url && !text && !imageBase64) {
-      const validation = validateImportUrl(url);
+      const validation = await validatePublicUrl(url);
       if (!validation.ok) {
         return NextResponse.json({ error: validation.reason }, { status: 400 });
       }

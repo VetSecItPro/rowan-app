@@ -39,8 +39,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = EmailSubscriptionSchema.safeParse(body);
     if (!parsed.success) {
+      // RT-102 (red-team 2026-05-03): suppress the Zod field-error schema
+      // from the public response. Field names + path arrays gave a free
+      // map of expected payload shape to anyone probing the endpoint.
+      // Generic 400 is enough — legitimate clients are the website's
+      // own form, which has its own client-side validation.
       return NextResponse.json(
-        { success: false, error: 'Invalid request body', details: parsed.error.flatten() },
+        { success: false, error: 'Invalid request body' },
         { status: 400 }
       );
     }
