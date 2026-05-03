@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { ICSFeedConfig, SyncResult } from '@/lib/types/calendar-integration';
 import ICAL from 'ical.js';
 import { logger } from '@/lib/logger';
+import { validatePublicUrl } from '@/lib/security/url-validator';
 
 /**
  * ICS Import Service
@@ -132,44 +133,50 @@ function isPrivateOrReservedHost(hostname: string): boolean {
 }
 
 /**
- * Validate an ICS feed URL
- * SECURITY: Includes SSRF protection to block private/internal targets
+ * Validate an ICS feed URL.
+ *
+ * RT-201 (red-team 2026-05-03): switched from sync string-only validation
+ * (isPrivateOrReservedHost on the literal hostname) to the shared async
+ * validatePublicUrl, which resolves DNS at validation time. This catches
+ * DNS rebinding (localtest.me, *.nip.io) + encoded-IP variants
+ * (octal/decimal/hex/IPv4-mapped IPv6) that the literal-hostname checks
+ * missed. The function signature is now async — callers updated in lockstep.
+ *
+ * SECURITY: Includes SSRF protection to block private/internal targets.
  */
-export function validateICSUrl(url: string): { valid: boolean; normalizedUrl: string; error?: string } {
+export async function validateICSUrl(url: string): Promise<{ valid: boolean; normalizedUrl: string; error?: string }> {
   try {
-    // Normalize webcal:// to https://
+    // Normalize webcal:// to https:// before any other validation.
     let normalizedUrl = url.trim();
     if (normalizedUrl.startsWith('webcal://')) {
       normalizedUrl = normalizedUrl.replace('webcal://', 'https://');
     }
 
-    // Validate URL format
-    const parsedUrl = new URL(normalizedUrl);
-
-    // SECURITY: Only allow HTTPS in production to prevent MITM attacks
-    // Allow http:// only in development for local testing
-    if (process.env.NODE_ENV === 'production') {
-      if (parsedUrl.protocol !== 'https:') {
-        return { valid: false, normalizedUrl, error: 'URL must use HTTPS protocol' };
-      }
-    } else {
-      // Development: allow http and https
-      if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
-        return { valid: false, normalizedUrl, error: 'URL must use HTTP or HTTPS protocol' };
-      }
+    // Production HTTPS-only gate. validatePublicUrl accepts http/https
+    // generically; we tighten to https in production to prevent MITM on
+    // calendar feeds (which often carry sensitive event data).
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(normalizedUrl);
+    } catch {
+      return { valid: false, normalizedUrl, error: 'Invalid URL format' };
+    }
+    if (process.env.NODE_ENV === 'production' && parsedUrl.protocol !== 'https:') {
+      return { valid: false, normalizedUrl, error: 'URL must use HTTPS protocol' };
     }
 
-    // SECURITY: Block private/internal IPs to prevent SSRF attacks
-    // This blocks: RFC1918, loopback, link-local, cloud metadata, internal domains
-    if (isPrivateOrReservedHost(parsedUrl.hostname)) {
-      logger.warn('[ICS Validation] Blocked SSRF attempt to private/internal host', {
+    // Hand off the SSRF checks to the shared validator (DNS-resolved).
+    const ssrfCheck = await validatePublicUrl(normalizedUrl);
+    if (!ssrfCheck.ok) {
+      logger.warn('[ICS Validation] Blocked SSRF attempt', {
         component: 'lib-ics-import-service',
         hostname: parsedUrl.hostname,
+        reason: ssrfCheck.reason,
       });
-      return { valid: false, normalizedUrl, error: 'URL points to a private or internal address' };
+      return { valid: false, normalizedUrl, error: ssrfCheck.reason };
     }
 
-    // Block non-standard ports in production (except 443 for HTTPS)
+    // Block non-standard ports in production (except 443 for HTTPS).
     if (process.env.NODE_ENV === 'production' && parsedUrl.port && parsedUrl.port !== '443') {
       return { valid: false, normalizedUrl, error: 'Non-standard ports are not allowed' };
     }
@@ -221,7 +228,7 @@ async function fetchICSData(
           return { success: false, error: 'Too many redirects or missing Location header' };
         }
         const nextUrl = new URL(location, currentUrl).toString();
-        const recheck = validateICSUrl(nextUrl);
+        const recheck = await validateICSUrl(nextUrl);
         if (!recheck.valid) {
           return { success: false, error: `Redirect target rejected: ${recheck.error}` };
         }
@@ -730,7 +737,7 @@ async function testICSFeed(url: string): Promise<{
   error?: string;
 }> {
   // Validate URL
-  const validation = validateICSUrl(url);
+  const validation = await validateICSUrl(url);
   if (!validation.valid) {
     return { success: false, error: validation.error };
   }

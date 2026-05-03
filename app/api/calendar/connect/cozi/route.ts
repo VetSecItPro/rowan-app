@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = CoziConnectSchema.parse(body);
 
-    // Validate and normalize URL (Cozi URLs should be ICS format)
-    const urlValidation = icsImportService.validateICSUrl(validatedData.url);
+    // Validate and normalize URL (async — DNS-resolved SSRF check)
+    const urlValidation = await icsImportService.validateICSUrl(validatedData.url);
     if (!urlValidation.valid) {
       return NextResponse.json(
         { error: urlValidation.error },
