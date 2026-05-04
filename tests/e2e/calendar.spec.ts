@@ -21,10 +21,13 @@ test.describe('Calendar Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('calendar page loads and displays current month', async ({ page }) => {
-    // Verify page title/heading
+  test('calendar page loads and displays current month', async ({ page }) => {
+    // Verify page title/heading.
+    // FeatureGateWrapper / SubscriptionContext gate the real heading
+    // behind a fetch that can take 30s+ in CI (3× retry × 20s + backoff).
+    // See issue #350.
     const heading = page.locator('h1, h2').filter({ hasText: /calendar/i }).first();
-    await expect(heading).toBeVisible({ timeout: 10000 });
+    await expect(heading).toBeVisible({ timeout: 45000 });
 
     // Verify calendar grid is visible
     const calendarGrid = page.locator('[data-testid="calendar-grid"], .calendar-grid, [class*="calendar"]').first();

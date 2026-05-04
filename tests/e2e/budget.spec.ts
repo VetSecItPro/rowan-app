@@ -21,10 +21,14 @@ test.describe('Budget/Expenses Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('expenses page loads and displays budget overview', async ({ page }) => {
-    // Verify page title/heading
+  test('expenses page loads and displays budget overview', async ({ page }) => {
+    // Verify page title/heading.
+    // FeatureGateWrapper renders only a skeleton (no h1) while
+    // SubscriptionContext fetch is in flight. That fetch retries 3× with
+    // 20s timeout + backoff, so under CI load the real <h1>Expenses</h1>
+    // can take 30s+ to appear. See issue #350.
     const heading = page.locator('h1, h2').filter({ hasText: /budget|expenses|household/i }).first();
-    await expect(heading).toBeVisible({ timeout: 10000 });
+    await expect(heading).toBeVisible({ timeout: 45000 });
 
     // Verify add expense button exists
     const addButton = page.locator('[data-testid="add-expense-button"], button:has-text("Add Expense"), button:has-text("New Expense")').first();
