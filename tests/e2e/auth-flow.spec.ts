@@ -59,13 +59,21 @@ test.describe('Auth Flow Tests', () => {
     // Dismiss cookie banner if present (fixes mobile viewport blocking)
     await dismissCookieBanner(page);
 
-    // Try submitting empty form using resilient selector
-    await resilientClick(page, 'signup-submit-button', {
-      role: 'button',
-      text: 'Create Account',
-    });
+    // Submit button is gated on age + TOS confirmation; it stays disabled
+    // until both checkboxes are checked. That IS the form's first-line
+    // validation, so we assert the disabled state directly rather than
+    // attempting an un-clickable click.
+    const submitButton = page.getByTestId('signup-submit-button');
+    await expect(submitButton).toBeDisabled();
 
-    // Should show validation — page should stay on /signup
+    // After both checkboxes are checked but email/password empty, the
+    // button enables and submission triggers HTML5 / server-side validation
+    // — both keep us on /signup.
+    await page.getByTestId('signup-age-checkbox').check();
+    await page.getByTestId('signup-tos-checkbox').check();
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
+
     await page.waitForTimeout(1000);
     expect(page.url()).toContain('/signup');
 
@@ -100,6 +108,10 @@ test.describe('Auth Flow Tests', () => {
         role: 'textbox',
       });
     }
+
+    // Required: age + TOS confirmation gate the submit button
+    await page.getByTestId('signup-age-checkbox').check();
+    await page.getByTestId('signup-tos-checkbox').check();
 
     // Submit the form
     await resilientClick(page, 'signup-submit-button', {
