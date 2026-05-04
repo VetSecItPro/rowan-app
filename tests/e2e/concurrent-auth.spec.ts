@@ -172,8 +172,12 @@ async function testConcurrentLogin(
     await page.waitForLoadState('networkidle').catch(() => {});
 
     // Step 6: Wait for subscription data to load (generous timeout for CI)
+    // SubscriptionContext retries fetch 3× with 20s timeout + exponential
+    // backoff (1s, 2s, 4s) — worst case ~67s. Under 5-user concurrent load
+    // on a single CI runner, the third retry can land past 75s. Bumped to
+    // 120s to absorb that envelope. See issue #351.
     const planElement = page.getByTestId('subscription-plan-name');
-    await planElement.waitFor({ state: 'visible', timeout: 75000 });
+    await planElement.waitFor({ state: 'visible', timeout: 120000 });
 
     const displayedTier = await planElement.textContent();
     const fetchDuration = Date.now() - fetchStart;
