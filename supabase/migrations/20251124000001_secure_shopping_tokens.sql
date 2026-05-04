@@ -60,10 +60,15 @@ CREATE TRIGGER set_shopping_list_shared_at_secure
 -- 3. UPDATE DEFAULT VALUE FOR NEW RECORDS
 -- ==========================================
 
--- Update the default value for share_token to use secure generation
--- Note: We keep the existing column to avoid data loss
+-- The earlier migration that created shopping_lists declared
+-- share_token as UUID. The secure-token function returns TEXT, so set
+-- the type before changing the default. Drop the old default first
+-- (gen_random_uuid()) since it's incompatible with the new TEXT type.
+ALTER TABLE shopping_lists ALTER COLUMN share_token DROP DEFAULT;
 ALTER TABLE shopping_lists
-ALTER COLUMN share_token SET DEFAULT generate_secure_share_token();
+  ALTER COLUMN share_token TYPE TEXT USING share_token::text;
+ALTER TABLE shopping_lists
+  ALTER COLUMN share_token SET DEFAULT generate_secure_share_token();
 
 -- ==========================================
 -- 4. OPTIONAL: UPDATE EXISTING TOKENS

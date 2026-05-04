@@ -44,21 +44,28 @@ BEGIN
   END IF;
 END $$;
 
--- Add indexes for efficient querying of archived data
+-- Add indexes for efficient querying of archived data.
+-- The original migration tried to create composite indexes on
+-- (archived, partnership_id), but partnership_id doesn't exist on these
+-- tables in prod (the FK to a never-created partnerships table failed
+-- at original apply). Rewriting to a simple partial index on `archived`
+-- which matches prod's actual idx_tasks_archived layout. The expenses
+-- and calendar_events indexes never landed in prod — adding them here
+-- as the same partial-index pattern.
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'expenses') THEN
-    CREATE INDEX IF NOT EXISTS idx_expenses_archived ON expenses(archived, partnership_id);
+    CREATE INDEX IF NOT EXISTS idx_expenses_archived ON expenses(archived) WHERE archived = true;
     COMMENT ON COLUMN expenses.archived IS 'Whether this expense has been archived for data minimization';
   END IF;
 
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tasks') THEN
-    CREATE INDEX IF NOT EXISTS idx_tasks_archived ON tasks(archived, partnership_id);
+    CREATE INDEX IF NOT EXISTS idx_tasks_archived ON tasks(archived) WHERE archived = true;
     COMMENT ON COLUMN tasks.archived IS 'Whether this task has been archived for data minimization';
   END IF;
 
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'calendar_events') THEN
-    CREATE INDEX IF NOT EXISTS idx_calendar_events_archived ON calendar_events(archived, partnership_id);
+    CREATE INDEX IF NOT EXISTS idx_calendar_events_archived ON calendar_events(archived) WHERE archived = true;
     COMMENT ON COLUMN calendar_events.archived IS 'Whether this event has been archived for data minimization';
   END IF;
 END $$;

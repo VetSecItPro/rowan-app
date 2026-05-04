@@ -184,17 +184,22 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $function$;
 
--- Step 2: Clear existing trial data from all subscriptions
-UPDATE public.subscriptions
-SET trial_started_at = NULL,
-    trial_ends_at = NULL,
-    updated_at = NOW();
+-- Step 2: Clear existing trial data from all subscriptions.
+-- Wrapped in column-existence guards so a fresh DB (where these columns
+-- may not yet exist if downstream migrations haven't run) doesn't error.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema='public' AND table_name='subscriptions' AND column_name='trial_started_at') THEN
+    EXECUTE 'UPDATE public.subscriptions SET trial_started_at = NULL, trial_ends_at = NULL, updated_at = NOW()';
+  END IF;
+END $$;
 
--- Step 3: Clear beta fields from all users
-UPDATE public.users
-SET is_beta_tester = false,
-    beta_status = NULL,
-    beta_ends_at = NULL
-WHERE is_beta_tester = true
-   OR beta_status IS NOT NULL
-   OR beta_ends_at IS NOT NULL;
+-- Step 3: Clear beta fields from all users (also column-guarded).
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema='public' AND table_name='users' AND column_name='is_beta_tester') THEN
+    EXECUTE 'UPDATE public.users SET is_beta_tester = false, beta_status = NULL, beta_ends_at = NULL WHERE is_beta_tester = true OR beta_status IS NOT NULL OR beta_ends_at IS NOT NULL';
+  END IF;
+END $$;

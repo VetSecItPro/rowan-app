@@ -7,8 +7,14 @@
 -- ADMIN USERS TABLE
 -- =============================================
 
+-- Canonical admin_users table. The user_id column is added inline here
+-- so downstream migrations referencing it (e.g. 20251221000001's RLS
+-- policies on feature_events) replay cleanly on a fresh DB.
+-- CREATE TABLE IF NOT EXISTS makes this a no-op on prod where both
+-- columns already exist.
 CREATE TABLE IF NOT EXISTS admin_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
   role TEXT DEFAULT 'admin' CHECK (role IN ('admin', 'super_admin', 'viewer')),
   permissions JSONB DEFAULT '{}',

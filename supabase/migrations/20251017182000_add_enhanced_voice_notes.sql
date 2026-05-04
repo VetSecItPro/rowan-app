@@ -149,8 +149,12 @@ CREATE POLICY "Users can delete their own templates"
   FOR DELETE
   USING (created_by = auth.uid() AND is_default = FALSE);
 
--- Function to update template usage count
-CREATE OR REPLACE FUNCTION increment_template_usage(template_id UUID)
+-- Function to update template usage count.
+-- DROP first because the same function name was defined earlier with
+-- parameter `p_template_id`; Postgres rejects CREATE OR REPLACE that
+-- changes parameter names.
+DROP FUNCTION IF EXISTS increment_template_usage(UUID);
+CREATE FUNCTION increment_template_usage(template_id UUID)
 RETURNS VOID AS $$
 BEGIN
   UPDATE voice_note_templates

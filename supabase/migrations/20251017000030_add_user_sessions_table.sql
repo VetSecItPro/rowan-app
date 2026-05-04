@@ -31,9 +31,12 @@ CREATE TABLE IF NOT EXISTS user_sessions (
   revoked_at TIMESTAMPTZ,
 
   -- Additional metadata
-  user_agent TEXT,
-
-  CONSTRAINT user_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+  user_agent TEXT
+  -- Removed redundant `CONSTRAINT user_sessions_user_id_fkey FOREIGN KEY (user_id) ...`:
+  -- the inline `REFERENCES` on the user_id column above auto-generates a
+  -- constraint with the same name, causing a duplicate-constraint error
+  -- on fresh-DB replay. Prod was unaffected because the duplicate failed
+  -- silently the first time.
 );
 
 -- Create indexes for performance

@@ -265,3 +265,18 @@ GROUP BY gc.goal_id, g.target_amount, g.current_amount, g.target_date;
 -- Grant view permissions
 GRANT SELECT ON goal_contribution_stats TO authenticated;
 GRANT SELECT ON goal_contribution_stats TO service_role;
+
+-- =====================================================================
+-- Backfill: re-attach the milestone-celebration trigger from
+-- 20251016000009_milestone_celebration_system.sql now that the
+-- goals.current_amount column exists. The earlier migration's CREATE
+-- TRIGGER was guarded with IF EXISTS so it skipped on fresh-DB replay;
+-- re-create it here to land at the same trigger set as prod.
+-- (No-op on prod where the trigger is already present.)
+-- =====================================================================
+DROP TRIGGER IF EXISTS check_milestone_completion_on_update ON goals;
+CREATE TRIGGER check_milestone_completion_on_update
+  AFTER UPDATE OF current_amount ON goals
+  FOR EACH ROW
+  WHEN (NEW.current_amount IS DISTINCT FROM OLD.current_amount)
+  EXECUTE FUNCTION check_milestone_completion();

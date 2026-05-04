@@ -62,7 +62,12 @@ CREATE TABLE IF NOT EXISTS settlements (
 -- Create partnership_balances table (running balance between partners)
 CREATE TABLE IF NOT EXISTS partnership_balances (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  partnership_id UUID NOT NULL REFERENCES partnerships(id) ON DELETE CASCADE,
+  -- partnerships table does not exist in production (the FK was never
+  -- successfully created — this migration was applied but the FK clause
+  -- silently failed or got dropped post-apply). Storing partnership_id
+  -- as a plain UUID to match the actual prod schema. If a partnerships
+  -- table is added later, the FK can be restored via a separate migration.
+  partnership_id UUID NOT NULL,
   space_id UUID NOT NULL REFERENCES spaces(id) ON DELETE CASCADE,
 
   -- Balance tracking (who owes whom)
@@ -102,14 +107,19 @@ ALTER TABLE settlements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE partnership_balances ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies: Expense Splits
+-- The original policy joined through `partnership_members`, but that table
+-- never existed in production — the FK silently failed at original apply.
+-- Production's actual policies (verified 2026-05-04) join through
+-- space_members instead, which IS the canonical membership table for Rowan.
+-- Rewriting to match the prod schema for replay parity.
 CREATE POLICY "Users can view expense splits for their expenses"
 ON expense_splits FOR SELECT TO authenticated
 USING (
   expense_id IN (
     SELECT e.id FROM expenses e
-    INNER JOIN spaces ON e.space_id = spaces.id
-    INNER JOIN partnership_members pm ON spaces.partnership_id = pm.partnership_id
-    WHERE pm.user_id = auth.uid()
+    WHERE e.space_id IN (
+      SELECT space_id FROM space_members WHERE user_id = auth.uid()
+    )
   )
 );
 
@@ -118,9 +128,9 @@ ON expense_splits FOR ALL TO authenticated
 USING (
   expense_id IN (
     SELECT e.id FROM expenses e
-    INNER JOIN spaces ON e.space_id = spaces.id
-    INNER JOIN partnership_members pm ON spaces.partnership_id = pm.partnership_id
-    WHERE pm.user_id = auth.uid()
+    WHERE e.space_id IN (
+      SELECT space_id FROM space_members WHERE user_id = auth.uid()
+    )
   )
 );
 
@@ -151,19 +161,22 @@ ON settlements FOR DELETE TO authenticated
 USING (created_by = auth.uid());
 
 -- RLS Policies: Partnership Balances
+-- Same fix as expense_splits — partnership_members never existed.
+-- Gate access through space_members + the partnership_balances.space_id
+-- column instead.
 CREATE POLICY "Users can view balances for their partnerships"
 ON partnership_balances FOR SELECT TO authenticated
 USING (
-  partnership_id IN (
-    SELECT partnership_id FROM partnership_members WHERE user_id = auth.uid()
+  space_id IN (
+    SELECT space_id FROM space_members WHERE user_id = auth.uid()
   )
 );
 
 CREATE POLICY "Partnership members can update balances"
 ON partnership_balances FOR ALL TO authenticated
 USING (
-  partnership_id IN (
-    SELECT partnership_id FROM partnership_members WHERE user_id = auth.uid()
+  space_id IN (
+    SELECT space_id FROM space_members WHERE user_id = auth.uid()
   )
 );
 

@@ -63,7 +63,8 @@ BEGIN
 END;
 $$;
 
--- Comment explaining the fix
+-- Comment explaining the fix.
+-- COMMENT ON ... IS expects a string LITERAL — || concatenation is
+-- invalid there. Inlined into a single literal.
 COMMENT ON FUNCTION sync_task_to_calendar() IS
-  'Trigger function to create calendar events for tasks with due dates. ' ||
-  'SECURITY DEFINER bypasses RLS to prevent query optimization issues.';
+  'Trigger function to create calendar events for tasks with due dates. SECURITY DEFINER bypasses RLS to prevent query optimization issues.';

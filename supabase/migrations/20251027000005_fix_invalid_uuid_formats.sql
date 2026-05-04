@@ -55,11 +55,12 @@ BEGIN
     FROM reminder_activities
     WHERE reminder_id::text !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 
-    -- Check if constraint was added
+    -- Check if constraint was added (use pg_constraint directly for
+    -- reliable cross-version behavior).
     SELECT EXISTS (
-        SELECT 1 FROM information_schema.check_constraints
-        WHERE constraint_name = 'reminder_activities_valid_uuid_check'
-        AND table_name = 'reminder_activities'
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'reminder_activities_valid_uuid_check'
+          AND conrelid = 'public.reminder_activities'::regclass
     ) INTO constraint_exists;
 
     RAISE NOTICE 'AFTER UUID CLEANUP:';

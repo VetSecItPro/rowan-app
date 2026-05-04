@@ -15,40 +15,40 @@
 -- 20251128120000_fix_remaining_fk_indexes.sql.
 
 -- Admin domain
-CREATE INDEX IF NOT EXISTS idx_admin_goals_created_by ON public.admin_goals(created_by);
-CREATE INDEX IF NOT EXISTS idx_admin_users_granted_by ON public.admin_users(granted_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_admin_goals_created_by ON public.admin_goals(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_admin_users_granted_by ON public.admin_users(granted_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- AI / messages
-CREATE INDEX IF NOT EXISTS idx_ai_messages_conversation_id ON public.ai_messages(conversation_id);
-CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON public.messages(thread_id);
-CREATE INDEX IF NOT EXISTS idx_messages_pinned_by ON public.messages(pinned_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_ai_messages_conversation_id ON public.ai_messages(conversation_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON public.messages(thread_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_messages_pinned_by ON public.messages(pinned_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Bills / reminders / events linkage
-CREATE INDEX IF NOT EXISTS idx_bills_linked_calendar_event_id ON public.bills(linked_calendar_event_id);
-CREATE INDEX IF NOT EXISTS idx_reminders_linked_bill_id ON public.reminders(linked_bill_id);
-CREATE INDEX IF NOT EXISTS idx_reminder_notifications_goal_id ON public.reminder_notifications(goal_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_bills_linked_calendar_event_id ON public.bills(linked_calendar_event_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_reminders_linked_bill_id ON public.reminders(linked_bill_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_reminder_notifications_goal_id ON public.reminder_notifications(goal_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Calendar / events
-CREATE INDEX IF NOT EXISTS idx_calendar_events_created_by ON public.calendar_events(created_by);
-CREATE INDEX IF NOT EXISTS idx_event_templates_created_by ON public.event_templates(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_calendar_events_created_by ON public.calendar_events(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_event_templates_created_by ON public.event_templates(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Goals
-CREATE INDEX IF NOT EXISTS idx_goal_milestones_goal_id ON public.goal_milestones(goal_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_milestones_goal_id ON public.goal_milestones(goal_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Investor summary
-CREATE INDEX IF NOT EXISTS idx_investor_summary_tokens_created_by ON public.investor_summary_tokens(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_investor_summary_tokens_created_by ON public.investor_summary_tokens(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Monetization
-CREATE INDEX IF NOT EXISTS idx_monetization_logs_user_id ON public.monetization_logs(user_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_monetization_logs_user_id ON public.monetization_logs(user_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Projects
-CREATE INDEX IF NOT EXISTS idx_projects_created_by ON public.projects(created_by);
-CREATE INDEX IF NOT EXISTS idx_project_milestones_project_id ON public.project_milestones(project_id);
-CREATE INDEX IF NOT EXISTS idx_project_milestones_space_id ON public.project_milestones(space_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_projects_created_by ON public.projects(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_project_milestones_project_id ON public.project_milestones(project_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_project_milestones_space_id ON public.project_milestones(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Rewards
-CREATE INDEX IF NOT EXISTS idx_rewards_catalog_space_id ON public.rewards_catalog(space_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_rewards_catalog_space_id ON public.rewards_catalog(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
 
 -- Recipes / shopping
-CREATE INDEX IF NOT EXISTS idx_shopping_items_recipe_id ON public.shopping_items(recipe_id);
-CREATE INDEX IF NOT EXISTS idx_shopping_tasks_source_recipe_id ON public.shopping_tasks(source_recipe_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_items_recipe_id ON public.shopping_items(recipe_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_tasks_source_recipe_id ON public.shopping_tasks(source_recipe_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index — col/table missing'; END $do$;

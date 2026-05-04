@@ -29,7 +29,17 @@ END $$;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE spaces ENABLE ROW LEVEL SECURITY;
 ALTER TABLE space_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE space_invitations ENABLE ROW LEVEL SECURITY;
+-- space_invitations is created by a later migration (20251019000000_create_space_invitations.sql).
+-- RLS for it is enabled in 20251023000000_fix_space_invitations_rls_policy.sql.
+-- Removed from here so this migration replays cleanly on a fresh DB.
+-- Wrap in DO/IF EXISTS so already-applied prod state isn't disturbed:
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables
+             WHERE table_schema='public' AND table_name='space_invitations') THEN
+    EXECUTE 'ALTER TABLE space_invitations ENABLE ROW LEVEL SECURITY';
+  END IF;
+END $$;
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
@@ -440,25 +450,38 @@ CREATE POLICY spaces_delete ON spaces FOR DELETE
 -- =============================================
 -- SECTION 8: SPACE INVITATIONS POLICIES (Pattern D)
 -- =============================================
-
--- Users can view invitations TO their email OR FROM their spaces
-CREATE POLICY space_invitations_select ON space_invitations FOR SELECT
-  USING (
-    email = (SELECT email FROM auth.users WHERE id = auth.uid()) OR
-    user_has_space_access(space_id)
-  );
-
--- Only space members can create invitations
-CREATE POLICY space_invitations_insert ON space_invitations FOR INSERT
-  WITH CHECK (user_has_space_access(space_id));
-
--- Only space members can update invitations
-CREATE POLICY space_invitations_update ON space_invitations FOR UPDATE
-  USING (user_has_space_access(space_id));
-
--- Only space members can delete invitations
-CREATE POLICY space_invitations_delete ON space_invitations FOR DELETE
-  USING (user_has_space_access(space_id));
+-- Wrapped in DO/IF EXISTS — space_invitations is created later
+-- (20251019000000_create_space_invitations.sql). Policies here only
+-- run if the table happens to exist at this point. Production already
+-- ran this migration after the table was created, so the policies are
+-- in place there. On a fresh replay, the table doesn't exist yet and
+-- 20251023000000_fix_space_invitations_rls_policy.sql sets up the
+-- definitive policies later.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables
+             WHERE table_schema='public' AND table_name='space_invitations') THEN
+    EXECUTE $cmd$
+      CREATE POLICY space_invitations_select ON space_invitations FOR SELECT
+        USING (
+          email = (SELECT email FROM auth.users WHERE id = auth.uid()) OR
+          user_has_space_access(space_id)
+        )
+    $cmd$;
+    EXECUTE $cmd$
+      CREATE POLICY space_invitations_insert ON space_invitations FOR INSERT
+        WITH CHECK (user_has_space_access(space_id))
+    $cmd$;
+    EXECUTE $cmd$
+      CREATE POLICY space_invitations_update ON space_invitations FOR UPDATE
+        USING (user_has_space_access(space_id))
+    $cmd$;
+    EXECUTE $cmd$
+      CREATE POLICY space_invitations_delete ON space_invitations FOR DELETE
+        USING (user_has_space_access(space_id))
+    $cmd$;
+  END IF;
+END $$;
 
 -- =============================================
 -- VERIFICATION QUERIES (Run in Supabase SQL Editor)

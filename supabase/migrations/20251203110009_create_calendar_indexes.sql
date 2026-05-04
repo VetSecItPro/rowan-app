@@ -8,7 +8,7 @@
 -- Index for finding connections needing sync
 CREATE INDEX IF NOT EXISTS idx_calendar_connections_needs_sync
   ON calendar_connections(provider, next_sync_at)
-  WHERE sync_status = 'active' AND next_sync_at <= NOW();
+  WHERE sync_status = 'active';
 
 -- Index for token expiry checks
 CREATE INDEX IF NOT EXISTS idx_calendar_connections_token_expiry
@@ -24,30 +24,34 @@ CREATE INDEX IF NOT EXISTS idx_calendar_connections_user_provider_active
 -- CALENDAR_EVENT_MAPPINGS - Additional Performance Indexes
 -- ============================================================================
 
--- Index for finding unmapped Rowan events (for initial sync)
+-- Index for finding unmapped Rowan events (for initial sync).
+-- The NOT IN (SELECT ...) subquery isn't allowed in index predicates.
+-- Restrict to the deleted_at IS NULL filter only — the unmapped check
+-- happens at query time via LEFT JOIN, not index time.
 CREATE INDEX IF NOT EXISTS idx_events_unmapped
   ON events(space_id, created_at)
-  WHERE deleted_at IS NULL
-    AND id NOT IN (SELECT rowan_event_id FROM calendar_event_mappings);
+  WHERE deleted_at IS NULL;
 
 -- Partial index for conflicted mappings
 CREATE INDEX IF NOT EXISTS idx_event_mappings_has_conflict
   ON calendar_event_mappings(connection_id, has_conflict, conflict_detected_at)
   WHERE has_conflict = TRUE;
 
--- Index for finding stale mappings (not synced recently)
+-- Index for finding stale mappings (not synced recently).
+-- NOW() is VOLATILE — Postgres rejects it in index predicates. Drop the
+-- time predicate; the planner can still use this index when a query
+-- specifies its own NOW() filter on last_synced_at.
 CREATE INDEX IF NOT EXISTS idx_event_mappings_stale
-  ON calendar_event_mappings(connection_id, last_synced_at)
-  WHERE last_synced_at < NOW() - INTERVAL '1 day';
+  ON calendar_event_mappings(connection_id, last_synced_at);
 
 -- ============================================================================
 -- CALENDAR_SYNC_LOGS - Query Optimization Indexes
 -- ============================================================================
 
--- Composite index for recent sync history per connection
+-- Composite index for recent sync history per connection.
+-- NOW() removed from predicate (VOLATILE — Postgres rejects).
 CREATE INDEX IF NOT EXISTS idx_sync_logs_recent_by_connection
-  ON calendar_sync_logs(connection_id, started_at DESC, status)
-  WHERE started_at > NOW() - INTERVAL '30 days';
+  ON calendar_sync_logs(connection_id, started_at DESC, status);
 
 -- Index for finding failed syncs needing retry
 CREATE INDEX IF NOT EXISTS idx_sync_logs_failed
@@ -57,7 +61,7 @@ CREATE INDEX IF NOT EXISTS idx_sync_logs_failed
 -- Index for sync performance monitoring
 CREATE INDEX IF NOT EXISTS idx_sync_logs_performance
   ON calendar_sync_logs(sync_type, completed_at, duration_ms)
-  WHERE status = 'completed' AND completed_at > NOW() - INTERVAL '7 days';
+  WHERE status = 'completed';
 
 -- ============================================================================
 -- CALENDAR_SYNC_CONFLICTS - Resolution Tracking Indexes
@@ -66,7 +70,7 @@ CREATE INDEX IF NOT EXISTS idx_sync_logs_performance
 -- Index for finding recent unresolved conflicts
 CREATE INDEX IF NOT EXISTS idx_sync_conflicts_recent_unresolved
   ON calendar_sync_conflicts(connection_id, detected_at DESC)
-  WHERE resolution_status = 'detected' AND detected_at > NOW() - INTERVAL '7 days';
+  WHERE resolution_status = 'detected';
 
 -- Index for conflict resolution analytics
 CREATE INDEX IF NOT EXISTS idx_sync_conflicts_analytics
