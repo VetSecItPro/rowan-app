@@ -3,6 +3,21 @@ name: Smart E2E Tests
 on:
   pull_request:
     branches: [main, develop]
+    # Skip E2E for PRs that can't possibly affect Playwright outcomes.
+    # The 40-min Playwright suite is the dominant CI cost line, so any
+    # PR that only touches docs, migrations, marketing assets, or issue
+    # templates is wasted minutes. Migrations have their own drift-check
+    # gate in deploy.yml; everything else here can't change UI behavior.
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'supabase/migrations/**'
+      - 'public/marketing/**'
+      - 'public/screenshots/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - 'CHANGELOG*.md'
+      - 'LICENSE'
   push:
     branches: [main]
   workflow_dispatch:
@@ -28,10 +43,13 @@ jobs:
   e2e:
     name: Run E2E Tests
     runs-on: ubuntu-latest
-    # Skip if commit message or PR title contains [skip-e2e].
+    # Skip if commit message or PR title contains [skip-e2e],
+    # or if the PR is still a draft (no need to burn 40 minutes
+    # on work that hasn't been marked ready for review).
     if: >-
       !contains(github.event.head_commit.message || '', '[skip-e2e]') &&
-      !contains(github.event.pull_request.title || '', '[skip-e2e]')
+      !contains(github.event.pull_request.title || '', '[skip-e2e]') &&
+      github.event.pull_request.draft != true
     # Local Supabase boot adds ~60-90s; build + 25-45min test suite is
     # the bulk of the time. 60 min total leaves headroom for retries.
     timeout-minutes: 60
