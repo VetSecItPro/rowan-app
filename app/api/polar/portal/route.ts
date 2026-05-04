@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
     // Get Polar client
     const polar = await getPolarClient();
     if (!polar) {
+      // CI / E2E test mode: return a stubbed portal URL. See issue #352.
+      if (process.env.CI === 'true' && process.env.NODE_ENV !== 'production') {
+        return NextResponse.json(
+          { url: `${request.nextUrl.origin}/settings?tab=subscription&portal=stub` },
+          { status: 200 }
+        );
+      }
       return NextResponse.json(
         { error: 'Polar not configured. Install @polar-sh/sdk and set POLAR_ACCESS_TOKEN.' },
         { status: 503 }
