@@ -392,7 +392,7 @@ CREATE OR REPLACE FUNCTION generate_recurring_instances(
 ) RETURNS INTEGER AS $$
 DECLARE
   template_record recurring_goal_templates%ROWTYPE;
-  current_date DATE;
+  cur_date DATE; -- renamed from `current_date` (reserved keyword in newer Postgres)
   next_date DATE;
   instances_created INTEGER := 0;
   instance_exists BOOLEAN;
@@ -404,14 +404,14 @@ BEGIN
     RAISE EXCEPTION 'Template not found: %', template_id_param;
   END IF;
 
-  current_date := GREATEST(template_record.start_date, CURRENT_DATE);
+  cur_date := GREATEST(template_record.start_date, CURRENT_DATE);
 
   -- Generate instances until the target date
-  WHILE current_date <= until_date AND (template_record.end_date IS NULL OR current_date <= template_record.end_date) LOOP
+  WHILE cur_date <= until_date AND (template_record.end_date IS NULL OR cur_date <= template_record.end_date) LOOP
     -- Check if instance already exists
     SELECT EXISTS(
       SELECT 1 FROM recurring_goal_instances
-      WHERE template_id = template_id_param AND period_start = current_date
+      WHERE template_id = template_id_param AND period_start = cur_date
     ) INTO instance_exists;
 
     IF NOT instance_exists THEN
@@ -424,8 +424,8 @@ BEGIN
         status
       ) VALUES (
         template_id_param,
-        current_date,
-        current_date, -- For habits, start and end are the same day
+        cur_date,
+        cur_date, -- For habits, start and end are the same day
         template_record.target_value,
         'pending'
       );
@@ -437,15 +437,15 @@ BEGIN
     next_date := calculate_next_occurrence(
       template_record.recurrence_type,
       template_record.recurrence_pattern,
-      current_date
+      cur_date
     );
 
     -- Prevent infinite loops
-    IF next_date <= current_date THEN
-      next_date := current_date + INTERVAL '1 day';
+    IF next_date <= cur_date THEN
+      next_date := cur_date + INTERVAL '1 day';
     END IF;
 
-    current_date := next_date;
+    cur_date := next_date;
   END LOOP;
 
   RETURN instances_created;

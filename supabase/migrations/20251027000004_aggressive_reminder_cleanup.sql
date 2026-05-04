@@ -3,38 +3,26 @@
 -- Issue: Specific reminder_id 8698-ae2d2bf283a52e46.js21 causing persistent errors
 -- Date: 2025-10-27
 
--- Step 1: Debug - See what orphaned records exist
+-- Step 1: Debug — count orphaned records.
+--
+-- The original block looked up a specific malformed reminder_id
+-- ('8698-ae2d2bf283a52e46.js21') that isn't a valid UUID. On modern
+-- Postgres this fails as `uuid = text` operator-not-found. The lookup
+-- was a one-time forensic in prod; on fresh-DB replay there's nothing
+-- to find, so simplify the debug block to just count orphans.
 DO $$
 DECLARE
     orphaned_count INTEGER;
     total_activities INTEGER;
-    problem_reminder_id TEXT := '8698-ae2d2bf283a52e46.js21';
 BEGIN
-    -- Count total activities
     SELECT COUNT(*) INTO total_activities FROM reminder_activities;
-
-    -- Count orphaned activities
     SELECT COUNT(*) INTO orphaned_count
     FROM reminder_activities ra
     WHERE NOT EXISTS (
         SELECT 1 FROM reminders r WHERE r.id = ra.reminder_id
     );
-
-    RAISE NOTICE 'BEFORE CLEANUP:';
-    RAISE NOTICE 'Total reminder_activities: %', total_activities;
-    RAISE NOTICE 'Orphaned reminder_activities: %', orphaned_count;
-
-    -- Check if the specific problematic reminder exists
-    IF EXISTS (SELECT 1 FROM reminder_activities WHERE reminder_id = problem_reminder_id) THEN
-        RAISE NOTICE 'Found problematic reminder_id: %', problem_reminder_id;
-
-        -- Check if this reminder actually exists
-        IF NOT EXISTS (SELECT 1 FROM reminders WHERE id = problem_reminder_id) THEN
-            RAISE NOTICE 'Reminder % does NOT exist in reminders table - will be deleted', problem_reminder_id;
-        ELSE
-            RAISE NOTICE 'Reminder % DOES exist in reminders table', problem_reminder_id;
-        END IF;
-    END IF;
+    RAISE NOTICE 'BEFORE CLEANUP: total=% orphaned=%',
+      total_activities, orphaned_count;
 END $$;
 
 -- Step 2: FORCE drop ALL foreign key constraints on reminder_activities
@@ -48,11 +36,16 @@ WHERE reminder_id NOT IN (
     SELECT id FROM reminders
 );
 
--- Step 4: Delete the specific problematic record if it's orphaned
+-- Step 4: Delete the specific problematic record if it's orphaned.
+-- The literal '8698-ae2d2bf283a52e46.js21' is not a valid UUID, so this
+-- comparison would error on Postgres types. The orphan it referred to
+-- has long since been deleted from prod via the cleanup above; this is
+-- effectively dead code. Skip cleanly on a fresh DB by guarding with a
+-- text-cast comparison that finds nothing.
 DELETE FROM reminder_activities
-WHERE reminder_id = '8698-ae2d2bf283a52e46.js21'
+WHERE reminder_id::text = '8698-ae2d2bf283a52e46.js21'
 AND NOT EXISTS (
-    SELECT 1 FROM reminders WHERE id = '8698-ae2d2bf283a52e46.js21'
+    SELECT 1 FROM reminders WHERE id::text = '8698-ae2d2bf283a52e46.js21'
 );
 
 -- Step 5: Clean up other related tables aggressively
@@ -107,8 +100,9 @@ BEGIN
     RAISE NOTICE 'Orphaned reminder_activities: %', orphaned_count;
     RAISE NOTICE 'CASCADE constraint exists: %', constraint_exists;
 
-    -- Check if problematic record is gone
-    IF NOT EXISTS (SELECT 1 FROM reminder_activities WHERE reminder_id = '8698-ae2d2bf283a52e46.js21') THEN
+    -- Check if problematic record is gone (text cast — the value is
+    -- not a valid UUID, so direct comparison errors on modern Postgres).
+    IF NOT EXISTS (SELECT 1 FROM reminder_activities WHERE reminder_id::text = '8698-ae2d2bf283a52e46.js21') THEN
         RAISE NOTICE 'SUCCESS: Problematic reminder_id 8698-ae2d2bf283a52e46.js21 has been removed';
     ELSE
         RAISE NOTICE 'WARNING: Problematic reminder_id 8698-ae2d2bf283a52e46.js21 still exists';

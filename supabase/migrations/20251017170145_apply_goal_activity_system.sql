@@ -78,6 +78,27 @@ ALTER TABLE goal_check_ins ENABLE ROW LEVEL SECURITY;
 ALTER TABLE goal_check_in_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE goal_check_in_settings ENABLE ROW LEVEL SECURITY;
 
+-- Drop any pre-existing policies on these tables to make this migration
+-- idempotent. The earlier migration 20251017100000_create_goal_check_ins.sql
+-- creates the SAME policies; on a fresh-DB replay we'd hit a duplicate-name
+-- error here. Drop-then-create gives us deterministic state.
+DO $$
+DECLARE pol RECORD;
+BEGIN
+  FOR pol IN
+    SELECT policyname, tablename
+    FROM pg_policies
+    WHERE schemaname='public'
+      AND tablename IN (
+        'goal_check_ins','goal_check_in_photos','goal_check_in_settings',
+        'goal_activities','goal_comments','goal_comment_reactions',
+        'goal_mentions','goal_dependencies','goal_check_in_reactions'
+      )
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', pol.policyname, pol.tablename);
+  END LOOP;
+END $$;
+
 -- RLS policies for goal_check_ins
 CREATE POLICY "Users can view check-ins for goals they have access to"
   ON goal_check_ins

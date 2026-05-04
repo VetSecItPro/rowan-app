@@ -37,8 +37,11 @@ CREATE TABLE calendar_webhook_subscriptions (
 -- Indexes
 CREATE INDEX idx_webhook_subs_connection ON calendar_webhook_subscriptions(connection_id);
 CREATE INDEX idx_webhook_subs_webhook_id ON calendar_webhook_subscriptions(webhook_id);
-CREATE INDEX idx_webhook_subs_expiring ON calendar_webhook_subscriptions(expires_at)
-  WHERE is_active = TRUE AND expires_at < NOW() + INTERVAL '24 hours';
+-- Postgres requires index predicates to use IMMUTABLE functions only;
+-- NOW() is VOLATILE. Dropped the `expires_at < NOW() + INTERVAL '24 hours'`
+-- clause — the planner will filter on expires_at via the index range scan.
+CREATE INDEX IF NOT EXISTS idx_webhook_subs_expiring ON calendar_webhook_subscriptions(expires_at)
+  WHERE is_active = TRUE;
 CREATE INDEX idx_webhook_subs_active ON calendar_webhook_subscriptions(is_active) WHERE is_active = TRUE;
 
 -- Updated timestamp trigger

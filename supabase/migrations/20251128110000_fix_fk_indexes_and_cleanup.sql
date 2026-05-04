@@ -9,212 +9,212 @@ DROP POLICY IF EXISTS "Users can update space projects" ON public.projects;
 -- =====================================================
 
 -- account_deletion_audit_log
-CREATE INDEX IF NOT EXISTS idx_account_deletion_audit_log_performed_by ON public.account_deletion_audit_log(performed_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_account_deletion_audit_log_performed_by ON public.account_deletion_audit_log(performed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_account_deletion_audit_log_performed_by — column or table missing'; END $do$;
 
 -- achievement_progress
-CREATE INDEX IF NOT EXISTS idx_achievement_progress_badge_id ON public.achievement_progress(badge_id);
-CREATE INDEX IF NOT EXISTS idx_achievement_progress_space_id ON public.achievement_progress(space_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_achievement_progress_badge_id ON public.achievement_progress(badge_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_achievement_progress_badge_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_achievement_progress_space_id ON public.achievement_progress(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_achievement_progress_space_id — column or table missing'; END $do$;
 
 -- activity_feed
-CREATE INDEX IF NOT EXISTS idx_activity_feed_check_in_id ON public.activity_feed(check_in_id);
-CREATE INDEX IF NOT EXISTS idx_activity_feed_habit_entry_id ON public.activity_feed(habit_entry_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_activity_feed_check_in_id ON public.activity_feed(check_in_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_activity_feed_check_in_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_activity_feed_habit_entry_id ON public.activity_feed(habit_entry_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_activity_feed_habit_entry_id — column or table missing'; END $do$;
 
 -- admin_users
-CREATE INDEX IF NOT EXISTS idx_admin_users_granted_by ON public.admin_users(granted_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_admin_users_granted_by ON public.admin_users(granted_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_admin_users_granted_by — column or table missing'; END $do$;
 
 -- beta_feedback_comments
-CREATE INDEX IF NOT EXISTS idx_beta_feedback_comments_user_id ON public.beta_feedback_comments(user_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_beta_feedback_comments_user_id ON public.beta_feedback_comments(user_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_beta_feedback_comments_user_id — column or table missing'; END $do$;
 
 -- bills
-CREATE INDEX IF NOT EXISTS idx_bills_created_by ON public.bills(created_by);
-CREATE INDEX IF NOT EXISTS idx_bills_linked_calendar_event_id ON public.bills(linked_calendar_event_id);
-CREATE INDEX IF NOT EXISTS idx_bills_linked_expense_id ON public.bills(linked_expense_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_bills_created_by ON public.bills(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_bills_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_bills_linked_calendar_event_id ON public.bills(linked_calendar_event_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_bills_linked_calendar_event_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_bills_linked_expense_id ON public.bills(linked_expense_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_bills_linked_expense_id — column or table missing'; END $do$;
 
 -- chore_completions
-CREATE INDEX IF NOT EXISTS idx_chore_completions_completed_by ON public.chore_completions(completed_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_chore_completions_completed_by ON public.chore_completions(completed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_chore_completions_completed_by — column or table missing'; END $do$;
 
 -- chore_rotations
-CREATE INDEX IF NOT EXISTS idx_chore_rotations_created_by ON public.chore_rotations(created_by);
-CREATE INDEX IF NOT EXISTS idx_chore_rotations_last_assigned_to ON public.chore_rotations(last_assigned_to);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_chore_rotations_created_by ON public.chore_rotations(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_chore_rotations_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_chore_rotations_last_assigned_to ON public.chore_rotations(last_assigned_to); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_chore_rotations_last_assigned_to — column or table missing'; END $do$;
 
 -- chores
-CREATE INDEX IF NOT EXISTS idx_chores_created_by ON public.chores(created_by);
-CREATE INDEX IF NOT EXISTS idx_chores_rotation_id ON public.chores(rotation_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_chores_created_by ON public.chores(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_chores_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_chores_rotation_id ON public.chores(rotation_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_chores_rotation_id — column or table missing'; END $do$;
 
 -- comments
-CREATE INDEX IF NOT EXISTS idx_comments_deleted_by ON public.comments(deleted_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_comments_deleted_by ON public.comments(deleted_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_comments_deleted_by — column or table missing'; END $do$;
 
 -- custom_categories
-CREATE INDEX IF NOT EXISTS idx_custom_categories_created_by ON public.custom_categories(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_custom_categories_created_by ON public.custom_categories(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_custom_categories_created_by — column or table missing'; END $do$;
 
 -- event_audit_log
-CREATE INDEX IF NOT EXISTS idx_event_audit_log_changed_by ON public.event_audit_log(changed_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_event_audit_log_changed_by ON public.event_audit_log(changed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_event_audit_log_changed_by — column or table missing'; END $do$;
 
 -- event_note_versions
-CREATE INDEX IF NOT EXISTS idx_event_note_versions_edited_by ON public.event_note_versions(edited_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_event_note_versions_edited_by ON public.event_note_versions(edited_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_event_note_versions_edited_by — column or table missing'; END $do$;
 
 -- event_notes
-CREATE INDEX IF NOT EXISTS idx_event_notes_last_edited_by ON public.event_notes(last_edited_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_event_notes_last_edited_by ON public.event_notes(last_edited_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_event_notes_last_edited_by — column or table missing'; END $do$;
 
 -- event_proposals
-CREATE INDEX IF NOT EXISTS idx_event_proposals_counter_proposal_id ON public.event_proposals(counter_proposal_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_event_proposals_counter_proposal_id ON public.event_proposals(counter_proposal_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_event_proposals_counter_proposal_id — column or table missing'; END $do$;
 
 -- event_share_links
-CREATE INDEX IF NOT EXISTS idx_event_share_links_event_id ON public.event_share_links(event_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_event_share_links_event_id ON public.event_share_links(event_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_event_share_links_event_id — column or table missing'; END $do$;
 
 -- events
-CREATE INDEX IF NOT EXISTS idx_events_created_by ON public.events(created_by);
-CREATE INDEX IF NOT EXISTS idx_events_deleted_by ON public.events(deleted_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_events_created_by ON public.events(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_events_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_events_deleted_by ON public.events(deleted_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_events_deleted_by — column or table missing'; END $do$;
 
 -- generated_reports
-CREATE INDEX IF NOT EXISTS idx_generated_reports_generated_by ON public.generated_reports(generated_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_generated_reports_generated_by ON public.generated_reports(generated_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_generated_reports_generated_by — column or table missing'; END $do$;
 
 -- goal_activities
-CREATE INDEX IF NOT EXISTS idx_goal_activities_check_in_id ON public.goal_activities(check_in_id);
-CREATE INDEX IF NOT EXISTS idx_goal_activities_milestone_id ON public.goal_activities(milestone_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_activities_check_in_id ON public.goal_activities(check_in_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_activities_check_in_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_activities_milestone_id ON public.goal_activities(milestone_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_activities_milestone_id — column or table missing'; END $do$;
 
 -- goal_check_ins
-CREATE INDEX IF NOT EXISTS idx_goal_check_ins_voice_template ON public.goal_check_ins(voice_note_template_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_check_ins_voice_template ON public.goal_check_ins(voice_note_template_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_check_ins_voice_template — column or table missing'; END $do$;
 
 -- goal_collaborators
-CREATE INDEX IF NOT EXISTS idx_goal_collaborators_invited_by ON public.goal_collaborators(invited_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_collaborators_invited_by ON public.goal_collaborators(invited_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_collaborators_invited_by — column or table missing'; END $do$;
 
 -- goal_contributions
-CREATE INDEX IF NOT EXISTS idx_goal_contributions_created_by ON public.goal_contributions(created_by);
-CREATE INDEX IF NOT EXISTS idx_goal_contributions_expense_id ON public.goal_contributions(expense_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_contributions_created_by ON public.goal_contributions(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_contributions_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_contributions_expense_id ON public.goal_contributions(expense_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_contributions_expense_id — column or table missing'; END $do$;
 
 -- goal_dependencies
-CREATE INDEX IF NOT EXISTS idx_goal_dependencies_bypassed_by ON public.goal_dependencies(bypassed_by);
-CREATE INDEX IF NOT EXISTS idx_goal_dependencies_created_by ON public.goal_dependencies(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_dependencies_bypassed_by ON public.goal_dependencies(bypassed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_dependencies_bypassed_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_dependencies_created_by ON public.goal_dependencies(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_dependencies_created_by — column or table missing'; END $do$;
 
 -- goal_nudge_tracking
-CREATE INDEX IF NOT EXISTS idx_goal_nudge_tracking_user_id ON public.goal_nudge_tracking(user_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_nudge_tracking_user_id ON public.goal_nudge_tracking(user_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_nudge_tracking_user_id — column or table missing'; END $do$;
 
 -- goal_templates
-CREATE INDEX IF NOT EXISTS idx_goal_templates_created_by ON public.goal_templates(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_templates_created_by ON public.goal_templates(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_templates_created_by — column or table missing'; END $do$;
 
 -- goal_updates
-CREATE INDEX IF NOT EXISTS idx_goal_updates_user_id ON public.goal_updates(user_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goal_updates_user_id ON public.goal_updates(user_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goal_updates_user_id — column or table missing'; END $do$;
 
 -- goals
-CREATE INDEX IF NOT EXISTS idx_goals_template_id ON public.goals(template_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_goals_template_id ON public.goals(template_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_goals_template_id — column or table missing'; END $do$;
 
 -- in_app_notifications
-CREATE INDEX IF NOT EXISTS idx_in_app_notifications_sender_id ON public.in_app_notifications(sender_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_in_app_notifications_sender_id ON public.in_app_notifications(sender_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_in_app_notifications_sender_id — column or table missing'; END $do$;
 
 -- meal_plans
-CREATE INDEX IF NOT EXISTS idx_meal_plans_created_by ON public.meal_plans(created_by);
-CREATE INDEX IF NOT EXISTS idx_meal_plans_recipe_id ON public.meal_plans(recipe_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_meal_plans_created_by ON public.meal_plans(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_meal_plans_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_meal_plans_recipe_id ON public.meal_plans(recipe_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_meal_plans_recipe_id — column or table missing'; END $do$;
 
 -- message_mentions
-CREATE INDEX IF NOT EXISTS idx_message_mentions_mentioned_by_user_id ON public.message_mentions(mentioned_by_user_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_message_mentions_mentioned_by_user_id ON public.message_mentions(mentioned_by_user_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_message_mentions_mentioned_by_user_id — column or table missing'; END $do$;
 
 -- messages
-CREATE INDEX IF NOT EXISTS idx_messages_pinned_by ON public.messages(pinned_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_messages_pinned_by ON public.messages(pinned_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_messages_pinned_by — column or table missing'; END $do$;
 
 -- nudge_history
-CREATE INDEX IF NOT EXISTS idx_nudge_history_goal_id ON public.nudge_history(goal_id);
-CREATE INDEX IF NOT EXISTS idx_nudge_history_space_id ON public.nudge_history(space_id);
-CREATE INDEX IF NOT EXISTS idx_nudge_history_template_id ON public.nudge_history(template_id);
-CREATE INDEX IF NOT EXISTS idx_nudge_history_user_id ON public.nudge_history(user_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_nudge_history_goal_id ON public.nudge_history(goal_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_nudge_history_goal_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_nudge_history_space_id ON public.nudge_history(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_nudge_history_space_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_nudge_history_template_id ON public.nudge_history(template_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_nudge_history_template_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_nudge_history_user_id ON public.nudge_history(user_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_nudge_history_user_id — column or table missing'; END $do$;
 
 -- nudge_settings
-CREATE INDEX IF NOT EXISTS idx_nudge_settings_space_id ON public.nudge_settings(space_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_nudge_settings_space_id ON public.nudge_settings(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_nudge_settings_space_id — column or table missing'; END $do$;
 
 -- project_photos
-CREATE INDEX IF NOT EXISTS idx_project_photos_uploaded_by ON public.project_photos(uploaded_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_project_photos_uploaded_by ON public.project_photos(uploaded_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_project_photos_uploaded_by — column or table missing'; END $do$;
 
 -- receipts
-CREATE INDEX IF NOT EXISTS idx_receipts_created_by ON public.receipts(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_receipts_created_by ON public.receipts(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_receipts_created_by — column or table missing'; END $do$;
 
 -- recipes
-CREATE INDEX IF NOT EXISTS idx_recipes_created_by ON public.recipes(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_recipes_created_by ON public.recipes(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_recipes_created_by — column or table missing'; END $do$;
 
 -- recurring_event_exceptions
-CREATE INDEX IF NOT EXISTS idx_recurring_event_exceptions_modified_event_id ON public.recurring_event_exceptions(modified_event_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_recurring_event_exceptions_modified_event_id ON public.recurring_event_exceptions(modified_event_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_recurring_event_exceptions_modified_event_id — column or table missing'; END $do$;
 
 -- reminders
-CREATE INDEX IF NOT EXISTS idx_reminders_created_by ON public.reminders(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_reminders_created_by ON public.reminders(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_reminders_created_by — column or table missing'; END $do$;
 
 -- report_favorites
-CREATE INDEX IF NOT EXISTS idx_report_favorites_report_id ON public.report_favorites(report_id);
-CREATE INDEX IF NOT EXISTS idx_report_favorites_template_id ON public.report_favorites(template_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_report_favorites_report_id ON public.report_favorites(report_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_report_favorites_report_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_report_favorites_template_id ON public.report_favorites(template_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_report_favorites_template_id — column or table missing'; END $do$;
 
 -- report_schedules
-CREATE INDEX IF NOT EXISTS idx_report_schedules_created_by ON public.report_schedules(created_by);
-CREATE INDEX IF NOT EXISTS idx_report_schedules_template_id ON public.report_schedules(template_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_report_schedules_created_by ON public.report_schedules(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_report_schedules_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_report_schedules_template_id ON public.report_schedules(template_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_report_schedules_template_id — column or table missing'; END $do$;
 
 -- report_templates
-CREATE INDEX IF NOT EXISTS idx_report_templates_created_by ON public.report_templates(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_report_templates_created_by ON public.report_templates(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_report_templates_created_by — column or table missing'; END $do$;
 
 -- shopping_items
-CREATE INDEX IF NOT EXISTS idx_shopping_items_added_by ON public.shopping_items(added_by);
-CREATE INDEX IF NOT EXISTS idx_shopping_items_purchased_by ON public.shopping_items(purchased_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_items_added_by ON public.shopping_items(added_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_shopping_items_added_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_items_purchased_by ON public.shopping_items(purchased_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_shopping_items_purchased_by — column or table missing'; END $do$;
 
 -- shopping_lists
-CREATE INDEX IF NOT EXISTS idx_shopping_lists_created_by ON public.shopping_lists(created_by);
-CREATE INDEX IF NOT EXISTS idx_shopping_lists_last_modified_by ON public.shopping_lists(last_modified_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_lists_created_by ON public.shopping_lists(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_shopping_lists_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_lists_last_modified_by ON public.shopping_lists(last_modified_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_shopping_lists_last_modified_by — column or table missing'; END $do$;
 
 -- shopping_tasks
-CREATE INDEX IF NOT EXISTS idx_shopping_tasks_source_recipe_id ON public.shopping_tasks(source_recipe_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_shopping_tasks_source_recipe_id ON public.shopping_tasks(source_recipe_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_shopping_tasks_source_recipe_id — column or table missing'; END $do$;
 
 -- space_invitations
-CREATE INDEX IF NOT EXISTS idx_space_invitations_invited_by ON public.space_invitations(invited_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_space_invitations_invited_by ON public.space_invitations(invited_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_space_invitations_invited_by — column or table missing'; END $do$;
 
 -- spaces
-CREATE INDEX IF NOT EXISTS idx_spaces_created_by ON public.spaces(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_spaces_created_by ON public.spaces(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_spaces_created_by — column or table missing'; END $do$;
 
 -- store_layouts
-CREATE INDEX IF NOT EXISTS idx_store_layouts_created_by ON public.store_layouts(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_store_layouts_created_by ON public.store_layouts(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_store_layouts_created_by — column or table missing'; END $do$;
 
 -- subtasks
-CREATE INDEX IF NOT EXISTS idx_subtasks_completed_by ON public.subtasks(completed_by);
-CREATE INDEX IF NOT EXISTS idx_subtasks_created_by ON public.subtasks(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_subtasks_completed_by ON public.subtasks(completed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_subtasks_completed_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_subtasks_created_by ON public.subtasks(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_subtasks_created_by — column or table missing'; END $do$;
 
 -- tags
-CREATE INDEX IF NOT EXISTS idx_tags_created_by ON public.tags(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_tags_created_by ON public.tags(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_tags_created_by — column or table missing'; END $do$;
 
 -- task_approvals
-CREATE INDEX IF NOT EXISTS idx_task_approvals_requested_by ON public.task_approvals(requested_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_approvals_requested_by ON public.task_approvals(requested_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_approvals_requested_by — column or table missing'; END $do$;
 
 -- task_assignments
-CREATE INDEX IF NOT EXISTS idx_task_assignments_assigned_by ON public.task_assignments(assigned_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_assignments_assigned_by ON public.task_assignments(assigned_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_assignments_assigned_by — column or table missing'; END $do$;
 
 -- task_categories
-CREATE INDEX IF NOT EXISTS idx_task_categories_created_by ON public.task_categories(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_categories_created_by ON public.task_categories(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_categories_created_by — column or table missing'; END $do$;
 
 -- task_dependencies
-CREATE INDEX IF NOT EXISTS idx_task_dependencies_created_by ON public.task_dependencies(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_dependencies_created_by ON public.task_dependencies(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_dependencies_created_by — column or table missing'; END $do$;
 
 -- task_handoffs
-CREATE INDEX IF NOT EXISTS idx_task_handoffs_performed_by ON public.task_handoffs(performed_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_handoffs_performed_by ON public.task_handoffs(performed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_handoffs_performed_by — column or table missing'; END $do$;
 
 -- task_reminders
-CREATE INDEX IF NOT EXISTS idx_task_reminders_created_by ON public.task_reminders(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_reminders_created_by ON public.task_reminders(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_reminders_created_by — column or table missing'; END $do$;
 
 -- task_templates
-CREATE INDEX IF NOT EXISTS idx_task_templates_default_assigned_to ON public.task_templates(default_assigned_to);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_task_templates_default_assigned_to ON public.task_templates(default_assigned_to); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_task_templates_default_assigned_to — column or table missing'; END $do$;
 
 -- tasks
-CREATE INDEX IF NOT EXISTS idx_tasks_approved_by ON public.tasks(approved_by);
-CREATE INDEX IF NOT EXISTS idx_tasks_created_by ON public.tasks(created_by);
-CREATE INDEX IF NOT EXISTS idx_tasks_snoozed_by ON public.tasks(snoozed_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_tasks_approved_by ON public.tasks(approved_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_tasks_approved_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_tasks_created_by ON public.tasks(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_tasks_created_by — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_tasks_snoozed_by ON public.tasks(snoozed_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_tasks_snoozed_by — column or table missing'; END $do$;
 
 -- user_achievements
-CREATE INDEX IF NOT EXISTS idx_user_achievements_badge_id ON public.user_achievements(badge_id);
-CREATE INDEX IF NOT EXISTS idx_user_achievements_space_id ON public.user_achievements(space_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_user_achievements_badge_id ON public.user_achievements(badge_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_user_achievements_badge_id — column or table missing'; END $do$;
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_user_achievements_space_id ON public.user_achievements(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_user_achievements_space_id — column or table missing'; END $do$;
 
 -- user_progress
-CREATE INDEX IF NOT EXISTS idx_user_progress_space_id ON public.user_progress(space_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_user_progress_space_id ON public.user_progress(space_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_user_progress_space_id — column or table missing'; END $do$;
 
 -- vendors
-CREATE INDEX IF NOT EXISTS idx_vendors_created_by ON public.vendors(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_vendors_created_by ON public.vendors(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_vendors_created_by — column or table missing'; END $do$;
 
 -- voice_note_templates
-CREATE INDEX IF NOT EXISTS idx_voice_note_templates_created_by ON public.voice_note_templates(created_by);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_voice_note_templates_created_by ON public.voice_note_templates(created_by); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_voice_note_templates_created_by — column or table missing'; END $do$;
 
 -- voice_transcriptions
-CREATE INDEX IF NOT EXISTS idx_voice_transcriptions_voice_note_template_id ON public.voice_transcriptions(voice_note_template_id);
+DO $do$ BEGIN CREATE INDEX IF NOT EXISTS idx_voice_transcriptions_voice_note_template_id ON public.voice_transcriptions(voice_note_template_id); EXCEPTION WHEN undefined_column OR undefined_table THEN RAISE NOTICE 'Skipping index idx_voice_transcriptions_voice_note_template_id — column or table missing'; END $do$;
 
 
 -- =====================================================

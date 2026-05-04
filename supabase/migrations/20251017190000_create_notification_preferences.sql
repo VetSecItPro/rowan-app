@@ -1,8 +1,11 @@
 -- Create notification preferences table for comprehensive notification system
 -- Part of Phase 1: Database Schema & Preferences Backend
 
--- User notification preferences table
-CREATE TABLE user_notification_preferences (
+-- User notification preferences table.
+-- Note: this table is also created in 20251014000020_create_reminder_notifications.sql
+-- with a slightly different shape. IF NOT EXISTS makes the migration replay
+-- cleanly; later migrations ALTER the table to land at the same final shape.
+CREATE TABLE IF NOT EXISTS user_notification_preferences (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
 
@@ -62,7 +65,41 @@ USING (user_id = auth.uid());
 -- Index for performance
 CREATE INDEX idx_notification_preferences_user ON user_notification_preferences(user_id);
 
--- Create trigger for updated_at using existing function
+-- The earlier 20251014000020 creates this table without a unique constraint
+-- on user_id. The ON CONFLICT (user_id) below requires one — add it
+-- conditionally so prod (which already has it via 20251022000005) and a
+-- fresh-DB replay both end up with the constraint.
+DO $$
+DECLARE
+  has_unique BOOLEAN;
+  has_dups   BOOLEAN;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM pg_constraint c
+    JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY(c.conkey)
+    WHERE c.conrelid = 'public.user_notification_preferences'::regclass
+      AND c.contype = 'u'
+      AND a.attname = 'user_id'
+      AND array_length(c.conkey, 1) = 1
+  ) INTO has_unique;
+
+  IF NOT has_unique THEN
+    SELECT EXISTS (
+      SELECT 1 FROM public.user_notification_preferences
+      GROUP BY user_id HAVING COUNT(*) > 1
+    ) INTO has_dups;
+    IF NOT has_dups THEN
+      ALTER TABLE public.user_notification_preferences
+        ADD CONSTRAINT user_notification_preferences_user_id_key UNIQUE (user_id);
+    END IF;
+  END IF;
+END $$;
+
+-- Create trigger for updated_at using existing function (drop-then-create
+-- because the trigger may have been created by an earlier migration with
+-- the same name).
+DROP TRIGGER IF EXISTS update_notification_preferences_updated_at ON user_notification_preferences;
 CREATE TRIGGER update_notification_preferences_updated_at
   BEFORE UPDATE ON user_notification_preferences
   FOR EACH ROW

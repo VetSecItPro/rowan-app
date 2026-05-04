@@ -15,55 +15,64 @@
 
 BEGIN;
 
--- =============================================================================
--- SECTION 1: Security Definer Views (ERROR)
--- Remove SECURITY DEFINER from automation views by enabling security_invoker
--- =============================================================================
+-- The `automation` schema and `sm_*` tables are not part of Rowan
+-- (CLAUDE.md isolation rules — they belong to other tenants sharing
+-- this Supabase project). They don't exist on a fresh DB. Wrap each
+-- non-Rowan operation in existence guards so this migration is a
+-- no-op locally; on prod where the schemas/tables exist, the body
+-- runs normally.
 
-ALTER VIEW automation.pending_responses SET (security_invoker = on);
-ALTER VIEW automation.daily_stats SET (security_invoker = on);
+-- =============================================================================
+-- SECTION 1: Security Definer Views (ERROR) — automation schema
+-- =============================================================================
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name='automation') THEN
+    EXECUTE 'ALTER VIEW automation.pending_responses SET (security_invoker = on)';
+    EXECUTE 'ALTER VIEW automation.daily_stats SET (security_invoker = on)';
+  END IF;
+END $$;
 
 -- =============================================================================
 -- SECTION 2: RLS Disabled — automation schema tables (ERROR)
--- Enable RLS with service_role-only access
 -- =============================================================================
-
-ALTER TABLE automation.workflow_logs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON automation.workflow_logs
-  FOR ALL USING ((select auth.role()) = 'service_role');
-
-ALTER TABLE automation.reddit_monitoring ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON automation.reddit_monitoring
-  FOR ALL USING ((select auth.role()) = 'service_role');
-
-ALTER TABLE automation.subreddit_config ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON automation.subreddit_config
-  FOR ALL USING ((select auth.role()) = 'service_role');
-
-ALTER TABLE automation.product_context ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON automation.product_context
-  FOR ALL USING ((select auth.role()) = 'service_role');
+DO $$
+DECLARE t TEXT;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name='automation') THEN
+    RETURN;
+  END IF;
+  FOREACH t IN ARRAY ARRAY['workflow_logs','reddit_monitoring','subreddit_config','product_context'] LOOP
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='automation' AND table_name=t) THEN
+      EXECUTE format('ALTER TABLE automation.%I ENABLE ROW LEVEL SECURITY', t);
+      EXECUTE format($cmd$
+        DROP POLICY IF EXISTS "Service role only" ON automation.%I;
+        CREATE POLICY "Service role only" ON automation.%I
+          FOR ALL USING ((select auth.role()) = 'service_role')
+      $cmd$, t, t);
+    END IF;
+  END LOOP;
+END $$;
 
 -- =============================================================================
 -- SECTION 3: RLS Disabled — sm_* shared SteelMotion CRM tables (ERROR)
 -- Enable RLS with service_role-only access
 -- =============================================================================
 
-ALTER TABLE public.sm_leads ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON public.sm_leads
-  FOR ALL USING ((select auth.role()) = 'service_role');
-
-ALTER TABLE public.sm_activities ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON public.sm_activities
-  FOR ALL USING ((select auth.role()) = 'service_role');
-
-ALTER TABLE public.sm_deals ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON public.sm_deals
-  FOR ALL USING ((select auth.role()) = 'service_role');
-
-ALTER TABLE public.sm_proposals ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON public.sm_proposals
-  FOR ALL USING ((select auth.role()) = 'service_role');
+DO $$
+DECLARE t TEXT;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['sm_leads','sm_activities','sm_deals','sm_proposals'] LOOP
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=t) THEN
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+      EXECUTE format($cmd$
+        DROP POLICY IF EXISTS "Service role only" ON public.%I;
+        CREATE POLICY "Service role only" ON public.%I
+          FOR ALL USING ((select auth.role()) = 'service_role')
+      $cmd$, t, t);
+    END IF;
+  END LOOP;
+END $$;
 
 -- =============================================================================
 -- SECTION 4: RLS Disabled — public.spatial_ref_sys (ERROR)
@@ -80,44 +89,59 @@ GRANT SELECT ON public.spatial_ref_sys TO anon, authenticated;
 -- Analytics table written by visitor tracking API (supabaseAdmin), read by admin
 -- =============================================================================
 
-ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role only" ON public.site_visits
-  FOR ALL USING ((select auth.role()) = 'service_role');
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='site_visits') THEN
+    EXECUTE 'ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY';
+    EXECUTE 'DROP POLICY IF EXISTS "Service role only" ON public.site_visits';
+    EXECUTE $cmd$
+      CREATE POLICY "Service role only" ON public.site_visits
+        FOR ALL USING ((select auth.role()) = 'service_role')
+    $cmd$;
+  END IF;
+END $$;
 
 -- =============================================================================
 -- SECTION 6: Function Search Path Mutable (WARNING)
 -- Set search_path on functions to prevent search path injection attacks
 -- =============================================================================
 
-ALTER FUNCTION public.get_task_stats SET search_path = public;
-ALTER FUNCTION automation.update_updated_at SET search_path = automation;
-ALTER FUNCTION public.sm_update_updated_at SET search_path = public;
-ALTER FUNCTION public.cleanup_old_site_visits SET search_path = public;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname='get_task_stats' AND pronamespace='public'::regnamespace) THEN
+    EXECUTE 'ALTER FUNCTION public.get_task_stats SET search_path = public';
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name='automation') AND
+     EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE p.proname='update_updated_at' AND n.nspname='automation') THEN
+    EXECUTE 'ALTER FUNCTION automation.update_updated_at SET search_path = automation';
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname='sm_update_updated_at' AND pronamespace='public'::regnamespace) THEN
+    EXECUTE 'ALTER FUNCTION public.sm_update_updated_at SET search_path = public';
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname='cleanup_old_site_visits' AND pronamespace='public'::regnamespace) THEN
+    EXECUTE 'ALTER FUNCTION public.cleanup_old_site_visits SET search_path = public';
+  END IF;
+END $$;
 
 -- =============================================================================
 -- SECTION 7: RLS Policy Always True — sm_* tables (WARNING)
 -- Replace overly permissive USING(true) policies with proper role checks
 -- =============================================================================
 
-DROP POLICY IF EXISTS "Service role full access" ON public.sm_clients;
-CREATE POLICY "Service role full access" ON public.sm_clients
-  FOR ALL USING ((select auth.role()) = 'service_role')
-  WITH CHECK ((select auth.role()) = 'service_role');
-
-DROP POLICY IF EXISTS "Service role full access" ON public.sm_invoice_items;
-CREATE POLICY "Service role full access" ON public.sm_invoice_items
-  FOR ALL USING ((select auth.role()) = 'service_role')
-  WITH CHECK ((select auth.role()) = 'service_role');
-
-DROP POLICY IF EXISTS "Service role full access" ON public.sm_invoices;
-CREATE POLICY "Service role full access" ON public.sm_invoices
-  FOR ALL USING ((select auth.role()) = 'service_role')
-  WITH CHECK ((select auth.role()) = 'service_role');
-
-DROP POLICY IF EXISTS "Service role full access" ON public.sm_service_templates;
-CREATE POLICY "Service role full access" ON public.sm_service_templates
-  FOR ALL USING ((select auth.role()) = 'service_role')
-  WITH CHECK ((select auth.role()) = 'service_role');
+DO $$
+DECLARE t TEXT;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['sm_clients','sm_invoice_items','sm_invoices','sm_service_templates'] LOOP
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=t) THEN
+      EXECUTE format($cmd$
+        DROP POLICY IF EXISTS "Service role full access" ON public.%I;
+        CREATE POLICY "Service role full access" ON public.%I
+          FOR ALL USING ((select auth.role()) = 'service_role')
+          WITH CHECK ((select auth.role()) = 'service_role')
+      $cmd$, t, t);
+    END IF;
+  END LOOP;
+END $$;
 
 -- =============================================================================
 -- SECTION 8: Auth RLS InitPlan — user_feedback policies (WARNING)

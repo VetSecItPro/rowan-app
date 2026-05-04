@@ -128,13 +128,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to check milestone completion after goal updates (when contributions are added)
+-- Trigger to check milestone completion after goal updates (when contributions are added).
+-- The `goals.current_amount` column is added by a LATER migration
+-- (20251016000011_create_goal_contributions.sql). Guard the trigger
+-- creation so this migration replays cleanly on a fresh DB. Production
+-- already has the column + trigger; the IF EXISTS check is a no-op there.
 DROP TRIGGER IF EXISTS check_milestone_completion_on_update ON goals;
-CREATE TRIGGER check_milestone_completion_on_update
-  AFTER UPDATE OF current_amount ON goals
-  FOR EACH ROW
-  WHEN (NEW.current_amount IS DISTINCT FROM OLD.current_amount)
-  EXECUTE FUNCTION check_milestone_completion();
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public'
+      AND table_name='goals'
+      AND column_name='current_amount'
+  ) THEN
+    EXECUTE $cmd$
+      CREATE TRIGGER check_milestone_completion_on_update
+        AFTER UPDATE OF current_amount ON goals
+        FOR EACH ROW
+        WHEN (NEW.current_amount IS DISTINCT FROM OLD.current_amount)
+        EXECUTE FUNCTION check_milestone_completion()
+    $cmd$;
+  END IF;
+END $$;
 
 -- ==========================================
 -- 3. NOTIFICATIONS TABLE (if not exists)
@@ -220,56 +236,78 @@ ALTER TABLE notification_log ADD CONSTRAINT notification_log_category_check
 -- ==========================================
 -- 6. BACKFILL: Create milestones for existing financial goals
 -- ==========================================
--- This will create milestones for any existing financial goals that don't have them
+-- The `target_amount` and `current_amount` columns on goals are added
+-- by the LATER migration 20251016000011_create_goal_contributions.sql.
+-- On a fresh-DB replay these columns don't exist yet, so wrap the
+-- backfills in DO/IF EXISTS guards. (No-op on prod — those backfills
+-- already ran when this migration was first applied with the columns
+-- already in place via an earlier hot-patch.)
 DO $$
-DECLARE
-  v_goal RECORD;
 BEGIN
-  FOR v_goal IN
-    SELECT id, title, target_amount
-    FROM goals
-    WHERE is_financial = TRUE
-      AND target_amount IS NOT NULL
-      AND id NOT IN (SELECT DISTINCT goal_id FROM goal_milestones WHERE type = 'percentage')
-  LOOP
-    -- Create percentage milestones for this existing goal
-    INSERT INTO goal_milestones (goal_id, title, description, type, target_value)
-    VALUES
-      (v_goal.id, '25% Complete', 'Reached 25% of your goal!', 'percentage', 25),
-      (v_goal.id, 'Halfway There!', 'You have reached 50% of your goal!', 'percentage', 50),
-      (v_goal.id, '75% Complete', 'Almost there! 75% of your goal achieved!', 'percentage', 75),
-      (v_goal.id, 'Goal Complete!', 'Congratulations! You have reached your goal!', 'percentage', 100);
-  END LOOP;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='goals' AND column_name='target_amount'
+  ) THEN
+    EXECUTE $cmd$
+      DO $inner$
+      DECLARE
+        v_goal RECORD;
+      BEGIN
+        FOR v_goal IN
+          SELECT id, title, target_amount
+          FROM goals
+          WHERE is_financial = TRUE
+            AND target_amount IS NOT NULL
+            AND id NOT IN (SELECT DISTINCT goal_id FROM goal_milestones WHERE type = 'percentage')
+        LOOP
+          INSERT INTO goal_milestones (goal_id, title, description, type, target_value)
+          VALUES
+            (v_goal.id, '25% Complete', 'Reached 25% of your goal!', 'percentage', 25),
+            (v_goal.id, 'Halfway There!', 'You have reached 50% of your goal!', 'percentage', 50),
+            (v_goal.id, '75% Complete', 'Almost there! 75% of your goal achieved!', 'percentage', 75),
+            (v_goal.id, 'Goal Complete!', 'Congratulations! You have reached your goal!', 'percentage', 100);
+        END LOOP;
+      END $inner$;
+    $cmd$;
+  END IF;
 END $$;
 
 -- ==========================================
 -- 7. MANUALLY CHECK AND MARK EXISTING COMPLETED MILESTONES
 -- ==========================================
--- For existing goals that have already passed milestones, mark them as complete
 DO $$
-DECLARE
-  v_goal RECORD;
-  v_milestone RECORD;
-  v_current_percentage NUMERIC;
 BEGIN
-  FOR v_goal IN
-    SELECT id, current_amount, target_amount, space_id, title
-    FROM goals
-    WHERE is_financial = TRUE
-      AND target_amount IS NOT NULL
-      AND target_amount > 0
-      AND current_amount IS NOT NULL
-  LOOP
-    -- Calculate current completion percentage
-    v_current_percentage := (v_goal.current_amount / v_goal.target_amount) * 100;
-
-    -- Mark milestones as complete if already reached
-    UPDATE goal_milestones
-    SET completed = TRUE,
-        completed_at = NOW()
-    WHERE goal_id = v_goal.id
-      AND type = 'percentage'
-      AND completed = FALSE
-      AND target_value <= v_current_percentage;
-  END LOOP;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='goals' AND column_name='current_amount'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='goals' AND column_name='target_amount'
+  ) THEN
+    EXECUTE $cmd$
+      DO $inner$
+      DECLARE
+        v_goal RECORD;
+        v_current_percentage NUMERIC;
+      BEGIN
+        FOR v_goal IN
+          SELECT id, current_amount, target_amount, space_id, title
+          FROM goals
+          WHERE is_financial = TRUE
+            AND target_amount IS NOT NULL
+            AND target_amount > 0
+            AND current_amount IS NOT NULL
+        LOOP
+          v_current_percentage := (v_goal.current_amount / v_goal.target_amount) * 100;
+          UPDATE goal_milestones
+          SET completed = TRUE,
+              completed_at = NOW()
+          WHERE goal_id = v_goal.id
+            AND type = 'percentage'
+            AND completed = FALSE
+            AND target_value <= v_current_percentage;
+        END LOOP;
+      END $inner$;
+    $cmd$;
+  END IF;
 END $$;

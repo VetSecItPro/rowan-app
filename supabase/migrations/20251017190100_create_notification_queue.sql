@@ -1,8 +1,11 @@
 -- Create notification queue table for comprehensive notification system
 -- Part of Phase 1: Database Schema & Preferences Backend
 
--- Notification queue table for batching and reliable delivery
-CREATE TABLE notification_queue (
+-- Notification queue table for batching and reliable delivery.
+-- IF NOT EXISTS — table is also created by 20251017000041_add_notification_queue.sql
+-- which runs earlier in the sequence; we just want this migration to be a no-op
+-- in that case rather than fail with duplicate-relation.
+CREATE TABLE IF NOT EXISTS notification_queue (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
 
@@ -52,12 +55,19 @@ CREATE POLICY "System can delete processed notifications"
 ON notification_queue FOR DELETE
 USING (true); -- Allow cleanup of old notifications
 
+-- The earlier 20251017000041 creates notification_queue without these
+-- columns; the IF NOT EXISTS above keeps that earlier shape. ADD the
+-- missing columns so the indexes below resolve.
+ALTER TABLE notification_queue ADD COLUMN IF NOT EXISTS category TEXT;
+ALTER TABLE notification_queue ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'normal';
+ALTER TABLE notification_queue ADD COLUMN IF NOT EXISTS digest_eligible BOOLEAN DEFAULT true;
+
 -- Indexes for performance
-CREATE INDEX idx_notification_queue_user_status ON notification_queue(user_id, status);
-CREATE INDEX idx_notification_queue_scheduled ON notification_queue(scheduled_for);
-CREATE INDEX idx_notification_queue_category ON notification_queue(category);
-CREATE INDEX idx_notification_queue_type_priority ON notification_queue(notification_type, priority);
-CREATE INDEX idx_notification_queue_digest_eligible ON notification_queue(digest_eligible, scheduled_for);
+CREATE INDEX IF NOT EXISTS idx_notification_queue_user_status ON notification_queue(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_notification_queue_scheduled ON notification_queue(scheduled_for);
+CREATE INDEX IF NOT EXISTS idx_notification_queue_category ON notification_queue(category);
+CREATE INDEX IF NOT EXISTS idx_notification_queue_type_priority ON notification_queue(notification_type, priority);
+CREATE INDEX IF NOT EXISTS idx_notification_queue_digest_eligible ON notification_queue(digest_eligible, scheduled_for);
 
 -- Function to clean up old processed notifications (older than 30 days)
 CREATE OR REPLACE FUNCTION cleanup_old_notifications()
