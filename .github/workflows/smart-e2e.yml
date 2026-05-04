@@ -93,10 +93,11 @@ jobs:
 
       - name: Export Supabase env to workflow
         run: |
-          # `supabase status -o env` emits KEY="value" pairs for each
-          # service URL/key. Append to GITHUB_ENV so subsequent steps
-          # see them as env vars without us hand-listing every one.
-          supabase status -o env >> $GITHUB_ENV
+          # `supabase status -o env` emits KEY="value" pairs. GITHUB_ENV
+          # does NOT strip surrounding quotes — passing them through makes
+          # consumers read literal `"http://..."` strings, which fail URL
+          # validation in @supabase/supabase-js. Strip the quotes here.
+          supabase status -o env | sed -E 's/^([A-Z_]+)="(.*)"$/\1=\2/' >> $GITHUB_ENV
 
       - name: Seed E2E test users
         run: pnpm tsx tests/e2e/setup/seed-test-users.ts
