@@ -18,6 +18,14 @@ on:
       - '.github/PULL_REQUEST_TEMPLATE.md'
       - 'CHANGELOG*.md'
       - 'LICENSE'
+      # Vitest unit tests run in their own CI job (Lint & Type Check / Build).
+      # E2E never imports __tests__/ — changes there can't move Playwright outcomes.
+      - '__tests__/**'
+      # One-shot ops scripts that aren't part of the runtime bundle.
+      - 'scripts/**'
+      # Other CI workflows have their own gates; only this file affects E2E.
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/deploy.yml'
   push:
     branches: [main]
   workflow_dispatch:
@@ -35,6 +43,102 @@ permissions:
   pull-requests: write
 
 jobs:
+  # ─── Layer 2: smart change detection ───
+  # paths-ignore (above) handles the trivial cases where the entire diff
+  # is in non-runtime paths. This detector job handles the harder cases
+  # paths-ignore can't express — most importantly, package.json edits
+  # that only touch devDependencies. A dev-only dep change cannot affect
+  # Playwright outcomes, so burning 40 min of CI on it is pure waste.
+  #
+  # Outputs `run_e2e` for the e2e job's `if:` gate. Skipped jobs count as
+  # "passed" for required-status branch protection, so this is safe to
+  # gate even when "Run E2E Tests" is required.
+  detect:
+    name: Detect E2E-relevant changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      run_e2e: ${{ steps.decide.outputs.run_e2e }}
+      reason: ${{ steps.decide.outputs.reason }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - id: decide
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Determine base + head SHAs for the diff.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+            # First push to a branch has zero base — fall back to running E2E.
+            if [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              echo "run_e2e=true" >> "$GITHUB_OUTPUT"
+              echo "reason=initial push (no base ref to diff against)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          else
+            # workflow_dispatch — operator chose to run, honor it.
+            echo "run_e2e=true" >> "$GITHUB_OUTPUT"
+            echo "reason=workflow_dispatch" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed=$(git diff --name-only "$base" "$head")
+          echo "Changed files between $base..$head:"
+          echo "$changed" | sed 's/^/  /'
+
+          # Files outside paths-ignore that DEFINITELY require E2E.
+          # paths-ignore already short-circuits docs/migrations/etc., so
+          # by the time we get here the diff has at least one runtime-ish
+          # file. We still need to distinguish runtime code from
+          # package.json devDeps-only edits.
+          runtime=$(echo "$changed" | grep -E '^(app|components|lib|hooks|tests/e2e|playwright\.config|next\.config|middleware|tailwind\.config|supabase/(seed|functions)|\.github/workflows/smart-e2e\.yml)' || true)
+
+          if [ -n "$runtime" ]; then
+            echo "run_e2e=true" >> "$GITHUB_OUTPUT"
+            echo "reason=runtime files changed" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Diff includes package.json or pnpm-lock.yaml. Distinguish
+          # devDependencies-only edits (safe to skip) from any change
+          # that could affect runtime: production `dependencies`,
+          # `scripts`, or `pnpm.overrides` (which can rewrite runtime
+          # transitive versions).
+          if echo "$changed" | grep -q '^package\.json$'; then
+            before=$(git show "$base:package.json" 2>/dev/null || echo '{}')
+            after=$(cat package.json)
+            before_runtime=$(echo "$before" | jq -S '{dependencies, scripts, pnpm}')
+            after_runtime=$(echo "$after"  | jq -S '{dependencies, scripts, pnpm}')
+
+            if [ "$before_runtime" != "$after_runtime" ]; then
+              echo "run_e2e=true" >> "$GITHUB_OUTPUT"
+              echo "reason=package.json runtime fields changed (deps/scripts/pnpm.overrides)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            # Otherwise: only devDependencies moved — pnpm-lock.yaml
+            # delta is just the corresponding transitive churn for
+            # dev-only packages, also safe.
+          fi
+
+          echo "run_e2e=false" >> "$GITHUB_OUTPUT"
+          echo "reason=no runtime-affecting changes detected" >> "$GITHUB_OUTPUT"
+
+      - name: Summarize decision
+        run: |
+          echo "### E2E gate decision" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- run_e2e: \`${{ steps.decide.outputs.run_e2e }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- reason: ${{ steps.decide.outputs.reason }}" >> "$GITHUB_STEP_SUMMARY"
+
   # Single consolidated job: previously seed-users + e2e + cleanup-users
   # ran across three separate runners against the production database.
   # Now each run boots its own Docker-based Supabase, so they all live
@@ -42,11 +146,14 @@ jobs:
   # cleaned up — production never sees any of it.
   e2e:
     name: Run E2E Tests
+    needs: detect
     runs-on: ubuntu-latest
-    # Skip if commit message or PR title contains [skip-e2e],
-    # or if the PR is still a draft (no need to burn 40 minutes
-    # on work that hasn't been marked ready for review).
+    # Skip when:
+    # - detector says no runtime-affecting changes, or
+    # - commit message / PR title contains [skip-e2e], or
+    # - the PR is still a draft.
     if: >-
+      needs.detect.outputs.run_e2e == 'true' &&
       !contains(github.event.head_commit.message || '', '[skip-e2e]') &&
       !contains(github.event.pull_request.title || '', '[skip-e2e]') &&
       github.event.pull_request.draft != true
