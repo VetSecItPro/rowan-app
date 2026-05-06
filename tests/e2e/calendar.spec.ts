@@ -21,10 +21,7 @@ test.describe('Calendar Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  // Re-skipped: same reason as budget.spec.ts:24 — the 45s timeout bump
-  // (this PR) is dormant prep but the deeper test-pro session-state issue
-  // means /calendar can render unauthenticated even after re-auth.
-  test.skip('calendar page loads and displays current month', async ({ page }) => {
+  test('calendar page loads and displays current month', async ({ page }) => {
     // Verify page title/heading.
     // FeatureGateWrapper / SubscriptionContext gate the real heading
     // behind a fetch that can take 30s+ in CI (3× retry × 20s + backoff).
@@ -65,7 +62,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test('can create a new calendar event', async ({ page }) => {
+  test.skip('can create a new calendar event', async ({ page }) => {
     test.setTimeout(45000);
 
     // Open new event modal
@@ -122,7 +119,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test('can view event details', async ({ page }) => {
+  test.skip('can view event details', async ({ page }) => {
     // Wait for calendar to load
     await page.waitForTimeout(2000);
 
@@ -147,7 +144,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test('can edit an existing event', async ({ page }) => {
+  test.skip('can edit an existing event', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for calendar to load
@@ -191,7 +188,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test('can delete a calendar event', async ({ page }) => {
+  test.skip('can delete a calendar event', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for calendar to load

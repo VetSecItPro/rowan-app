@@ -21,7 +21,7 @@ test.describe('Settings Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('settings page loads and displays tabs', async ({ page }) => {
+  test('settings page loads and displays tabs', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /settings/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });

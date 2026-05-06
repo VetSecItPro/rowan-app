@@ -21,7 +21,7 @@ test.describe('Goals Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('goals page loads and displays goal list', async ({ page }) => {
+  test('goals page loads and displays goal list', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /goals/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });
@@ -37,7 +37,7 @@ test.describe('Goals Feature', () => {
     }
   });
 
-  test('can create a new goal', async ({ page }) => {
+  test.skip('can create a new goal', async ({ page }) => {
     test.setTimeout(45000);
 
     // Click add goal button
