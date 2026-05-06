@@ -198,18 +198,26 @@ async function tryUiLogin(
   const submitButton = page.locator('[data-testid="login-submit-button"], button[type="submit"]').first();
   await submitButton.click();
 
-  // Check for login error messages before waiting for redirect
-  // The login form shows errors inline (e.g., "Invalid email or password", rate limit)
+  // Check for login error messages before waiting for redirect.
+  // Use the form-scoped testid (data-testid="login-form-error") rather than
+  // a global ".text-red-400, [role=alert]" match — the broad selector matched
+  // unrelated global UI like NetworkStatus banners or transient toasts, often
+  // with empty textContent, producing false-positive "Login form error: " with
+  // an empty message. Scoping to the actual login form's error eliminates that.
+  const loginErrorSelector = '[data-testid="login-form-error"]';
   const errorOrRedirect = await Promise.race([
     page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 90000 })
       .then(() => 'redirected' as const),
-    page.locator('.text-red-400, [role="alert"]').first()
+    page.locator(loginErrorSelector)
       .waitFor({ state: 'visible', timeout: 10000 })
       .then(async () => {
-        const errorText = await page.locator('.text-red-400, [role="alert"]').first().textContent();
-        return `error:${errorText}` as const;
+        // Wait for text to populate — Framer Motion's enter animation can briefly
+        // show the element with empty content before children render.
+        const text = (await page.locator(loginErrorSelector).textContent())?.trim() ?? '';
+        if (!text) return null; // empty/animating — keep waiting for redirect
+        return `error:${text}` as const;
       })
-      .catch(() => null), // No error appeared — keep waiting for redirect
+      .catch(() => null),
   ]);
 
   if (typeof errorOrRedirect === 'string' && errorOrRedirect.startsWith('error:')) {
