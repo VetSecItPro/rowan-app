@@ -125,11 +125,22 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
       setShowCountdown(editEvent.show_countdown || false);
       setCountdownLabel(editEvent.countdown_label || '');
     } else {
+      // Default start_time to "now, rounded to next hour" — matches typical
+      // calendar UX (Google Calendar, Apple Calendar, Outlook all pre-fill).
+      // Empty default forced users to manually pick a date every time and
+      // also broke the "click Create then submit" path: with no
+      // start_time, the API rejects the create and the modal silently
+      // shows a generic error.
+      const nextHour = new Date();
+      nextHour.setMinutes(0, 0, 0);
+      nextHour.setHours(nextHour.getHours() + 1);
+      const defaultStart = nextHour.toISOString();
+
       setFormData({
         space_id: spaceId,
         title: '',
         description: '',
-        start_time: '',
+        start_time: defaultStart,
         end_time: '',
         is_recurring: false,
         location: '',
