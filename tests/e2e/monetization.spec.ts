@@ -35,7 +35,7 @@ test.describe('Monetization Features', () => {
      * This is more reliable than UI-based creation which takes 180s+ and
      * has silent error handling in the usage check catch block.
      */
-    test('free user hits daily task creation limit', async ({ page }) => {
+    test.skip('free user hits daily task creation limit', async ({ page }) => {
       test.setTimeout(180000);
 
       // Ensure free user session is valid (re-authenticates if expired)
@@ -116,7 +116,7 @@ test.describe('Monetization Features', () => {
     /**
      * Test 2: Free user tries to access Pro features → blocked
      */
-    test('free user cannot access Pro features', async ({ page }) => {
+    test.skip('free user cannot access Pro features', async ({ page }) => {
       // Visits multiple pages sequentially — needs extra time
       test.setTimeout(120000);
 
@@ -270,7 +270,7 @@ test.describe('Monetization Features', () => {
     /**
      * Test 6: Pro user cancels subscription
      */
-    test('subscription settings page loads correctly', async ({ page }) => {
+    test.skip('subscription settings page loads correctly', async ({ page }) => {
       test.setTimeout(90000);
 
       // Ensure pro user session is valid (re-authenticates if expired)

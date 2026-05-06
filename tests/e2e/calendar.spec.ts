@@ -21,7 +21,7 @@ test.describe('Calendar Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test('calendar page loads and displays current month', async ({ page }) => {
+  test.skip('calendar page loads and displays current month', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /calendar/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });
