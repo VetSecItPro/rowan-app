@@ -52,26 +52,39 @@ test.describe('Auth Flow Tests', () => {
     console.log('✓ Signup page renders with email, password fields — no beta references');
   });
 
-  test.skip('Signup form validates inputs', async ({ page }) => {
+  test('Signup form validates inputs', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
 
     // Dismiss cookie banner if present (fixes mobile viewport blocking)
     await dismissCookieBanner(page);
 
-    // Try submitting empty form using resilient selector
-    await resilientClick(page, 'signup-submit-button', {
-      role: 'button',
-      text: 'Create Account',
-    });
+    // Submit button is gated on age + TOS confirmation; it stays disabled
+    // until both checkboxes are checked. That IS the form's first-line
+    // validation, so we assert the disabled state directly rather than
+    // attempting an un-clickable click.
+    const submitButton = page.getByTestId('signup-submit-button');
+    await expect(submitButton).toBeDisabled();
 
-    // Should show validation — page should stay on /signup
+    // After both checkboxes are checked but email/password empty, the
+    // button enables and submission triggers HTML5 / server-side validation
+    // — both keep us on /signup.
+    await page.getByTestId('signup-age-checkbox').check();
+    await page.getByTestId('signup-tos-checkbox').check();
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
+
     await page.waitForTimeout(1000);
     expect(page.url()).toContain('/signup');
 
     console.log('✓ Signup form validates empty submission');
   });
 
+  // Re-skipped: the checkbox fix unblocks the form interaction, but the
+  // helper's name-field fallback (`getByRole('textbox')`) hits a strict-mode
+  // violation since the signup form has 2 textbox-roled inputs without a
+  // disambiguating data-testid. Needs `data-testid="signup-name-input"` on
+  // the component before this can run.
   test.skip('Signup flow with test data', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
@@ -100,6 +113,10 @@ test.describe('Auth Flow Tests', () => {
         role: 'textbox',
       });
     }
+
+    // Required: age + TOS confirmation gate the submit button
+    await page.getByTestId('signup-age-checkbox').check();
+    await page.getByTestId('signup-tos-checkbox').check();
 
     // Submit the form
     await resilientClick(page, 'signup-submit-button', {

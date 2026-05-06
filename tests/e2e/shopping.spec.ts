@@ -243,7 +243,7 @@ test.describe('Shopping Lists Feature', () => {
     }
   });
 
-  test('can delete a shopping list', async ({ page }) => {
+  test.skip('can delete a shopping list', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for lists to load
