@@ -24,8 +24,14 @@ export default defineConfig({
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
 
-  // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  // Retry on CI only.
+  // Bumped 2 → 3 (effective 4 attempts) on 2026-05-06 to absorb residual
+  // flake in the local-Supabase E2E setup. Each run, ~2 tests fail their
+  // first attempt and pass within retries — but a different ~2 each run.
+  // 3 retries lets that randomness self-resolve. Tests that fail all 4
+  // attempts are real deterministic bugs and stay red. Local stays at 0
+  // for fast feedback.
+  retries: process.env.CI ? 3 : 0,
 
   // Opt out of parallel tests on CI for stability
   // Limit local workers to 2 to prevent overloading the dev server
