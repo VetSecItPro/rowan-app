@@ -150,6 +150,17 @@ export async function checkRateLimit(
   fallbackLimit: number = 10,
   fallbackWindowMs: number = 10000
 ): Promise<{ success: boolean }> {
+  // E2E test bypass: every Playwright test fires dozens of API calls from a
+  // single CI runner IP. Per-IP limits (10/10s on general, 10/h on auth)
+  // exhaust quickly across a 95-test suite — the resulting 429s on
+  // /api/csrf/token were misread as "session invalid", triggering UI re-auth
+  // fallbacks that compounded into the broken-baseline pattern (red since
+  // 2026-02-11). PLAYWRIGHT_TEST is set ONLY by playwright.config.ts's
+  // webServer.env block, so this gate cannot fire in real production.
+  if (process.env.PLAYWRIGHT_TEST === 'true') {
+    return { success: true };
+  }
+
   // If Redis rate limiter is available, use it
   if (rateLimiter) {
     try {

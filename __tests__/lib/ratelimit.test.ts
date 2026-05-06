@@ -8,7 +8,7 @@
  * - All exported limiters are null when no Redis env vars are set (graceful degradation)
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // Hoist mock fns
@@ -118,6 +118,38 @@ describe('Rate limiter instances — no Redis env vars', () => {
 // ---------------------------------------------------------------------------
 // checkRateLimit — fallback path (limiter is null)
 // ---------------------------------------------------------------------------
+describe('checkRateLimit — PLAYWRIGHT_TEST bypass', () => {
+  const originalPwt = process.env.PLAYWRIGHT_TEST;
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => {
+    if (originalPwt === undefined) delete process.env.PLAYWRIGHT_TEST;
+    else process.env.PLAYWRIGHT_TEST = originalPwt;
+  });
+
+  it('returns success without consulting Redis or fallback when PLAYWRIGHT_TEST=true', async () => {
+    process.env.PLAYWRIGHT_TEST = 'true';
+    const fakeLimiter = { limit: mockRedisLimiterLimit } as never;
+    const result = await checkRateLimit('any-ip', fakeLimiter, 10, 10000);
+    expect(result).toEqual({ success: true });
+    expect(mockRedisLimiterLimit).not.toHaveBeenCalled();
+    expect(mockFallbackRateLimit).not.toHaveBeenCalled();
+  });
+
+  it('does NOT bypass when PLAYWRIGHT_TEST is unset', async () => {
+    delete process.env.PLAYWRIGHT_TEST;
+    mockFallbackRateLimit.mockReturnValueOnce(true);
+    await checkRateLimit('any-ip', null, 10, 10000);
+    expect(mockFallbackRateLimit).toHaveBeenCalled();
+  });
+
+  it('does NOT bypass when PLAYWRIGHT_TEST is "false" (only "true" enables)', async () => {
+    process.env.PLAYWRIGHT_TEST = 'false';
+    mockFallbackRateLimit.mockReturnValueOnce(true);
+    await checkRateLimit('any-ip', null, 10, 10000);
+    expect(mockFallbackRateLimit).toHaveBeenCalled();
+  });
+});
+
 describe('checkRateLimit — fallback path', () => {
   beforeEach(() => vi.clearAllMocks());
 
