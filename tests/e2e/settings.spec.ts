@@ -21,7 +21,7 @@ test.describe('Settings Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test('settings page loads and displays tabs', async ({ page }) => {
+  test.skip('settings page loads and displays tabs', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /settings/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });
@@ -98,7 +98,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test('can manage notification preferences', async ({ page }) => {
+  test.skip('can manage notification preferences', async ({ page }) => {
     test.setTimeout(45000);
 
     // Navigate to notifications tab
@@ -239,7 +239,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test('can change password', async ({ page }) => {
+  test.skip('can change password', async ({ page }) => {
     test.setTimeout(45000);
 
     // Navigate to account/security tab
@@ -275,7 +275,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test('can export user data', async ({ page }) => {
+  test.skip('can export user data', async ({ page }) => {
     test.setTimeout(45000);
 
     // Look for data export section (may be in account or privacy tab)

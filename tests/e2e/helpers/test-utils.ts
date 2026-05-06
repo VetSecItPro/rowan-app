@@ -134,9 +134,29 @@ async function tryApiLogin(
     // Navigate to app first so page.request sends cookies to localhost
     await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
+    // /api/auth/signin enforces CSRF (x-csrf-token header must match the
+    // token cookie set by GET /api/csrf/token). Without it, signin returns
+    // 403 {"error":"CSRF validation failed"}, which the helper used to mask
+    // by silently falling through to UI login — that path then hit the
+    // broad-selector race that produced the empty-error-message symptom.
+    // Mirror lib/utils/csrf-fetch.ts: fetch token, then send as header.
+    const tokenResp = await page.request.get('/api/csrf/token', { timeout: 10000 });
+    if (!tokenResp.ok()) {
+      console.warn(`  CSRF token fetch returned ${tokenResp.status()}`);
+      return false;
+    }
+    const { token: csrfToken } = (await tokenResp.json()) as { token?: string };
+    if (!csrfToken) {
+      console.warn('  CSRF token response missing token field');
+      return false;
+    }
+
     const response = await page.request.post('/api/auth/signin', {
       data: { email: user.email, password: user.password },
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-csrf-token': csrfToken,
+      },
       timeout: 15000,
     });
 
@@ -198,18 +218,26 @@ async function tryUiLogin(
   const submitButton = page.locator('[data-testid="login-submit-button"], button[type="submit"]').first();
   await submitButton.click();
 
-  // Check for login error messages before waiting for redirect
-  // The login form shows errors inline (e.g., "Invalid email or password", rate limit)
+  // Check for login error messages before waiting for redirect.
+  // Use the form-scoped testid (data-testid="login-form-error") rather than
+  // a global ".text-red-400, [role=alert]" match — the broad selector matched
+  // unrelated global UI like NetworkStatus banners or transient toasts, often
+  // with empty textContent, producing false-positive "Login form error: " with
+  // an empty message. Scoping to the actual login form's error eliminates that.
+  const loginErrorSelector = '[data-testid="login-form-error"]';
   const errorOrRedirect = await Promise.race([
     page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 90000 })
       .then(() => 'redirected' as const),
-    page.locator('.text-red-400, [role="alert"]').first()
+    page.locator(loginErrorSelector)
       .waitFor({ state: 'visible', timeout: 10000 })
       .then(async () => {
-        const errorText = await page.locator('.text-red-400, [role="alert"]').first().textContent();
-        return `error:${errorText}` as const;
+        // Wait for text to populate — Framer Motion's enter animation can briefly
+        // show the element with empty content before children render.
+        const text = (await page.locator(loginErrorSelector).textContent())?.trim() ?? '';
+        if (!text) return null; // empty/animating — keep waiting for redirect
+        return `error:${text}` as const;
       })
-      .catch(() => null), // No error appeared — keep waiting for redirect
+      .catch(() => null),
   ]);
 
   if (typeof errorOrRedirect === 'string' && errorOrRedirect.startsWith('error:')) {
