@@ -62,166 +62,103 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test.skip('can create a new calendar event', async ({ page }) => {
+  test('can create a new calendar event', async ({ page }) => {
     test.setTimeout(45000);
 
-    // Open new event modal
-    const createButton = page.locator('[data-testid="add-event-button"], button:has-text("New Event"), button:has-text("Add Event")').first();
+    // Use strict testid selectors. The page renders multiple "New Event"
+    // buttons (mode-toggle pills + the dynamic action button) — broad
+    // text matchers like :has-text("New Event") match the wrong one.
+    // The action button has data-testid="add-event-button"; testids are
+    // the canonical contract between tests and components.
+    await page.getByTestId('add-event-button').click();
 
-    // Check if button exists
-    const hasCreateButton = await createButton.isVisible().catch(() => false);
-
-    if (!hasCreateButton) {
-      // Try clicking on a calendar day to open event creation
-      const calendarDay = page.locator('[data-testid^="calendar-day"], .calendar-day, [class*="day"]').first();
-      if (await calendarDay.isVisible()) {
-        await calendarDay.click();
-        await page.waitForTimeout(1000);
-      }
-    } else {
-      await createButton.click();
-      await page.waitForTimeout(1000);
-    }
-
-    // Fill event form
     const eventTitle = `E2E Test Event ${Date.now()}`;
+    await page.getByTestId('event-title-input').fill(eventTitle);
+    await page.getByTestId('event-description-input').fill('Created by E2E test');
+    await page.getByTestId('event-submit-button').click();
 
-    // Look for event title input
-    const titleInput = page.locator('[data-testid="event-title-input"], input[name="title"], input[placeholder*="event" i]').first();
+    // After submit, useCalendarHandlers.handleCreateEvent calls
+    // loadEvents() to refresh — the new event should appear in the list.
+    const eventInList = page.locator(`text=/${eventTitle}/i`).first();
+    await expect(eventInList).toBeVisible({ timeout: 10000 });
 
-    if (await titleInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await titleInput.fill(eventTitle);
-
-      // Optional: Fill description if field exists
-      const descriptionInput = page.locator('[data-testid="event-description-input"], textarea[name="description"], textarea[placeholder*="description" i]').first();
-      if (await descriptionInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await descriptionInput.fill('Created by E2E test');
-      }
-
-      // Submit form
-      const submitButton = page.locator('[data-testid="event-submit-button"], button[type="submit"], button:has-text("Create"), button:has-text("Save")').first();
-      await submitButton.click();
-
-      // Wait for event to appear
-      await page.waitForTimeout(2000);
-
-      // Verify event appears in calendar
-      const eventElement = page.locator(`text=/${eventTitle}/i`).first();
-      const eventExists = await eventElement.isVisible({ timeout: 5000 }).catch(() => false);
-
-      if (eventExists) {
-        console.log(`✓ Created calendar event: ${eventTitle}`);
-      } else {
-        console.log('⚠ Event created but may not be visible in current view');
-      }
-    } else {
-      console.log('⚠ Event creation form not found - calendar may use different interaction pattern');
-    }
+    console.log(`✓ Created calendar event: ${eventTitle}`);
   });
 
-  test.skip('can view event details', async ({ page }) => {
-    // Wait for calendar to load
-    await page.waitForTimeout(2000);
-
-    // Look for any existing event
-    const existingEvent = page.locator('[data-testid^="event-"], .calendar-event, [class*="event"]').first();
+  test('can view event details', async ({ page }) => {
+    // Strict testid selector. The previous broad `[class*="event"]` fallback
+    // matched non-EventCard elements that threw on click.
+    // EventCard outer wrapper has data-testid={`event-${event.id}`} since
+    // the calendar testid PR. If no events exist in the test DB on a fresh
+    // run, the test gracefully bails (no events to view = nothing to assert).
+    const existingEvent = page.locator('[data-testid^="event-"]').first();
 
     if (await existingEvent.isVisible({ timeout: 5000 }).catch(() => false)) {
       await existingEvent.click();
-      await page.waitForTimeout(1000);
-
-      // Check if event details modal/panel appeared
-      const eventDetails = page.locator('[data-testid="event-details"], [role="dialog"], .event-details').first();
-      const detailsVisible = await eventDetails.isVisible({ timeout: 3000 }).catch(() => false);
-
-      if (detailsVisible) {
-        console.log('✓ Event details displayed');
-      } else {
-        console.log('⚠ Event clicked but details view not found');
-      }
+      // EventCard outer click → onViewDetails → opens EventDetailModal.
+      const eventDetails = page.getByTestId('event-details');
+      await expect(eventDetails).toBeVisible({ timeout: 3000 });
+      console.log('✓ Event details displayed');
     } else {
-      console.log('⚠ No existing events found to view');
+      console.log('⚠ No existing events found to view (expected on fresh test DB)');
     }
   });
 
-  test.skip('can edit an existing event', async ({ page }) => {
+  test('can edit an existing event', async ({ page }) => {
     test.setTimeout(45000);
 
-    // Wait for calendar to load
-    await page.waitForTimeout(2000);
-
-    // Look for any existing event
-    const existingEvent = page.locator('[data-testid^="event-"], .calendar-event, [class*="event"]').first();
+    const existingEvent = page.locator('[data-testid^="event-"]').first();
 
     if (await existingEvent.isVisible({ timeout: 5000 }).catch(() => false)) {
       await existingEvent.click();
-      await page.waitForTimeout(1000);
+      // Detail modal renders — click its Edit button.
+      await page.getByTestId('event-edit-button').click();
 
-      // Look for edit button
-      const editButton = page.locator('[data-testid="event-edit-button"], button:has-text("Edit")').first();
+      // Edit modal renders — use the same testids as the create form.
+      const titleInput = page.getByTestId('event-title-input');
+      await expect(titleInput).toBeVisible({ timeout: 3000 });
+      const updatedTitle = `Updated Event ${Date.now()}`;
+      await titleInput.fill(updatedTitle);
+      await page.getByTestId('event-submit-button').click();
 
-      if (await editButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await editButton.click();
-        await page.waitForTimeout(1000);
-
-        // Modify event title
-        const titleInput = page.locator('[data-testid="event-title-input"], input[name="title"], input[placeholder*="event" i]').first();
-
-        if (await titleInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-          const updatedTitle = `Updated Event ${Date.now()}`;
-          await titleInput.fill(updatedTitle);
-
-          // Save changes
-          const saveButton = page.locator('[data-testid="event-submit-button"], button[type="submit"], button:has-text("Save"), button:has-text("Update")').first();
-          await saveButton.click();
-          await page.waitForTimeout(2000);
-
-          console.log(`✓ Event updated to: ${updatedTitle}`);
-        } else {
-          console.log('⚠ Edit form not found');
-        }
-      } else {
-        console.log('⚠ Edit button not found');
-      }
+      // Verify the updated title appears in the list after the post-save reload.
+      const updatedInList = page.locator(`text=/${updatedTitle}/i`).first();
+      await expect(updatedInList).toBeVisible({ timeout: 10000 });
+      console.log(`✓ Event updated to: ${updatedTitle}`);
     } else {
-      console.log('⚠ No existing events found to edit');
+      console.log('⚠ No existing events found to edit (expected on fresh test DB)');
     }
+
   });
 
-  test.skip('can delete a calendar event', async ({ page }) => {
+  test('can delete a calendar event', async ({ page }) => {
     test.setTimeout(45000);
 
-    // Wait for calendar to load
-    await page.waitForTimeout(2000);
-
-    // Look for any existing event
-    const existingEvent = page.locator('[data-testid^="event-"], .calendar-event, [class*="event"]').first();
+    const existingEvent = page.locator('[data-testid^="event-"]').first();
 
     if (await existingEvent.isVisible({ timeout: 5000 }).catch(() => false)) {
-      const eventText = await existingEvent.textContent();
-      await existingEvent.click();
-      await page.waitForTimeout(1000);
+      const eventTitle = await existingEvent.locator('h3').first().textContent();
+      // Open the 3-dot menu (card click opens detail modal, but delete lives
+      // in the menu, not on the detail modal in the current UI — the
+      // detail modal's Delete button is conditional on onDelete prop).
+      // Use the menu approach for deletion to match user-actual flow.
+      await existingEvent.locator('button[aria-label="Event options menu"]').click();
+      await page.getByTestId('event-delete-button').click();
 
-      // Look for delete button
-      const deleteButton = page.locator('[data-testid="event-delete-button"], button:has-text("Delete"), button[aria-label*="delete" i]').first();
+      // Confirm dialog if present
+      const confirmButton = page.locator('[data-testid="confirm-delete-button"], button:has-text("Confirm"), button:has-text("Yes")').first();
+      if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+        await confirmButton.click();
+      }
 
-      if (await deleteButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await deleteButton.click();
-        await page.waitForTimeout(500);
-
-        // Handle confirmation dialog if it appears
-        const confirmButton = page.locator('[data-testid="confirm-delete-button"], button:has-text("Confirm"), button:has-text("Yes")').first();
-        if (await confirmButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await confirmButton.click();
-        }
-
-        await page.waitForTimeout(2000);
-        console.log(`✓ Event deleted: ${eventText}`);
-      } else {
-        console.log('⚠ Delete button not found');
+      // Verify the event is removed from the list (after refresh).
+      if (eventTitle) {
+        const eventInList = page.locator(`text="${eventTitle.trim()}"`).first();
+        await expect(eventInList).not.toBeVisible({ timeout: 10000 });
+        console.log(`✓ Event deleted: ${eventTitle}`);
       }
     } else {
-      console.log('⚠ No existing events found to delete');
+      console.log('⚠ No existing events found to delete (expected on fresh test DB)');
     }
   });
 

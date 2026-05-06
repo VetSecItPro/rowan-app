@@ -57,7 +57,7 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
       maxWidth="lg"
       headerGradient="bg-gradient-to-r from-purple-500 to-purple-600"
     >
-      <div className="space-y-4">
+      <div data-testid="event-details" className="space-y-4">
         {/* Category & Status Row */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">{categoryConfig.icon}</span>
@@ -114,6 +114,7 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
           <div className="flex gap-2 mt-5">
             {onEdit && (
               <button
+                data-testid="event-edit-button"
                 onClick={() => {
                   onClose();
                   onEdit(event);
