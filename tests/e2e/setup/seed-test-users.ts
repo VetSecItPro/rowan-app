@@ -240,6 +240,24 @@ async function seedTestUsers() {
       }
 
       console.log(`  ✓ Subscription set to: ${testUser.tier}`);
+
+      // Step 5: Mark welcome flow as completed.
+      // app/(main)/layout.tsx redirects any space-owner whose
+      // welcome_completed_at IS NULL to /welcome. Without this, every
+      // test that hits /dashboard, /expenses, /tasks, etc. lands on
+      // the onboarding form instead of the page under test — every
+      // page-load assertion (h1 = "Expenses", "Calendar", etc.) fails
+      // because the rendered h1 is "Welcome to Rowan".
+      const { error: welcomeError } = await supabase
+        .from('users')
+        .update({ welcome_completed_at: new Date().toISOString() })
+        .eq('id', userId);
+
+      if (welcomeError) {
+        throw new Error(`Failed to mark welcome completed: ${welcomeError.message}`);
+      }
+      console.log(`  ✓ Welcome flow marked completed`);
+
       console.log(`  ✓ User ${testUser.email} ready\n`);
     } catch (error) {
       console.error(`❌ ${testUser.email}: ${error instanceof Error ? error.message : String(error)}\n`);
