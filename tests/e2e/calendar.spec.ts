@@ -62,7 +62,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test.skip('can create a new calendar event', async ({ page }) => {
+  test('can create a new calendar event', async ({ page }) => {
     test.setTimeout(45000);
 
     // Open new event modal
@@ -119,7 +119,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test.skip('can view event details', async ({ page }) => {
+  test('can view event details', async ({ page }) => {
     // Wait for calendar to load
     await page.waitForTimeout(2000);
 
@@ -144,7 +144,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test.skip('can edit an existing event', async ({ page }) => {
+  test('can edit an existing event', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for calendar to load
@@ -188,7 +188,7 @@ test.describe('Calendar Feature', () => {
     }
   });
 
-  test.skip('can delete a calendar event', async ({ page }) => {
+  test('can delete a calendar event', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for calendar to load

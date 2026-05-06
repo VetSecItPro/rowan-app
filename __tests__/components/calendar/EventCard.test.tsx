@@ -108,4 +108,55 @@ describe('EventCard', () => {
     fireEvent.click(statusBtn);
     expect(onStatusChange).toHaveBeenCalledWith('ev-1', 'in-progress');
   });
+
+  // Card-level click behavior — view details on click of card body, with
+  // stopPropagation on inner interactive elements so they don't double-fire.
+  describe('card-level click → onViewDetails', () => {
+    it('outer wrapper has data-testid="event-${id}" for E2E selectors', () => {
+      const { container } = render(<EventCard {...defaultProps} />);
+      const card = container.querySelector('[data-testid="event-ev-1"]');
+      expect(card).not.toBeNull();
+    });
+
+    it('clicking the card body calls onViewDetails when prop is provided', () => {
+      const onViewDetails = vi.fn();
+      const { container } = render(<EventCard {...defaultProps} onViewDetails={onViewDetails} />);
+      const card = container.querySelector('[data-testid="event-ev-1"]') as HTMLElement;
+      fireEvent.click(card);
+      expect(onViewDetails).toHaveBeenCalledWith(mockEvent);
+    });
+
+    it('does NOT make the card clickable when onViewDetails is not provided', () => {
+      const { container } = render(<EventCard {...defaultProps} />);
+      const card = container.querySelector('[data-testid="event-ev-1"]') as HTMLElement;
+      // No role, no tabIndex, no cursor-pointer when handler is absent
+      expect(card.getAttribute('role')).toBeNull();
+      expect(card.getAttribute('tabindex')).toBeNull();
+      expect(card.className).not.toContain('cursor-pointer');
+    });
+
+    it('checkbox click does NOT bubble up to card-level onViewDetails', () => {
+      const onViewDetails = vi.fn();
+      const onStatusChange = vi.fn();
+      render(<EventCard {...defaultProps} onViewDetails={onViewDetails} onStatusChange={onStatusChange} />);
+      fireEvent.click(screen.getByLabelText(/Toggle event status/));
+      expect(onStatusChange).toHaveBeenCalled();
+      expect(onViewDetails).not.toHaveBeenCalled();
+    });
+
+    it('three-dot menu click does NOT bubble up to card-level onViewDetails', () => {
+      const onViewDetails = vi.fn();
+      render(<EventCard {...defaultProps} onViewDetails={onViewDetails} />);
+      fireEvent.click(screen.getByLabelText('Event options menu'));
+      expect(onViewDetails).not.toHaveBeenCalled();
+    });
+
+    it('Enter key on focused card invokes onViewDetails', () => {
+      const onViewDetails = vi.fn();
+      const { container } = render(<EventCard {...defaultProps} onViewDetails={onViewDetails} />);
+      const card = container.querySelector('[data-testid="event-ev-1"]') as HTMLElement;
+      fireEvent.keyDown(card, { key: 'Enter' });
+      expect(onViewDetails).toHaveBeenCalledWith(mockEvent);
+    });
+  });
 });

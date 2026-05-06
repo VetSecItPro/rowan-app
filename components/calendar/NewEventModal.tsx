@@ -379,6 +379,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
           Cancel
         </button>
         <button
+          data-testid="event-submit-button"
           type="submit"
           form="new-event-form"
           disabled={!!dateError || uploading}
@@ -409,6 +410,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             </label>
             <div className="relative">
               <input
+                data-testid="event-title-input"
                 type="text"
                 required
                 aria-required="true"
@@ -458,6 +460,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               Description
             </label>
             <textarea
+              data-testid="event-description-input"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add event details..."

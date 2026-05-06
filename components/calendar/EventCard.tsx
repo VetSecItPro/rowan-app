@@ -71,15 +71,39 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
     return configs[event.category] || configs.personal;
   };
 
-  const handleCheckboxClick = () => {
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const states: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
     const currentIndex = states.indexOf(event.status);
     const nextIndex = (currentIndex + 1) % states.length;
     onStatusChange(event.id, states[nextIndex]);
   };
 
+  // Card-level click opens detail view (when onViewDetails is provided).
+  // Inner buttons (checkbox, 3-dot menu, in-menu actions, internal Links) call
+  // stopPropagation so they don't double-trigger this handler. Provides the
+  // common "click anywhere on card to view" UX pattern + gives E2E tests a
+  // stable click target via the data-testid attribute.
+  const handleCardClick = onViewDetails
+    ? () => onViewDetails(event)
+    : undefined;
+
   return (
-    <div className="bg-gray-800 sm:bg-gray-800/80 border border-gray-700 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
+    <div
+      data-testid={`event-${event.id}`}
+      onClick={handleCardClick}
+      role={handleCardClick ? 'button' : undefined}
+      tabIndex={handleCardClick ? 0 : undefined}
+      onKeyDown={handleCardClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick();
+        }
+      } : undefined}
+      className={`bg-gray-800 sm:bg-gray-800/80 border border-gray-700 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200 ${
+        handleCardClick ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500' : ''
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -163,6 +187,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
           {linkedShoppingList && (
             <Link
               href="/shopping"
+              onClick={(e) => e.stopPropagation()}
               className={`inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 mt-2 sm:mt-3 ml-3 sm:ml-4 text-emerald-400 hover:text-emerald-300 transition-colors hover:bg-emerald-900/20 rounded-md ${
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
@@ -176,7 +201,10 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
           )}
         </div>
 
-        <div className="relative">
+        {/* Action menu — wrapped div stops click-propagation so the
+            card-level onClick (view details) doesn't double-fire when the
+            user opens the menu or selects a menu item. */}
+        <div className="relative" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Event options menu"
@@ -233,6 +261,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
                   Edit Event
                 </button>
                 <button
+                  data-testid="event-delete-button"
                   onClick={() => {
                     onDelete(event.id);
                     setShowMenu(false);

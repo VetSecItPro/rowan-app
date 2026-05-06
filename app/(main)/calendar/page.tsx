@@ -248,6 +248,7 @@ export default function CalendarPage() {
 
               {/* Dynamic Action Button - Fixed size to accommodate longest text */}
               <button
+                data-testid={activeAction === 'new-event' ? 'add-event-button' : `calendar-action-${activeAction}`}
                 onClick={() => {
                   if (activeAction === 'quick-add') setIsQuickAddOpen(true);
                   else if (activeAction === 'templates') setIsTemplateLibraryOpen(true);
