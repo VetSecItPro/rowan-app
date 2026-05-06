@@ -52,7 +52,7 @@ test.describe('Auth Flow Tests', () => {
     console.log('✓ Signup page renders with email, password fields — no beta references');
   });
 
-  test.skip('Signup form validates inputs', async ({ page }) => {
+  test('Signup form validates inputs', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
 
@@ -80,7 +80,7 @@ test.describe('Auth Flow Tests', () => {
     console.log('✓ Signup form validates empty submission');
   });
 
-  test.skip('Signup flow with test data', async ({ page }) => {
+  test('Signup flow with test data', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
 
