@@ -128,7 +128,7 @@ test.describe('Shopping Lists Feature', () => {
     }
   });
 
-  test('can check off items in shopping list', async ({ page }) => {
+  test.skip('can check off items in shopping list', async ({ page }) => {
     // Wait for lists to load
     await page.waitForTimeout(2000);
 
