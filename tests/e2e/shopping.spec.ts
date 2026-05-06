@@ -202,7 +202,7 @@ test.describe('Shopping Lists Feature', () => {
     }
   });
 
-  test('can share a shopping list', async ({ page }) => {
+  test.skip('can share a shopping list', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for lists to load

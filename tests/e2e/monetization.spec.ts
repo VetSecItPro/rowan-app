@@ -207,18 +207,21 @@ test.describe('Monetization Features', () => {
       const upgradeButton = page.getByTestId('upgrade-pro-button');
       await upgradeButton.click();
 
-      // Should redirect to Polar Checkout - wait for URL change or verify payment flow initiated
-      const urlChanged = await page.waitForURL(/checkout\.polar\.sh|polar|login|signup/i, { timeout: 10000 })
+      // Should redirect somewhere off /pricing — accept any of:
+      // - real Polar URL (POLAR_ACCESS_TOKEN set)
+      // - login/signup/welcome bounce (unauth)
+      // - /dashboard?checkout=stub (CI stub from this PR)
+      const urlChanged = await page.waitForURL(/checkout\.polar\.sh|polar|login|signup|welcome|checkout=stub/i, { timeout: 10000 })
         .then(() => true)
         .catch(() => false);
 
       const url = page.url();
       if (!urlChanged) {
         // In test environment, Polar redirect may not happen
-        if (url.includes('/pricing') || url.includes('/login') || url.includes('/signup')) {
+        if (url.includes('/pricing') || url.includes('/login') || url.includes('/signup') || url.includes('/welcome')) {
           await expect(page.getByText(/upgrade|payment|checkout|sign in|sign up|log in/i).first()).toBeVisible();
         } else {
-          throw new Error(`Expected Polar redirect, got: ${url}`);
+          throw new Error(`Expected Polar/login/signup/welcome/stub redirect, got: ${url}`);
         }
       }
     });
