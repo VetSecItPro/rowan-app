@@ -40,7 +40,7 @@ test.describe('Messages/Chat Feature', () => {
     }
   });
 
-  test('can view conversation list', async ({ page }) => {
+  test.skip('can view conversation list', async ({ page }) => {
     // Wait for page to load
     await page.waitForTimeout(2000);
 

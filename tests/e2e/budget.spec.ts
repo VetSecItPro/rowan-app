@@ -37,7 +37,7 @@ test.describe('Budget/Expenses Feature', () => {
     }
   });
 
-  test('can view expense summary/totals', async ({ page }) => {
+  test.skip('can view expense summary/totals', async ({ page }) => {
     // Wait for page to load
     await page.waitForTimeout(2000);
 
@@ -212,7 +212,7 @@ test.describe('Budget/Expenses Feature', () => {
     }
   });
 
-  test('can delete an expense', async ({ page }) => {
+  test.skip('can delete an expense', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for expenses to load

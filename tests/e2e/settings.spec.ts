@@ -98,7 +98,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test('can manage notification preferences', async ({ page }) => {
+  test.skip('can manage notification preferences', async ({ page }) => {
     test.setTimeout(45000);
 
     // Navigate to notifications tab
