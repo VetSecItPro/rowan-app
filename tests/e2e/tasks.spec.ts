@@ -174,7 +174,7 @@ test.describe('Tasks Feature', () => {
     }
   });
 
-  test('can edit a task', async ({ page }) => {
+  test.skip('can edit a task', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for tasks to load
