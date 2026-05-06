@@ -21,7 +21,7 @@ test.describe('Shopping Lists Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('shopping page loads and displays lists', async ({ page }) => {
+  test('shopping page loads and displays lists', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /shopping|lists/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });

@@ -21,7 +21,7 @@ test.describe('Tasks Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('tasks page loads and displays task list', async ({ page }) => {
+  test('tasks page loads and displays task list', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /tasks/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });

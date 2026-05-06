@@ -21,12 +21,7 @@ test.describe('Budget/Expenses Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  // Re-skipped: the 45s timeout bump (this PR) is dormant prep but doesn't
-  // resolve the deeper test-pro session-state issue — re-auth occasionally
-  // succeeds visually while API verification fails, leaving /expenses
-  // rendered as unauthenticated (no <h1>Expenses</h1>). Un-skip in a
-  // follow-up once the session issue is root-caused.
-  test.skip('expenses page loads and displays budget overview', async ({ page }) => {
+  test('expenses page loads and displays budget overview', async ({ page }) => {
     // Verify page title/heading.
     // FeatureGateWrapper renders only a skeleton (no h1) while
     // SubscriptionContext fetch is in flight. That fetch retries 3× with

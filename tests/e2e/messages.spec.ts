@@ -21,7 +21,7 @@ test.describe('Messages/Chat Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('messages page loads and displays conversations', async ({ page }) => {
+  test('messages page loads and displays conversations', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /messages|chat|conversations/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });

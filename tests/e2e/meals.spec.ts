@@ -21,7 +21,7 @@ test.describe('Meals/Recipes Feature', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
   });
 
-  test.skip('meals page loads and displays meal planner', async ({ page }) => {
+  test('meals page loads and displays meal planner', async ({ page }) => {
     // Verify page title/heading
     const heading = page.locator('h1, h2').filter({ hasText: /meals|recipes|planner/i }).first();
     await expect(heading).toBeVisible({ timeout: 10000 });
