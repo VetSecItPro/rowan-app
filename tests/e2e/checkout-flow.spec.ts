@@ -20,20 +20,25 @@ test.describe('Authenticated Checkout Flow', () => {
       text: /Get Pro|Choose Pro|Start Pro/i,
     });
 
-    // Should redirect to Polar Checkout - wait for URL change or Polar-specific element
-    // In E2E environment, Polar redirect may fail or redirect to signup - accept valid outcomes
-    const urlChanged = await page.waitForURL(/checkout\.polar\.sh|polar|signup/i, { timeout: 10000 })
+    // Should redirect to Polar Checkout — accept valid outcomes:
+    // - Real Polar URL (checkout.polar.sh) when POLAR_ACCESS_TOKEN is set
+    // - /signup if user is unauthenticated and gets bounced
+    // - /dashboard?checkout=stub when CI mode hits the stubbed checkout API
+    //   (see app/api/polar/checkout/route.ts — returns stub URL when
+    //   CI=true && NODE_ENV !== 'production')
+    const urlChanged = await page
+      .waitForURL(/checkout\.polar\.sh|polar|signup|checkout=stub/i, { timeout: 10000 })
       .then(() => true)
       .catch(() => false);
 
     const url = page.url();
     if (!urlChanged) {
-      // If URL didn't change to Polar/signup, verify we got an expected fallback
+      // If URL didn't change, verify we got an expected fallback
       if (url.includes('/pricing') || url.includes('/signup')) {
         const pageTitle = await page.textContent('h1');
         expect(pageTitle).toBeTruthy();
       } else {
-        throw new Error(`Expected Polar/signup redirect, got: ${url}`);
+        throw new Error(`Expected Polar/signup/stub redirect, got: ${url}`);
       }
     }
   });
