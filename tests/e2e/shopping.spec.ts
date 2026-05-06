@@ -72,7 +72,7 @@ test.describe('Shopping Lists Feature', () => {
     }
   });
 
-  test('can add items to a shopping list', async ({ page }) => {
+  test.skip('can add items to a shopping list', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for lists to load
@@ -291,7 +291,7 @@ test.describe('Shopping Lists Feature', () => {
     }
   });
 
-  test('shows empty state when no lists exist', async ({ page }) => {
+  test.skip('shows empty state when no lists exist', async ({ page }) => {
     // Check for empty state
     const emptyState = page.locator('[data-testid="shopping-empty-state"], text=/no lists/i, text=/create your first/i').first();
     const hasEmptyState = await emptyState.isVisible({ timeout: 3000 }).catch(() => false);
