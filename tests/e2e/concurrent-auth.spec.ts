@@ -247,14 +247,18 @@ test.describe('Concurrent Authentication Load Test', () => {
     'Concurrent auth load tests require CI and SUPABASE_SERVICE_ROLE_KEY'
   );
 
-  // REAL CONCURRENCY BUG CONFIRMED (PR #375): 5s stagger didn't help.
-  // All 5 users still timeout at planElement.waitFor (120s). This is a
-  // genuine subscription-context concurrency issue under load, not a
-  // test infrastructure problem. Fixing it requires investigation of
-  // SubscriptionContext fetch behavior under simultaneous load (likely
-  // rate-limit interaction or fetch race in the provider). Multi-hour
-  // dedicated debug session needed — skip until then.
-  test.skip('5 users log in concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
+  // FIXED 2026-05-07 (subscription-context concurrency hardening):
+  //   1. Module-level in-flight dedup so multiple Provider mounts share one
+  //      /api/subscriptions request.
+  //   2. Hard isLoading ceiling (75s) — guarantees UI renders even if the
+  //      fetch stack misbehaves. Consumers see tier='free' fallback rather
+  //      than infinite spinner.
+  //   3. 429 + 4xx short-circuit — no retry-storm; default to free
+  //      immediately on terminal-class responses.
+  //   4. 5xx remains retry-eligible; network errors retry with exp backoff.
+  // See lib/contexts/subscription-context.tsx and the matching unit suite
+  // __tests__/lib/contexts/subscription-context.test.tsx.
+  test('5 users log in concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
     test.setTimeout(300000);
     if (!baseURL) {
       throw new Error('baseURL is required for this test');
@@ -373,6 +377,13 @@ test.describe('Concurrent Authentication Load Test', () => {
     }
   });
 
+  // KEPT SKIPPED 2026-05-07 — redundant once the 5-user test passes.
+  // The subscription-context fix is verified by the 5-user case (real
+  // concurrent fetch dedup, hard ceiling, 4xx short-circuit). The 10-user
+  // test exercises the same code paths with 2x load and a tighter 1.5s
+  // stagger — useful pre-launch under explicit perf-regression hunts, but
+  // doubles CI minutes per run for marginal day-to-day signal. Re-enable
+  // before major launches or after significant Provider/auth changes.
   test.skip('10 users log in concurrently (stress test)', async ({ browser, baseURL }) => {
     test.setTimeout(600000);
     if (!baseURL) {
