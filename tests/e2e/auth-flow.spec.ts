@@ -85,7 +85,7 @@ test.describe('Auth Flow Tests', () => {
   // violation since the signup form has 2 textbox-roled inputs without a
   // disambiguating data-testid. Needs `data-testid="signup-name-input"` on
   // the component before this can run.
-  test.skip('Signup flow with test data', async ({ page }) => {
+  test('Signup flow with test data', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
 

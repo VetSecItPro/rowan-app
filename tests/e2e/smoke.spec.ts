@@ -64,7 +64,7 @@ test.describe('Smoke Flow', () => {
   // Use pre-authenticated pro user session (any authenticated user works for smoke tests)
   test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
-  test.skip('login and core flows work end-to-end', async ({ page }) => {
+  test('login and core flows work end-to-end', async ({ page }) => {
     // Smoke test makes many sequential API calls — needs extra time
     // Under parallel test load, individual API calls may be slow (rate limiting, server load)
     test.setTimeout(300000);
