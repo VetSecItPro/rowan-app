@@ -66,6 +66,23 @@ function generateTestUsers(count: number): TestUser[] {
 /**
  * Pre-create users via admin API (bypasses signup rate limits)
  * Also creates their subscription records with correct tiers
+ *
+ * IMPORTANT: provision_new_user() trigger fires synchronously on
+ * auth.users INSERT, so by the time admin.createUser resolves, the
+ * public.users row + public.spaces row + public.space_members row +
+ * public.subscriptions row already exist. We still poll defensively
+ * because Supabase replication between primary and read replicas
+ * can lag a few hundred ms under concurrent admin creates.
+ *
+ * ROOT-CAUSE FIX 2026-05-07: This routine previously omitted the
+ * `welcome_completed_at` stamp. The canonical seeder
+ * (tests/e2e/setup/seed-test-users.ts) sets it because
+ * app/(main)/layout.tsx redirects any space-OWNER with
+ * welcome_completed_at IS NULL to /welcome. Without the stamp, every
+ * concurrent-auth user landed on /welcome instead of /settings,
+ * subscription-plan-name never rendered, and the 120s waitFor
+ * timed out — even though the SubscriptionContext rewrite (PR #379)
+ * was working correctly. The redirect was fully masking it.
  */
 async function createUsersViaAdmin(users: TestUser[]): Promise<Map<string, string>> {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -95,15 +112,36 @@ async function createUsersViaAdmin(users: TestUser[]): Promise<Map<string, strin
     }
   }
 
-  // Wait for provision_new_user trigger to complete for all users
+  // Poll for provision_new_user trigger completion. Replaces the
+  // previous blind 8s sleep — polls every 250ms up to 15s, returns
+  // as soon as every active user has a public.users row visible.
   console.log(`  Waiting for space provisioning triggers...`);
-  await new Promise(resolve => setTimeout(resolve, 8000));
+  const activeIds = Array.from(userIds.values());
+  const pollDeadline = Date.now() + 15000;
+  while (Date.now() < pollDeadline) {
+    const { count } = await supabase
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .in('id', activeIds);
+    if ((count ?? 0) >= activeIds.length) break;
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
 
-  // Set subscription tiers for users that need non-free tiers
   for (const user of users) {
-    if (!user.supabaseId || user.tier === 'free') continue;
+    if (!user.supabaseId) continue;
 
-    // Upsert subscription record with correct tier
+    // Step A: stamp welcome_completed_at so /settings doesn't bounce
+    // through the welcome flow. See ROOT-CAUSE FIX comment above.
+    const { error: welcomeError } = await supabase
+      .from('users')
+      .update({ welcome_completed_at: new Date().toISOString() })
+      .eq('id', user.supabaseId);
+    if (welcomeError) {
+      console.error(`Failed to stamp welcome_completed_at for ${user.email}:`, welcomeError.message);
+    }
+
+    // Step B: upsert subscription tier for non-free users
+    if (user.tier === 'free') continue;
     const { error } = await supabase
       .from('subscriptions')
       .upsert({
@@ -120,7 +158,7 @@ async function createUsersViaAdmin(users: TestUser[]): Promise<Map<string, strin
     }
   }
 
-  console.log(`  Created ${userIds.size}/${users.length} users with tiers set\n`);
+  console.log(`  Created ${userIds.size}/${users.length} users with tiers set + welcome stamped\n`);
   return userIds;
 }
 
@@ -177,7 +215,28 @@ async function testConcurrentLogin(
     // on a single CI runner, the third retry can land past 75s. Bumped to
     // 120s to absorb that envelope. See issue #351.
     const planElement = page.getByTestId('subscription-plan-name');
-    await planElement.waitFor({ state: 'visible', timeout: 120000 });
+    try {
+      await planElement.waitFor({ state: 'visible', timeout: 120000 });
+    } catch (err) {
+      // Diagnostic: capture screenshot + URL + DOM snippet so future
+      // concurrent-load failures are debuggable without rerunning.
+      const safeId = `user${user.id}-${Date.now()}`;
+      const shotPath = `playwright-report/concurrent-auth-timeout-${safeId}.png`;
+      try {
+        await page.screenshot({ path: shotPath, fullPage: true });
+        const currentUrl = page.url();
+        const bodyHtml = await page.evaluate(
+          () => document.body.innerHTML.slice(0, 2000)
+        );
+        console.log(`[User ${user.id}] TIMEOUT diagnostic:`);
+        console.log(`  current URL: ${currentUrl}`);
+        console.log(`  screenshot: ${shotPath}`);
+        console.log(`  body[0..2000]: ${bodyHtml}`);
+      } catch (diagErr) {
+        console.log(`[User ${user.id}] diagnostic capture failed: ${diagErr}`);
+      }
+      throw err;
+    }
 
     const displayedTier = await planElement.textContent();
     const fetchDuration = Date.now() - fetchStart;
@@ -247,38 +306,34 @@ test.describe('Concurrent Authentication Load Test', () => {
     'Concurrent auth load tests require CI and SUPABASE_SERVICE_ROLE_KEY'
   );
 
-  // FIXED 2026-05-07 (subscription-context concurrency hardening):
-  //   1. Module-level in-flight dedup so multiple Provider mounts share one
-  //      /api/subscriptions request.
-  //   2. Hard isLoading ceiling (75s) — guarantees UI renders even if the
-  //      fetch stack misbehaves. Consumers see tier='free' fallback rather
-  //      than infinite spinner.
-  //   3. 429 + 4xx short-circuit — no retry-storm; default to free
-  //      immediately on terminal-class responses.
-  //   4. 5xx remains retry-eligible; network errors retry with exp backoff.
-  // See lib/contexts/subscription-context.tsx and the matching unit suite
-  // __tests__/lib/contexts/subscription-context.test.tsx.
-  // PROVIDER REWRITE LANDED, E2E STILL FAILS:
-  // This PR ships a defense-in-depth SubscriptionContext rewrite (module-
-  // level inflight dedup, 75s hard isLoading ceiling, 4xx no-retry) plus
-  // 8 passing unit tests proving the math. But the 5-user E2E still
-  // times out at planElement.waitFor(120s) — meaning even the 75s fallback
-  // doesn't surface subscription-plan-name for these concurrent users.
+  // ROOT-CAUSE FIX 2026-05-07 (concurrent-auth real fix):
+  // The 5-user concurrent test was masking a redirect bug, NOT a
+  // SubscriptionContext bug. Sequence of failure:
+  //   1. createUsersViaAdmin created auth.users with admin API.
+  //   2. provision_new_user() trigger created public.users +
+  //      spaces + space_members + subscriptions atomically. All
+  //      good — but welcome_completed_at was NULL.
+  //   3. app/(main)/layout.tsx checks welcome_completed_at on
+  //      every authenticated render and redirects space-OWNERS to
+  //      /welcome when it's NULL. All 5 test users were owners.
+  //   4. page.goto('/settings?tab=subscription') landed on
+  //      /welcome instead. subscription-plan-name never rendered.
+  //   5. waitFor(120000) timed out. SubscriptionContext was never
+  //      the issue — the page never even mounted SubscriptionSettings.
   //
-  // The problem isn't in the Provider — unit tests prove that path works.
-  // It's somewhere else in the auth/page lifecycle under concurrent load:
-  //   - createUsersViaAdmin's 8s wait may not be enough for subscription
-  //     rows to be queryable across 5 simultaneous fetches
-  //   - The /settings page may wrap SubscriptionProvider in an outer
-  //     loading guard that masks the Provider's fallback render
-  //   - Browser context isolation may interact with Supabase auth in a
-  //     way that delays the fetch loop start
+  // Fix in createUsersViaAdmin: mirror the canonical seeder
+  // (tests/e2e/setup/seed-test-users.ts:259) and stamp
+  // welcome_completed_at after user creation. Also replaced the
+  // blind 8s sleep with a poll-until-visible loop on public.users
+  // for faster + more reliable trigger waits.
   //
-  // Needs interactive debugging with screenshot capture on timeout
-  // before un-skipping again. The Provider rewrite + unit tests still
-  // ship (verified working in isolation) — they're net positive even
-  // with the E2E still skipped.
-  test.skip('5 users log in concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
+  // The PR #379 SubscriptionContext rewrite (module-level inflight
+  // dedup, 75s hard ceiling, 4xx no-retry) is still correct and
+  // remains in place — defense-in-depth for the path we couldn't
+  // exercise before this fix. With the redirect masked and the
+  // page now actually mounting, the Provider hardening is what
+  // makes the concurrent fetch storm safe.
+  test('5 users log in concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
     test.setTimeout(300000);
     if (!baseURL) {
       throw new Error('baseURL is required for this test');
