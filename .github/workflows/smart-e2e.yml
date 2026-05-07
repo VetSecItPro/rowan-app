@@ -232,6 +232,19 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SERVICE_ROLE_KEY }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
 
+      # Schema-drift audit. Verifies the schema produced by all
+      # migrations matches what application code references via
+      # service-level select() column lists. Fails fast (~5s) with a
+      # clear error if drift is detected — turns 40-min Playwright
+      # timeouts into actionable PGRST204 / 42703 fix-the-migration
+      # signals. Added 2026-05-06 after Phase 8 baseline repair found
+      # 4 distinct schema-correctness bugs masked by squashed history.
+      - name: Schema-drift audit
+        run: pnpm tsx scripts/ci/schema-check.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.API_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SERVICE_ROLE_KEY }}
+
       - name: Build app (pointed at local Supabase)
         run: pnpm build
         env:
