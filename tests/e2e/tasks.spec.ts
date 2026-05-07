@@ -33,7 +33,7 @@ test.describe('Tasks Feature', () => {
     console.log('✓ Tasks page loaded successfully');
   });
 
-  test.skip('can create a new task', async ({ page }) => {
+  test('can create a new task', async ({ page }) => {
     test.setTimeout(45000);
 
     // Click add task button
@@ -41,9 +41,13 @@ test.describe('Tasks Feature', () => {
     await addButton.click();
     await page.waitForTimeout(1000);
 
-    // Fill task title
+    // Fill task title — strict testid only. The page header has a search
+    // input with placeholder="Search tasks and chores..." which earlier
+    // matched the OR fallback `input[placeholder*="task" i]` and got
+    // filled instead of the modal's title input. Modal-scoped testid is
+    // unambiguous.
     const taskTitle = `E2E Test Task ${Date.now()}`;
-    const titleInput = page.locator('[data-testid="task-title-input"], input[name="title"], input[placeholder*="task" i]').first();
+    const titleInput = page.getByTestId('task-title-input');
     await expect(titleInput).toBeVisible({ timeout: 5000 });
     await titleInput.fill(taskTitle);
 
@@ -62,8 +66,13 @@ test.describe('Tasks Feature', () => {
       await dueDateInput.fill(dateString);
     }
 
-    // Submit form
-    const submitButton = page.locator('[data-testid="task-submit-button"], button[type="submit"], button:has-text("Create"), button:has-text("Add")').first();
+    // Submit form — strict testid only. The empty-state on /tasks renders
+    // an "Add From Scratch" button BEFORE the modal in DOM, so the OR
+    // fallback `button:has-text("Add")` was matching that element via
+    // .first(). It happens to be enabled, so toBeEnabled() passed, but
+    // .click() fails because the modal overlay intercepts pointer events.
+    const submitButton = page.getByTestId('task-submit-button');
+    await expect(submitButton).toBeEnabled({ timeout: 5000 });
     await submitButton.click();
     await page.waitForTimeout(2000);
 

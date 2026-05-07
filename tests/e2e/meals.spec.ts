@@ -247,7 +247,7 @@ test.describe('Meals/Recipes Feature', () => {
     }
   });
 
-  test.skip('shows empty state when no meals planned', async ({ page }) => {
+  test('shows empty state when no meals planned', async ({ page }) => {
     // Check for empty state
     const emptyState = page.locator('[data-testid="meals-empty-state"], text=/no meals/i, text=/plan your first/i').first();
     const hasEmptyState = await emptyState.isVisible({ timeout: 3000 }).catch(() => false);
