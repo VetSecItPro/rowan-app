@@ -247,7 +247,7 @@ test.describe('Concurrent Authentication Load Test', () => {
     'Concurrent auth load tests require CI and SUPABASE_SERVICE_ROLE_KEY'
   );
 
-  test.skip('5 users log in concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
+  test('5 users log in concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
     test.setTimeout(300000);
     if (!baseURL) {
       throw new Error('baseURL is required for this test');
