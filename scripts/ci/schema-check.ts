@@ -94,6 +94,59 @@ const EXPECTED_SCHEMA: ExpectedSchema = {
     'mood', 'energy_level',
     'created_at', 'updated_at',
   ],
+
+  // From lib/services/tasks-service.ts and related
+  tasks: [
+    'id', 'parent_task_id', 'title', 'description', 'status', 'priority',
+    'sort_order', 'assigned_to', 'due_date', 'estimated_duration',
+    'actual_duration', 'completed_at', 'completed_by', 'created_by',
+    'created_at', 'updated_at',
+  ],
+
+  // From lib/services/goals-service.ts (metric goal pattern)
+  goals: [
+    'id', 'metric_name', 'target_value', 'current_value', 'unit',
+    'deadline', 'status', 'notes', 'created_by',
+    'created_at', 'updated_at',
+  ],
+
+  // From lib/services/expense-service.ts
+  expenses: [
+    'id', 'amount', 'category', 'date', 'description', 'title',
+  ],
+
+  // From lib/services/reminders/* (canonical select)
+  reminders: [
+    'id', 'task_id', 'user_id', 'remind_at', 'reminder_type',
+    'offset_type', 'custom_offset_minutes', 'is_sent', 'sent_at',
+    'created_by', 'created_at', 'updated_at',
+  ],
+
+  // From lib/services/projects-service.ts
+  projects: [
+    'id', 'space_id', 'name', 'description', 'status',
+    'start_date', 'target_date', 'budget_amount',
+    'created_by', 'created_at', 'updated_at',
+  ],
+
+  // From lib/services/bills-service.ts (heavily-linked table)
+  bills: [
+    'id', 'space_id', 'name', 'amount', 'category', 'payee', 'notes',
+    'due_date', 'frequency', 'status', 'auto_pay',
+    'last_paid_date', 'next_due_date',
+    'linked_expense_id', 'linked_calendar_event_id', 'linked_reminder_id',
+    'reminder_enabled', 'reminder_days_before', 'last_reminder_sent_at',
+    'created_by', 'created_at', 'updated_at',
+  ],
+
+  // From lib/services/receipts-service.ts
+  receipts: [
+    'id', 'space_id', 'expense_id', 'storage_path', 'file_name',
+    'file_size', 'mime_type', 'merchant_name', 'total_amount',
+    'receipt_date', 'category', 'currency',
+    'ocr_text', 'ocr_confidence', 'ocr_processed_at',
+    'created_at', 'updated_at', 'created_by',
+  ],
 };
 
 async function checkSchema(): Promise<number> {
