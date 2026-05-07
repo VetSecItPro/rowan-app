@@ -152,8 +152,17 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       },
     });
     logger.error('[API] /api/shopping/[id]/sharing PATCH error:', error, { component: 'api-route', action: 'api_request' });
+
+    // In non-production environments (CI / dev), include the actual error
+    // message in the response body so smoke-test failures are diagnosable.
+    // Production keeps the generic message to avoid leaking internals.
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isProd = process.env.NODE_ENV === 'production';
     return NextResponse.json(
-      { error: 'Failed to update sharing settings' },
+      {
+        error: 'Failed to update sharing settings',
+        ...(isProd ? {} : { detail: errorMessage }),
+      },
       { status: 500 }
     );
   }
