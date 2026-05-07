@@ -340,6 +340,9 @@ describe('/api/tasks', () => {
       expect(response.status).toBe(429);
       expect(data.error).toBe('Daily task creation limit reached');
       expect(data.upgradeRequired).toBe(true);
+      // Fail-closed guarantee: task must not be created when gate fires
+      const { tasksService } = await import('@/lib/services/tasks-service');
+      expect(tasksService.createTask).not.toHaveBeenCalled();
     });
 
     it('should return 400 for invalid input', async () => {
@@ -490,6 +493,112 @@ describe('/api/tasks', () => {
 
       expect(response.status).toBe(403);
       expect(data.error).toBe('You do not have access to this space');
+    });
+
+    // Pro-tier: checkUsageLimit returns allowed=true with limit=-1 (unlimited).
+    // Verifies that a pro user who has created more than 10 tasks today is not blocked.
+    it('should allow task creation for pro user even past free-tier limit', async () => {
+      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { createClient } = await import('@/lib/supabase/server');
+      const { checkUsageLimit, trackUsage } = await import('@/lib/middleware/usage-check');
+      const { verifySpaceAccess } = await import('@/lib/services/authorization-service');
+      const { tasksService } = await import('@/lib/services/tasks-service');
+
+      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+        success: true,
+        limit: 100,
+        remaining: 99,
+        reset: Date.now() + 60000,
+      });
+
+      vi.mocked(createClient).mockResolvedValue({
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: '00000000-0000-4000-8000-000000000003' } },
+            error: null,
+          }),
+        },
+      } as any);
+
+      // Pro tier: unlimited daily task creation (limit=-1 sentinel)
+      vi.mocked(checkUsageLimit).mockResolvedValue({
+        allowed: true,
+        currentUsage: 25,
+        limit: -1,
+        remaining: -1,
+      });
+
+      vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
+
+      const mockTask = {
+        id: '00000000-0000-4000-8000-000000000020',
+        title: 'Pro Task',
+        status: 'pending',
+        priority: 'medium',
+        space_id: '00000000-0000-4000-8000-000000000004',
+        created_by: '00000000-0000-4000-8000-000000000003',
+      };
+
+      vi.mocked(tasksService.createTask).mockResolvedValue(mockTask as any);
+      vi.mocked(trackUsage).mockResolvedValue(undefined);
+
+      const request = new NextRequest('http://localhost/api/tasks', {
+        method: 'POST',
+        body: JSON.stringify({
+          space_id: '00000000-0000-4000-8000-000000000004',
+          title: 'Pro Task',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      // Pro user with 25 tasks already created today still gets through
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.data.id).toBe('00000000-0000-4000-8000-000000000020');
+    });
+
+    // Gate hardening: if usage-service throws (DB unavailable), the route
+    // must return 500 rather than silently bypassing the limit. This is the
+    // root-cause regression from the original bug — a catch block previously
+    // swallowed errors and allowed unlimited task creation (PR #375 fix).
+    it('should return 500 when usage limit check throws', async () => {
+      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { createClient } = await import('@/lib/supabase/server');
+      const { checkUsageLimit } = await import('@/lib/middleware/usage-check');
+
+      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+        success: true,
+        limit: 10,
+        remaining: 9,
+        reset: Date.now() + 60000,
+      });
+
+      vi.mocked(createClient).mockResolvedValue({
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: { id: '00000000-0000-4000-8000-000000000001' } },
+            error: null,
+          }),
+        },
+      } as any);
+
+      // Simulate usage-service DB failure
+      vi.mocked(checkUsageLimit).mockRejectedValue(new Error('daily_usage: relation does not exist'));
+
+      const request = new NextRequest('http://localhost/api/tasks', {
+        method: 'POST',
+        body: JSON.stringify({
+          space_id: '00000000-0000-4000-8000-000000000002',
+          title: 'New Task',
+        }),
+      });
+
+      const response = await POST(request);
+
+      // Must NOT silently pass — infra failure should surface as 500
+      expect(response.status).toBe(500);
     });
   });
 });
