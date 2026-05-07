@@ -41,9 +41,13 @@ test.describe('Tasks Feature', () => {
     await addButton.click();
     await page.waitForTimeout(1000);
 
-    // Fill task title
+    // Fill task title — strict testid only. The page header has a search
+    // input with placeholder="Search tasks and chores..." which earlier
+    // matched the OR fallback `input[placeholder*="task" i]` and got
+    // filled instead of the modal's title input. Modal-scoped testid is
+    // unambiguous.
     const taskTitle = `E2E Test Task ${Date.now()}`;
-    const titleInput = page.locator('[data-testid="task-title-input"], input[name="title"], input[placeholder*="task" i]').first();
+    const titleInput = page.getByTestId('task-title-input');
     await expect(titleInput).toBeVisible({ timeout: 5000 });
     await titleInput.fill(taskTitle);
 
