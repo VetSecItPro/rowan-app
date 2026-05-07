@@ -31,25 +31,55 @@ type PolarClient = {
   };
 };
 
+// Polar environment helpers — set POLAR_ENV=sandbox in .env.local to
+// route the SDK at sandbox-api.polar.sh and use POLAR_SANDBOX_* env vars
+// throughout. Production (default) uses POLAR_ACCESS_TOKEN, POLAR_*_PRODUCT_ID
+// against api.polar.sh.
+export function isPolarSandbox(): boolean {
+  return process.env.POLAR_ENV === 'sandbox';
+}
+
+export function getPolarAccessToken(): string | undefined {
+  return isPolarSandbox()
+    ? process.env.POLAR_SANDBOX_ACCESS_TOKEN
+    : process.env.POLAR_ACCESS_TOKEN;
+}
+
+export function getPolarWebhookSecret(): string | undefined {
+  return isPolarSandbox()
+    ? process.env.POLAR_SANDBOX_WEBHOOK_SECRET
+    : process.env.POLAR_WEBHOOK_SECRET;
+}
+
 // Polar client - initialized lazily to avoid import errors
+// Cache key includes the environment so toggling POLAR_ENV at runtime
+// (e.g. between tests) doesn't return a stale-environment client.
 let _polarClient: PolarClient | null = null;
+let _polarClientEnv: string | undefined = undefined;
 
 export async function getPolarClient(): Promise<PolarClient | null> {
-  if (!process.env.POLAR_ACCESS_TOKEN) {
+  const token = getPolarAccessToken();
+  if (!token) {
     return null;
   }
 
-  if (_polarClient) {
+  const currentEnv = isPolarSandbox() ? 'sandbox' : 'production';
+  if (_polarClient && _polarClientEnv === currentEnv) {
     return _polarClient;
   }
 
   try {
-    // Dynamic import for optional dependency
-    const sdk = await import("@polar-sh/sdk") as unknown as { Polar: new (options: { accessToken: string }) => PolarClient };
+    // Dynamic import for optional dependency. SDK constructor accepts
+    // server: 'sandbox' | 'production' to route the API base URL.
+    const sdk = await import("@polar-sh/sdk") as unknown as {
+      Polar: new (options: { accessToken: string; server?: 'sandbox' | 'production' }) => PolarClient;
+    };
     const Polar = sdk.Polar;
     _polarClient = new Polar({
-      accessToken: process.env.POLAR_ACCESS_TOKEN,
+      accessToken: token,
+      server: currentEnv,
     });
+    _polarClientEnv = currentEnv;
     return _polarClient;
   } catch {
     // SDK not installed — optional dependency
@@ -133,15 +163,23 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
   },
 };
 
+// Per-environment product-ID resolution. POLAR_ENV=sandbox swaps to
+// POLAR_SANDBOX_* product IDs for everything below.
+function envProductId(envSuffix: 'PRO_MONTHLY' | 'PRO_ANNUAL' | 'FAMILY_MONTHLY' | 'FAMILY_ANNUAL'): string | undefined {
+  return isPolarSandbox()
+    ? process.env[`POLAR_SANDBOX_${envSuffix}_PRODUCT_ID`]
+    : process.env[`POLAR_${envSuffix}_PRODUCT_ID`];
+}
+
 // Map Polar product ID to subscription tier
 // IMPORTANT: Read env vars at runtime to avoid module load order issues
 export function getPlanFromProductId(productId: string): SubscriptionTier {
   if (!productId) return "free";
 
-  const proMonthly = process.env.POLAR_PRO_MONTHLY_PRODUCT_ID;
-  const proAnnual = process.env.POLAR_PRO_ANNUAL_PRODUCT_ID;
-  const familyMonthly = process.env.POLAR_FAMILY_MONTHLY_PRODUCT_ID;
-  const familyAnnual = process.env.POLAR_FAMILY_ANNUAL_PRODUCT_ID;
+  const proMonthly = envProductId('PRO_MONTHLY');
+  const proAnnual = envProductId('PRO_ANNUAL');
+  const familyMonthly = envProductId('FAMILY_MONTHLY');
+  const familyAnnual = envProductId('FAMILY_ANNUAL');
 
   if (productId === proMonthly || productId === proAnnual) return "pro";
   if (productId === familyMonthly || productId === familyAnnual) return "family";
@@ -154,8 +192,8 @@ export function getPlanFromProductId(productId: string): SubscriptionTier {
 export function getPeriodFromProductId(productId: string): SubscriptionPeriod {
   if (!productId) return "monthly";
 
-  const proAnnual = process.env.POLAR_PRO_ANNUAL_PRODUCT_ID;
-  const familyAnnual = process.env.POLAR_FAMILY_ANNUAL_PRODUCT_ID;
+  const proAnnual = envProductId('PRO_ANNUAL');
+  const familyAnnual = envProductId('FAMILY_ANNUAL');
 
   if (productId === proAnnual || productId === familyAnnual) return "annual";
   return "monthly";
@@ -167,14 +205,14 @@ export function getProductId(plan: SubscriptionTier, interval: SubscriptionPerio
 
   if (plan === "pro") {
     return interval === "annual"
-      ? process.env.POLAR_PRO_ANNUAL_PRODUCT_ID || null
-      : process.env.POLAR_PRO_MONTHLY_PRODUCT_ID || null;
+      ? envProductId('PRO_ANNUAL') || null
+      : envProductId('PRO_MONTHLY') || null;
   }
 
   if (plan === "family") {
     return interval === "annual"
-      ? process.env.POLAR_FAMILY_ANNUAL_PRODUCT_ID || null
-      : process.env.POLAR_FAMILY_MONTHLY_PRODUCT_ID || null;
+      ? envProductId('FAMILY_ANNUAL') || null
+      : envProductId('FAMILY_MONTHLY') || null;
   }
 
   return null;
