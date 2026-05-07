@@ -311,36 +311,59 @@ test.describe('Monetization Features', () => {
       expect(hasBilling || hasUpgrade).toBeTruthy();
     });
 
-    // TODO: Implement cancel subscription functionality in SubscriptionSettings component
-    // INCORRECT TEST DESIGN (PR #375 confirmed): there's no in-app
-    // "Cancel Subscription" button. Cancellation happens via Polar's
-    // customer portal — clicking "Manage Subscription" or similar opens
-    // the portal, user cancels there, webhook updates cancelAtPeriodEnd:
-    // true on the subscription. SubscriptionSettings.tsx only displays
-    // "Cancels after this period" when cancelAtPeriodEnd is set; no
-    // confirm-cancel button exists in the app.
-    //
-    // Real fix would be to rewrite this test to either: (a) assert the
-    // customer-portal redirect button exists + clicks navigate to Polar,
-    // or (b) seed a subscription with cancelAtPeriodEnd=true and assert
-    // the cancellation banner renders. Skip until rewritten.
-    test.skip('cancel subscription flow shows confirmation', async ({ page }) => {
+    // Cancellation in Rowan happens via Polar's customer portal: the
+    // "Manage Billing" button POSTs to /api/polar/portal which returns a
+    // redirect URL. There is no in-app cancel button or confirmation modal.
+    test('manage subscription button redirects to Polar portal', async ({ page }) => {
+      test.setTimeout(90000);
+
+      await ensureAuthenticated(page, 'pro');
 
       await page.goto('/settings?tab=subscription');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('networkidle');
 
-      // Click cancel button
-      const cancelButton = page.locator('button:has-text("Cancel Subscription"), a:has-text("Cancel")');
-      await cancelButton.click({ timeout: 15000 });
+      // Wait for SubscriptionContext to finish loading (same pattern as surrounding tests)
+      await expect(page.getByTestId('subscription-plan-name')).toBeVisible({ timeout: 75000 });
 
-      // Should show confirmation modal
-      await expect(page.locator('[role="dialog"], [class*="modal"]')).toBeVisible();
+      // The "Manage Billing" button is only rendered for pro/family users
+      const manageButton = page.getByTestId('manage-subscription-button');
+      await expect(manageButton).toBeVisible();
+      await expect(manageButton).toBeEnabled();
 
-      // Modal should explain what happens
-      await expect(page.locator('text=/access until|end of|period/i')).toBeVisible();
+      // Intercept /api/polar/portal via page.route — captures the response
+      // BEFORE the click's window.location.href triggers navigation. Without
+      // this, by the time we await response.json() the page has already
+      // unloaded and the body resource is gone (Playwright error: "No
+      // resource with given identifier found"). Rewriting the URL to
+      // about:blank prevents real navigation to polar.sh which CI can't
+      // reach anyway.
+      let capturedBody: { url?: string } | null = null;
+      let capturedStatus: number | null = null;
+      await page.route(/\/api\/polar\/portal/, async (route) => {
+        const response = await route.fetch();
+        capturedStatus = response.status();
+        try {
+          capturedBody = await response.json();
+        } catch {
+          capturedBody = null;
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ...capturedBody, url: 'about:blank' }),
+        });
+      });
 
-      // Should have confirm and keep options
-      await expect(page.locator('button:has-text("Confirm Cancel"), button:has-text("Keep")')).toBeVisible();
+      await manageButton.click();
+
+      // Wait for the about:blank navigation to settle so capturedBody is set.
+      await page.waitForURL('about:blank', { timeout: 15000 }).catch(() => {});
+
+      expect(capturedStatus).toBe(200);
+      expect(capturedBody).not.toBeNull();
+      expect(capturedBody).toHaveProperty('url');
+      expect(typeof capturedBody?.url).toBe('string');
+      expect((capturedBody?.url ?? '').length).toBeGreaterThan(0);
     });
   });
 
