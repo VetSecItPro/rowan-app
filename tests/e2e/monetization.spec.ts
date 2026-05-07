@@ -36,16 +36,13 @@ test.describe('Monetization Features', () => {
      * has silent error handling in the usage check catch block.
      *
      *
-     * REAL PRODUCT BUG (PR #375 confirmed): the free-tier daily task limit
-     * is NOT being enforced. Test creates 15 tasks via /api/tasks expecting
-     * the 11th to return 429; all 15 succeed. expect(hitLimit).toBeTruthy()
-     * fails at line 117. Skip until the rate-limit logic in
-     * lib/services/usage-service.ts (or wherever feature-limits.ts is
-     * applied) actually gates free users. This is exactly the kind of
-     * regression E2E is supposed to catch — when fixed, un-skip will
-     * verify the gate works.
+     * Verifies free-tier rate limit (fix shipped 2026-05-07): the silent
+     * catch block in app/api/tasks/route.ts that swallowed usage-check
+     * errors (allowing unlimited task creation) has been removed. The gate
+     * now propagates errors as 500 rather than silently passing. Free users
+     * at their daily limit (10) receive 429; paid users are unaffected.
      */
-    test.skip('free user hits daily task creation limit', async ({ page }) => {
+    test('free user hits daily task creation limit', async ({ page }) => {
       test.setTimeout(180000);
 
       // Ensure free user session is valid (re-authenticates if expired)
@@ -88,6 +85,8 @@ test.describe('Monetization Features', () => {
       // Create tasks via API until we hit the daily limit
       // Free tier limit is 10 daily task creations (from feature-limits.ts)
       let hitLimit = false;
+      // 15 = free-tier limit (10) + 5 buffer — ensures the gate fires before
+      // loop exhaustion rather than only at exactly the 10th request.
       for (let i = 0; i < 15; i++) {
         // Fetch fresh CSRF token before each mutation (middleware rotates after each POST)
         const freshCsrf = await page.request.get('/api/csrf/token', { timeout: 30000 });

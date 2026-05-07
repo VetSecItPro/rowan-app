@@ -170,36 +170,32 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    // Check daily task creation limit
+    // Check daily task creation limit — hard gate, must not swallow errors.
+    // If the usage-service is unavailable we return 500 rather than silently
+    // allowing unlimited task creation (which defeats the free-tier limit).
+    let usageCheck: Awaited<ReturnType<typeof checkUsageLimit>>;
     try {
-      const usageCheck = await checkUsageLimit(user.id, 'tasks_created');
-      if (!usageCheck.allowed) {
-        return NextResponse.json(
-          {
-            error: 'Daily task creation limit reached',
-            message: usageCheck.message,
-            currentUsage: usageCheck.currentUsage,
-            limit: usageCheck.limit,
-            remaining: usageCheck.remaining,
-            upgradeRequired: true,
-            upgradeUrl: '/pricing',
-          },
-          { status: 429 }
-        );
-      }
-    } catch (usageError) {
-      // Log but don't block - allow task creation to proceed
-      // This prevents E2E test failures if usage tracking is unavailable
-      logger.warn('[API] Usage limit check failed, proceeding anyway', {
-        component: 'TasksAPI',
-        action: 'POST',
-        userId: user.id,
-        error: usageError,
+      usageCheck = await checkUsageLimit(user.id, 'tasks_created');
+    } catch (err) {
+      logger.error('[POST /api/tasks] Usage gate check failed', err, {
+        component: 'api-tasks-post',
+        action: 'usage_gate',
       });
-      Sentry.captureException(usageError, {
-        level: 'warning',
-        tags: { endpoint: '/api/tasks', method: 'POST', stage: 'usage-check' },
-      });
+      throw err;
+    }
+    if (!usageCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily task creation limit reached',
+          message: usageCheck.message,
+          currentUsage: usageCheck.currentUsage,
+          limit: usageCheck.limit,
+          remaining: usageCheck.remaining,
+          upgradeRequired: true,
+          upgradeUrl: '/pricing',
+        },
+        { status: 429 }
+      );
     }
 
     // Parse and validate request body with Zod
