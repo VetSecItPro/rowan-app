@@ -330,21 +330,40 @@ test.describe('Monetization Features', () => {
       await expect(manageButton).toBeVisible();
       await expect(manageButton).toBeEnabled();
 
-      // Intercept the /api/polar/portal POST before clicking (CI mode returns a stub URL)
-      const portalResponsePromise = page.waitForResponse(
-        res => res.url().includes('/api/polar/portal') && res.request().method() === 'POST',
-        { timeout: 15000 }
-      );
+      // Intercept /api/polar/portal via page.route — captures the response
+      // BEFORE the click's window.location.href triggers navigation. Without
+      // this, by the time we await response.json() the page has already
+      // unloaded and the body resource is gone (Playwright error: "No
+      // resource with given identifier found"). Rewriting the URL to
+      // about:blank prevents real navigation to polar.sh which CI can't
+      // reach anyway.
+      let capturedBody: { url?: string } | null = null;
+      let capturedStatus: number | null = null;
+      await page.route(/\/api\/polar\/portal/, async (route) => {
+        const response = await route.fetch();
+        capturedStatus = response.status();
+        try {
+          capturedBody = await response.json();
+        } catch {
+          capturedBody = null;
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ...capturedBody, url: 'about:blank' }),
+        });
+      });
 
       await manageButton.click();
 
-      // Verify the portal endpoint was called and returned a redirect URL
-      const portalResponse = await portalResponsePromise;
-      expect(portalResponse.status()).toBe(200);
-      const body = await portalResponse.json();
-      expect(body).toHaveProperty('url');
-      expect(typeof body.url).toBe('string');
-      expect(body.url.length).toBeGreaterThan(0);
+      // Wait for the about:blank navigation to settle so capturedBody is set.
+      await page.waitForURL('about:blank', { timeout: 15000 }).catch(() => {});
+
+      expect(capturedStatus).toBe(200);
+      expect(capturedBody).not.toBeNull();
+      expect(capturedBody).toHaveProperty('url');
+      expect(typeof capturedBody?.url).toBe('string');
+      expect((capturedBody?.url ?? '').length).toBeGreaterThan(0);
     });
   });
 
