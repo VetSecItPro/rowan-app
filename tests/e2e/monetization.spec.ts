@@ -311,36 +311,40 @@ test.describe('Monetization Features', () => {
       expect(hasBilling || hasUpgrade).toBeTruthy();
     });
 
-    // TODO: Implement cancel subscription functionality in SubscriptionSettings component
-    // INCORRECT TEST DESIGN (PR #375 confirmed): there's no in-app
-    // "Cancel Subscription" button. Cancellation happens via Polar's
-    // customer portal — clicking "Manage Subscription" or similar opens
-    // the portal, user cancels there, webhook updates cancelAtPeriodEnd:
-    // true on the subscription. SubscriptionSettings.tsx only displays
-    // "Cancels after this period" when cancelAtPeriodEnd is set; no
-    // confirm-cancel button exists in the app.
-    //
-    // Real fix would be to rewrite this test to either: (a) assert the
-    // customer-portal redirect button exists + clicks navigate to Polar,
-    // or (b) seed a subscription with cancelAtPeriodEnd=true and assert
-    // the cancellation banner renders. Skip until rewritten.
-    test.skip('cancel subscription flow shows confirmation', async ({ page }) => {
+    // Cancellation in Rowan happens via Polar's customer portal: the
+    // "Manage Billing" button POSTs to /api/polar/portal which returns a
+    // redirect URL. There is no in-app cancel button or confirmation modal.
+    test('manage subscription button redirects to Polar portal', async ({ page }) => {
+      test.setTimeout(90000);
+
+      await ensureAuthenticated(page, 'pro');
 
       await page.goto('/settings?tab=subscription');
-      await page.waitForLoadState('networkidle').catch(() => {});
+      await page.waitForLoadState('networkidle');
 
-      // Click cancel button
-      const cancelButton = page.locator('button:has-text("Cancel Subscription"), a:has-text("Cancel")');
-      await cancelButton.click({ timeout: 15000 });
+      // Wait for SubscriptionContext to finish loading (same pattern as surrounding tests)
+      await expect(page.getByTestId('subscription-plan-name')).toBeVisible({ timeout: 75000 });
 
-      // Should show confirmation modal
-      await expect(page.locator('[role="dialog"], [class*="modal"]')).toBeVisible();
+      // The "Manage Billing" button is only rendered for pro/family users
+      const manageButton = page.getByTestId('manage-subscription-button');
+      await expect(manageButton).toBeVisible();
+      await expect(manageButton).toBeEnabled();
 
-      // Modal should explain what happens
-      await expect(page.locator('text=/access until|end of|period/i')).toBeVisible();
+      // Intercept the /api/polar/portal POST before clicking (CI mode returns a stub URL)
+      const portalResponsePromise = page.waitForResponse(
+        res => res.url().includes('/api/polar/portal') && res.request().method() === 'POST',
+        { timeout: 15000 }
+      );
 
-      // Should have confirm and keep options
-      await expect(page.locator('button:has-text("Confirm Cancel"), button:has-text("Keep")')).toBeVisible();
+      await manageButton.click();
+
+      // Verify the portal endpoint was called and returned a redirect URL
+      const portalResponse = await portalResponsePromise;
+      expect(portalResponse.status()).toBe(200);
+      const body = await portalResponse.json();
+      expect(body).toHaveProperty('url');
+      expect(typeof body.url).toBe('string');
+      expect(body.url.length).toBeGreaterThan(0);
     });
   });
 

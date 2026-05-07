@@ -506,6 +506,7 @@ export function SubscriptionSettings() {
           {(tier === 'pro' || tier === 'family') && (
             <div className="space-y-2">
               <button
+                data-testid="manage-subscription-button"
                 className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-700 hover:bg-gray-700/50 hover:border-blue-800 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleManageBilling}
                 disabled={isBillingLoading}
