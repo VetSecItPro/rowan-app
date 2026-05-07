@@ -40,11 +40,13 @@ test.describe('Goals Feature', () => {
   test('can create a new goal', async ({ page }) => {
     test.setTimeout(45000);
 
-    // Strict testid selectors. The goals page renders different "New"
-    // buttons based on viewMode (Goal/Milestone/Habit) — broad text
-    // fallbacks could match the wrong one. Modal form uses standardized
-    // testids; Save button is `goal-submit-button`.
+    // The "New Goal" button (data-testid="add-goal-button") opens the
+    // TemplateSelectionModal first — that's the goals UX, prompting the
+    // user to pick a template before falling back to a blank form.
+    // Click "Create from Scratch" to skip templates and reach the
+    // NewGoalModal form fields.
     await page.getByTestId('add-goal-button').click();
+    await page.getByTestId('goal-create-from-scratch-button').click();
 
     const goalTitle = `E2E Test Goal ${Date.now()}`;
     await page.getByTestId('goal-title-input').fill(goalTitle);
@@ -53,7 +55,7 @@ test.describe('Goals Feature', () => {
 
     // useGoalsHandlers.handleCreateGoal applies an optimistic update
     // (setGoals(prev => [optimisticGoal, ...prev])) so the new goal
-    // should appear in the list as soon as the modal closes.
+    // appears in the list as soon as the modal closes.
     const goalInList = page.locator(`text=/${goalTitle}/i`).first();
     await expect(goalInList).toBeVisible({ timeout: 10000 });
     console.log(`✓ Created goal: ${goalTitle}`);
