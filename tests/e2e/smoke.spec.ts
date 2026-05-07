@@ -64,14 +64,12 @@ test.describe('Smoke Flow', () => {
   // Use pre-authenticated pro user session (any authenticated user works for smoke tests)
   test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
-  // PARTIAL FIX (PR #375): the meal create/update step now passes after
-  // adding a 500ms delay + body logging. Test progresses to line 206
-  // where shopping-list /api/shopping/{id}/sharing PATCH returns non-ok
-  // — different endpoint, separate investigation. Multiple sequential
-  // API steps need the same hardening pattern OR a real fix to whatever
-  // breaks the shopping share toggle for the test pro user. Skip until
-  // each step's failure mode is individually triaged.
-  test.skip('login and core flows work end-to-end', async ({ page }) => {
+  /**
+   * Verifies core app flows end-to-end: tasks, reminders, meals, shopping,
+   * bulk operations, and data exports all respond correctly for a pro user.
+   * Each API step includes body logging so failures are diagnosable in CI.
+   */
+  test('login and core flows work end-to-end', async ({ page }) => {
     // Smoke test makes many sequential API calls — needs extra time
     // Under parallel test load, individual API calls may be slow (rate limiting, server load)
     test.setTimeout(300000);
@@ -100,7 +98,7 @@ test.describe('Smoke Flow', () => {
       });
     }
     if (!taskCreate.ok()) {
-      const body = await taskCreate.text();
+      const body = await taskCreate.text().catch(() => '(unreadable)');
       throw new Error(`Task create failed: ${taskCreate.status()} ${body}`);
     }
     const taskData = await taskCreate.json();
@@ -112,7 +110,7 @@ test.describe('Smoke Flow', () => {
       timeout: 30000,
     });
     if (!taskUpdate.ok()) {
-      const body = await taskUpdate.text();
+      const body = await taskUpdate.text().catch(() => '(unreadable)');
       throw new Error(`Task update failed: ${taskUpdate.status()} ${body}`);
     }
 
@@ -163,7 +161,7 @@ test.describe('Smoke Flow', () => {
       timeout: 30000,
     });
     if (!mealCreate.ok()) {
-      const body = await mealCreate.text();
+      const body = await mealCreate.text().catch(() => '(unreadable)');
       throw new Error(`Meal create failed: ${mealCreate.status()} ${body}`);
     }
     const mealData = await mealCreate.json();
@@ -200,17 +198,32 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(listCreate.ok()).toBeTruthy();
+    if (!listCreate.ok()) {
+      const body = await listCreate.text().catch(() => '(unreadable)');
+      throw new Error(`Shopping list create failed: ${listCreate.status()} ${body}`);
+    }
     const listData = await listCreate.json();
     const listId = listData.data?.id as string;
+    if (!listId) {
+      throw new Error(`Shopping list create returned ok but no list id. Body: ${JSON.stringify(listData)}`);
+    }
 
-    // Use dedicated sharing endpoint — DB column is "is_public" (not "is_shared")
+    // Small delay so the list-create write fully lands before the update.
+    // Under CI load the API can return 200 on create before the row is
+    // queryable for PATCH (replication / cache lag).
+    await page.waitForTimeout(500);
+
+    // Use dedicated sharing endpoint — route accepts isPublic (camelCase),
+    // which it maps to the DB column "is_public" (snake_case).
     const listShareToggle = await page.request.patch(`/api/shopping/${listId}/sharing`, {
       data: { isPublic: true },
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(listShareToggle.ok()).toBeTruthy();
+    if (!listShareToggle.ok()) {
+      const body = await listShareToggle.text().catch(() => '(unreadable)');
+      throw new Error(`Shopping share toggle failed: ${listShareToggle.status()} ${body}`);
+    }
 
     await page.goto('/shopping');
     await page.waitForLoadState('networkidle').catch(() => {});
@@ -222,7 +235,10 @@ test.describe('Smoke Flow', () => {
       `/api/bulk/delete-expenses?space_id=${spaceId}&start_date=2000-01-01&end_date=2000-01-02`,
       { timeout: 30000 },
     );
-    expect(bulkDeleteCount.ok()).toBeTruthy();
+    if (!bulkDeleteCount.ok()) {
+      const body = await bulkDeleteCount.text().catch(() => '(unreadable)');
+      throw new Error(`Bulk delete-expenses GET failed: ${bulkDeleteCount.status()} ${body}`);
+    }
 
     const bulkDelete = await page.request.post('/api/bulk/delete-expenses', {
       data: {
@@ -235,7 +251,10 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(bulkDelete.ok()).toBeTruthy();
+    if (!bulkDelete.ok()) {
+      const body = await bulkDelete.text().catch(() => '(unreadable)');
+      throw new Error(`Bulk delete-expenses POST failed: ${bulkDelete.status()} ${body}`);
+    }
 
     const bulkArchive = await page.request.post('/api/bulk/archive-old-data', {
       data: {
@@ -246,23 +265,35 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(bulkArchive.ok()).toBeTruthy();
+    if (!bulkArchive.ok()) {
+      const body = await bulkArchive.text().catch(() => '(unreadable)');
+      throw new Error(`Bulk archive-old-data POST failed: ${bulkArchive.status()} ${body}`);
+    }
 
     // Data export: JSON/CSV/PDF
     const jsonExport = await page.request.get('/api/user/export-data', { timeout: 30000 });
-    expect(jsonExport.ok()).toBeTruthy();
+    if (!jsonExport.ok()) {
+      const body = await jsonExport.text().catch(() => '(unreadable)');
+      throw new Error(`JSON export failed: ${jsonExport.status()} ${body}`);
+    }
     expect(jsonExport.headers()['content-type']).toContain('application/json');
 
     // Note: type=all returns JSON with all CSVs bundled; use type=tasks for actual CSV response
     const csvExport = await page.request.get('/api/user/export-data-csv?type=tasks', { timeout: 30000 });
     // 404 = no data available is acceptable for new test user
-    expect([200, 404]).toContain(csvExport.status());
+    if (![200, 404].includes(csvExport.status())) {
+      const body = await csvExport.text().catch(() => '(unreadable)');
+      throw new Error(`CSV export failed: ${csvExport.status()} ${body}`);
+    }
     if (csvExport.ok()) {
       expect(csvExport.headers()['content-type']).toContain('text/csv');
     }
 
     const pdfExport = await page.request.get('/api/user/export-data-pdf?type=all', { timeout: 30000 });
-    expect(pdfExport.ok()).toBeTruthy();
+    if (!pdfExport.ok()) {
+      const body = await pdfExport.text().catch(() => '(unreadable)');
+      throw new Error(`PDF export failed: ${pdfExport.status()} ${body}`);
+    }
     expect(pdfExport.headers()['content-type']).toContain('application/pdf');
 
     // Admin notification export
@@ -274,14 +305,20 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(adminLogin.ok()).toBeTruthy();
+    if (!adminLogin.ok()) {
+      const body = await adminLogin.text().catch(() => '(unreadable)');
+      throw new Error(`Admin login failed: ${adminLogin.status()} ${body}`);
+    }
 
     const adminExport = await page.request.post('/api/admin/notifications/export', {
       data: { includeAll: true, format: 'csv' },
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(adminExport.ok()).toBeTruthy();
+    if (!adminExport.ok()) {
+      const body = await adminExport.text().catch(() => '(unreadable)');
+      throw new Error(`Admin notifications export failed: ${adminExport.status()} ${body}`);
+    }
     expect(adminExport.headers()['content-type']).toContain('text/csv');
   });
 });
