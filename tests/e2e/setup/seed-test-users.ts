@@ -223,7 +223,11 @@ async function seedTestUsers() {
         console.log(`  ✓ Space membership created`);
       }
 
-      // Step 4: Upsert subscription
+      // Step 4: Upsert subscription. Paid tiers get a fake polar_subscription_id
+      // so the cancel-subscription UI gate (which requires an active polar
+      // subscription) renders for paid test users. The cancel flow itself
+      // is tested via Polar sandbox webhooks, not real API revoke.
+      const isPaidTier = testUser.tier !== 'free';
       const { error: subError } = await supabase.from('subscriptions').upsert(
         {
           user_id: userId,
@@ -231,6 +235,10 @@ async function seedTestUsers() {
           status: 'active',
           period: 'monthly',
           subscription_started_at: new Date().toISOString(),
+          ...(isPaidTier && {
+            polar_subscription_id: `sandbox-test-sub-${userId}`,
+            polar_customer_id: `sandbox-test-cus-${userId}`,
+          }),
         },
         { onConflict: 'user_id' }
       );

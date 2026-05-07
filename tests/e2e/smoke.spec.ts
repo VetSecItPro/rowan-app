@@ -64,14 +64,13 @@ test.describe('Smoke Flow', () => {
   // Use pre-authenticated pro user session (any authenticated user works for smoke tests)
   test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
-  // TODO(2026-05-07): un-skip pending root cause investigation. PR #372
-  // un-skipped this and the meal-update API call returned non-ok (line ~171:
-  // expect(mealUpdate.ok()).toBeTruthy() failed). 25-second test runtime
-  // before failure suggests one of: meal API schema mismatch, the meal
-  // creation succeeded but update failed, or rate-limiting kicked in
-  // somewhere in the multi-step API workflow. The smoke test is 260+ LOC
-  // of sequential API calls (tasks/reminders/meals/shopping/etc) — each
-  // individual API call needs to be verified in isolation before un-skipping.
+  // PARTIAL FIX (PR #375): the meal create/update step now passes after
+  // adding a 500ms delay + body logging. Test progresses to line 206
+  // where shopping-list /api/shopping/{id}/sharing PATCH returns non-ok
+  // — different endpoint, separate investigation. Multiple sequential
+  // API steps need the same hardening pattern OR a real fix to whatever
+  // breaks the shopping share toggle for the test pro user. Skip until
+  // each step's failure mode is individually triaged.
   test.skip('login and core flows work end-to-end', async ({ page }) => {
     // Smoke test makes many sequential API calls — needs extra time
     // Under parallel test load, individual API calls may be slow (rate limiting, server load)
@@ -169,6 +168,10 @@ test.describe('Smoke Flow', () => {
     }
     const mealData = await mealCreate.json();
     const mealId = mealData.data?.id as string;
+    // Small delay so the meal-create write fully lands before the update.
+    // Under CI load the API can return 200 on create before the row is
+    // queryable for PATCH (replication / cache lag).
+    await page.waitForTimeout(500);
     const mealUpdate = await page.request.patch(`/api/meals/${mealId}`, {
       data: {
         notes: 'Updated by smoke test',
@@ -176,7 +179,10 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    expect(mealUpdate.ok()).toBeTruthy();
+    if (!mealUpdate.ok()) {
+      const body = await mealUpdate.text().catch(() => '(unreadable)');
+      throw new Error(`Meal update failed: ${mealUpdate.status()} ${body}`);
+    }
 
     await page.goto('/meals');
     await page.waitForLoadState('networkidle').catch(() => {});
