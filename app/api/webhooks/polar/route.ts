@@ -2,66 +2,39 @@
  * API Route: Polar Webhook Handler
  * POST /api/webhooks/polar
  *
- * Handles Polar webhook events for subscription lifecycle management
+ * Handles Polar webhook events for subscription lifecycle management.
  *
- * IMPORTANT: Before using this handler, ensure you have:
- * 1. Added polar_customer_id and polar_subscription_id columns to subscriptions table
- * 2. Run: npm run db:push (if using migrations) or update Supabase directly
- * 3. Set POLAR_WEBHOOK_SECRET in .env.local
+ * Signature verification uses Polar's standardwebhooks-format signing
+ * via @polar-sh/sdk/webhooks `validateEvent`. Polar sends headers
+ * `webhook-id`, `webhook-timestamp`, `webhook-signature` (with
+ * `v1,<base64>` value). Custom HMAC-of-body verification (which the
+ * pre-2026-05-07 implementation used) silently rejects every real
+ * webhook, so subscriptions never activate after payment.
+ *
+ * Before using:
+ * 1. Set POLAR_WEBHOOK_SECRET in .env.local (format: polar_whs_<random>)
+ * 2. Configure webhook endpoint in Polar dashboard pointing at this route
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createHmac, timingSafeEqual } from 'crypto';
+import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { getPlanFromProductId, getPeriodFromProductId } from '@/lib/polar';
+import { getPlanFromProductId, getPeriodFromProductId, getPolarWebhookSecret } from '@/lib/polar';
 import { sendSubscriptionWelcomeEmail, sendSubscriptionCancelledEmail } from '@/lib/services/email-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
-import { z } from 'zod';
 import type { SubscriptionTier, SubscriptionPeriod } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 // PERF: Prevent serverless timeout — FIX-015
 export const maxDuration = 60;
 
-// SECURITY: Zod schema to validate webhook payload structure
-const PolarWebhookEventSchema = z.object({
-  type: z.string(),
-  data: z.record(z.string(), z.unknown()),
-});
-
-// Polar webhook event types
+// Polar webhook event shape after validateEvent — matches the SDK's
+// returned union type but our handler only reads .type and .data.
 interface PolarWebhookEvent {
   type: string;
   data: Record<string, unknown>;
-}
-
-// Verify Polar webhook signature using HMAC-SHA256
-function verifyWebhookSignature(
-  payload: string,
-  signature: string | null,
-  secret: string
-): boolean {
-  if (!signature) return false;
-
-  try {
-    const hmac = createHmac('sha256', secret);
-    hmac.update(payload);
-    const expectedSignature = hmac.digest('hex');
-
-    // Use timing-safe comparison
-    const sigBuffer = Buffer.from(signature);
-    const expectedBuffer = Buffer.from(expectedSignature);
-
-    if (sigBuffer.length !== expectedBuffer.length) {
-      return false;
-    }
-
-    return timingSafeEqual(sigBuffer, expectedBuffer);
-  } catch {
-    return false;
-  }
 }
 
 export async function POST(request: NextRequest) {
@@ -73,10 +46,10 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.text();
-  const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+  const webhookSecret = getPolarWebhookSecret();
 
   if (!webhookSecret) {
-    logger.error('POLAR_WEBHOOK_SECRET not configured', undefined, {
+    logger.error('Polar webhook secret not configured (check POLAR_WEBHOOK_SECRET or POLAR_SANDBOX_WEBHOOK_SECRET when POLAR_ENV=sandbox)', undefined, {
       component: 'PolarWebhook',
     });
     return NextResponse.json(
@@ -85,44 +58,34 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Get signature from headers
-  // Polar may use different header names - check their docs
-  const signature =
-    request.headers.get('x-polar-signature') ||
-    request.headers.get('polar-signature') ||
-    request.headers.get('x-webhook-signature');
+  // Polar SDK's validateEvent uses standardwebhooks-format signature
+  // verification — combines the webhook-id, webhook-timestamp, and body
+  // headers, computes HMAC against the decoded secret, and compares
+  // against the v1,<base64> signature header. Throws WebhookVerificationError
+  // on bad signature, returns the typed event on success.
+  const headersRecord: Record<string, string> = {};
+  request.headers.forEach((value, key) => {
+    headersRecord[key] = value;
+  });
 
-  if (!verifyWebhookSignature(body, signature, webhookSecret)) {
-    logger.error('Polar webhook signature verification failed', undefined, {
-      component: 'PolarWebhook',
-    });
-    return NextResponse.json(
-      { error: 'Invalid webhook signature' },
-      { status: 400 }
-    );
-  }
-
-  // SECURITY: Parse and validate webhook payload with Zod
   let event: PolarWebhookEvent;
   try {
-    const rawParsed = JSON.parse(body);
-    const validated = PolarWebhookEventSchema.safeParse(rawParsed);
-    if (!validated.success) {
-      logger.error('Webhook payload failed Zod validation', undefined, {
+    event = validateEvent(body, headersRecord, webhookSecret) as unknown as PolarWebhookEvent;
+  } catch (err) {
+    if (err instanceof WebhookVerificationError) {
+      logger.error('Polar webhook signature verification failed', err, {
         component: 'PolarWebhook',
       });
       return NextResponse.json(
-        { error: 'Invalid webhook payload structure' },
+        { error: 'Invalid webhook signature' },
         { status: 400 }
       );
     }
-    event = rawParsed as PolarWebhookEvent;
-  } catch {
-    logger.error('Failed to parse webhook body', undefined, {
+    logger.error('Failed to parse webhook event', err, {
       component: 'PolarWebhook',
     });
     return NextResponse.json(
-      { error: 'Invalid JSON body' },
+      { error: 'Invalid webhook payload' },
       { status: 400 }
     );
   }
