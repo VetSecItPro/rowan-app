@@ -219,3 +219,5 @@ household-balance-*.png
 .a11y-reports/
 
 .admin-audit-reports/
+.subagent-dev-reports/
+.worktrees/
