@@ -24,13 +24,15 @@ export interface NotificationPreferencesRow {
   quiet_hours_enabled: boolean;
   quiet_hours_start: string | null;
   quiet_hours_end: string | null;
-  digest_enabled: boolean;
-  digest_time: string | null;
-  digest_timezone: string;
-  timezone: string;
 }
 
-const PREFERENCE_COLUMNS = 'id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, push_enabled, push_due_reminders, push_assignments, push_mentions, push_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone, timezone';
+// digest_enabled / digest_time / digest_timezone / timezone were dropped by
+// migration 20251020060000_remove_digest_functionality.sql. They remained in
+// this service file by accident until 2026-05-06. The daily-digest cron job
+// itself (lib/jobs/daily-digest-job.ts) still references the dropped columns
+// — see project memory "Notification digest is dead-on-replay" for the
+// follow-up decision about whether to delete that pipeline.
+const PREFERENCE_COLUMNS = 'id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, push_enabled, push_due_reminders, push_assignments, push_mentions, push_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end';
 
 export const notificationPreferencesService = {
   /**

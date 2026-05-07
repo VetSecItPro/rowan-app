@@ -74,15 +74,22 @@ const EXPECTED_SCHEMA: ExpectedSchema = {
     'created_at', 'updated_at',
   ],
 
-  // user_notification_preferences is INTENTIONALLY NOT in EXPECTED_SCHEMA.
-  // The actual table schema (from migration 20251017190000) uses columns
-  // like email_task_assignments / email_event_reminders / push_event_alerts,
-  // but lib/services/notification-preferences-service.ts PREFERENCE_COLUMNS
-  // references a totally different (imagined) schema with email_enabled /
-  // in_app_assignments / digest_enabled. Migration 20251020060000 also
-  // explicitly DROPPED digest_* columns the code still references. This
-  // is a "rewrite the service to match actual schema" job (Phase 8.6),
-  // not a schema-fix job — adding the cols would undo the cleanup.
+  // From lib/services/notification-preferences-service.ts PREFERENCE_COLUMNS.
+  // Note: TWO competing CREATE TABLE IF NOT EXISTS migrations exist for this
+  // table (20251014000020 + 20251017190000) with different column sets. The
+  // first wins on replay. The service was reconciled to the first migration's
+  // shape on 2026-05-06 (Task #6). The dropped digest_*/timezone columns
+  // were also removed from the service then. The daily-digest cron pipeline
+  // (lib/jobs/daily-digest-job.ts) still references the dropped columns —
+  // separate cleanup decision pending.
+  user_notification_preferences: [
+    'id', 'user_id', 'space_id',
+    'email_enabled', 'email_due_reminders', 'email_assignments', 'email_mentions', 'email_comments',
+    'in_app_enabled', 'in_app_due_reminders', 'in_app_assignments', 'in_app_mentions', 'in_app_comments',
+    'push_enabled', 'push_due_reminders', 'push_assignments', 'push_mentions', 'push_comments',
+    'notification_frequency',
+    'quiet_hours_enabled', 'quiet_hours_start', 'quiet_hours_end',
+  ],
 
   // From check-in flow (useCheckIn.ts + checkins-service.ts).
   // Migration 20260506213958 (this PR) adds energy_level if missing.
