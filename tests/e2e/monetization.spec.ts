@@ -35,19 +35,19 @@ test.describe('Monetization Features', () => {
      * This is more reliable than UI-based creation which takes 180s+ and
      * has silent error handling in the usage check catch block.
      *
-     * TODO(2026-05-07): un-skip pending free-user-session hydration fix.
-     * PR #374 surfaced expect(csrfToken).toBeTruthy() OR expect(spaceId)
-     * .toBeTruthy() failing within ~6s of test start. Likely the
-     * tests/e2e/.auth/free.json storage state isn't carrying the right
-     * cookies for /api/csrf/token + /api/spaces. Investigation needed
-     * on the seed-test-users script's free-user provisioning before
-     * re-un-skipping.
      */
-    test.skip('free user hits daily task creation limit', async ({ page }) => {
+    test('free user hits daily task creation limit', async ({ page }) => {
       test.setTimeout(180000);
 
       // Ensure free user session is valid (re-authenticates if expired)
       await ensureAuthenticated(page, 'free');
+
+      // Navigate to dashboard first to hydrate auth cookies into the browser
+      // context. In CI, page.request may not carry cookies until a page
+      // navigation establishes them — same pattern smoke.spec.ts uses in
+      // getPrimarySpaceId. Without this, /api/csrf/token returns 401 even
+      // though the storage state is valid.
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
       // Get a CSRF token for API calls (with retry for session hydration)
       let csrfToken = '';
@@ -304,20 +304,18 @@ test.describe('Monetization Features', () => {
     });
 
     // TODO: Implement cancel subscription functionality in SubscriptionSettings component
-    // TODO(2026-05-07): un-skip pending UI selector fix. PR #374 surfaced
-    // a 15s timeout on cancelButton.click() — the broad selector
-    // `button:has-text("Cancel Subscription"), a:has-text("Cancel")`
-    // didn't find the cancel control on /settings?tab=subscription. Either
-    // the button has different text, lives in a sub-route, or is gated
-    // behind an active subscription that the test pro user doesn't have.
-    // Needs the subscription-cancel UI inspected for the actual testid/text.
-    test.skip('cancel subscription flow shows confirmation', async ({ page }) => {
+    test('cancel subscription flow shows confirmation', async ({ page }) => {
 
       await page.goto('/settings?tab=subscription');
+      // Wait for SubscriptionContext to fetch + render. The cancel UI is
+      // gated on subscription.polar_subscription_id being set; the seed
+      // script (seed-test-users.ts) now sets a sandbox-test-sub-* value
+      // for paid-tier test users so this gate satisfies.
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // Click cancel button
       const cancelButton = page.locator('button:has-text("Cancel Subscription"), a:has-text("Cancel")');
-      await cancelButton.click();
+      await cancelButton.click({ timeout: 15000 });
 
       // Should show confirmation modal
       await expect(page.locator('[role="dialog"], [class*="modal"]')).toBeVisible();
