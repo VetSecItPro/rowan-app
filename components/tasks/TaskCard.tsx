@@ -46,8 +46,11 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   })();
   const priorityColor = priorityColors[task.priority as keyof typeof priorityColors] || 'bg-gray-500';
 
-  // Handle status rotation: pending → in_progress → completed → pending
-  const handleStatusClick = () => {
+  // Handle status rotation: pending → in_progress → completed → pending.
+  // stopPropagation prevents card-level onClick (view details) from firing
+  // when user just wanted to toggle status.
+  const handleStatusClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     let newStatus: TaskStatus = 'pending';
     if (task.status === 'pending') {
       newStatus = 'in-progress';
@@ -75,8 +78,29 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
     return 'Click to reset';
   };
 
+  // Card-level click opens detail view (when onViewDetails is provided).
+  // Inner buttons (checkbox, 3-dot menu wrapper) call stopPropagation so
+  // they don't double-trigger this handler. Same pattern as EventCard.
+  const handleCardClick = onViewDetails
+    ? () => onViewDetails(task)
+    : undefined;
+
   return (
-    <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200">
+    <div
+      data-testid={`task-item-${task.id}`}
+      onClick={handleCardClick}
+      role={handleCardClick ? 'button' : undefined}
+      tabIndex={handleCardClick ? 0 : undefined}
+      onKeyDown={handleCardClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick();
+        }
+      } : undefined}
+      className={`bg-gray-800/80 border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200 ${
+        handleCardClick ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500' : ''
+      }`}
+    >
       {/* Main row */}
       <div className="flex items-center gap-2">
         {/* Checkbox */}
@@ -120,8 +144,10 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
           {task.status === 'in-progress' ? 'Active' : task.status === 'completed' ? 'Done' : 'Pending'}
         </span>
 
-        {/* Menu button */}
-        <div className="relative flex-shrink-0">
+        {/* Menu button — wrapped div stops click-propagation so the
+            card-level onClick (view details) doesn't double-fire when the
+            user opens the menu or selects a menu item. */}
+        <div className="relative flex-shrink-0" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Task options"
@@ -145,6 +171,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
                   </button>
                 )}
                 <button
+                  data-testid="task-edit-button"
                   onClick={() => { onEdit(task); setShowMenu(false); }}
                   className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700"
                 >

@@ -427,6 +427,7 @@ function DetailsModalContent({
         <div className="flex-shrink-0 px-4 py-3 border-t border-gray-700 bg-gray-800/50">
           <div className="flex items-center justify-between gap-3">
             <button
+              data-testid="unified-details-edit-button"
               onClick={() => onEdit?.(item as (Task & { type: 'task' }) | (Chore & { type: 'chore' }))}
               className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"
             >

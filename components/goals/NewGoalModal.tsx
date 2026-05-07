@@ -184,6 +184,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
         Cancel
       </button>
       <button
+        data-testid="goal-submit-button"
         type="submit"
         form="new-goal-form"
         disabled={isSaving}
@@ -220,6 +221,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
             </label>
             <div className="relative">
               <input
+                data-testid="goal-title-input"
                 type="text"
                 required
                 aria-required="true"
@@ -270,6 +272,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
               Description
             </label>
             <textarea
+              data-testid="goal-description-input"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this goal..."
