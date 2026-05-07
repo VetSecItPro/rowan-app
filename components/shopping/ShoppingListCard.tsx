@@ -86,7 +86,10 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
   };
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-md transition-colors group">
+    <div
+      data-testid={`shopping-list-card-${list.id}`}
+      className="bg-gray-800 border border-gray-700 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-md transition-colors group"
+    >
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex-1 min-w-0">
           {/* Mobile: Stack checkbox + progress vertically, then title. Desktop: All inline */}
