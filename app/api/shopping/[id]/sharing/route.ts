@@ -154,14 +154,31 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     logger.error('[API] /api/shopping/[id]/sharing PATCH error:', error, { component: 'api-route', action: 'api_request' });
 
     // In non-production environments (CI / dev), include the actual error
-    // message in the response body so smoke-test failures are diagnosable.
-    // Production keeps the generic message to avoid leaking internals.
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    // message + Supabase error fields in the response body so smoke-test
+    // failures are diagnosable. Production keeps the generic message.
+    // Supabase errors are PostgrestError shape: { message, details, hint, code }
+    // — String() on them returns "[object Object]" so we serialize properly.
     const isProd = process.env.NODE_ENV === 'production';
+    let detail: string | object | undefined;
+    if (!isProd) {
+      if (error instanceof Error) {
+        detail = error.message;
+      } else if (error && typeof error === 'object') {
+        // Supabase PostgrestError or similar — capture all properties
+        detail = {
+          message: (error as { message?: string }).message ?? '(no message)',
+          details: (error as { details?: string }).details,
+          hint: (error as { hint?: string }).hint,
+          code: (error as { code?: string }).code,
+        };
+      } else {
+        detail = String(error);
+      }
+    }
     return NextResponse.json(
       {
         error: 'Failed to update sharing settings',
-        ...(isProd ? {} : { detail: errorMessage }),
+        ...(isProd ? {} : { detail }),
       },
       { status: 500 }
     );
