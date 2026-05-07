@@ -238,13 +238,35 @@ test.describe('Smoke Flow', () => {
     // Supabase shopping_lists fetch that React Query fires after auth resolves.
     // networkidle alone is not sufficient: auth check + React Query fetch are
     // sequential client-side async steps that happen after networkidle fires.
+    // Wait for the shopping_lists response that ACTUALLY contains our newly-
+    // created list. The first response after navigation may be a stale cached
+    // result (React Query fires immediately, then a fresh fetch lands later).
+    // Match against listTitle in the body so we wait for the response that
+    // proves the data is in the browser, not just any 200.
     const shoppingListsFetch = page.waitForResponse(
-      (res) => res.url().includes('shopping_lists') && res.status() === 200,
+      async (res) => {
+        if (!res.url().includes('shopping_lists') || res.status() !== 200) return false;
+        try {
+          const body = await res.text();
+          return body.includes(listTitle);
+        } catch {
+          return false;
+        }
+      },
       { timeout: 15000 },
     );
     await page.goto('/shopping');
-    await shoppingListsFetch;
-    // Shopping list should be visible on the page
+    try {
+      await shoppingListsFetch;
+    } catch (err) {
+      // Diagnostic: capture URL + first 2KB of body so future failures are
+      // diagnosable rather than opaque toBeVisible timeouts.
+      const url = page.url();
+      const html = (await page.content().catch(() => '')).substring(0, 2048);
+      console.error(`[Smoke] shopping_lists wait failed at URL=${url}\nbody[0:2048]=${html}`);
+      throw err;
+    }
+    // Shopping list should be visible on the page now (response with our title landed)
     await expect(page.locator(`text=${listTitle}`).first()).toBeVisible({ timeout: 10000 });
 
     // Bulk delete + archive (smoke test endpoints)
