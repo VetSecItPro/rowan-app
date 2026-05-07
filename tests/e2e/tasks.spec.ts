@@ -62,8 +62,12 @@ test.describe('Tasks Feature', () => {
       await dueDateInput.fill(dateString);
     }
 
-    // Submit form
+    // Submit form — wait for the submit button to become enabled (form
+    // validates title-non-empty + date-valid; React state batch can lag the
+    // .fill() call slightly, so a bare .click() races the disable→enable
+    // transition).
     const submitButton = page.locator('[data-testid="task-submit-button"], button[type="submit"], button:has-text("Create"), button:has-text("Add")').first();
+    await expect(submitButton).toBeEnabled({ timeout: 5000 });
     await submitButton.click();
     await page.waitForTimeout(2000);
 
