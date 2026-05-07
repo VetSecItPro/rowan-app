@@ -127,4 +127,44 @@ describe('TaskCard', () => {
     fireEvent.click(screen.getByLabelText('Task options'));
     expect(screen.getByText('View Details')).toBeDefined();
   });
+
+  // Card-level click → onViewDetails behavior (parallel to EventCard pattern).
+  describe('card-level click → onViewDetails', () => {
+    it('outer wrapper has data-testid="task-item-{id}" for E2E selectors', () => {
+      const { container } = render(<TaskCard {...defaultProps} />);
+      const card = container.querySelector('[data-testid="task-item-task-1"]');
+      expect(card).not.toBeNull();
+    });
+
+    it('clicking the card body calls onViewDetails when prop is provided', () => {
+      const onViewDetails = vi.fn();
+      const { container } = render(<TaskCard {...defaultProps} onViewDetails={onViewDetails} />);
+      const card = container.querySelector('[data-testid="task-item-task-1"]') as HTMLElement;
+      fireEvent.click(card);
+      expect(onViewDetails).toHaveBeenCalledWith(mockTask);
+    });
+
+    it('does NOT make the card clickable when onViewDetails is not provided', () => {
+      const { container } = render(<TaskCard {...defaultProps} />);
+      const card = container.querySelector('[data-testid="task-item-task-1"]') as HTMLElement;
+      expect(card.getAttribute('role')).toBeNull();
+      expect(card.getAttribute('tabindex')).toBeNull();
+      expect(card.className).not.toContain('cursor-pointer');
+    });
+
+    it('three-dot menu click does NOT bubble to card-level onViewDetails', () => {
+      const onViewDetails = vi.fn();
+      render(<TaskCard {...defaultProps} onViewDetails={onViewDetails} />);
+      fireEvent.click(screen.getByLabelText('Task options'));
+      expect(onViewDetails).not.toHaveBeenCalled();
+    });
+
+    it('Enter key on focused card invokes onViewDetails', () => {
+      const onViewDetails = vi.fn();
+      const { container } = render(<TaskCard {...defaultProps} onViewDetails={onViewDetails} />);
+      const card = container.querySelector('[data-testid="task-item-task-1"]') as HTMLElement;
+      fireEvent.keyDown(card, { key: 'Enter' });
+      expect(onViewDetails).toHaveBeenCalledWith(mockTask);
+    });
+  });
 });

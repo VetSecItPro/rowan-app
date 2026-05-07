@@ -174,52 +174,35 @@ test.describe('Tasks Feature', () => {
     }
   });
 
-  test.skip('can edit a task', async ({ page }) => {
+  test('can edit a task', async ({ page }) => {
     test.setTimeout(45000);
 
-    // Wait for tasks to load
-    await page.waitForTimeout(2000);
-
-    // Look for an existing task
-    const existingTask = page.locator('[data-testid^="task-item-"], .task-item, [class*="task"]').first();
+    // Strict testid selector — broad `[class*="task"]` matched non-TaskCard
+    // elements (sidebar nav, etc.) and threw on click. TaskCard outer
+    // wrapper has data-testid={`task-item-${task.id}`} since the testid PR.
+    // If no tasks exist on a fresh test DB, gracefully bail.
+    const existingTask = page.locator('[data-testid^="task-item-"]').first();
 
     if (await existingTask.isVisible({ timeout: 5000 }).catch(() => false)) {
-      // Click task to open details/edit
+      // Card click opens UnifiedDetailsModal (via onViewDetails handler).
       await existingTask.click();
-      await page.waitForTimeout(1000);
+      // Detail modal has its own Edit button. The 3-dot menu's Edit also
+      // works via data-testid="task-edit-button"; either path is fine.
+      await page.getByTestId('unified-details-edit-button').click();
 
-      // Look for edit button
-      const editButton = page.locator('[data-testid="task-edit-button"], button:has-text("Edit")').first();
+      // Edit form (NewTaskModal in edit mode) loads.
+      const titleInput = page.getByTestId('task-title-input');
+      await expect(titleInput).toBeVisible({ timeout: 3000 });
+      const updatedTitle = `Updated Task ${Date.now()}`;
+      await titleInput.fill(updatedTitle);
+      await page.getByTestId('task-submit-button').click();
 
-      if (await editButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await editButton.click();
-        await page.waitForTimeout(1000);
-      }
-
-      // Modify task title
-      const titleInput = page.locator('[data-testid="task-title-input"], input[name="title"], input[placeholder*="task" i]').first();
-
-      if (await titleInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-        const updatedTitle = `Updated Task ${Date.now()}`;
-        await titleInput.fill(updatedTitle);
-
-        // Save changes
-        const saveButton = page.locator('[data-testid="task-submit-button"], button[type="submit"], button:has-text("Save"), button:has-text("Update")').first();
-        await saveButton.click();
-        await page.waitForTimeout(2000);
-
-        // Verify updated task appears
-        const updatedTask = page.locator(`text=/${updatedTitle}/i`).first();
-        const taskUpdated = await updatedTask.isVisible({ timeout: 5000 }).catch(() => false);
-
-        if (taskUpdated) {
-          console.log(`✓ Task updated to: ${updatedTitle}`);
-        }
-      } else {
-        console.log('⚠ Edit form not accessible');
-      }
+      // After save, the updated title should appear in the list.
+      const updatedInList = page.locator(`text=/${updatedTitle}/i`).first();
+      await expect(updatedInList).toBeVisible({ timeout: 10000 });
+      console.log(`✓ Task updated to: ${updatedTitle}`);
     } else {
-      console.log('⚠ No tasks found to edit');
+      console.log('⚠ No tasks found to edit (expected on fresh test DB)');
     }
   });
 

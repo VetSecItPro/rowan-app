@@ -37,53 +37,28 @@ test.describe('Goals Feature', () => {
     }
   });
 
-  test.skip('can create a new goal', async ({ page }) => {
+  test('can create a new goal', async ({ page }) => {
     test.setTimeout(45000);
 
-    // Click add goal button
-    const addButton = page.locator('[data-testid="add-goal-button"], button:has-text("New Goal"), button:has-text("Create Goal"), button:has-text("Add Goal")').first();
+    // The "New Goal" button (data-testid="add-goal-button") opens the
+    // TemplateSelectionModal first — that's the goals UX, prompting the
+    // user to pick a template before falling back to a blank form.
+    // Click "Create from Scratch" to skip templates and reach the
+    // NewGoalModal form fields.
+    await page.getByTestId('add-goal-button').click();
+    await page.getByTestId('goal-create-from-scratch-button').click();
 
-    if (await addButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await addButton.click();
-      await page.waitForTimeout(1000);
+    const goalTitle = `E2E Test Goal ${Date.now()}`;
+    await page.getByTestId('goal-title-input').fill(goalTitle);
+    await page.getByTestId('goal-description-input').fill('Created by E2E test for goals feature');
+    await page.getByTestId('goal-submit-button').click();
 
-      // Fill goal form
-      const goalTitle = `E2E Test Goal ${Date.now()}`;
-      const titleInput = page.locator('[data-testid="goal-title-input"], input[name="title"], input[placeholder*="goal" i]').first();
-
-      if (await titleInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await titleInput.fill(goalTitle);
-
-        // Optional: Fill description
-        const descriptionInput = page.locator('[data-testid="goal-description-input"], textarea[name="description"], textarea[placeholder*="description" i]').first();
-        if (await descriptionInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await descriptionInput.fill('Created by E2E test for goals feature');
-        }
-
-        // Optional: Set target date
-        const targetDateInput = page.locator('[data-testid="goal-target-date-input"], input[type="date"], input[name*="target" i]').first();
-        if (await targetDateInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-          const nextMonth = new Date();
-          nextMonth.setMonth(nextMonth.getMonth() + 1);
-          await targetDateInput.fill(nextMonth.toISOString().split('T')[0]);
-        }
-
-        // Submit form
-        const submitButton = page.locator('[data-testid="goal-submit-button"], button[type="submit"], button:has-text("Create"), button:has-text("Save")').first();
-        await submitButton.click();
-        await page.waitForTimeout(2000);
-
-        // Verify goal appears in list
-        const goalElement = page.locator(`text=/${goalTitle}/i`).first();
-        await expect(goalElement).toBeVisible({ timeout: 5000 });
-
-        console.log(`✓ Created goal: ${goalTitle}`);
-      } else {
-        console.log('⚠ Goal title input not found');
-      }
-    } else {
-      console.log('⚠ Add goal button not found');
-    }
+    // useGoalsHandlers.handleCreateGoal applies an optimistic update
+    // (setGoals(prev => [optimisticGoal, ...prev])) so the new goal
+    // appears in the list as soon as the modal closes.
+    const goalInList = page.locator(`text=/${goalTitle}/i`).first();
+    await expect(goalInList).toBeVisible({ timeout: 10000 });
+    console.log(`✓ Created goal: ${goalTitle}`);
   });
 
   test('can view goal progress', async ({ page }) => {

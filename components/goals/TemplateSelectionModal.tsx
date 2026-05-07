@@ -202,6 +202,7 @@ export function TemplateSelectionModal({
       </button>
       {onCreateFromScratch && (
         <button
+          data-testid="goal-create-from-scratch-button"
           onClick={onCreateFromScratch}
           title="Start with a blank goal instead of using a template"
           className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-full font-medium transition-all shadow-lg shadow-indigo-500/25"

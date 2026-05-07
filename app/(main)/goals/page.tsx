@@ -239,6 +239,12 @@ export default function GoalsPage() {
                 </button>
               </div>
               <button
+                data-testid={
+                  viewMode === 'goals' ? 'add-goal-button' :
+                  viewMode === 'milestones' ? 'add-milestone-button' :
+                  viewMode === 'habits' ? 'add-habit-button' :
+                  'add-goal-button'
+                }
                 onClick={() => handleNewButtonClick(viewMode)}
                 className="px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base font-medium"
               >
