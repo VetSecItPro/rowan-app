@@ -41,7 +41,7 @@ test.describe('Budget/Expenses Feature', () => {
     }
   });
 
-  test.skip('can view expense summary/totals', async ({ page }) => {
+  test('can view expense summary/totals', async ({ page }) => {
     // Wait for page to load
     await page.waitForTimeout(2000);
 
@@ -147,7 +147,7 @@ test.describe('Budget/Expenses Feature', () => {
     }
   });
 
-  test.skip('can filter expenses by date range', async ({ page }) => {
+  test('can filter expenses by date range', async ({ page }) => {
     // Wait for expenses to load
     await page.waitForTimeout(2000);
 
@@ -216,7 +216,7 @@ test.describe('Budget/Expenses Feature', () => {
     }
   });
 
-  test.skip('can delete an expense', async ({ page }) => {
+  test('can delete an expense', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for expenses to load

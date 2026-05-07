@@ -40,7 +40,7 @@ test.describe('Messages/Chat Feature', () => {
     }
   });
 
-  test.skip('can view conversation list', async ({ page }) => {
+  test('can view conversation list', async ({ page }) => {
     // Wait for page to load
     await page.waitForTimeout(2000);
 
@@ -273,7 +273,7 @@ test.describe('Messages/Chat Feature', () => {
     }
   });
 
-  test.skip('can archive or delete conversation', async ({ page }) => {
+  test('can archive or delete conversation', async ({ page }) => {
     test.setTimeout(45000);
 
     // Wait for page to load

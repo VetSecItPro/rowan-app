@@ -33,7 +33,7 @@ test.describe('Tasks Feature', () => {
     console.log('✓ Tasks page loaded successfully');
   });
 
-  test.skip('can create a new task', async ({ page }) => {
+  test('can create a new task', async ({ page }) => {
     test.setTimeout(45000);
 
     // Click add task button
