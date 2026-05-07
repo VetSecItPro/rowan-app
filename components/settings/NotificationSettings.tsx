@@ -9,7 +9,6 @@ import {
   Clock,
   Moon,
   Sun,
-  Calendar,
   CheckSquare,
   MessageCircle,
   AtSign,
@@ -21,7 +20,6 @@ import {
   Send,
   CheckCircle2,
   AlertTriangle,
-  Eye
 } from 'lucide-react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { notificationPreferencesService } from '@/lib/services/notification-preferences-service';
@@ -55,12 +53,6 @@ interface NotificationPreferences {
   quiet_hours_enabled: boolean;
   quiet_hours_start: string | null;
   quiet_hours_end: string | null;
-  // Daily digest
-  digest_enabled: boolean;
-  digest_time: string | null;
-  digest_timezone: string;
-  // General timezone
-  timezone: string;
 }
 
 const defaultPreferences: Omit<NotificationPreferences, 'id' | 'user_id' | 'space_id'> = {
@@ -83,10 +75,6 @@ const defaultPreferences: Omit<NotificationPreferences, 'id' | 'user_id' | 'spac
   quiet_hours_enabled: false,
   quiet_hours_start: null,
   quiet_hours_end: null,
-  digest_enabled: false,
-  digest_time: '07:00',
-  digest_timezone: 'America/Chicago',
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago'
 };
 
 // Toggle component
@@ -212,51 +200,6 @@ const TimePicker = memo(function TimePicker({
   );
 });
 
-// Timezone selector
-const TimezoneSelector = memo(function TimezoneSelector({
-  value,
-  onChange,
-  disabled = false
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-}) {
-  const timezones = [
-    { value: 'America/New_York', label: 'Eastern (ET)' },
-    { value: 'America/Chicago', label: 'Central (CT)' },
-    { value: 'America/Denver', label: 'Mountain (MT)' },
-    { value: 'America/Los_Angeles', label: 'Pacific (PT)' },
-    { value: 'America/Anchorage', label: 'Alaska (AKT)' },
-    { value: 'Pacific/Honolulu', label: 'Hawaii (HT)' },
-    { value: 'Europe/London', label: 'London (GMT/BST)' },
-    { value: 'Europe/Paris', label: 'Paris (CET)' },
-    { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-    { value: 'Australia/Sydney', label: 'Sydney (AEST)' }
-  ];
-
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className={`
-        px-3 py-1.5 text-sm border border-gray-600 rounded-lg
-        bg-gray-700 text-white
-        focus:ring-2 focus:ring-purple-500 focus:border-transparent
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-      `}
-    >
-      {timezones.map((tz) => (
-        <option key={tz.value} value={tz.value}>
-          {tz.label}
-        </option>
-      ))}
-    </select>
-  );
-});
-
-
 /** Renders notification preference controls for all notification categories. */
 export const NotificationSettings = memo(function NotificationSettings() {
   const { user, currentSpace } = useAuthWithSpaces();
@@ -275,12 +218,6 @@ export const NotificationSettings = memo(function NotificationSettings() {
   const [pushTestLoading, setPushTestLoading] = useState(false);
   const [pushError, setPushError] = useState<string | null>(null);
   const [pushTestSuccess, setPushTestSuccess] = useState(false);
-
-  // Daily digest preview state — renders the actual email template inline
-  // so the user can see exactly what they'd get at their delivery time.
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
-  const [previewError, setPreviewError] = useState<string | null>(null);
 
   // Load preferences
   useEffect(() => {
@@ -371,29 +308,6 @@ export const NotificationSettings = memo(function NotificationSettings() {
     }
   }, [pushSubscribed]);
 
-  // Load a render-only preview of today's digest from the server. Re-uses
-  // the exact email template the cron uses, so what the user sees here is
-  // what they'd get at 7am.
-  const handlePreviewDigest = useCallback(async () => {
-    setPreviewLoading(true);
-    setPreviewError(null);
-    try {
-      const res = await fetch('/api/notifications/digest-preview');
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setPreviewError(data.error || 'Failed to load preview');
-        setPreviewHtml(null);
-      } else {
-        setPreviewHtml(data.html as string);
-      }
-    } catch (err) {
-      logger.error('Digest preview error:', err, { component: 'NotificationSettings', action: 'component_action' });
-      setPreviewError(err instanceof Error ? err.message : 'Failed to load preview');
-    } finally {
-      setPreviewLoading(false);
-    }
-  }, []);
-
   // Send test push notification
   const handleTestPush = useCallback(async () => {
     setPushTestLoading(true);
@@ -449,9 +363,6 @@ export const NotificationSettings = memo(function NotificationSettings() {
         quiet_hours_enabled: preferences.quiet_hours_enabled,
         quiet_hours_start: preferences.quiet_hours_start,
         quiet_hours_end: preferences.quiet_hours_end,
-        digest_enabled: preferences.digest_enabled,
-        digest_time: preferences.digest_time,
-        digest_timezone: preferences.digest_timezone,
       });
 
       setHasChanges(false);
@@ -690,128 +601,6 @@ export const NotificationSettings = memo(function NotificationSettings() {
               disabled={!preferences.email_enabled}
             />
           </SettingRow>
-        </div>
-      </Section>
-
-      {/* AI-Powered Daily Digest - Featured Section */}
-      <Section
-        title="AI Daily Briefing"
-        description="Your personalized morning assistant"
-        icon={Calendar}
-      >
-        <div className="p-4 bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border border-purple-800 rounded-xl mb-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">✨</span>
-            </div>
-            <div className="text-sm">
-              <p className="font-semibold text-purple-100">JARVIS-Style Morning Briefing</p>
-              <p className="text-purple-300 mt-1">
-                Wake up to a personalized email that reads like your own AI assistant. Get a conversational
-                summary of your day followed by a quick-reference schedule - events, tasks, meals, and reminders
-                all in one beautiful email.
-              </p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-800 text-purple-300">
-                  AI-Powered
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-800 text-indigo-300">
-                  Personalized
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-800 text-blue-300">
-                  Once Daily
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <SettingRow
-          label="Enable Daily Briefing"
-          description="Receive your AI-powered morning summary"
-        >
-          <Toggle
-            enabled={preferences.digest_enabled}
-            onChange={(v) => updatePreference('digest_enabled', v)}
-          />
-        </SettingRow>
-
-        <div className={`space-y-4 pt-3 ${!preferences.digest_enabled ? 'opacity-50 pointer-events-none' : ''}`}>
-          <SettingRow
-            label="Delivery Time"
-            description="Choose when to receive your briefing"
-            icon={Clock}
-          >
-            <TimePicker
-              value={preferences.digest_time || '07:00'}
-              onChange={(v) => updatePreference('digest_time', v)}
-              disabled={!preferences.digest_enabled}
-            />
-          </SettingRow>
-
-          <SettingRow
-            label="Timezone"
-            description="Your local timezone"
-            icon={Sun}
-          >
-            <TimezoneSelector
-              value={preferences.digest_timezone}
-              onChange={(v) => updatePreference('digest_timezone', v)}
-              disabled={!preferences.digest_enabled}
-            />
-          </SettingRow>
-        </div>
-
-        {/* Preview today's digest — server-renders the actual email template
-            so users can see exactly what shows up at delivery time. */}
-        <div className="pt-4 border-t border-gray-700">
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-white">Preview today&apos;s digest</p>
-              <p className="text-xs text-gray-400">
-                See exactly what you&apos;d get in your inbox right now.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handlePreviewDigest}
-              disabled={previewLoading}
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-purple-900/30 text-purple-300 hover:bg-purple-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {previewLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Rendering...
-                </>
-              ) : (
-                <>
-                  <Eye className="w-4 h-4" />
-                  Preview today&apos;s digest
-                </>
-              )}
-            </button>
-          </div>
-
-          {previewError && (
-            <div className="mt-3 p-3 bg-red-900/20 border border-red-800 rounded-lg text-sm text-red-300 flex items-center gap-2">
-              <AlertCircle aria-hidden="true" className="w-4 h-4 flex-shrink-0" />
-              {previewError}
-            </div>
-          )}
-
-          {previewHtml && (
-            <div className="mt-4 rounded-lg overflow-hidden border border-gray-700 bg-white">
-              {/* Email HTML is rendered in a sandboxed iframe to isolate its
-                  styles from the app shell and to prevent script execution. */}
-              <iframe
-                title="Daily digest preview"
-                srcDoc={previewHtml}
-                sandbox=""
-                className="w-full"
-                style={{ height: '720px', border: 0 }}
-              />
-            </div>
-          )}
         </div>
       </Section>
 
