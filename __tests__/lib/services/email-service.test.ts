@@ -55,10 +55,6 @@ vi.mock('@/lib/emails/templates/GeneralReminderEmail', () => ({
   default: vi.fn((data) => data),
 }));
 
-vi.mock('@/lib/emails/templates/DailyDigestEmail', () => ({
-  default: vi.fn((data) => data),
-}));
-
 vi.mock('@/lib/emails/templates/password-reset-email', () => ({
   PasswordResetEmail: vi.fn((data) => data),
 }));

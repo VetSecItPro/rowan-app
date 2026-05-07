@@ -1132,13 +1132,8 @@ export default function HouseholdDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Notification Preferences</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Each household member can customize their notification preferences. Some may want real-time alerts for everything, while others prefer daily summaries. Find the balance that keeps everyone informed without overwhelming them.
+                  Each household member can customize their notification preferences. Use quiet hours and per-channel toggles (email, in-app, push) to keep everyone informed without overwhelming them.
                 </p>
-                <div className="p-4 bg-pink-900/30 border border-pink-800 rounded-lg mt-6">
-                  <p className="text-pink-200 text-sm">
-                    <strong>Daily Digest:</strong> If real-time notifications feel like too much, try the daily digest option that summarizes the day&apos;s household activity in one message.
-                  </p>
-                </div>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-amber-400 hover:underline text-sm font-medium">
                 ← Back to top

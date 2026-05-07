@@ -25,7 +25,6 @@ import ShoppingListEmail from '@/lib/emails/templates/ShoppingListEmail';
 import MealReminderEmail from '@/lib/emails/templates/MealReminderEmail';
 import GeneralReminderEmail from '@/lib/emails/templates/GeneralReminderEmail';
 import SpaceInvitationEmail from '@/lib/emails/templates/SpaceInvitationEmail';
-import DailyDigestEmail from '@/lib/emails/templates/DailyDigestEmail';
 import { PasswordResetEmail } from '@/lib/emails/templates/password-reset-email';
 import { MagicLinkEmail } from '@/lib/emails/templates/magic-link-email';
 import { EmailVerificationEmail } from '@/lib/emails/templates/email-verification-email';
@@ -35,7 +34,7 @@ import { EmailChangeEmail } from '@/lib/emails/templates/email-change-email';
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Email service configuration
-// notifications@rowanapp.com  — general in-app notifications (tasks, events, messages, shopping, meals, daily digest)
+// notifications@rowanapp.com  — general in-app notifications (tasks, events, messages, shopping, meals)
 // reminders@rowanapp.com      — reminder-type notifications (general reminders, event reminders, meal reminders)
 // noreply@rowanapp.com        — transactional auth emails (password reset, magic link, verification, email change, invitations, subscription)
 const FROM_NOTIFICATIONS = 'Rowan <notifications@rowanapp.com>';
@@ -236,86 +235,6 @@ export interface EmailChangeData {
   userName: string;
 }
 
-export interface DailyDigestData {
-  recipientEmail: string;
-  recipientName: string;
-  date: string;
-  spaceName: string;
-  spaceId: string;
-  events: Array<{
-    id: string;
-    title: string;
-    start_time: string;
-    end_time?: string;
-    location?: string;
-    all_day?: boolean;
-  }>;
-  tasksDue: Array<{
-    id: string;
-    title: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    due_date?: string;
-  }>;
-  overdueTasks: Array<{
-    id: string;
-    title: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    due_date?: string;
-  }>;
-  meals: Array<{
-    id: string;
-    meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-    name: string;
-  }>;
-  reminders: Array<{
-    id: string;
-    title: string;
-    reminder_time?: string;
-  }>;
-  greeting: string;
-}
-
-// AI-Enhanced Daily Digest Data
-export interface AIDailyDigestData {
-  recipientEmail: string;
-  recipientName: string;
-  date: string;
-  spaceName: string;
-  spaceId: string;
-  events: Array<{
-    id: string;
-    title: string;
-    start_time: string;
-    end_time?: string;
-    location?: string;
-    all_day?: boolean;
-  }>;
-  tasksDue: Array<{
-    id: string;
-    title: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    due_date?: string;
-  }>;
-  overdueTasks: Array<{
-    id: string;
-    title: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    due_date?: string;
-  }>;
-  meals: Array<{
-    id: string;
-    meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-    name: string;
-  }>;
-  reminders: Array<{
-    id: string;
-    title: string;
-    reminder_time?: string;
-  }>;
-  narrativeIntro: string;
-  closingMessage: string;
-  aiGenerated: boolean;
-}
 
 
 /**
@@ -827,147 +746,6 @@ export async function sendEmailChangeEmail(data: EmailChangeData): Promise<Email
 }
 
 /**
- * Sends a daily digest email summarizing the user's upcoming day.
- *
- * Includes events, tasks due, overdue tasks, meals, and reminders.
- *
- * @param data - Digest content including all daily activities grouped by type
- * @returns Result object indicating success or failure with optional message ID
- */
-export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
-  try {
-    if (!resend) {
-      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
-      return { success: false, error: 'Email service not configured' };
-    }
-
-    const emailHtml = await render(DailyDigestEmail({
-      recipientName: data.recipientName,
-      date: data.date,
-      spaceName: data.spaceName,
-      spaceId: data.spaceId,
-      events: data.events,
-      tasksDue: data.tasksDue,
-      overdueTasks: data.overdueTasks,
-      meals: data.meals,
-      reminders: data.reminders,
-      greeting: data.greeting,
-    }));
-
-    const { data: result, error } = await resend.emails.send({
-      from: FROM_NOTIFICATIONS,
-      to: [data.recipientEmail],
-      subject: `Your Daily Digest for ${data.date}`,
-      html: emailHtml,
-      replyTo: REPLY_TO_EMAIL,
-      tags: [
-        { name: 'category', value: 'daily-digest' },
-        { name: 'space_id', value: data.spaceId }
-      ]
-    });
-
-    if (error) {
-      logger.error('Failed to send daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, messageId: result?.id };
-  } catch (error) {
-    logger.error('Error sending daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
-}
-
-/**
- * Renders the AI Daily Digest email template to HTML without sending.
- *
- * Used by the in-app preview UI so users can see what their morning briefing
- * will look like before opting in. Shares the exact same template that the
- * cron-driven send path uses, so preview === actual email.
- *
- * @param data - Same digest payload accepted by sendAIDailyDigestEmail
- * @returns Rendered HTML string
- */
-export async function renderAIDailyDigestHTML(data: AIDailyDigestData): Promise<string> {
-  const AIDailyDigestEmail = (await import('@/lib/emails/templates/AIDailyDigestEmail')).default;
-
-  return render(AIDailyDigestEmail({
-    recipientName: data.recipientName,
-    date: data.date,
-    spaceName: data.spaceName,
-    spaceId: data.spaceId,
-    events: data.events,
-    tasksDue: data.tasksDue,
-    overdueTasks: data.overdueTasks,
-    meals: data.meals,
-    reminders: data.reminders,
-    narrativeIntro: data.narrativeIntro,
-    closingMessage: data.closingMessage,
-    aiGenerated: data.aiGenerated,
-  }));
-}
-
-/**
- * Sends an AI-enhanced daily digest email with personalized narrative content.
- *
- * Similar to the standard daily digest but includes AI-generated introduction
- * and closing messages for a more engaging user experience.
- *
- * @param data - Digest content with AI-generated narrative intro and closing
- * @returns Result object indicating success or failure with optional message ID
- */
-export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<EmailResult> {
-  try {
-    if (!resend) {
-      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
-      return { success: false, error: 'Email service not configured' };
-    }
-
-    // Import and use the AI Daily Digest template
-    const AIDailyDigestEmail = (await import('@/lib/emails/templates/AIDailyDigestEmail')).default;
-
-    const emailHtml = await render(AIDailyDigestEmail({
-      recipientName: data.recipientName,
-      date: data.date,
-      spaceName: data.spaceName,
-      spaceId: data.spaceId,
-      events: data.events,
-      tasksDue: data.tasksDue,
-      overdueTasks: data.overdueTasks,
-      meals: data.meals,
-      reminders: data.reminders,
-      narrativeIntro: data.narrativeIntro,
-      closingMessage: data.closingMessage,
-      aiGenerated: data.aiGenerated,
-    }));
-
-    const { data: result, error } = await resend.emails.send({
-      from: FROM_NOTIFICATIONS,
-      to: [data.recipientEmail],
-      subject: `Your Daily Briefing for ${data.date}`,
-      html: emailHtml,
-      replyTo: REPLY_TO_EMAIL,
-      tags: [
-        { name: 'category', value: 'ai-daily-digest' },
-        { name: 'space_id', value: data.spaceId },
-        { name: 'ai_generated', value: data.aiGenerated ? 'true' : 'false' }
-      ]
-    });
-
-    if (error) {
-      logger.error('Failed to send AI daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, messageId: result?.id };
-  } catch (error) {
-    logger.error('Error sending AI daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
-}
-
-
-/**
  * Sends a single email based on the specified type.
  *
  * Internal helper function used by batch sending. Routes to the appropriate
@@ -1279,8 +1057,6 @@ export const emailService = {
   sendMealReminderEmail,
   sendGeneralReminderEmail,
   sendSpaceInvitationEmail,
-  sendDailyDigestEmail,
-  sendAIDailyDigestEmail,
   sendPasswordResetEmail,
   sendMagicLinkEmail,
   sendEmailVerificationEmail,
