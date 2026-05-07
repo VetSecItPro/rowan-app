@@ -35,7 +35,7 @@ test.describe('Monetization Features', () => {
      * This is more reliable than UI-based creation which takes 180s+ and
      * has silent error handling in the usage check catch block.
      */
-    test.skip('free user hits daily task creation limit', async ({ page }) => {
+    test('free user hits daily task creation limit', async ({ page }) => {
       test.setTimeout(180000);
 
       // Ensure free user session is valid (re-authenticates if expired)
@@ -116,7 +116,7 @@ test.describe('Monetization Features', () => {
     /**
      * Test 2: Free user tries to access Pro features → blocked
      */
-    test.skip('free user cannot access Pro features', async ({ page }) => {
+    test('free user cannot access Pro features', async ({ page }) => {
       // Visits multiple pages sequentially — needs extra time
       test.setTimeout(120000);
 
@@ -273,7 +273,7 @@ test.describe('Monetization Features', () => {
     /**
      * Test 6: Pro user cancels subscription
      */
-    test.skip('subscription settings page loads correctly', async ({ page }) => {
+    test('subscription settings page loads correctly', async ({ page }) => {
       test.setTimeout(90000);
 
       // Ensure pro user session is valid (re-authenticates if expired)
@@ -296,7 +296,7 @@ test.describe('Monetization Features', () => {
     });
 
     // TODO: Implement cancel subscription functionality in SubscriptionSettings component
-    test.skip('cancel subscription flow shows confirmation', async ({ page }) => {
+    test('cancel subscription flow shows confirmation', async ({ page }) => {
 
       await page.goto('/settings?tab=subscription');
 
@@ -320,25 +320,26 @@ test.describe('Monetization Features', () => {
      * Test 7: Webhook updates subscription correctly
      * Note: This test requires Polar webhook secret for local testing
      */
-    test.skip('webhook endpoint responds correctly', async ({ request }) => {
+    test('webhook endpoint responds correctly', async ({ request }) => {
       test.setTimeout(90000);
 
-      // Test webhook endpoint exists and responds
-      // Use header names that the route actually checks: x-polar-signature, polar-signature, x-webhook-signature
+      // The webhook handler uses standardwebhooks-format signing via
+      // @polar-sh/sdk validateEvent (PR #371). Test that a payload with
+      // an obviously-invalid signature (wrong header values) is rejected.
       const response = await request.post('/api/webhooks/polar', {
         headers: {
           'Content-Type': 'application/json',
-          'x-polar-signature': 'test_invalid_signature',
+          'webhook-id': 'msg_test_invalid',
+          'webhook-timestamp': Math.floor(Date.now() / 1000).toString(),
+          'webhook-signature': 'v1,invalid-signature-base64',
         },
-        data: {
-          type: 'test',
-          data: { object: {} },
-        },
+        data: { type: 'subscription.created', data: { id: 'test' } },
         timeout: 30000,
       });
 
-      // Should reject invalid signature or webhook secret not configured
-      expect([400, 401, 500]).toContain(response.status());
+      // Bad sig → 400 (validateEvent throws WebhookVerificationError)
+      // No secret configured → 500 (defensive fallback)
+      expect([400, 500]).toContain(response.status());
     });
   });
 
@@ -372,7 +373,7 @@ test.describe('Security Checks', () => {
   // Explicitly clear storage state so request fixture has no auth cookies
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test.skip('API routes require authentication', async ({ request }) => {
+  test('API routes require authentication', async ({ request }) => {
     test.setTimeout(90000);
 
     // Test subscription status without auth - should reject or return free tier
@@ -408,8 +409,8 @@ test.describe('Security Checks', () => {
     expect([400, 401, 403, 422]).toContain(invalidIntervalResponse.status());
   });
 
-  test.skip('webhook endpoint validates signature', async ({ request }) => {
-    // Test without signature header
+  test('webhook endpoint validates signature', async ({ request }) => {
+    // Test without signature headers (no webhook-* keys at all)
     const noSigResponse = await request.post('/api/webhooks/polar', {
       headers: { 'Content-Type': 'application/json' },
       data: {
@@ -418,14 +419,18 @@ test.describe('Security Checks', () => {
       },
       timeout: 30000,
     });
-    // Should reject - missing webhook signature headers
-    expect([400, 401, 500]).toContain(noSigResponse.status());
+    // Should reject - validateEvent throws on missing standardwebhooks headers
+    expect([400, 500]).toContain(noSigResponse.status());
 
-    // Test with invalid signature — use header names the route actually checks
+    // Test with bogus signature in standardwebhooks header format. The
+    // updated route uses @polar-sh/sdk validateEvent, which reads
+    // webhook-id, webhook-timestamp, and webhook-signature.
     const invalidSigResponse = await request.post('/api/webhooks/polar', {
       headers: {
         'Content-Type': 'application/json',
-        'x-polar-signature': 'invalid_signature_here',
+        'webhook-id': 'msg_test_invalid',
+        'webhook-timestamp': Math.floor(Date.now() / 1000).toString(),
+        'webhook-signature': 'v1,deadbeefdeadbeefdeadbeefdeadbeef',
       },
       data: {
         type: 'subscription.created',
@@ -433,7 +438,7 @@ test.describe('Security Checks', () => {
       },
       timeout: 30000,
     });
-    // Should reject invalid signature
-    expect([400, 401, 500]).toContain(invalidSigResponse.status());
+    // Should reject invalid signature (WebhookVerificationError → 400)
+    expect([400, 500]).toContain(invalidSigResponse.status());
   });
 });
