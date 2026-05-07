@@ -85,7 +85,7 @@ test.describe('Auth Flow Tests', () => {
   // violation since the signup form has 2 textbox-roled inputs without a
   // disambiguating data-testid. Needs `data-testid="signup-name-input"` on
   // the component before this can run.
-  test.skip('Signup flow with test data', async ({ page }) => {
+  test('Signup flow with test data', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
 
@@ -103,15 +103,15 @@ test.describe('Auth Flow Tests', () => {
       type: 'password',
     });
 
-    // Check for name field
-    const hasNameField = await elementExists(page, 'signup-name-input', {
-      role: 'textbox',
-    });
+    // Check for name field — STRICT testid only (no role fallback).
+    // elementExists with role:'textbox' returns true even when the name
+    // testid is absent, because the email + password fields are also
+    // textboxes. The subsequent resilientFill then strict-mode-violates
+    // on getByRole('textbox'). Strict testid count avoids that path.
+    const hasNameField = (await page.getByTestId('signup-name-input').count()) > 0;
 
     if (hasNameField) {
-      await resilientFill(page, 'signup-name-input', 'Playwright Tester', {
-        role: 'textbox',
-      });
+      await page.getByTestId('signup-name-input').fill('Playwright Tester');
     }
 
     // Required: age + TOS confirmation gate the submit button

@@ -98,7 +98,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test.skip('can manage notification preferences', async ({ page }) => {
+  test('can manage notification preferences', async ({ page }) => {
     test.setTimeout(45000);
 
     // Navigate to notifications tab
@@ -239,7 +239,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test.skip('can change password', async ({ page }) => {
+  test('can change password', async ({ page }) => {
     test.setTimeout(45000);
 
     // Navigate to account/security tab
@@ -275,7 +275,7 @@ test.describe('Settings Feature', () => {
     }
   });
 
-  test.skip('can export user data', async ({ page }) => {
+  test('can export user data', async ({ page }) => {
     test.setTimeout(45000);
 
     // Look for data export section (may be in account or privacy tab)
