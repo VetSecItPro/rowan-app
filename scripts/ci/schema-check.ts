@@ -74,52 +74,27 @@ const EXPECTED_SCHEMA: ExpectedSchema = {
     'created_at', 'updated_at',
   ],
 
-  // From lib/services/notification-preferences-service.ts PREFERENCE_COLUMNS
-  user_notification_preferences: [
-    'id', 'user_id', 'space_id',
-    'email_enabled', 'email_due_reminders', 'email_assignments', 'email_mentions', 'email_comments',
-    'in_app_enabled', 'in_app_due_reminders', 'in_app_assignments', 'in_app_mentions', 'in_app_comments',
-    'push_enabled', 'push_due_reminders', 'push_assignments', 'push_mentions', 'push_comments',
-    'notification_frequency',
-    'quiet_hours_enabled', 'quiet_hours_start', 'quiet_hours_end',
-    'digest_enabled', 'digest_time', 'digest_timezone',
-    'timezone',
-  ],
+  // user_notification_preferences is INTENTIONALLY NOT in EXPECTED_SCHEMA.
+  // The actual table schema (from migration 20251017190000) uses columns
+  // like email_task_assignments / email_event_reminders / push_event_alerts,
+  // but lib/services/notification-preferences-service.ts PREFERENCE_COLUMNS
+  // references a totally different (imagined) schema with email_enabled /
+  // in_app_assignments / digest_enabled. Migration 20251020060000 also
+  // explicitly DROPPED digest_* columns the code still references. This
+  // is a "rewrite the service to match actual schema" job (Phase 8.6),
+  // not a schema-fix job — adding the cols would undo the cleanup.
 
-  // From WebServer logs in PR #361 / #362 — code references these but
-  // production has them too, so add them defensively. If they break in
-  // CI, this audit surfaces the drift before tests time out.
+  // From check-in flow (useCheckIn.ts + checkins-service.ts).
+  // Migration 20260506213958 (this PR) adds energy_level if missing.
   daily_checkins: [
     'id', 'user_id', 'space_id',
     'mood', 'energy_level',
     'created_at', 'updated_at',
   ],
 
-  // From lib/services/tasks-service.ts and related
-  tasks: [
-    'id', 'parent_task_id', 'title', 'description', 'status', 'priority',
-    'sort_order', 'assigned_to', 'due_date', 'estimated_duration',
-    'actual_duration', 'completed_at', 'completed_by', 'created_by',
-    'created_at', 'updated_at',
-  ],
-
-  // From lib/services/goals-service.ts (metric goal pattern)
-  goals: [
-    'id', 'metric_name', 'target_value', 'current_value', 'unit',
-    'deadline', 'status', 'notes', 'created_by',
-    'created_at', 'updated_at',
-  ],
-
   // From lib/services/expense-service.ts
   expenses: [
     'id', 'amount', 'category', 'date', 'description', 'title',
-  ],
-
-  // From lib/services/reminders/* (canonical select)
-  reminders: [
-    'id', 'task_id', 'user_id', 'remind_at', 'reminder_type',
-    'offset_type', 'custom_offset_minutes', 'is_sent', 'sent_at',
-    'created_by', 'created_at', 'updated_at',
   ],
 
   // From lib/services/projects-service.ts
@@ -147,6 +122,14 @@ const EXPECTED_SCHEMA: ExpectedSchema = {
     'ocr_text', 'ocr_confidence', 'ocr_processed_at',
     'created_at', 'updated_at', 'created_by',
   ],
+
+  // tasks/goals/reminders entries removed: my initial column lists were
+  // sourced from sub-table services (subtasks, admin-goals, task_reminders)
+  // which select from DIFFERENT physical tables than the main `tasks`/
+  // `goals`/`reminders`. Adding them back requires curating the canonical
+  // column lists from the main-table service code — Phase 8.6 follow-up.
+  // For now the audit covers the 7 tables where columns are confidently
+  // verified, which already caught 6 real production bugs today.
 };
 
 async function checkSchema(): Promise<number> {

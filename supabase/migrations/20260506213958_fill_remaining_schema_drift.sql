@@ -1,44 +1,25 @@
 -- ============================================================================
--- Migration: Fill remaining schema drift surfaced by Task 8.5 audit
+-- Migration: Add daily_checkins.energy_level (Task 8.5 audit drift fix)
 -- Date: 2026-05-06
 --
 -- WHY:
--- The new schema-drift audit script (scripts/ci/schema-check.ts) ran on
--- a fresh CI Supabase boot and found two more columns that production
--- has via squashed history but migrations don't recreate:
+-- The schema-drift audit (scripts/ci/schema-check.ts) found that the
+-- daily_checkins table is missing the energy_level column that
+-- lib/hooks/useCheckIn.ts and checkins-service.ts reference. The
+-- check-in flow stores mood + energy as a paired 1-5 scale.
 --
---   1. user_notification_preferences.digest_enabled (and friends)
---      Referenced in lib/services/reminder-notifications-service.ts and
---      PREFERENCE_COLUMNS const in notification-preferences-service.ts.
---      Used by the daily/weekly digest email feature.
+-- IDEMPOTENT — safe on prod (no-op) and local CI (where it's missing).
 --
---   2. daily_checkins.energy_level
---      Referenced in lib/hooks/useCheckIn.ts + checkins-service.ts.
---      The check-in flow stores mood + energy as a 1-5 scale.
---
--- Same fix pattern as the prior 3 schema-drift migrations
--- (subscriptions trial cols, events countdown cols, sync_priority typo).
--- IDEMPOTENT — safe on prod (no-op) and local CI (where they're missing).
+-- NOTE: an earlier draft of this migration also re-added digest_*
+-- columns to user_notification_preferences. That was wrong-direction —
+-- migration 20251020060000_remove_digest_functionality.sql intentionally
+-- DROPPED those columns. The application code in
+-- notification-preferences-service.ts (PREFERENCE_COLUMNS const) is
+-- stale and references columns that don't exist on the actual table.
+-- That's a code-cleanup job (Phase 8.6 in backlog), not a schema fix.
 -- ============================================================================
 
--- ─── user_notification_preferences ─────────────────────────────────
--- Daily/weekly digest email preferences. Sourced from PREFERENCE_COLUMNS
--- in lib/services/notification-preferences-service.ts.
-ALTER TABLE public.user_notification_preferences
-  ADD COLUMN IF NOT EXISTS digest_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-  ADD COLUMN IF NOT EXISTS digest_time TIME,
-  ADD COLUMN IF NOT EXISTS digest_timezone TEXT;
-
-COMMENT ON COLUMN public.user_notification_preferences.digest_enabled IS
-  'When TRUE, user receives a daily/weekly summary email instead of (or in addition to) per-event notifications.';
-
-COMMENT ON COLUMN public.user_notification_preferences.digest_time IS
-  'Local time-of-day for the digest email (HH:MM:SS). NULL means use service default (typically 8am).';
-
-COMMENT ON COLUMN public.user_notification_preferences.digest_timezone IS
-  'IANA timezone for digest_time interpretation. NULL means fall back to user.timezone.';
-
--- ─── daily_checkins ─────────────────────────────────────────────────
+-- ─── daily_checkins.energy_level ─────────────────────────────────────
 -- Energy is a self-reported 1-5 scale paired with mood. NULL = not
 -- recorded for this check-in (some users only answer mood).
 ALTER TABLE public.daily_checkins
@@ -56,6 +37,6 @@ COMMENT ON COLUMN public.daily_checkins.energy_level IS
 
 DO $$
 BEGIN
-  RAISE NOTICE '✅ user_notification_preferences digest_* + daily_checkins.energy_level columns ensured';
+  RAISE NOTICE '✅ daily_checkins.energy_level column ensured';
 END
 $$;
