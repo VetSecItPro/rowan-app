@@ -452,14 +452,12 @@ test.describe('Concurrent Authentication Load Test', () => {
     }
   });
 
-  // KEPT SKIPPED 2026-05-07 — redundant once the 5-user test passes.
-  // The subscription-context fix is verified by the 5-user case (real
-  // concurrent fetch dedup, hard ceiling, 4xx short-circuit). The 10-user
-  // test exercises the same code paths with 2x load and a tighter 1.5s
-  // stagger — useful pre-launch under explicit perf-regression hunts, but
-  // doubles CI minutes per run for marginal day-to-day signal. Re-enable
-  // before major launches or after significant Provider/auth changes.
-  test.skip('10 users log in concurrently (stress test)', async ({ browser, baseURL }) => {
+  // 10-user stress test verifies the concurrency fix from PR #381
+  // (welcome_completed_at stamping during admin user creation) and
+  // PR #379 (SubscriptionProvider dedup + hard ceiling + 4xx no-retry)
+  // hold under 2x the 5-user load with a tighter 1.5s stagger.
+  // Re-enabled 2026-05-07 after the 5-user test went green.
+  test('10 users log in concurrently (stress test)', async ({ browser, baseURL }) => {
     test.setTimeout(600000);
     if (!baseURL) {
       throw new Error('baseURL is required for this test');
