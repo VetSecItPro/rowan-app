@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger';
 const NotificationLogSchema = z.object({
   userId: z.string().uuid(),
   type: z.enum(['email', 'push']),
-  category: z.enum(['reminder', 'task', 'shopping', 'meal', 'event', 'message', 'digest']),
+  category: z.enum(['reminder', 'task', 'shopping', 'meal', 'event', 'message']),
   subject: z.string().min(1).max(200),
   status: z.enum(['sent', 'failed', 'bounced']),
   errorMessage: z.string().max(1000).optional(),

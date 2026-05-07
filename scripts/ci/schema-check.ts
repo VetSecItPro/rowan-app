@@ -77,11 +77,9 @@ const EXPECTED_SCHEMA: ExpectedSchema = {
   // From lib/services/notification-preferences-service.ts PREFERENCE_COLUMNS.
   // Note: TWO competing CREATE TABLE IF NOT EXISTS migrations exist for this
   // table (20251014000020 + 20251017190000) with different column sets. The
-  // first wins on replay. The service was reconciled to the first migration's
-  // shape on 2026-05-06 (Task #6). The dropped digest_*/timezone columns
-  // were also removed from the service then. The daily-digest cron pipeline
-  // (lib/jobs/daily-digest-job.ts) still references the dropped columns —
-  // separate cleanup decision pending.
+  // first wins on replay. The service + UI + cron pipeline that referenced
+  // the dropped digest_*/timezone columns were all retired in the digest
+  // feature retirement (2026-05-07).
   user_notification_preferences: [
     'id', 'user_id', 'space_id',
     'email_enabled', 'email_due_reminders', 'email_assignments', 'email_mentions', 'email_comments',

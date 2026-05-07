@@ -7,10 +7,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed
+- **Daily Digest / "JARVIS Morning Briefing" feature** — fully retired. Deleted: hourly cron entry in `vercel.json`, `app/api/cron/daily-digest/`, `app/api/notifications/digest-preview/`, `lib/jobs/daily-digest-job.ts`, `lib/emails/templates/DailyDigestEmail.tsx`, `lib/emails/templates/AIDailyDigestEmail.tsx`, `sendDailyDigestEmail` / `sendAIDailyDigestEmail` / `renderAIDailyDigestHTML` from `email-service.ts`, the AI Daily Briefing UI section in `NotificationSettings.tsx`, the `digest` notification log category, and the household docs reference. Migration `20260507044831` drops the now-unused `digest_enabled`/`digest_time`/`digest_timezone`/`digest_frequency`/`timezone` columns from `user_notification_preferences`. The DB-level cleanup migration `20251020060000` from October 2025 had silently failed to apply against prod; the new migration idempotently completes it.
+- `notification-preferences-service.ts` no longer references the dropped digest fields (#366 + this PR).
+
 ### Changed
 - Dashboard restructure — new StatCard, CheckInSection, RewardsSection components
 - Custom hooks: `useActiveSessions`, `useCheckIn`, `useSpaceMembers`
 - Settings tabs decomposed: AnalyticsTab, DocumentationTab, ProfileTab, SecurityTab
+
+### Added
+- `scripts/ci/schema-check.ts` — CI gate that probes 8 high-traffic tables for column drift between application code and migrations. Catches "I edited the dashboard but forgot the migration" in 5 seconds instead of months.
 
 ---
 
