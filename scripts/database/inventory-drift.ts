@@ -47,7 +47,7 @@ function grepCount(pattern: string): number {
   }
 }
 
-interface FunctionRow { name: string; signature: string; refs: number; }
+interface FunctionRow { name: string; signature: string; refs: number; policy_refs: number; trigger_refs: number; }
 interface TableRow { name: string; row_count: number; refs: number; }
 interface TriggerRow { schema: string; table: string; trigger: string; func: string; refs: number; }
 
@@ -70,10 +70,40 @@ async function main() {
     ORDER BY p.proname;
   `);
 
+  // Pre-fetch trigger usage and policy usage so we can classify orphans
+  // properly. Three reference paths must be checked: (1) app code grep,
+  // (2) pg_trigger.tgfoid, (3) pg_policy.qual/with_check. Missing any of
+  // these caused the Phase 9.2 first-deploy failure.
+  const trgUsage = await client.query(`
+    SELECT p.proname AS fn, COUNT(*)::int AS n
+    FROM pg_trigger t
+    JOIN pg_proc p ON t.tgfoid = p.oid
+    WHERE NOT t.tgisinternal
+    GROUP BY p.proname;
+  `);
+  const triggerRefMap = new Map<string, number>(trgUsage.rows.map(r => [r.fn, r.n]));
+
+  const polUsage = await client.query(`
+    SELECT proname AS fn, COUNT(*)::int AS n
+    FROM (
+      SELECT p.proname,
+             pp.policyname,
+             pp.tablename
+      FROM pg_proc p
+      CROSS JOIN pg_policies pp
+      WHERE pp.qual::text LIKE '%' || p.proname || '%'
+         OR pp.with_check::text LIKE '%' || p.proname || '%'
+    ) sub
+    GROUP BY proname;
+  `);
+  const policyRefMap = new Map<string, number>(polUsage.rows.map(r => [r.fn, r.n]));
+
   const functions: FunctionRow[] = fnRes.rows.map(r => ({
     name: r.name,
     signature: `${r.name}(${r.args})`,
     refs: grepCount(`\\b${r.name}\\b`),
+    trigger_refs: triggerRefMap.get(r.name) ?? 0,
+    policy_refs: policyRefMap.get(r.name) ?? 0,
   }));
 
   console.log(`  Functions in public schema: ${functions.length}`);
@@ -126,9 +156,12 @@ async function main() {
 
   console.log(`  Custom triggers (public + auth.users): ${triggers.length}\n`);
 
-  // Categorize
-  const fnOrphans = functions.filter(f => f.refs === 0);
-  const fnReferenced = functions.filter(f => f.refs > 0);
+  // Categorize. A TRUE orphan must have zero refs across ALL three paths:
+  // app code, triggers, and RLS policies. Missing any one of these is how
+  // we mis-classified get_user_space_ids in the first 9.2 attempt — that
+  // function had zero app+trigger refs but 10 policy refs.
+  const fnOrphans = functions.filter(f => f.refs === 0 && f.trigger_refs === 0 && f.policy_refs === 0);
+  const fnReferenced = functions.filter(f => f.refs > 0 || f.trigger_refs > 0 || f.policy_refs > 0);
   const tblOrphans = tables.filter(t => t.refs === 0);
   const tblZeroRow = tables.filter(t => t.row_count === 0);
 
@@ -145,17 +178,17 @@ async function main() {
     `- Tables: ${tables.length} (${tblOrphans.length} no app refs / ${tblZeroRow.length} empty)`,
     `- Custom triggers: ${triggers.length}`,
     '',
-    '## Function orphans (DROP candidates for Phase 9.2)',
+    '## Function orphans (DROP candidates — zero refs across all 3 paths)',
     '',
-    '| Signature | App refs |',
-    '|---|---|',
-    ...fnOrphans.map(f => `| \`${f.signature}\` | ${f.refs} |`),
+    '| Signature | App refs | Trigger refs | Policy refs |',
+    '|---|---|---|---|',
+    ...fnOrphans.map(f => `| \`${f.signature}\` | ${f.refs} | ${f.trigger_refs} | ${f.policy_refs} |`),
     '',
-    '## Function referenced (KEEP)',
+    '## Function referenced (KEEP — used by app, trigger, or RLS policy)',
     '',
-    '| Signature | App refs |',
-    '|---|---|',
-    ...fnReferenced.map(f => `| \`${f.signature}\` | ${f.refs} |`),
+    '| Signature | App refs | Trigger refs | Policy refs |',
+    '|---|---|---|---|',
+    ...fnReferenced.map(f => `| \`${f.signature}\` | ${f.refs} | ${f.trigger_refs} | ${f.policy_refs} |`),
     '',
     '## Tables with no app refs (review candidates)',
     '',
