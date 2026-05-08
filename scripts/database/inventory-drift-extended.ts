@@ -58,11 +58,14 @@ interface MigrationDef {
   bodyLength: number;
 }
 
-// Match CREATE [OR REPLACE] FUNCTION name(args) ... AS $$ body $$ ... LANGUAGE
-// Approximate — handles common cases including multi-line bodies. Captures:
+// Match CREATE [OR REPLACE] FUNCTION name(args) ... AS $tag$ body $tag$
+// Approximate — handles common cases including multi-line bodies AND both
+// PG orderings: AS-before-LANGUAGE (typical hand-written) and LANGUAGE-
+// before-AS (what pg_get_functiondef emits, used by Phase 9.3 path B).
+// Captures:
 //   1. function name (no schema)
-//   2. body (between AS $$ ... $$, OR between AS ' ... ')
-const FN_DECL_RE = /CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+(?:public\.)?([a-z_]+)\s*\([^)]*\)[\s\S]*?(?:RETURNS[\s\S]*?)?AS\s+(\$\$[\s\S]*?\$\$|'(?:[^']|'')*')[\s\S]*?LANGUAGE/gi;
+//   2. body (between any matching $tag$...$tag$, OR a quoted ' ... ')
+const FN_DECL_RE = /CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+(?:public\.)?([a-z_]+)\s*\([^)]*\)[\s\S]*?AS\s+(\$\w*\$[\s\S]*?\$\w*\$|'(?:[^']|'')*')/gi;
 
 function normalize(s: string): string {
   // Strip the wrapping dollar-quote tag — both `$$...$$` and `$function$...$function$`
@@ -133,6 +136,12 @@ async function main() {
   console.log(`   ${migrationDefs.size} unique functions defined (after applying drops)\n`);
 
   // -------- 2. Get prod functions + bodies --------
+  // Filter out functions OWNED by an extension (pg_depend.deptype='e' with
+  // refclassid pointing at pg_extension specifically, NOT just any 'e'
+  // dependency — the looser form excluded user-defined functions that
+  // transitively reference extension types/classes, producing false
+  // LOCAL_ONLY reports for functions like record_task_snooze that have
+  // a pg_depend row through a vault.secrets type reference).
   const client = new Client({ connectionString: DB_URL });
   await client.connect();
   const fnRes = await client.query(`
@@ -142,9 +151,14 @@ async function main() {
       pg_get_function_identity_arguments(p.oid) AS args
     FROM pg_proc p
     JOIN pg_namespace n ON p.pronamespace = n.oid
-    LEFT JOIN pg_depend d ON d.objid = p.oid AND d.deptype = 'e'
     WHERE n.nspname = 'public'
-      AND d.objid IS NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM pg_depend d
+        WHERE d.classid = 'pg_proc'::regclass
+          AND d.objid = p.oid
+          AND d.deptype = 'e'
+          AND d.refclassid = 'pg_extension'::regclass
+      )
     ORDER BY p.proname;
   `);
   await client.end();

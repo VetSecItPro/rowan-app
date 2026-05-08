@@ -51,6 +51,17 @@ const MISMATCH = [
   // Reclassified — actually exist in both prod + migrations:
   'record_task_snooze', 'mark_reminder_sent', 'record_task_handoff',
   'process_chore_rotations', 'mark_queue_item_processing',
+  // Added 2026-05-08 after regex fix in inventory-drift-extended.ts
+  // surfaced these previously-hidden MISMATCHes (the regex
+  // required AS-before-LANGUAGE; pg_get_functiondef emits
+  // LANGUAGE-before-AS, so any function with that ordering in
+  // its source migration was classified as "match" when bodies
+  // actually differed):
+  'sync_task_to_calendar', 'can_access_user_profile',
+  'initialize_subscription', 'check_storage_quota',
+  'handle_token_expiry', 'update_token_expiry',
+  'record_feature_event', 'get_founding_member_spots_remaining',
+  'get_dashboard_summary',
 ];
 
 // LOCAL_ONLY list from Phase 9.1.5 inventory (5 reclassified to MISMATCH above)
