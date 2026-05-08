@@ -2,6 +2,16 @@
 
 This directory holds the canonical record of every schema change applied to the Rowan Supabase project. Migrations are timestamp-ordered SQL files (`<YYYYMMDDHHMMSS>_<description>.sql`) and run forward-only via `supabase db push --linked` from CI.
 
+## History squash (2026-05-07)
+
+The 317 individual migrations from 2025-10-05 through 2026-05-08 were collapsed into a single canonical baseline (`20251005000000_initial_squashed_schema.sql`) that contains the full schema as `pg_dump --schema-only` produces it after applying the entire history. This eliminates the "first CREATE TABLE IF NOT EXISTS wins, later ones silently no-op" footgun pattern that bit us 5+ times in October 2025 and was being tracked by `scripts/ci/migration-drift-audit.mjs`.
+
+The squashed migration includes a security-hardening footer that re-applies the May-3 advisor cleanup pattern (REVOKE EXECUTE FROM anon AND PUBLIC on every public.* SECURITY DEFINER function, plus an explicit REVOKE SELECT on the `quick_action_stats` materialized view from anon). Without this footer, Supabase's auto-grant trigger would re-grant anon access to every function on apply.
+
+**Verified equivalence**: post-squash `pg_dump --schema public` differs from pre-squash by 3 lines, all of which are intentional security improvements (anon access correctly revoked from `calculate_sync_priority` and `increment_daily_usage`, which were created after the May-3 advisor pass and so escaped the original cleanup).
+
+The pre-squash 317 files are preserved in git history. To inspect any of them, use `git log --diff-filter=D --summary -- supabase/migrations/<filename>` then `git show <sha>:<path>`.
+
 ## Policy
 
 **1. Migration files are the source of truth, not the live DB.**
