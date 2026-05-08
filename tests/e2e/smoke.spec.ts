@@ -244,18 +244,24 @@ test.describe('Smoke Flow', () => {
     await titleInput.fill(listTitle);
     await titleInput.press('Enter');
 
-    // Wait for the new list card to render. The mutation's onSuccess
-    // invalidates QUERY_KEYS.shopping.lists, which fires a fresh fetch
-    // and re-renders. The text matcher is sufficient here since each
-    // smoke run uses a unique Date.now()-suffixed title.
-    const newCard = page.locator(`[data-testid^="shopping-list-card-"]`).filter({ hasText: listTitle });
-    await expect(newCard).toBeVisible({ timeout: 20000 });
+    // Wait for the SERVER-CONFIRMED card (testid carrying the real DB UUID,
+    // not the temp- optimistic ID). useShoppingHandlers.handleCreateList
+    // does an optimistic insert with `id: \`temp-${Date.now()}\`` so the
+    // card appears instantly, then `invalidateShopping()` after the server
+    // POST replaces it with the real list. The `:not(...)` selector here
+    // excludes the optimistic row so we extract the real UUID for the
+    // sharing PATCH that follows. Without this filter, the PATCH 404s on
+    // the temp- id (the API has no row by that key).
+    const newCard = page.locator(
+      '[data-testid^="shopping-list-card-"]:not([data-testid^="shopping-list-card-temp-"])'
+    ).filter({ hasText: listTitle });
+    await expect(newCard).toBeVisible({ timeout: 25000 });
 
     // Extract listId from the testid attribute for the sharing PATCH below.
     const cardTestid = await newCard.getAttribute('data-testid');
     const listId = cardTestid?.replace('shopping-list-card-', '') ?? '';
-    if (!listId) {
-      throw new Error(`Could not extract listId from card testid: "${cardTestid}"`);
+    if (!listId || listId.startsWith('temp-')) {
+      throw new Error(`Could not extract real listId from card testid: "${cardTestid}"`);
     }
 
     // Sharing toggle — API path is the right call here (no in-app button
@@ -274,9 +280,12 @@ test.describe('Smoke Flow', () => {
     // a sanity check against accidental delete-on-share regressions.
     await expect(page.getByTestId(`shopping-list-card-${listId}`)).toBeVisible({ timeout: 5000 });
 
-    // Bulk delete + archive (smoke test endpoints)
+    // Bulk delete + archive (smoke test endpoints).
+    // Both GET query params and POST options use ISO-8601 datetime form
+    // (the Zod validator on /api/bulk/delete-expenses requires `T...Z`).
+    // Plain `YYYY-MM-DD` was rejected with 400 invalid_format.
     const bulkDeleteCount = await page.request.get(
-      `/api/bulk/delete-expenses?space_id=${spaceId}&start_date=2000-01-01&end_date=2000-01-02`,
+      `/api/bulk/delete-expenses?space_id=${spaceId}&start_date=2000-01-01T00:00:00.000Z&end_date=2000-01-02T00:00:00.000Z`,
       { timeout: 30000 },
     );
     if (!bulkDeleteCount.ok()) {
@@ -288,8 +297,8 @@ test.describe('Smoke Flow', () => {
       data: {
         space_id: spaceId,
         options: {
-          startDate: '2000-01-01',
-          endDate: '2000-01-02',
+          startDate: '2000-01-01T00:00:00.000Z',
+          endDate: '2000-01-02T00:00:00.000Z',
         },
       },
       headers: await freshHeaders(page),
