@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Calendar, Check, Plus, ListTodo } from 'lucide-react';
 import { simplifyIngredients, SimplifiedIngredient } from '@/lib/utils/ingredient-simplifier';
 import { shoppingService } from '@/lib/services/shopping-service';
-import { tasksService } from '@/lib/services/tasks-service';
+import { createTaskViaApi, UsageLimitError } from '@/lib/api/tasks-client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from 'sonner';
@@ -100,24 +100,34 @@ export function ShoppingListPreviewModal({
         const dueDate = new Date(scheduledDate);
         dueDate.setHours(12, 0, 0, 0); // Set to noon
 
-        await tasksService.createTask({
-          space_id: spaceId,
-          title: `🛒 ${listName.trim()}`,
-          description: `Shopping trip for ${recipeName}.\n\n${selectedCount} items to buy.`,
-          status: 'pending',
-          priority: 'medium',
-          due_date: dueDate.toISOString(),
-          category: 'Shopping',
-          created_by: user.id,
-          assigned_to: null,
-          calendar_sync: false,
-          quick_note: null,
-          tags: null,
-        });
+        try {
+          await createTaskViaApi({
+            space_id: spaceId,
+            title: `🛒 ${listName.trim()}`,
+            description: `Shopping trip for ${recipeName}.\n\n${selectedCount} items to buy.`,
+            status: 'pending',
+            priority: 'medium',
+            due_date: dueDate.toISOString(),
+            category: 'Shopping',
+            created_by: user.id,
+            assigned_to: null,
+            calendar_sync: false,
+            quick_note: null,
+            tags: null,
+          });
 
-        toast.success('Shopping list and task created!', {
-          description: `Added ${selectedCount} items and scheduled for ${new Date(scheduledDate).toLocaleDateString()}`,
-        });
+          toast.success('Shopping list and task created!', {
+            description: `Added ${selectedCount} items and scheduled for ${new Date(scheduledDate).toLocaleDateString()}`,
+          });
+        } catch (error) {
+          if (error instanceof UsageLimitError) {
+            toast.success('Shopping list created (task skipped)', {
+              description: `Daily task limit reached (${error.details.currentUsage}/${error.details.limit}). Upgrade to Pro for unlimited tasks.`,
+            });
+          } else {
+            throw error;
+          }
+        }
       } else {
         toast.success('Shopping list created!', {
           description: `Added ${selectedCount} items to "${listName}"`,

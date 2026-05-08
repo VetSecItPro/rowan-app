@@ -9,6 +9,7 @@ import { pointsService } from '@/lib/services/rewards';
 import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
 import { showSuccess, showError } from '@/lib/utils/toast';
+import { createTaskViaApi, UsageLimitError } from '@/lib/api/tasks-client';
 import type { TasksDataReturn } from '@/lib/hooks/useTasksData';
 import type { TasksModalsReturn } from '@/lib/hooks/useTasksModals';
 
@@ -155,7 +156,7 @@ export function useTasksHandlers(deps: TasksHandlersDeps): TasksHandlersReturn {
           setTasks(prev => [optimisticTask, ...prev]);
 
           try {
-            const createdTask = await tasksService.createTask(itemData as CreateTaskInput);
+            const createdTask = await createTaskViaApi(itemData as CreateTaskInput);
 
             setTasks(prev => prev.map(task =>
               task.id === tempId ? createdTask : task
@@ -164,7 +165,11 @@ export function useTasksHandlers(deps: TasksHandlersDeps): TasksHandlersReturn {
             return { id: createdTask.id };
           } catch (error) {
             setTasks(prev => prev.filter(task => task.id !== tempId));
-            logger.error('Failed to create task', error, { component: 'page', action: 'create_task' });
+            if (error instanceof UsageLimitError) {
+              showError(`Daily task limit reached (${error.details.currentUsage}/${error.details.limit}). Upgrade to Pro for unlimited.`);
+            } else {
+              logger.error('Failed to create task', error, { component: 'page', action: 'create_task' });
+            }
             throw error;
           }
         } else {
