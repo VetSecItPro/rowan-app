@@ -498,30 +498,35 @@ export function useShoppingHandlers(deps: UseShoppingHandlersDeps): UseShoppingH
     }
 
     try {
-      // Create a task linked to the shopping list
-      const { tasksService } = await import('@/lib/services/tasks-service');
+      // Route through /api/tasks so the rate-limit gate is enforced uniformly.
+      const { createTaskViaApi, UsageLimitError } = await import('@/lib/api/tasks-client');
 
-      const task = await tasksService.createTask({
-        space_id: currentSpace.id,
-        title: `Complete shopping: ${list.title}`,
-        description: `Shopping list with ${list.items?.length || 0} items${list.store_name ? ` at ${list.store_name}` : ''}`,
-        priority: 'medium',
-        status: 'pending',
-        assigned_to: null,
-        due_date: null,
-        category: 'shopping',
-        calendar_sync: false,
-        quick_note: null,
-        tags: null,
-        estimated_hours: null,
-        created_by: user?.id || '',
-      });
+      try {
+        const task = await createTaskViaApi({
+          space_id: currentSpace.id,
+          title: `Complete shopping: ${list.title}`,
+          description: `Shopping list with ${list.items?.length || 0} items${list.store_name ? ` at ${list.store_name}` : ''}`,
+          priority: 'medium',
+          status: 'pending',
+          assigned_to: null,
+          due_date: null,
+          category: 'shopping',
+          calendar_sync: false,
+          quick_note: null,
+          tags: null,
+          estimated_hours: null,
+          created_by: user?.id || '',
+        });
 
-      // Link the task to the shopping list
-      await shoppingIntegrationService.linkToTask(list.id, task.id);
-
-      // Show success message
-      showSuccess(`Task created: ${task.title}`);
+        await shoppingIntegrationService.linkToTask(list.id, task.id);
+        showSuccess(`Task created: ${task.title}`);
+      } catch (error) {
+        if (error instanceof UsageLimitError) {
+          showError(`Daily task limit reached (${error.details.currentUsage}/${error.details.limit}). Upgrade to Pro for unlimited.`);
+        } else {
+          throw error;
+        }
+      }
     } catch (error) {
       logger.error('Failed to create task:', error, { component: 'page', action: 'execution' });
       showError('Failed to create task. Please try again.');

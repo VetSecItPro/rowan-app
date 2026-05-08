@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 import { CheckSquare, Search, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X, CalendarCheck, Trash2, Wallet } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { StarterSuggestions, type StarterSuggestion } from '@/components/shared/StarterSuggestions';
-import { tasksService } from '@/lib/services/tasks-service';
+import { createTaskViaApi, UsageLimitError } from '@/lib/api/tasks-client';
+import { showError } from '@/lib/utils/toast';
 import { choresService } from '@/lib/services/chores-service';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
@@ -393,21 +394,29 @@ export default function TasksPage() {
                               });
                               data.refreshChores();
                             } else {
-                              await tasksService.createTask({
-                                space_id: currentSpace.id,
-                                title: starter.title,
-                                created_by: user.id,
-                                status: 'pending',
-                                priority: 'medium',
-                                description: null,
-                                assigned_to: null,
-                                due_date: null,
-                                category: null,
-                                quick_note: null,
-                                tags: null,
-                                calendar_sync: false,
-                              });
-                              data.refreshTasks();
+                              try {
+                                await createTaskViaApi({
+                                  space_id: currentSpace.id,
+                                  title: starter.title,
+                                  created_by: user.id,
+                                  status: 'pending',
+                                  priority: 'medium',
+                                  description: null,
+                                  assigned_to: null,
+                                  due_date: null,
+                                  category: null,
+                                  quick_note: null,
+                                  tags: null,
+                                  calendar_sync: false,
+                                });
+                                data.refreshTasks();
+                              } catch (error) {
+                                if (error instanceof UsageLimitError) {
+                                  showError(`Daily task limit reached (${error.details.currentUsage}/${error.details.limit}). Upgrade to Pro for unlimited.`);
+                                } else {
+                                  throw error;
+                                }
+                              }
                             }
                           }}
                         />
