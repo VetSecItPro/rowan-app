@@ -7,6 +7,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed (drift reconciliation)
+- **14 orphan public-schema functions** (Phase 9.2) — dropped via migration `20260508173921_drop_orphan_functions.sql`. Inventory script (`scripts/database/inventory-drift.ts`) found 14 functions with zero application code references AND zero `pg_trigger.tgfoid` references. Categories: trial helpers superseded by Polar app-side logic (3), admin helpers never wired up (2), space helpers superseded by direct flag reads (3), cron-style cleanup never scheduled (3), stats RPCs never called (3). All DROPs are idempotent (`IF EXISTS`) and reversible — bodies preserved in earlier migration files. Cross-reference findings preserved in `docs/security-audit/phase-9-drift-inventory.md`.
+
+### Fixed
+- **E2E auth-verifier false positive** (#390) — `auth.setup.ts` and `ensureAuthenticated` were verifying auth via `GET /api/csrf/token`, but that route only rate-limits and returns a token; it never invokes `supabase.auth.getUser()`. A 200 there meant "rate-limit OK," not "session valid," so unauthenticated sessions could pass verification and get saved as Playwright storage state. Fix: NEW `/api/auth/session` route that actually calls `getUser()`; harness updated to use it. CSRF token rate limit also bumped from 10/10s (general) to 100/10s (dedicated `checkCsrfTokenRateLimit`) to stop parallel CI workers from colliding on token fetches and being misread as auth failures. Resolves Phase 8.1 in `rowan-backlog.md`.
+- **CI drift audit gate** (#389) — `scripts/ci/migration-drift-audit.mjs` now runs on every PR via the Lint & Type Check job. Catches first-create-wins drift (the Oct-2025 footgun pattern) at PR-time instead of post-deploy.
+
 ### Removed
 - **Daily Digest / "JARVIS Morning Briefing" feature** — fully retired. Deleted: hourly cron entry in `vercel.json`, `app/api/cron/daily-digest/`, `app/api/notifications/digest-preview/`, `lib/jobs/daily-digest-job.ts`, `lib/emails/templates/DailyDigestEmail.tsx`, `lib/emails/templates/AIDailyDigestEmail.tsx`, `sendDailyDigestEmail` / `sendAIDailyDigestEmail` / `renderAIDailyDigestHTML` from `email-service.ts`, the AI Daily Briefing UI section in `NotificationSettings.tsx`, the `digest` notification log category, and the household docs reference. Migration `20260507044831` drops the now-unused `digest_enabled`/`digest_time`/`digest_timezone`/`digest_frequency`/`timezone` columns from `user_notification_preferences`. The DB-level cleanup migration `20251020060000` from October 2025 had silently failed to apply against prod; the new migration idempotently completes it.
 - `notification-preferences-service.ts` no longer references the dropped digest fields (#366 + this PR).
