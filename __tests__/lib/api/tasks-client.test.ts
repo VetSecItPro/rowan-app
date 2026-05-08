@@ -1,6 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createTaskViaApi, UsageLimitError } from '@/lib/api/tasks-client';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { CreateTaskInput } from '@/lib/validations/task-schemas';
+
+vi.mock('@/lib/utils/csrf-fetch', () => ({
+  csrfFetch: vi.fn(),
+}));
+
+import { createTaskViaApi, UsageLimitError } from '@/lib/api/tasks-client';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 const baseInput: CreateTaskInput = {
   space_id: 'space-1',
@@ -18,35 +24,29 @@ const baseInput: CreateTaskInput = {
 };
 
 describe('createTaskViaApi', () => {
-  const fetchMock = vi.fn();
+  const csrfFetchMock = vi.mocked(csrfFetch);
 
   beforeEach(() => {
-    fetchMock.mockReset();
-    vi.stubGlobal('fetch', fetchMock);
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
+    csrfFetchMock.mockReset();
   });
 
   it('returns task on 200', async () => {
     const task = { id: 't-1', title: 'Test task', space_id: 'space-1' };
-    fetchMock.mockResolvedValueOnce({
+    csrfFetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
       json: async () => ({ success: true, data: task }),
-    });
+    } as Response);
 
     const result = await createTaskViaApi(baseInput);
     expect(result).toEqual(task);
-    expect(fetchMock).toHaveBeenCalledWith('/api/tasks', expect.objectContaining({
+    expect(csrfFetchMock).toHaveBeenCalledWith('/api/tasks', expect.objectContaining({
       method: 'POST',
-      credentials: 'include',
     }));
   });
 
   it('throws UsageLimitError on 429 with details', async () => {
-    fetchMock.mockResolvedValueOnce({
+    csrfFetchMock.mockResolvedValueOnce({
       ok: false,
       status: 429,
       json: async () => ({
@@ -56,20 +56,7 @@ describe('createTaskViaApi', () => {
         remaining: 0,
         upgradeUrl: '/pricing',
       }),
-    });
-
-    await expect(createTaskViaApi(baseInput)).rejects.toBeInstanceOf(UsageLimitError);
-
-    fetchMock.mockResolvedValueOnce({
-      ok: false,
-      status: 429,
-      json: async () => ({
-        currentUsage: 10,
-        limit: 10,
-        remaining: 0,
-        upgradeUrl: '/pricing',
-      }),
-    });
+    } as Response);
 
     try {
       await createTaskViaApi(baseInput);
@@ -86,13 +73,13 @@ describe('createTaskViaApi', () => {
   });
 
   it('falls back to defaults when 429 body is malformed', async () => {
-    fetchMock.mockResolvedValueOnce({
+    csrfFetchMock.mockResolvedValueOnce({
       ok: false,
       status: 429,
       json: async () => {
         throw new Error('not json');
       },
-    });
+    } as Response);
 
     try {
       await createTaskViaApi(baseInput);
@@ -104,31 +91,31 @@ describe('createTaskViaApi', () => {
   });
 
   it('throws generic Error on 401', async () => {
-    fetchMock.mockResolvedValueOnce({
+    csrfFetchMock.mockResolvedValueOnce({
       ok: false,
       status: 401,
       json: async () => ({ error: 'Unauthorized' }),
-    });
+    } as Response);
 
     await expect(createTaskViaApi(baseInput)).rejects.toThrow('Unauthorized');
   });
 
   it('throws generic Error on 500', async () => {
-    fetchMock.mockResolvedValueOnce({
+    csrfFetchMock.mockResolvedValueOnce({
       ok: false,
       status: 500,
       json: async () => ({ error: 'Internal error', message: 'DB unreachable' }),
-    });
+    } as Response);
 
     await expect(createTaskViaApi(baseInput)).rejects.toThrow('DB unreachable');
   });
 
   it('uses status code in message when body has no error/message', async () => {
-    fetchMock.mockResolvedValueOnce({
+    csrfFetchMock.mockResolvedValueOnce({
       ok: false,
       status: 502,
       json: async () => ({}),
-    });
+    } as Response);
 
     await expect(createTaskViaApi(baseInput)).rejects.toThrow('Task create failed: 502');
   });

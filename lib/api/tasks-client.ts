@@ -1,5 +1,6 @@
 import type { CreateTaskInput } from '@/lib/validations/task-schemas';
 import type { Task } from '@/lib/types';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export interface UsageLimitDetails {
   currentUsage: number;
@@ -24,13 +25,15 @@ export class UsageLimitError extends Error {
  * Why this exists: tasksService.createTask hits Supabase directly from the
  * browser and bypasses /api/tasks's rate-limit gate. UI callers must use this
  * helper so free-tier daily limits are enforced uniformly across the app.
+ *
+ * Uses csrfFetch so the x-csrf-token header is attached automatically —
+ * /api/tasks is protected by the global CSRF middleware (lib/middleware/csrf.ts).
  */
 export async function createTaskViaApi(input: CreateTaskInput): Promise<Task> {
-  const res = await fetch('/api/tasks', {
+  const res = await csrfFetch('/api/tasks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
-    credentials: 'include',
   });
 
   if (res.status === 429) {
