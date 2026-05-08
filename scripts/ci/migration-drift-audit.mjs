@@ -165,4 +165,13 @@ for (const [table, instances] of [...creates.entries()].sort()) {
 console.log(`\n=== Summary ===`);
 console.log(`Drift instances: ${driftCount}`);
 console.log(`Unbackfilled (latent debt): ${unbackfilled}`);
-console.log(`\nAudit complete. Informational only — does not gate CI.`);
+
+if (unbackfilled > 0) {
+  console.log(`\n❌ FAIL: ${unbackfilled} table(s) have first-create-wins drift with`);
+  console.log(`columns referenced by app code but missing from CI replay.`);
+  console.log(`Either add an idempotent ALTER TABLE ADD COLUMN IF NOT EXISTS`);
+  console.log(`migration, or add the column to EXPECTED_ORPHANS with a why-comment.`);
+  process.exit(1);
+}
+
+console.log(`\n✅ Audit clean — 0 unbackfilled drift instances.`);
