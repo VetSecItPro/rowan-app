@@ -112,7 +112,7 @@ export default function ShoppingPage() {
                 <p className="text-sm sm:text-base text-gray-400">Collaborative shopping made easy</p>
               </div>
             </div>
-            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors flex items-center justify-center gap-2 font-medium shadow-md">
+            <button data-testid="new-shopping-list-button" onClick={handleOpenNewListModal} className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors flex items-center justify-center gap-2 font-medium shadow-md">
               <Plus className="w-5 h-5" />
               New Shopping List
             </button>
