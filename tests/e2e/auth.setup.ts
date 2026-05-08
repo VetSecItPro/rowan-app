@@ -67,11 +67,16 @@ setup.describe('Auth Setup', () => {
       // Wait for page to finish loading
       await page.waitForLoadState('networkidle').catch(() => {});
 
-      // VALIDATE: Make an API call to confirm the session has valid auth cookies.
-      // This is the definitive check — if /api/spaces returns 200, we're authenticated.
+      // VALIDATE: Confirm the session has valid auth cookies by hitting the
+      // dedicated auth-verifier endpoint. /api/auth/session calls
+      // supabase.auth.getUser() and returns 200 only when the JWT validates
+      // server-side. The legacy check used /api/csrf/token, but that route
+      // doesn't verify auth — its 200 only meant "rate limit OK," which let
+      // unauthenticated sessions get saved as storage state and cascaded into
+      // intermittent test-pro failures (Phase 8.1 root cause).
       let apiVerified = false;
       for (let attempt = 1; attempt <= 5; attempt++) {
-        const response = await page.request.get('/api/csrf/token', { timeout: 10000 }).catch(() => null);
+        const response = await page.request.get('/api/auth/session', { timeout: 10000 }).catch(() => null);
         if (response?.ok()) {
           apiVerified = true;
           console.log(`  ✓ API auth verified (attempt ${attempt})`);

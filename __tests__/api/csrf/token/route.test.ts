@@ -10,7 +10,7 @@ vi.mock('@/lib/security/csrf', () => ({
 }));
 
 vi.mock('@/lib/ratelimit', () => ({
-  checkGeneralRateLimit: vi.fn(),
+  checkCsrfTokenRateLimit: vi.fn(),
 }));
 
 vi.mock('@/lib/ratelimit-fallback', () => ({
@@ -24,8 +24,8 @@ describe('/api/csrf/token', () => {
 
   describe('GET', () => {
     it('should return 429 when rate limit exceeded', async () => {
-      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
-      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+      const { checkCsrfTokenRateLimit } = await import('@/lib/ratelimit');
+      vi.mocked(checkCsrfTokenRateLimit).mockResolvedValue({
         success: false,
         limit: 60,
         remaining: 0,
@@ -44,10 +44,10 @@ describe('/api/csrf/token', () => {
     });
 
     it('should return existing token if present in cookie', async () => {
-      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { checkCsrfTokenRateLimit } = await import('@/lib/ratelimit');
       const { getCsrfTokenFromCookie } = await import('@/lib/security/csrf');
 
-      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+      vi.mocked(checkCsrfTokenRateLimit).mockResolvedValue({
         success: true,
         limit: 60,
         remaining: 59,
@@ -69,10 +69,10 @@ describe('/api/csrf/token', () => {
     });
 
     it('should generate new token if none exists', async () => {
-      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { checkCsrfTokenRateLimit } = await import('@/lib/ratelimit');
       const { getCsrfTokenFromCookie, generateCsrfToken, setCsrfCookie } = await import('@/lib/security/csrf');
 
-      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+      vi.mocked(checkCsrfTokenRateLimit).mockResolvedValue({
         success: true,
         limit: 60,
         remaining: 59,
@@ -96,10 +96,10 @@ describe('/api/csrf/token', () => {
     });
 
     it('should return 500 on error', async () => {
-      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { checkCsrfTokenRateLimit } = await import('@/lib/ratelimit');
       const { getCsrfTokenFromCookie } = await import('@/lib/security/csrf');
 
-      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+      vi.mocked(checkCsrfTokenRateLimit).mockResolvedValue({
         success: true,
         limit: 60,
         remaining: 59,
