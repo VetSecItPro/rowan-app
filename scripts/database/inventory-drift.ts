@@ -57,16 +57,24 @@ async function main() {
 
   console.log('🔍 Phase 9.1 — Reading prod schema...\n');
 
-  // 1. Functions in public schema, excluding extensions
+  // 1. Functions in public schema, excluding ones OWNED by an extension
+  // (deptype='e' AND refclassid points at pg_extension — the looser
+  // "any 'e' dep" form misclassifies user-defined functions that
+  // transitively reference extension types, see inventory-drift-extended.ts).
   const fnRes = await client.query(`
     SELECT
       p.proname AS name,
       pg_get_function_identity_arguments(p.oid) AS args
     FROM pg_proc p
     JOIN pg_namespace n ON p.pronamespace = n.oid
-    LEFT JOIN pg_depend d ON d.objid = p.oid AND d.deptype = 'e'
     WHERE n.nspname = 'public'
-      AND d.objid IS NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM pg_depend d
+        WHERE d.classid = 'pg_proc'::regclass
+          AND d.objid = p.oid
+          AND d.deptype = 'e'
+          AND d.refclassid = 'pg_extension'::regclass
+      )
     ORDER BY p.proname;
   `);
 
