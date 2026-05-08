@@ -32,6 +32,55 @@ import { join } from 'node:path';
 
 const DIR = 'supabase/migrations';
 
+/**
+ * Expected-orphan allow-list: column-set drift instances we've triaged and
+ * decided NOT to backfill. The audit will still report drift here for
+ * visibility but won't count them toward the unbackfilled total.
+ *
+ * Each entry is `<table>:<column>` — the column that exists in a later
+ * CREATE TABLE IF NOT EXISTS block but was never backfilled because:
+ *   (a) the column is referenced only on OTHER tables (phantom), OR
+ *   (b) the feature using the column was retired (digest)
+ *
+ * To remove from this list: implement an ALTER TABLE ADD COLUMN IF NOT
+ * EXISTS migration and drop the entry. To add: surface the triage decision
+ * here with a why-comment.
+ */
+const EXPECTED_ORPHANS = new Set([
+  // chores.completion_percentage — referenced only by achievement_badges
+  // and recurring_goals tables (different tables). The chores column was
+  // never created anywhere; the duplicate CREATE silently no-ops.
+  'chores:completion_percentage',
+
+  // notification_queue digest_* and adjacent — digest feature fully
+  // retired 2026-05-07 (PRs #380 family). Columns dropped from prod;
+  // migration files retain references for history.
+  'notification_queue:attempts',
+  'notification_queue:content',
+  'notification_queue:error_message',
+  'notification_queue:last_attempt',
+  'notification_queue:subject',
+
+  // user_notification_preferences digest_* and push_* — digest cron retired
+  // alongside notification_queue. The push_* cols belong to a notification
+  // pipeline that was rewired to user_push_subscriptions instead.
+  'user_notification_preferences:digest_frequency',
+  'user_notification_preferences:digest_time',
+  'user_notification_preferences:email_event_reminders',
+  'user_notification_preferences:email_general_reminders',
+  'user_notification_preferences:email_meal_reminders',
+  'user_notification_preferences:email_new_messages',
+  'user_notification_preferences:email_shopping_lists',
+  'user_notification_preferences:email_task_assignments',
+  'user_notification_preferences:push_enabled',
+  'user_notification_preferences:push_event_alerts',
+  'user_notification_preferences:push_messages',
+  'user_notification_preferences:push_reminders',
+  'user_notification_preferences:push_shopping_updates',
+  'user_notification_preferences:push_task_updates',
+  'user_notification_preferences:timezone',
+]);
+
 const sqlFiles = readdirSync(DIR).filter(f => f.endsWith('.sql')).sort();
 
 // Map: tableName -> [{file, columns: Set<string>}]
@@ -90,7 +139,9 @@ for (const [table, instances] of [...creates.entries()].sort()) {
   const allCols = new Set(instances.flatMap(i => [...i.cols]));
   const colsBackfilled = alters.get(table) ?? new Set();
 
-  const missingInCI = [...allCols].filter(c => !firstCols.has(c) && !colsBackfilled.has(c)).sort();
+  const missingRaw = [...allCols].filter(c => !firstCols.has(c) && !colsBackfilled.has(c));
+  const missingInCI = missingRaw.filter(c => !EXPECTED_ORPHANS.has(`${table}:${c}`)).sort();
+  const expectedOrphans = missingRaw.filter(c => EXPECTED_ORPHANS.has(`${table}:${c}`)).sort();
 
   for (let i = 0; i < instances.length; i++) {
     const inst = instances[i];
@@ -103,6 +154,9 @@ for (const [table, instances] of [...creates.entries()].sort()) {
     unbackfilled++;
     console.log(`  ❌ MISSING in CI replay (no ALTER backfill found):`);
     console.log(`     ${missingInCI.join(', ')}`);
+  } else if (expectedOrphans.length) {
+    console.log(`  ✅ All actionable columns backfilled. Expected-orphans (triaged, see EXPECTED_ORPHANS comment):`);
+    console.log(`     ${expectedOrphans.join(', ')}`);
   } else {
     console.log(`  ✅ All later columns backfilled via ALTER TABLE ADD COLUMN`);
   }
