@@ -184,6 +184,20 @@ export async function checkGeneralRateLimit(ip: string): Promise<{ success: bool
 }
 
 /**
+ * CSRF token rate limit: 100 requests per 10 seconds.
+ *
+ * CSRF token issuance is not security-sensitive — the token is meant to be
+ * widely distributed within a session and verified on state-changing requests.
+ * The general rate limit (10/10s) collides with shared-IP environments where
+ * multiple authenticated clients legitimately fetch tokens (parallel CI test
+ * workers, NAT'd corporate networks, mobile carrier-grade NAT). This higher
+ * cap still bounds runaway-client abuse but doesn't punish concurrency.
+ */
+export async function checkCsrfTokenRateLimit(ip: string): Promise<{ success: boolean }> {
+  return checkRateLimit(ip, ratelimit, 100, 10000);
+}
+
+/**
  * API rate limit: 10 requests per 10 seconds
  */
 export async function checkApiRateLimit(ip: string): Promise<{ success: boolean }> {

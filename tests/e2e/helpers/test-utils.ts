@@ -83,8 +83,10 @@ export async function ensureAuthenticated(
   const redirectedToLogin = page.url().includes('/login');
   let apiAuthValid = false;
   if (!redirectedToLogin) {
+    // /api/auth/session calls supabase.auth.getUser() — a 200 here is a
+    // structural guarantee the session is valid. Phase 8.1 fix.
     apiAuthValid = await page.request
-      .get('/api/csrf/token', { timeout: 10000 })
+      .get('/api/auth/session', { timeout: 10000 })
       .then(r => r.ok())
       .catch(() => false);
   }
@@ -175,14 +177,14 @@ async function tryApiLogin(
       return false;
     }
 
-    // Verify with an API call
+    // Verify with the real auth-checking endpoint (Phase 8.1 fix).
     const verify = await page.request
-      .get('/api/csrf/token', { timeout: 10000 })
+      .get('/api/auth/session', { timeout: 10000 })
       .then(r => r.ok())
       .catch(() => false);
 
     if (!verify) {
-      console.warn('  API signin succeeded but CSRF token check failed');
+      console.warn('  API signin succeeded but session verification failed');
       return false;
     }
 

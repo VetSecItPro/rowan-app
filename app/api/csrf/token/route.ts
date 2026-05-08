@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCsrfToken, setCsrfCookie, getCsrfTokenFromCookie } from '@/lib/security/csrf';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkCsrfTokenRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   try {
     // Rate limiting
     const ip = extractIP(request.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkCsrfTokenRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
