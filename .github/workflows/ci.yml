@@ -62,6 +62,14 @@ jobs:
         run: pnpm lint
       - run: pnpm type-check
 
+      # Migration drift audit — catches first-create-wins drift the moment a
+      # PR introduces it. Pre-2026-05-07 we discovered this class of bug only
+      # via E2E failures days/weeks later (Oct-2025 incidents). Now it fires
+      # at PR-time. Exit non-zero on unbackfilled drift; allow-list the
+      # intentional-orphans inside the script's EXPECTED_ORPHANS set.
+      - name: Migration drift audit
+        run: node scripts/ci/migration-drift-audit.mjs
+
   # ─── Security scanning ───
   security:
     name: Security Audit
