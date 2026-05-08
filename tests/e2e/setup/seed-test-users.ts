@@ -266,6 +266,33 @@ async function seedTestUsers() {
       }
       console.log(`  ✓ Welcome flow marked completed`);
 
+      // Step 6: Seed test-pro as an admin user. The smoke test exercises
+      // /api/admin/auth/login + /api/admin/notifications/export — both
+      // require a row in admin_users keyed by email. Without this, the
+      // login route returns 401 (or 500 on a deeper crash) and the
+      // smoke test fails on the admin segment. Test-free is intentionally
+      // NOT given admin access — admin verification on a non-admin user
+      // is itself a security path worth testing in future.
+      if (testUser.tier === 'pro') {
+        const { error: adminUpsertError } = await supabase
+          .from('admin_users')
+          .upsert(
+            {
+              user_id: userId,
+              email: testUser.email,
+              role: 'admin',
+              permissions: {},
+              is_active: true,
+            },
+            { onConflict: 'email' }
+          );
+
+        if (adminUpsertError) {
+          throw new Error(`Failed to seed admin_users: ${adminUpsertError.message}`);
+        }
+        console.log(`  ✓ Seeded as admin (role=admin, is_active=true)`);
+      }
+
       console.log(`  ✓ User ${testUser.email} ready\n`);
     } catch (error) {
       console.error(`❌ ${testUser.email}: ${error instanceof Error ? error.message : String(error)}\n`);

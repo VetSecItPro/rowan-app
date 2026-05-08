@@ -142,6 +142,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
         Cancel
       </SecondaryButton>
       <CTAButton
+        data-testid="shopping-list-submit-button"
         type="submit"
         form="new-shopping-list-form"
         feature="shopping"
@@ -194,6 +195,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">Title *</label>
             <input
+              data-testid="shopping-list-title-input"
               type="text"
               required
               aria-required="true"
