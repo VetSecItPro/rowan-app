@@ -233,13 +233,16 @@ test.describe('Smoke Flow', () => {
     await openBtn.waitFor({ state: 'visible', timeout: 15000 });
     await openBtn.click();
 
-    // Fill the title and submit
+    // Fill the title and submit. Press Enter to submit the form rather
+    // than clicking the CTAButton — that button has continuous breathing
+    // + ripple CSS animations (animationLevel="dynamic" set on CTAButton),
+    // so Playwright's "wait for element to be stable" actionability check
+    // never resolves. The submit button has `form="new-shopping-list-form"`
+    // which means the form's onSubmit fires on Enter from any of its inputs.
     const titleInput = page.getByTestId('shopping-list-title-input');
     await titleInput.waitFor({ state: 'visible', timeout: 10000 });
     await titleInput.fill(listTitle);
-
-    const submitBtn = page.getByTestId('shopping-list-submit-button');
-    await submitBtn.click();
+    await titleInput.press('Enter');
 
     // Wait for the new list card to render. The mutation's onSuccess
     // invalidates QUERY_KEYS.shopping.lists, which fires a fresh fetch
