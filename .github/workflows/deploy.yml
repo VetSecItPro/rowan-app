@@ -57,6 +57,23 @@ jobs:
             exit 1
           fi
 
+          # Squash-baseline detection: if this push includes a *_squash_*.sql
+          # file, it's a Phase 9.3-style schema baseline that mirrors prod's
+          # current state (CREATE TABLE / CREATE FUNCTION without IF NOT
+          # EXISTS, raw pg_dump output). Running such a file against a
+          # populated prod DB would fail on every CREATE statement.
+          # Per ADR-019 (manual escape hatch for known-applied migrations),
+          # mark squash baselines as `applied` BEFORE the push. This adds
+          # the version to schema_migrations without executing the SQL —
+          # the file is then used only for fresh CI/local replay.
+          NEW_SQUASH_FILES=$(git diff --name-only HEAD~1 HEAD -- 'supabase/migrations/*_squash_*.sql' 2>/dev/null || true)
+          for sf in $NEW_SQUASH_FILES; do
+            SQUASH_VERSION=$(basename "$sf" | sed 's/_.*//')
+            echo "Detected squash baseline: $sf (version $SQUASH_VERSION)"
+            echo "Marking as applied without execution per ADR-019"
+            npx supabase migration repair --status applied "$SQUASH_VERSION" || true
+          done
+
           # Detect remote-only versions (rare, but handle if they appear).
           # No proactive "mark all applied" — that step created ghost
           # migrations (metadata recorded without SQL running).

@@ -50,8 +50,8 @@ When you ship a migration that establishes a new schema-level invariant (e.g., a
 
 ## History
 
-- `20260426000001_drop_location_tracking.sql` — Removed family location tracking feature (4 tables). See top-level CLAUDE.md "Feature Removal Log."
-- `20260426000002_drop_postgis.sql` — Dropped PostGIS extension (was unused, only existed for the removed location feature). Eliminated the unfixable `spatial_ref_sys` security advisor finding.
-- `20260328120000_fix_security_advisor_findings.sql` — Resolved 9 Supabase security advisor findings via subselect-form RLS, RESTRICTIVE service-role policies, and extension grants. (The REVOKE/GRANT lines targeting spatial_ref_sys in this migration were silent no-ops; superseded by the PostGIS drop above.)
+**`20260509004730_squash_v3_baseline.sql`** — On 2026-05-08 the migration history was squashed into a single canonical schema baseline (188 tables, 386 indexes, 227 functions, 562 RLS policies, 185 triggers, 644 ADD CONSTRAINTs + 3 custom triggers on `auth.users`). This file is the new starting point — it mirrors prod's exact state (verified 0/0/0 drift via `inventory-drift-extended.ts`) and is generated via `pg_dump --schema-only --schema=public` augmented with `pg_get_triggerdef` for `auth.users` triggers. The 321 migrations that produced this state are preserved in git history (see `git log` before commit `c1b84952`) but no longer in this directory.
 
-For older migration history, see `git log -- supabase/migrations/`.
+**Squash-baseline policy:** files matching the pattern `*_squash_*.sql` are detected by `.github/workflows/deploy.yml` and marked as `applied` via `supabase migration repair --status applied` BEFORE the push step. They are NOT executed against prod (per ADR-019 manual-escape-hatch pattern). They serve only the fresh CI/local replay path.
+
+For older migration history (pre-squash), see `git log` before the merge commit of the Phase 9.3 squash PR.
