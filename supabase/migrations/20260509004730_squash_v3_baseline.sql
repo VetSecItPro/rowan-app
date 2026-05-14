@@ -26662,7 +26662,7 @@ ALTER TABLE public.workspace_migrations ENABLE ROW LEVEL SECURITY;
 -- --schema=public skips them — the lesson from PR #387's first attempt)
 -- =============================================================================
 
-Found 3 custom triggers on auth.users:
+-- Found 3 custom triggers on auth.users:
 
 -- Trigger: on_auth_user_created
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
