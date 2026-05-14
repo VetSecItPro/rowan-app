@@ -20,6 +20,7 @@
     "test:e2e:report": "playwright show-report",
     "validate-db": "npx tsx scripts/database/validate-database.ts",
     "check-db-advisors": "npx tsx scripts/database/check-db-advisors.ts",
+    "perf:cwv": "npx tsx scripts/perf/lighthouse-cwv.ts",
     "setup-dev": "./scripts/dev-setup.sh",
     "analyze": "ANALYZE=true npm run build",
     "analyze:server": "BUNDLE_ANALYZE=server npm run build",
