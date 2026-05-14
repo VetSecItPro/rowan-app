@@ -4574,72 +4574,11 @@ CREATE FUNCTION public.log_reminder_comment_activity() RETURNS trigger
 -- Name: log_task_changes(); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.log_task_changes() RETURNS trigger
-    LANGUAGE plpgsql
-    SET search_path TO 'public'
-    AS $$
-DECLARE
-  current_user_id UUID;
-  change_summary_text TEXT;
-BEGIN
-  -- Get current user (from session context)
-  current_user_id := current_setting('app.current_user_id', TRUE)::UUID;
-
-  IF TG_OP = 'INSERT' THEN
-    INSERT INTO task_activity_log (task_id, user_id, action_type, change_summary)
-    VALUES (NEW.id, current_user_id, 'created', 'Task created: ' || NEW.title);
-
-  ELSIF TG_OP = 'UPDATE' THEN
-    -- Log status changes
-    IF NEW.status IS DISTINCT FROM OLD.status THEN
-      IF NEW.status = 'completed' THEN
-        INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, old_value, new_value, change_summary)
-        VALUES (NEW.id, current_user_id, 'completed', 'status', OLD.status, NEW.status, 'Task marked as completed');
-      ELSIF OLD.status = 'completed' THEN
-        INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, old_value, new_value, change_summary)
-        VALUES (NEW.id, current_user_id, 'uncompleted', 'status', OLD.status, NEW.status, 'Task marked as incomplete');
-      ELSE
-        INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, old_value, new_value, change_summary)
-        VALUES (NEW.id, current_user_id, 'status_changed', 'status', OLD.status, NEW.status, 'Status changed from ' || OLD.status || ' to ' || NEW.status);
-      END IF;
-    END IF;
-
-    -- Log priority changes
-    IF NEW.priority IS DISTINCT FROM OLD.priority THEN
-      INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, old_value, new_value, change_summary)
-      VALUES (NEW.id, current_user_id, 'priority_changed', 'priority', OLD.priority, NEW.priority, 'Priority changed from ' || OLD.priority || ' to ' || NEW.priority);
-    END IF;
-
-    -- Log due date changes
-    IF NEW.due_date IS DISTINCT FROM OLD.due_date THEN
-      INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, old_value, new_value, change_summary)
-      VALUES (NEW.id, current_user_id, 'due_date_changed', 'due_date', OLD.due_date::TEXT, NEW.due_date::TEXT, 'Due date changed');
-    END IF;
-
-    -- Log assignment changes
-    IF NEW.assigned_to IS DISTINCT FROM OLD.assigned_to THEN
-      IF NEW.assigned_to IS NULL THEN
-        INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, change_summary)
-        VALUES (NEW.id, current_user_id, 'unassigned', 'assigned_to', 'Task unassigned');
-      ELSE
-        INSERT INTO task_activity_log (task_id, user_id, action_type, field_name, change_summary)
-        VALUES (NEW.id, current_user_id, 'assigned', 'assigned_to', 'Task assigned');
-      END IF;
-    END IF;
-
-    -- Log general updates (title, description changes)
-    IF NEW.title IS DISTINCT FROM OLD.title OR NEW.description IS DISTINCT FROM OLD.description THEN
-      INSERT INTO task_activity_log (task_id, user_id, action_type, change_summary)
-      VALUES (NEW.id, current_user_id, 'updated', 'Task details updated');
-    END IF;
-
-  -- REMOVED DELETE HANDLING TO PREVENT FOREIGN KEY CONSTRAINT VIOLATION
-  -- The CASCADE deletion will handle cleaning up activity logs
-  END IF;
-
-  RETURN COALESCE(NEW, OLD);
-END;
-$$;
+-- REMOVED: log_task_changes + tasks_activity_log_trigger
+-- (orphan code from PR #344's incomplete cleanup of 25 orphan tables —
+-- task_activity_log table was dropped but its INSERT trigger survived.
+-- Both still live on prod but fail on fresh CI replay because the table
+-- they write to no longer exists.)
 
 
 --
@@ -17095,7 +17034,6 @@ CREATE TRIGGER task_templates_updated_at_trigger BEFORE UPDATE ON public.task_te
 -- Name: tasks tasks_activity_log_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tasks_activity_log_trigger AFTER INSERT OR UPDATE ON public.tasks FOR EACH ROW EXECUTE FUNCTION public.log_task_changes();
 
 
 --
