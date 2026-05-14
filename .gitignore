@@ -221,3 +221,5 @@ household-balance-*.png
 .admin-audit-reports/
 .subagent-dev-reports/
 .worktrees/
+.sec-ship-history.json
+.sec-ship-reports/
