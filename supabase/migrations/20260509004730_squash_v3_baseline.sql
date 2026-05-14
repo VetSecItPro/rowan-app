@@ -26665,11 +26665,11 @@ ALTER TABLE public.workspace_migrations ENABLE ROW LEVEL SECURITY;
 -- Found 3 custom triggers on auth.users:
 
 -- Trigger: on_auth_user_created
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- Trigger: on_auth_user_created_learn
-CREATE TRIGGER on_auth_user_created_learn AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_learn_user();
+CREATE TRIGGER on_auth_user_created_learn AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_learn_user();
 
 -- Trigger: on_auth_user_created_provision
-CREATE TRIGGER on_auth_user_created_provision AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION provision_new_user();
+CREATE TRIGGER on_auth_user_created_provision AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.provision_new_user();
 
