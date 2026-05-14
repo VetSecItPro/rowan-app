@@ -76,12 +76,26 @@ export function SwipeableConversationItem({
     setOffsetX(0);
   }, [conversation.id]);
 
+  // The delete button is positioned absolute behind the swipeable card
+  // and only meant to be reachable after the user swipes left past the
+  // threshold. Without an explicit interactability gate, the button is
+  // always in the DOM and always reports as visible/enabled to a11y
+  // tree consumers, screen readers, and automation tools — even though
+  // the card on top intercepts every mouse click. Hide it from all of
+  // them until swipe state actually exposes it.
+  const isDeleteRevealed = offsetX < DELETE_THRESHOLD / 2;
+
   return (
     <div className="relative overflow-hidden">
       {/* Delete Button Background */}
-      <div className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center">
+      <div
+        className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center"
+        style={{ visibility: isDeleteRevealed ? 'visible' : 'hidden' }}
+        aria-hidden={!isDeleteRevealed}
+      >
         <button aria-label="Delete"
           onClick={handleDelete}
+          tabIndex={isDeleteRevealed ? 0 : -1}
           className="w-full h-full flex items-center justify-center text-white active:bg-red-600"
         >
           <Trash2 aria-hidden="true" className="w-5 h-5" />
