@@ -111,22 +111,41 @@ jobs:
           # Diff includes package.json or pnpm-lock.yaml. Distinguish
           # devDependencies-only edits (safe to skip) from any change
           # that could affect runtime: production `dependencies`,
-          # `scripts`, or `pnpm.overrides` (which can rewrite runtime
-          # transitive versions).
+          # `pnpm.overrides` (which can rewrite runtime transitive
+          # versions), or scripts that actually execute during build/
+          # test/CI.
+          #
+          # The `scripts` field contains BOTH runtime entrypoints
+          # (build, start, dev, lint, type-check, test*) AND developer
+          # aliases (validate-db, perf:cwv, cap:*, analyze*) that
+          # never run in CI. Comparing the whole object treats every
+          # new alias as runtime-affecting and pays the 40-min E2E
+          # tax for changes that can't move Playwright outcomes.
+          # Slice to the known-runtime keys instead.
+          RUNTIME_SCRIPT_KEYS='["dev","build","start","lint","type-check","test","test:unit","test:e2e","test:e2e:chromium","prepare","postinstall","preinstall","pretest","pretest:e2e"]'
+
           if echo "$changed" | grep -q '^package\.json$'; then
             before=$(git show "$base:package.json" 2>/dev/null || echo '{}')
             after=$(cat package.json)
-            before_runtime=$(echo "$before" | jq -S '{dependencies, scripts, pnpm}')
-            after_runtime=$(echo "$after"  | jq -S '{dependencies, scripts, pnpm}')
+            before_runtime=$(echo "$before" | jq -S --argjson keys "$RUNTIME_SCRIPT_KEYS" '{
+              dependencies,
+              pnpm,
+              scripts: (.scripts // {} | to_entries | map(select(.key as $k | $keys | index($k))) | from_entries)
+            }')
+            after_runtime=$(echo "$after"  | jq -S --argjson keys "$RUNTIME_SCRIPT_KEYS" '{
+              dependencies,
+              pnpm,
+              scripts: (.scripts // {} | to_entries | map(select(.key as $k | $keys | index($k))) | from_entries)
+            }')
 
             if [ "$before_runtime" != "$after_runtime" ]; then
               echo "run_e2e=true" >> "$GITHUB_OUTPUT"
-              echo "reason=package.json runtime fields changed (deps/scripts/pnpm.overrides)" >> "$GITHUB_OUTPUT"
+              echo "reason=package.json runtime fields changed (dependencies / pnpm.overrides / runtime scripts)" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            # Otherwise: only devDependencies moved — pnpm-lock.yaml
-            # delta is just the corresponding transitive churn for
-            # dev-only packages, also safe.
+            # Otherwise: only devDependencies and/or non-runtime
+            # script aliases moved — pnpm-lock.yaml delta is just
+            # the corresponding transitive churn, also safe.
           fi
 
           echo "run_e2e=false" >> "$GITHUB_OUTPUT"
