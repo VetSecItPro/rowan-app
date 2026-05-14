@@ -221,3 +221,4 @@ household-balance-*.png
 .admin-audit-reports/
 .subagent-dev-reports/
 .worktrees/
+.investigate/
