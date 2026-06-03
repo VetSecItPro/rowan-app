@@ -560,6 +560,7 @@ export async function checkBudget(
   //    that error -> userUsage null -> usage read as 0 -> the daily AND monthly
   //    caps silently stop tripping (fail-open). Mirror the per-space sum below.
   //    (SEC-AI-01)
+  // nosemgrep: supabase-missing-space-id-filter - ai_usage_daily is per-user (keyed user_id+date+feature_source), not space-scoped
   const { data: userUsageRows } = await supabase
     .from('ai_usage_daily')
     .select('input_tokens, output_tokens, voice_seconds, conversation_count')
@@ -599,6 +600,7 @@ export async function checkBudget(
   const monthlyCap = MONTHLY_COGS_CAP_USD[tier] ?? MONTHLY_COGS_CAP_USD.plus;
   if (Number.isFinite(monthlyCap)) {
     const firstOfMonth = `${today.slice(0, 7)}-01`;
+    // nosemgrep: supabase-missing-space-id-filter - ai_usage_daily is per-user (keyed user_id+date+feature_source), not space-scoped
     const { data: monthRows } = await supabase
       .from('ai_usage_daily')
       .select('estimated_cost_usd')

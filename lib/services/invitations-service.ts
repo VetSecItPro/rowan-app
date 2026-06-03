@@ -96,6 +96,7 @@ export async function createInvitation(
     // plan limit). We read the owner's tier via the SECURITY DEFINER RPC so the
     // lookup works under the inviter's RLS scope, and count current members PLUS
     // pending invitations so a burst of invites cannot overshoot the cap.
+    // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
     const { data: ownerRow } = await supabase
       .from('space_members')
       .select('user_id')
@@ -113,10 +114,12 @@ export async function createInvitation(
       // maxUsers <= 0 is treated as unlimited (e.g. the owner tier).
       if (maxUsers > 0) {
         const [{ count: memberCount }, { count: pendingCount }] = await Promise.all([
+          // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
           supabase
             .from('space_members')
             .select('*', { count: 'exact', head: true })
             .eq('space_id', spaceId),
+          // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
           supabase
             .from('space_invitations')
             .select('*', { count: 'exact', head: true })
