@@ -8,7 +8,7 @@
 import { Check, Loader2, Users } from 'lucide-react';
 
 export interface PricingCardProps {
-  tier: 'free' | 'pro' | 'family';
+  tier: 'free' | 'plus' | 'family';
   title: string;
   description: string;
   monthlyPrice: number;

@@ -729,7 +729,7 @@ export async function recalculateStorageUsage(
 /**
  * Gets the storage limit in bytes for a subscription tier.
  *
- * @param tier - The subscription tier ('free', 'pro', 'family')
+ * @param tier - The subscription tier ('free', 'plus', 'family')
  * @returns Storage limit in bytes
  */
 export function getStorageLimitBytes(tier: SubscriptionTier): number {

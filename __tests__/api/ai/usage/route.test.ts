@@ -112,7 +112,7 @@ describe('/api/ai/usage', () => {
           getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER_ID } }, error: null }),
         },
       } as any);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getUsageSummary).mockResolvedValue(mockUsageSummary as any);
       vi.mocked(checkBudget).mockResolvedValue(mockBudget as any);
       vi.mocked(getTokenBudget).mockReturnValue(mockLimits as any);
@@ -125,7 +125,7 @@ describe('/api/ai/usage', () => {
       expect(data.data.usage).toEqual(mockUsageSummary);
       expect(data.data.budget).toEqual(mockBudget);
       expect(data.data.limits).toEqual(mockLimits);
-      expect(data.data.tier).toBe('pro');
+      expect(data.data.tier).toBe('plus');
     });
 
     it('should accept custom startDate and endDate query params', async () => {
@@ -140,7 +140,7 @@ describe('/api/ai/usage', () => {
           getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER_ID } }, error: null }),
         },
       } as any);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getUsageSummary).mockResolvedValue({} as any);
       vi.mocked(checkBudget).mockResolvedValue({} as any);
       vi.mocked(getTokenBudget).mockReturnValue({} as any);

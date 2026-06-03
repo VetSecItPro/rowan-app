@@ -95,7 +95,7 @@ describe('/api/recipes/external/cuisine', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const request = new NextRequest('http://localhost/api/recipes/external/cuisine', {
       method: 'GET',
@@ -126,7 +126,7 @@ describe('/api/recipes/external/cuisine', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
@@ -163,7 +163,7 @@ describe('/api/recipes/external/cuisine', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const filterResponse = { meals: [{ idMeal: '11111' }] };
     const detailResponse = {

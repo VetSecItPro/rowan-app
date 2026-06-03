@@ -64,8 +64,8 @@ const TIER_DETAILS = {
       '2 household members',
     ],
   },
-  pro: {
-    name: 'Pro',
+  plus: {
+    name: 'Plus',
     color: 'emerald',
     gradient: 'from-emerald-500 to-teal-500',
     features: [
@@ -84,7 +84,7 @@ const TIER_DETAILS = {
     color: 'purple',
     gradient: 'from-purple-500 to-indigo-500',
     features: [
-      'Everything in Pro',
+      'Everything in Plus',
       'AI-powered features',
       'External integrations',
       '3 spaces',
@@ -145,7 +145,7 @@ export function SubscriptionSettings() {
 
   // Fetch billing info for paid users
   useEffect(() => {
-    if (tier === 'pro' || tier === 'family') {
+    if (tier === 'plus' || tier === 'family') {
       setIsBillingInfoLoading(true);
       fetch('/api/polar/billing-info')
         .then(res => res.json())
@@ -218,7 +218,7 @@ export function SubscriptionSettings() {
         className={`relative overflow-hidden rounded-2xl border p-6 shadow-lg ${
           effectiveTier === 'family'
             ? 'bg-gradient-to-br from-purple-900/20 to-indigo-900/20 border-purple-800'
-            : effectiveTier === 'pro'
+            : effectiveTier === 'plus'
               ? 'bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-800'
               : 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700'
         }`}
@@ -252,7 +252,7 @@ export function SubscriptionSettings() {
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               <Sparkles className="h-4 w-4" />
-              {tier === 'pro' ? 'Upgrade to Family' : 'Upgrade'}
+              {tier === 'plus' ? 'Upgrade to Family' : 'Upgrade'}
             </Link>
           )}
         </div>
@@ -269,13 +269,13 @@ export function SubscriptionSettings() {
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
                   effectiveTier === 'family'
                     ? 'bg-purple-900/30'
-                    : effectiveTier === 'pro'
+                    : effectiveTier === 'plus'
                       ? 'bg-emerald-900/30'
                       : 'bg-gray-800'
                 }`}>
                   <Check aria-hidden="true" className={`h-3 w-3 ${
                     effectiveTier === 'family' ? 'text-purple-400' :
-                    effectiveTier === 'pro' ? 'text-emerald-400' : 'text-gray-400'
+                    effectiveTier === 'plus' ? 'text-emerald-400' : 'text-gray-400'
                   }`} />
                 </div>
                 {feature}
@@ -286,7 +286,7 @@ export function SubscriptionSettings() {
       </motion.div>
 
       {/* Billing Summary Card - Only for paid subscribers */}
-      {(tier === 'pro' || tier === 'family') && billingInfo?.hasBillingInfo && (
+      {(tier === 'plus' || tier === 'family') && billingInfo?.hasBillingInfo && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -503,7 +503,7 @@ export function SubscriptionSettings() {
             <span className="text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all">→</span>
           </Link>
 
-          {(tier === 'pro' || tier === 'family') && (
+          {(tier === 'plus' || tier === 'family') && (
             <div className="space-y-2">
               <button
                 data-testid="manage-subscription-button"
@@ -559,13 +559,13 @@ export function SubscriptionSettings() {
             Change Plan
           </h3>
           <p className="text-sm text-gray-400 mb-4">
-            Need fewer features? You can switch to the Pro plan ($18/mo). Changes take effect at your next billing cycle.
+            Need fewer features? You can switch to the Plus plan ($8/mo). Changes take effect at your next billing cycle.
           </p>
 
           <div className="p-4 rounded-xl bg-amber-900/10 border border-amber-800/50 mb-4">
             <p className="text-xs font-medium text-amber-400 mb-2 flex items-center gap-1.5">
               <AlertTriangle className="h-3.5 w-3.5" />
-              Switching to Pro means you&apos;ll lose:
+              Switching to Plus means you&apos;ll lose:
             </p>
             <ul className="text-xs text-gray-400 space-y-1 ml-5">
               <li>AI-powered features (Rowan AI assistant)</li>

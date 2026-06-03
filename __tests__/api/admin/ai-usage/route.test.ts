@@ -67,7 +67,7 @@ const mockMembers = [
   {
     user_id: '550e8400-e29b-41d4-a716-446655440001',
     role: 'owner',
-    spaces: { plan_type: 'pro' },
+    spaces: { plan_type: 'plus' },
   },
 ];
 

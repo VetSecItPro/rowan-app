@@ -154,7 +154,7 @@ describe('/api/chores', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       const request = new NextRequest('http://localhost/api/chores', {
@@ -193,7 +193,7 @@ describe('/api/chores', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
@@ -320,7 +320,7 @@ describe('/api/chores', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       const request = new NextRequest('http://localhost/api/chores', {
@@ -363,7 +363,7 @@ describe('/api/chores', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);

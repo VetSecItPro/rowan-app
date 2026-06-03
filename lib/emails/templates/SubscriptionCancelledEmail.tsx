@@ -20,7 +20,7 @@ import {
 interface SubscriptionCancelledEmailProps {
   recipientEmail: string;
   recipientName: string;
-  tier: 'pro' | 'family';
+  tier: 'plus' | 'family';
   accessUntil: string;
   resubscribeUrl: string;
 }
@@ -28,11 +28,11 @@ interface SubscriptionCancelledEmailProps {
 const SubscriptionCancelledEmail = ({
   recipientEmail = 'user@example.com',
   recipientName = 'there',
-  tier = 'pro',
+  tier = 'plus',
   accessUntil = 'January 15, 2025',
   resubscribeUrl = 'https://rowanapp.com/pricing',
 }: SubscriptionCancelledEmailProps) => {
-  const tierName = tier === 'family' ? 'Family' : 'Pro';
+  const tierName = tier === 'family' ? 'Family' : 'Plus';
 
   return (
     <Html>

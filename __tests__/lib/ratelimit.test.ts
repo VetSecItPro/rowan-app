@@ -259,7 +259,7 @@ describe('checkAIChatRateLimit', () => {
   });
 
   it('uses pro limits (20/min window) for non-family tiers', async () => {
-    const result = await checkAIChatRateLimit('user-1', 'pro');
+    const result = await checkAIChatRateLimit('user-1', 'plus');
     expect(result).toHaveProperty('success');
     expect(mockFallbackRateLimit).toHaveBeenCalledWith('user-1', 20, 60000);
   });

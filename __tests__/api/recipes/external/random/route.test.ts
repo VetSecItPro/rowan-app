@@ -139,7 +139,7 @@ describe('/api/recipes/external/random', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const request = new NextRequest(
       'http://localhost/api/recipes/external/random?count=999',
@@ -171,7 +171,7 @@ describe('/api/recipes/external/random', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       json: vi.fn().mockResolvedValue(mockMealResponse),
@@ -209,7 +209,7 @@ describe('/api/recipes/external/random', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       json: vi.fn().mockResolvedValue({ meals: null }),

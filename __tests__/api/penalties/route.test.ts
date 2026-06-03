@@ -177,7 +177,7 @@ describe('/api/penalties', () => {
     } as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never);
 
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const request = new NextRequest('http://localhost/api/penalties', { method: 'GET' });
     const response = await GET(request);
@@ -209,7 +209,7 @@ describe('/api/penalties', () => {
     } as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never);
 
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const response = await GET(makeRequest());
     const data = await response.json();
@@ -233,7 +233,7 @@ describe('/api/penalties', () => {
     );
 
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const { getUserPenalties } = await import('@/lib/services/rewards/late-penalty-service');
     vi.mocked(getUserPenalties).mockResolvedValue([
@@ -263,7 +263,7 @@ describe('/api/penalties', () => {
     );
 
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const { getPenaltyStats } = await import('@/lib/services/rewards/late-penalty-service');
     vi.mocked(getPenaltyStats).mockResolvedValue({ total: 3, forgiven: 1 } as unknown as Awaited<ReturnType<typeof getPenaltyStats>>);
@@ -291,7 +291,7 @@ describe('/api/penalties', () => {
     );
 
     const { canAccessFeature } = await import('@/lib/services/feature-access-service');
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const { getOverdueChores } = await import('@/lib/services/rewards/late-penalty-service');
     vi.mocked(getOverdueChores).mockResolvedValue([{ id: 'chore-1' }] as unknown as Awaited<ReturnType<typeof getOverdueChores>>);

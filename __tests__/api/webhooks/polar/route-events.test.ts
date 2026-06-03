@@ -15,12 +15,21 @@ vi.mock('@/lib/supabase/admin', () => ({
   supabaseAdmin: { from: vi.fn(), rpc: vi.fn() },
 }));
 vi.mock('@/lib/polar', () => ({
-  getPlanFromProductId: vi.fn(() => 'pro'),
+  getPlanFromProductId: vi.fn(() => 'plus'),
   getPeriodFromProductId: vi.fn(() => 'monthly'),
+  getPolarWebhookSecret: vi.fn(() => 'test-secret'),
+}));
+// Signature verification itself is covered in the base route.test.ts. Here we
+// bypass StandardWebhooks validation and parse the body so the lifecycle-branch
+// assertions can run against the event payload directly.
+vi.mock('@polar-sh/sdk/webhooks', () => ({
+  validateEvent: vi.fn((body: string) => JSON.parse(body)),
+  WebhookVerificationError: class WebhookVerificationError extends Error {},
 }));
 vi.mock('@/lib/services/email-service', () => ({
   sendSubscriptionWelcomeEmail: vi.fn().mockResolvedValue(undefined),
   sendSubscriptionCancelledEmail: vi.fn().mockResolvedValue(undefined),
+  sendPaymentFailedEmail: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('@/lib/ratelimit', () => ({ checkGeneralRateLimit: vi.fn() }));
 vi.mock('@/lib/ratelimit-fallback', () => ({ extractIP: vi.fn(() => '127.0.0.1') }));
@@ -84,37 +93,42 @@ describe('POST /api/webhooks/polar - lifecycle events', () => {
     expect(supabaseAdmin.from).toHaveBeenCalledWith('subscriptions');
   });
 
-  it('subscription.canceled downgrades non-owner to free + sends cancellation email', async () => {
+  it('subscription.canceled KEEPS tier + access until period end and emails the user (Phase 11.4)', async () => {
     const { supabaseAdmin } = await import('@/lib/supabase/admin');
     const { sendSubscriptionCancelledEmail } = await import('@/lib/services/email-service');
 
-    // 1) Lookup currentSub by customer id (tier: pro, not owner)
-    // 2) update subscription -> canceled
-    // 3) Lookup user info for email
     const fromMock = vi.mocked(supabaseAdmin.from);
-    fromMock.mockReturnValueOnce(chainFor({
-      data: { user_id: 'u1', tier: 'pro', subscription_ends_at: '2025-02-01T00:00:00Z' },
+    const lookupChain = chainFor({
+      data: { user_id: 'u1', tier: 'plus', subscription_ends_at: '2025-02-01T00:00:00Z' },
       error: null,
-    }) as never);
-    fromMock.mockReturnValueOnce(chainFor({ data: null, error: null }) as never);
-    fromMock.mockReturnValueOnce(chainFor({
-      data: { email: 'u@x.com', full_name: 'User One' },
-      error: null,
-    }) as never);
+    });
+    const updateChain = chainFor({ data: null, error: null });
+    const userChain = chainFor({ data: { email: 'u@x.com', full_name: 'User One' }, error: null });
+    fromMock
+      .mockReturnValueOnce(lookupChain as never)
+      .mockReturnValueOnce(updateChain as never)
+      .mockReturnValueOnce(userChain as never);
 
     const { POST } = await import('@/app/api/webhooks/polar/route');
     const res = await POST(makeReq({
       type: 'subscription.canceled',
-      data: { customerId: 'cus_1' },
+      data: { customerId: 'cus_1', currentPeriodEnd: '2025-03-01T00:00:00Z' },
     }));
 
     expect(res.status).toBe(200);
-    // Cancellation email is fired (non-blocking; we just verify it was scheduled).
+    // The fix: cancel must NOT downgrade to free. It marks canceled, records the
+    // paid-through date, and leaves the tier intact (getUserTier honors it).
+    expect(updateChain.update).toHaveBeenCalledWith(expect.objectContaining({
+      status: 'canceled',
+      subscription_ends_at: '2025-03-01T00:00:00Z',
+    }));
+    const updateArg = (updateChain.update as ReturnType<typeof vi.fn>).mock.calls[0][0] as Record<string, unknown>;
+    expect(updateArg.tier).toBeUndefined();
     await new Promise(r => setTimeout(r, 0));
     expect(sendSubscriptionCancelledEmail).toHaveBeenCalled();
   });
 
-  it('subscription.canceled skips downgrade for owner-tier user', async () => {
+  it('subscription.canceled skips owner-tier user', async () => {
     const { supabaseAdmin } = await import('@/lib/supabase/admin');
     const { sendSubscriptionCancelledEmail } = await import('@/lib/services/email-service');
 
@@ -130,25 +144,17 @@ describe('POST /api/webhooks/polar - lifecycle events', () => {
     }));
 
     expect(res.status).toBe(200);
-    // Owner tier short-circuits before update + email.
     expect(sendSubscriptionCancelledEmail).not.toHaveBeenCalled();
   });
 
-  it('subscription.revoked also routes through the cancel handler', async () => {
+  it('subscription.revoked downgrades to free (Phase 11.4)', async () => {
     const { supabaseAdmin } = await import('@/lib/supabase/admin');
     const fromMock = vi.mocked(supabaseAdmin.from);
-    // currentSub lookup -> non-owner
-    fromMock.mockReturnValueOnce(chainFor({
-      data: { user_id: 'u1', tier: 'pro', subscription_ends_at: '2025-02-01T00:00:00Z' },
-      error: null,
-    }) as never);
-    // update
-    fromMock.mockReturnValueOnce(chainFor({ data: null, error: null }) as never);
-    // user lookup
-    fromMock.mockReturnValueOnce(chainFor({
-      data: { email: 'u@x.com', full_name: null },
-      error: null,
-    }) as never);
+    const lookupChain = chainFor({ data: { user_id: 'u1', tier: 'plus' }, error: null });
+    const updateChain = chainFor({ data: null, error: null });
+    fromMock
+      .mockReturnValueOnce(lookupChain as never)
+      .mockReturnValueOnce(updateChain as never);
 
     const { POST } = await import('@/app/api/webhooks/polar/route');
     const res = await POST(makeReq({
@@ -156,6 +162,64 @@ describe('POST /api/webhooks/polar - lifecycle events', () => {
       data: { customerId: 'cus_1' },
     }));
     expect(res.status).toBe(200);
+    // Revoke is the real downgrade: free tier, canceled status, link severed.
+    expect(updateChain.update).toHaveBeenCalledWith(expect.objectContaining({
+      tier: 'free',
+      status: 'canceled',
+      polar_subscription_id: null,
+    }));
+  });
+
+  it('subscription.updated past_due keeps access and sends the recovery email (Phase 11.3)', async () => {
+    const { supabaseAdmin } = await import('@/lib/supabase/admin');
+    const { sendPaymentFailedEmail } = await import('@/lib/services/email-service');
+    const fromMock = vi.mocked(supabaseAdmin.from);
+    // existing row (was active), then update, then user lookup for the email
+    const existingChain = chainFor({ data: { user_id: 'u1', tier: 'plus', status: 'active' }, error: null });
+    const updateChain = chainFor({ data: null, error: null });
+    const userChain = chainFor({ data: { email: 'u@x.com', full_name: 'User One' }, error: null });
+    fromMock
+      .mockReturnValueOnce(existingChain as never)
+      .mockReturnValueOnce(updateChain as never)
+      .mockReturnValueOnce(userChain as never);
+
+    const { POST } = await import('@/app/api/webhooks/polar/route');
+    const res = await POST(makeReq({
+      type: 'subscription.updated',
+      data: { customerId: 'cus_1', productId: 'prod_1', status: 'past_due' },
+    }));
+
+    expect(res.status).toBe(200);
+    // Access is kept (status past_due, not free) and the dunning email fires once.
+    expect(updateChain.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'past_due' }));
+    await new Promise(r => setTimeout(r, 0));
+    expect(sendPaymentFailedEmail).toHaveBeenCalled();
+  });
+
+  it('subscription.updated does NOT downgrade a paying customer on an unresolved productId (review fix)', async () => {
+    const { supabaseAdmin } = await import('@/lib/supabase/admin');
+    const { getPlanFromProductId } = await import('@/lib/polar');
+    // Missing/unrecognized product -> getPlanFromProductId returns 'free'.
+    vi.mocked(getPlanFromProductId).mockReturnValueOnce('free');
+
+    const fromMock = vi.mocked(supabaseAdmin.from);
+    const existingChain = chainFor({ data: { user_id: 'u1', tier: 'plus', status: 'active' }, error: null });
+    const updateChain = chainFor({ data: null, error: null });
+    fromMock.mockReturnValueOnce(existingChain as never).mockReturnValueOnce(updateChain as never);
+
+    const { POST } = await import('@/app/api/webhooks/polar/route');
+    const res = await POST(makeReq({
+      type: 'subscription.updated',
+      data: { customerId: 'cus_1' }, // no productId, no period fields
+    }));
+
+    expect(res.status).toBe(200);
+    const arg = (updateChain.update as ReturnType<typeof vi.fn>).mock.calls[0][0] as Record<string, unknown>;
+    // Existing paid tier must be PRESERVED, never silently set to free.
+    expect(arg.tier).toBe('plus');
+    // Period fields absent from the event must NOT be written (would null the
+    // paid-through date the cancel-grace entitlement depends on).
+    expect(arg.subscription_ends_at).toBeUndefined();
   });
 
   it('order.refunded with subscriptionId triggers subscription cancel', async () => {

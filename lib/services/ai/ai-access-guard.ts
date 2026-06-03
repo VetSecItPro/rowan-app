@@ -88,15 +88,19 @@ export async function validateAIAccess(
     return {
       allowed: false,
       tier: featureAccess.tier ?? 'free',
-      reason: 'AI features require a Pro or Family subscription. Upgrade to unlock Rowan AI.',
+      reason: 'AI features require a Plus or Family subscription. Upgrade to unlock Rowan AI.',
       statusCode: 403,
     };
   }
 
   const tier = featureAccess.tier ?? 'free';
 
-  // 2. Check token budget (optional)
-  if (checkBudgetToo && spaceId) {
+  // 2. Check token budget. Keyed on userId (NOT gated on spaceId): the per-user
+  //    daily + monthly COGS caps must always run, especially now that free users
+  //    have AI (Phase 11.6) — gating on spaceId would let a spaceId-less caller
+  //    bypass the cap entirely. The per-space budget inside checkBudget is the
+  //    part that needs spaceId, and it self-skips when spaceId is absent.
+  if (checkBudgetToo) {
     try {
       const budgetResult = await checkBudget(supabase, userId, tier, spaceId);
 
@@ -125,8 +129,18 @@ export async function validateAIAccess(
           : undefined,
       };
     } catch {
-      // Budget check failed — allow request but log warning
-      // Better to let a request through than block due to infra error
+      // Fail OPEN for paid tiers: better to serve a paying customer than block
+      // on a transient infra error (and their revenue covers the marginal cost).
+      // Fail CLOSED for free: the budget is the ONLY thing bounding $0-revenue
+      // marketing spend, so a DB error must not silently uncap free AI.
+      if (tier === 'free') {
+        return {
+          allowed: false,
+          tier,
+          reason: 'AI is briefly unavailable. Please try again in a moment.',
+          statusCode: 503,
+        };
+      }
       return {
         allowed: true,
         tier,

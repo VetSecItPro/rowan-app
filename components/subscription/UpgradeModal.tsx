@@ -103,7 +103,7 @@ export function UpgradeModal({
   const _subscription = useSubscriptionSafe();
 
   const featureInfo = feature ? FEATURE_MESSAGES[feature] : null;
-  const title = customTitle || featureInfo?.title || 'Upgrade to Pro';
+  const title = customTitle || featureInfo?.title || 'Upgrade to Plus';
   const description = customDescription || featureInfo?.description || 'Unlock all features for your family.';
 
   // Determine which tier is needed for this feature
@@ -151,7 +151,7 @@ export function UpgradeModal({
         {/* Features list */}
         <div className="space-y-4">
           <h3 className="font-semibold text-white">
-            {requiresFamily ? 'Family Plan includes:' : 'Pro Plan includes:'}
+            {requiresFamily ? 'Family Plan includes:' : 'Plus Plan includes:'}
           </h3>
 
           <ul className="space-y-2">
@@ -168,8 +168,8 @@ export function UpgradeModal({
         <div className="text-center">
           <p className="text-sm text-gray-400">
             {requiresFamily
-              ? 'Starting at $29/month'
-              : 'Starting at $18/month'}
+              ? 'Starting at $12/month'
+              : 'Starting at $8/month'}
           </p>
         </div>
       </div>

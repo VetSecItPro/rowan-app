@@ -88,7 +88,7 @@ export function BottomNav() {
                   }
                 }}
                 className="relative flex flex-col items-center justify-center flex-1 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-lg"
-                aria-label={isLocked ? 'Upgrade to Pro for AI' : 'Open AI chat'}
+                aria-label={isLocked ? 'Upgrade to Plus for AI' : 'Open AI chat'}
               >
                 <motion.div
                   whileTap={{ scale: 0.85 }}
@@ -120,7 +120,7 @@ export function BottomNav() {
                 </motion.div>
 
                 {isLocked && (
-                  <span className="text-[8px] text-gray-400 mt-0.5">Pro</span>
+                  <span className="text-[8px] text-gray-400 mt-0.5">Plus</span>
                 )}
               </button>
             );

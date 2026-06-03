@@ -17,7 +17,7 @@ import {
 interface SubscriptionWelcomeEmailProps {
   recipientEmail: string;
   recipientName: string;
-  tier: 'pro' | 'family';
+  tier: 'plus' | 'family';
   period: 'monthly' | 'annual';
   dashboardUrl: string;
   isFoundingMember?: boolean;
@@ -27,13 +27,13 @@ interface SubscriptionWelcomeEmailProps {
 const SubscriptionWelcomeEmail = ({
   recipientEmail = 'user@example.com',
   recipientName = 'there',
-  tier = 'pro',
+  tier = 'plus',
   period = 'monthly',
   dashboardUrl = 'https://rowanapp.com/dashboard',
   isFoundingMember = false,
   foundingMemberNumber,
 }: SubscriptionWelcomeEmailProps) => {
-  const tierName = tier === 'family' ? 'Family' : 'Pro';
+  const tierName = tier === 'family' ? 'Family' : 'Plus';
   const periodLabel = period === 'annual' ? 'annual' : 'monthly';
 
   const proFeatures = [

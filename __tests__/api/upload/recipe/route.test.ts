@@ -61,7 +61,7 @@ describe('/api/upload/recipe', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const req = new NextRequest('http://localhost/api/upload/recipe', { method: 'POST', body: new FormData() });
       const res = await POST(req);
@@ -78,7 +78,7 @@ describe('/api/upload/recipe', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(validateImageMagicBytes).mockResolvedValue({ valid: true, format: 'jpeg' });
       vi.mocked(isFormatAllowed).mockReturnValue(true);
       vi.mocked(uploadRecipeImage).mockResolvedValue({ success: true, url: 'https://cdn.example.com/recipe.jpg', path: 'recipes/abc.jpg' } as any);

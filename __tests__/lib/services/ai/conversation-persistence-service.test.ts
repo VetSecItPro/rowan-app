@@ -54,21 +54,21 @@ describe('calculateCostUsd', () => {
   });
 
   it('calculates input token cost correctly', () => {
-    // 1M input tokens = $0.15 (OpenRouter Gemini 2.5 Flash)
+    // 1M input tokens = $0.30 (OpenRouter Gemini 2.5 Flash, repriced 2026-05)
     const cost = calculateCostUsd(1_000_000, 0);
-    expect(cost).toBeCloseTo(0.15, 4);
+    expect(cost).toBeCloseTo(0.3, 4);
   });
 
   it('calculates output token cost correctly', () => {
-    // 1M output tokens = $0.60 (OpenRouter Gemini 2.5 Flash)
+    // 1M output tokens = $2.50 (OpenRouter Gemini 2.5 Flash, repriced 2026-05)
     const cost = calculateCostUsd(0, 1_000_000);
-    expect(cost).toBeCloseTo(0.6, 4);
+    expect(cost).toBeCloseTo(2.5, 4);
   });
 
   it('combines input and output token costs', () => {
     const cost = calculateCostUsd(300_000, 80_000);
-    // 300k input = 0.045, 80k output = 0.048
-    expect(cost).toBeCloseTo(0.045 + 0.048, 4);
+    // 300k input = 0.09 ($0.30/1M), 80k output = 0.20 ($2.50/1M)
+    expect(cost).toBeCloseTo(0.09 + 0.2, 4);
   });
 
   it('rounds to 6 decimal places', () => {
@@ -81,7 +81,7 @@ describe('calculateCostUsd', () => {
 
 describe('getTokenBudget', () => {
   it('returns pro budget for pro tier', () => {
-    const budget = getTokenBudget('pro');
+    const budget = getTokenBudget('plus');
     expect(budget.daily_input_tokens).toBe(300_000);
     expect(budget.daily_output_tokens).toBe(80_000);
   });
@@ -97,8 +97,15 @@ describe('getTokenBudget', () => {
     expect(budget.daily_input_tokens).toBe(300_000);
   });
 
-  it('falls back to pro budget for free tier (no AI access)', () => {
+  it('gives the free tier its own tight teaser budget (Phase 11.6)', () => {
     const budget = getTokenBudget('free');
+    // Free is a small daily AI teaser, NOT the full paid budget.
+    expect(budget.daily_input_tokens).toBe(40_000);
+    expect(budget.daily_conversations).toBe(5);
+  });
+
+  it('falls back to the plus budget for an unknown tier', () => {
+    const budget = getTokenBudget('mystery-tier');
     expect(budget.daily_input_tokens).toBe(300_000);
   });
 });
@@ -426,7 +433,7 @@ describe('checkBudget', () => {
       from: vi.fn(() => createChainMock({ data: null, error: null })),
     } as unknown as Parameters<typeof checkBudget>[0];
 
-    const result = await checkBudget(supabase, 'user-1', 'pro', 'space-1');
+    const result = await checkBudget(supabase, 'user-1', 'plus', 'space-1');
     expect(result.allowed).toBe(true);
     expect(result.remaining_input_tokens).toBe(300_000);
     expect(result.remaining_output_tokens).toBe(80_000);
@@ -437,22 +444,42 @@ describe('checkBudget', () => {
     // User has used all their input tokens
     const supabase = {
       from: vi.fn(() =>
+        // ai_usage_daily is keyed (user_id, date, feature_source) — the per-user
+        // budget now SUMS a list of rows, so the mock returns an array.
         createChainMock({
-          data: {
-            input_tokens: 300_001,
-            output_tokens: 0,
-            voice_seconds: 0,
-            conversation_count: 0,
-          },
+          data: [
+            { input_tokens: 300_001, output_tokens: 0, voice_seconds: 0, conversation_count: 0 },
+          ],
           error: null,
         })
       ),
     } as unknown as Parameters<typeof checkBudget>[0];
 
-    const result = await checkBudget(supabase, 'user-1', 'pro');
+    const result = await checkBudget(supabase, 'user-1', 'plus');
     expect(result.allowed).toBe(false);
     expect(result.remaining_input_tokens).toBe(0);
     expect(result.reason).toMatch(/daily AI limit/);
+  });
+
+  it('SUMS per-user usage across feature_source rows (SEC-AI-01: no .single() fail-open)', async () => {
+    // Two rows for the same user+date (e.g. 'chat' + 'briefing'). The old
+    // .single() would have errored on multiple rows and read usage as 0,
+    // silently disabling the cap. Summing them (200K + 150K = 350K > 300K Plus
+    // input budget) must block.
+    const supabase = {
+      from: vi.fn(() =>
+        createChainMock({
+          data: [
+            { input_tokens: 200_000, output_tokens: 0, voice_seconds: 0, conversation_count: 0 },
+            { input_tokens: 150_000, output_tokens: 0, voice_seconds: 0, conversation_count: 0 },
+          ],
+          error: null,
+        })
+      ),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'plus');
+    expect(result.allowed).toBe(false);
   });
 
   it('returns allowed=true when spaceId is not provided and user has budget', async () => {
@@ -460,7 +487,7 @@ describe('checkBudget', () => {
       from: vi.fn(() => createChainMock({ data: null, error: null })),
     } as unknown as Parameters<typeof checkBudget>[0];
 
-    const result = await checkBudget(supabase, 'user-1', 'pro');
+    const result = await checkBudget(supabase, 'user-1', 'plus');
     expect(result.allowed).toBe(true);
   });
 
@@ -472,5 +499,17 @@ describe('checkBudget', () => {
     const result = await checkBudget(supabase, 'user-1', 'enterprise');
     expect(result.allowed).toBe(true);
     expect(result.remaining_input_tokens).toBe(300_000);
+  });
+
+  it('blocks when the monthly COGS cap is exceeded (Phase 10.6)', async () => {
+    // Daily usage is empty (within daily caps), but the month's summed
+    // estimated_cost_usd ($5) is over the Plus monthly cap ($1.50).
+    const supabase = {
+      from: vi.fn(() => createChainMock({ data: [{ estimated_cost_usd: 5 }], error: null })),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'plus');
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toMatch(/month/i);
   });
 });

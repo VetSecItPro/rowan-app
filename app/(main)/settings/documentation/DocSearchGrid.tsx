@@ -31,7 +31,7 @@ const documentationSearchKeywords: Record<string, string[]> = {
   expenses: ['expense', 'receipt', 'scan', 'spending', 'money', 'track', 'cost', 'ai'],
   projects: ['project', 'budget', 'vendor', 'contractor', 'renovation', 'actual'],
   checkin: ['check-in', 'checkin', 'wellness', 'mood', 'emotion', 'feeling', 'daily'],
-  subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'pro', 'family', 'upgrade', 'cancel'],
+  subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'plus', 'pro', 'family', 'upgrade', 'cancel'],
   rewards: ['reward', 'points', 'redeem', 'earn', 'chore', 'incentive', 'prize', 'catalog', 'shop', 'kids', 'children'],
 };
 

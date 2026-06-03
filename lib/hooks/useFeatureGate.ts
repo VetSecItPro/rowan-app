@@ -39,17 +39,17 @@ const FEATURE_LIMIT_MAP: Record<GatedFeature, keyof FeatureLimits> = {
 
 // Map features to their required minimum tier
 const FEATURE_TIER_MAP: Record<GatedFeature, SubscriptionTier> = {
-  mealPlanning: 'pro',
-  goals: 'pro',
-  household: 'pro',
-  photos: 'pro',
-  ai: 'pro',
+  mealPlanning: 'plus',
+  goals: 'plus',
+  household: 'plus',
+  photos: 'plus',
+  ai: 'plus',
   integrations: 'family',
-  calendar: 'pro',
+  calendar: 'plus',
   reminders: 'free', // Available to all
-  unlimitedTasks: 'pro',
-  unlimitedMessages: 'pro',
-  unlimitedShopping: 'pro',
+  unlimitedTasks: 'plus',
+  unlimitedMessages: 'plus',
+  unlimitedShopping: 'plus',
 };
 
 // Human-readable feature names

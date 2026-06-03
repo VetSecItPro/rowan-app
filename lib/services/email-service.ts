@@ -889,7 +889,7 @@ import SubscriptionCancelledEmail from '@/lib/emails/templates/SubscriptionCance
 export interface SubscriptionWelcomeData {
   recipientEmail: string;
   recipientName: string;
-  tier: 'pro' | 'family';
+  tier: 'plus' | 'family';
   period: 'monthly' | 'annual';
   dashboardUrl: string;
   isFoundingMember?: boolean;
@@ -899,7 +899,7 @@ export interface SubscriptionWelcomeData {
 export interface PaymentFailedData {
   recipientEmail: string;
   recipientName: string;
-  tier: 'pro' | 'family';
+  tier: 'plus' | 'family';
   attemptCount: number;
   updatePaymentUrl: string;
   gracePeriodDays: number;
@@ -908,7 +908,7 @@ export interface PaymentFailedData {
 export interface SubscriptionCancelledData {
   recipientEmail: string;
   recipientName: string;
-  tier: 'pro' | 'family';
+  tier: 'plus' | 'family';
   accessUntil: string;
   resubscribeUrl: string;
 }
@@ -929,7 +929,7 @@ export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData
       return { success: false, error: 'Email service not configured' };
     }
 
-    const tierName = data.tier === 'family' ? 'Family' : 'Pro';
+    const tierName = data.tier === 'family' ? 'Family' : 'Plus';
     const emailHtml = await render(SubscriptionWelcomeEmail(data));
 
     const subject = data.isFoundingMember
@@ -1021,7 +1021,7 @@ export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelled
       return { success: false, error: 'Email service not configured' };
     }
 
-    const tierName = data.tier === 'family' ? 'Family' : 'Pro';
+    const tierName = data.tier === 'family' ? 'Family' : 'Plus';
     const emailHtml = await render(SubscriptionCancelledEmail(data));
 
     const { data: result, error } = await resend.emails.send({

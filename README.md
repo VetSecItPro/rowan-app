@@ -86,7 +86,7 @@ Annual billing saves 2 months on both Pro ($180/yr) and Family ($290/yr).
 
 ## Built With
 
-- [Next.js 15](https://nextjs.org/) + [React 19](https://react.dev/) — App Router, Server Components, Streaming
+- [Next.js 16](https://nextjs.org/) + [React 19](https://react.dev/) - App Router, Server Components, Streaming
 - [TypeScript](https://www.typescriptlang.org/) — Strict mode throughout
 - [Supabase](https://supabase.com/) — PostgreSQL, Auth, Row Level Security, Realtime
 - [Tailwind CSS 4](https://tailwindcss.com/) + [Framer Motion](https://www.framer.com/motion/) — Dark mode UI with fluid animations

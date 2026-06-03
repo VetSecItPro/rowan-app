@@ -358,7 +358,7 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
                     <div className="w-full bg-gray-700 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all ${
-                          tier.tier === 'Pro' ? 'bg-blue-500' : 'bg-purple-500'
+                          tier.tier === 'Plus' ? 'bg-blue-500' : 'bg-purple-500'
                         }`}
                         style={{ width: `${tier.percentage}%` }}
                       />

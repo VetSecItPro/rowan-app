@@ -42,7 +42,7 @@ describe('useFeatureGate', () => {
   it('should grant access to pro tier for AI features', () => {
     mockUseSubscriptionSafe.mockReturnValue({
       canAccess: (feature: string) => feature === 'canUseAI',
-      effectiveTier: 'pro' as SubscriptionTier,
+      effectiveTier: 'plus' as SubscriptionTier,
       isLoading: false,
       showUpgradeModal: mockShowUpgradeModal,
     });
@@ -50,8 +50,8 @@ describe('useFeatureGate', () => {
     const { result } = renderHook(() => useFeatureGate('ai'));
 
     expect(result.current.hasAccess).toBe(true);
-    expect(result.current.tier).toBe('pro');
-    expect(result.current.requiredTier).toBe('pro');
+    expect(result.current.tier).toBe('plus');
+    expect(result.current.requiredTier).toBe('plus');
     expect(result.current.featureName).toBe('AI Features');
   });
 
@@ -67,7 +67,7 @@ describe('useFeatureGate', () => {
 
     expect(result.current.hasAccess).toBe(false);
     expect(result.current.tier).toBe('free');
-    expect(result.current.requiredTier).toBe('pro');
+    expect(result.current.requiredTier).toBe('plus');
   });
 
   it('should call showUpgradeModal on promptUpgrade', () => {
@@ -109,7 +109,7 @@ describe('useFeatureGate', () => {
   it('should return true on checkAndPrompt when has access', () => {
     mockUseSubscriptionSafe.mockReturnValue({
       canAccess: () => true,
-      effectiveTier: 'pro' as SubscriptionTier,
+      effectiveTier: 'plus' as SubscriptionTier,
       isLoading: false,
       showUpgradeModal: mockShowUpgradeModal,
     });
@@ -142,7 +142,7 @@ describe('useFeatureGate', () => {
   it('should require family tier for integrations', () => {
     mockUseSubscriptionSafe.mockReturnValue({
       canAccess: () => false,
-      effectiveTier: 'pro' as SubscriptionTier,
+      effectiveTier: 'plus' as SubscriptionTier,
       isLoading: false,
       showUpgradeModal: mockShowUpgradeModal,
     });

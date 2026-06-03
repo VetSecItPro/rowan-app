@@ -28,15 +28,15 @@ describe('PricingPreviewSection', () => {
   it('renders all three pricing tier names', () => {
     render(<PricingPreviewSection onSignupClick={vi.fn()} />);
     expect(screen.getByText('Free')).toBeTruthy();
-    expect(screen.getByText('Pro')).toBeTruthy();
+    expect(screen.getByText('Plus')).toBeTruthy();
     expect(screen.getByText('Family')).toBeTruthy();
   });
 
   it('renders pricing amounts', () => {
     render(<PricingPreviewSection onSignupClick={vi.fn()} />);
     expect(screen.getByText('$0')).toBeTruthy();
-    expect(screen.getByText('$18')).toBeTruthy();
-    expect(screen.getByText('$29')).toBeTruthy();
+    expect(screen.getByText('$8')).toBeTruthy();
+    expect(screen.getByText('$12')).toBeTruthy();
   });
 
   it('renders the Popular badge for the Pro tier', () => {

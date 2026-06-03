@@ -311,7 +311,7 @@ describe('email-service', () => {
       const data: emailService.SubscriptionWelcomeData = {
         recipientEmail: 'user@example.com',
         recipientName: 'John',
-        tier: 'pro',
+        tier: 'plus',
         period: 'monthly',
         dashboardUrl: 'https://app.com/dashboard',
       };
@@ -321,7 +321,7 @@ describe('email-service', () => {
       expect(result.success).toBe(true);
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          subject: expect.stringContaining('Pro'),
+          subject: expect.stringContaining('Plus'),
         })
       );
     });

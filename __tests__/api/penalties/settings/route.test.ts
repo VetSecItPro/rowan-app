@@ -60,7 +60,7 @@ describe('/api/penalties/settings', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const res = await GET(new NextRequest('http://localhost/api/penalties/settings'));
       expect(res.status).toBe(400);
@@ -77,7 +77,7 @@ describe('/api/penalties/settings', () => {
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
         from: vi.fn(() => memberChain),
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getSpacePenaltySettings).mockResolvedValue({ enabled: true, default_penalty_points: 10 } as any);
 
       const res = await GET(new NextRequest('http://localhost/api/penalties/settings?spaceId=space-1'));
@@ -98,7 +98,7 @@ describe('/api/penalties/settings', () => {
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
         from: vi.fn(() => memberChain),
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const res = await PUT(new NextRequest('http://localhost/api/penalties/settings', {
         method: 'PUT',

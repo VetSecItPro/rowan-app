@@ -76,7 +76,7 @@ describe('SubscriptionContext concurrency + error handling', () => {
 
   it('isLoading flips false after successful fetch', async () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      jsonResponse({ tier: 'pro' })
+      jsonResponse({ tier: 'plus' })
     );
 
     const states: Array<{ tier: string; isLoading: boolean }> = [];
@@ -87,7 +87,7 @@ describe('SubscriptionContext concurrency + error handling', () => {
     );
 
     await waitFor(() => {
-      expect(states.some(s => !s.isLoading && s.tier === 'pro')).toBe(true);
+      expect(states.some(s => !s.isLoading && s.tier === 'plus')).toBe(true);
     });
   });
 
@@ -230,14 +230,14 @@ describe('SubscriptionContext concurrency + error handling', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      resolveResponse(jsonResponse({ tier: 'pro' }));
+      resolveResponse(jsonResponse({ tier: 'plus' }));
       await Promise.resolve();
     });
   });
 
   it('after dedup completes, a fresh refresh starts a new fetch', async () => {
     const fetchMock = global.fetch as ReturnType<typeof vi.fn>;
-    fetchMock.mockResolvedValueOnce(jsonResponse({ tier: 'pro' }));
+    fetchMock.mockResolvedValueOnce(jsonResponse({ tier: 'plus' }));
 
     const refreshHolder: { current: (() => Promise<void>) | null } = { current: null };
     function CaptureRefresh() {

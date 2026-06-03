@@ -22,8 +22,8 @@ const tiers = [
     popular: false,
   },
   {
-    name: 'Pro',
-    price: '$18',
+    name: 'Plus',
+    price: '$8',
     period: '/mo',
     description: 'Everything you need for your household',
     features: [
@@ -36,11 +36,11 @@ const tiers = [
   },
   {
     name: 'Family',
-    price: '$29',
+    price: '$12',
     period: '/mo',
     description: 'For larger families who need more',
     features: [
-      'Everything in Pro',
+      'Everything in Plus',
       '6 household members',
       'AI Assistant (Full + Voice)',
       'Advanced analytics',

@@ -17,7 +17,7 @@ import {
 interface PaymentFailedEmailProps {
   recipientEmail: string;
   recipientName: string;
-  tier: 'pro' | 'family';
+  tier: 'plus' | 'family';
   attemptCount: number;
   updatePaymentUrl: string;
   gracePeriodDays: number;
@@ -26,12 +26,12 @@ interface PaymentFailedEmailProps {
 const PaymentFailedEmail = ({
   recipientEmail = 'user@example.com',
   recipientName = 'there',
-  tier = 'pro',
+  tier = 'plus',
   attemptCount = 1,
   updatePaymentUrl = 'https://rowanapp.com/settings/billing',
   gracePeriodDays = 7,
 }: PaymentFailedEmailProps) => {
-  const tierName = tier === 'family' ? 'Family' : 'Pro';
+  const tierName = tier === 'family' ? 'Family' : 'Plus';
 
   return (
     <Html>

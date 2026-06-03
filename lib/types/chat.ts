@@ -10,12 +10,21 @@ export type ChatRole = 'user' | 'assistant' | 'system';
 // `model_used` carries the OpenRouter model id resolved by the orchestrator
 // (primary on success, fallback after primary fails). The API route uses it
 // to bill turns at Flash vs Flash Lite rates so admin cost cards stay honest.
-export type ChatStreamEventType = 'text' | 'tool_call' | 'result' | 'error' | 'done' | 'conversation_id' | 'model_used';
+export type ChatStreamEventType = 'text' | 'tool_call' | 'result' | 'error' | 'done' | 'conversation_id' | 'model_used' | 'usage';
 
 // A single streamed event from the server
 export interface ChatStreamEvent {
   type: ChatStreamEventType;
-  data: string | ToolCallEvent | ResultEvent | ErrorEvent;
+  data: string | ToolCallEvent | ResultEvent | ErrorEvent | UsageEvent;
+}
+
+// Real token usage reported by the model provider for a single model call
+// (Phase 10.3). The API route sums these across all tool-call rounds and
+// records the actual billed tokens instead of a char-length estimate, so the
+// per-user daily budget becomes a genuine dollar ceiling.
+export interface UsageEvent {
+  promptTokens: number;
+  completionTokens: number;
 }
 
 // When the AI wants to call a tool (service method)

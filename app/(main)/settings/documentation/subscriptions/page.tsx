@@ -44,7 +44,7 @@ const guideSections: GuideSection[] = [
     articles: [
       {
         title: 'Understanding Rowan Plans',
-        description: 'Compare Free, Pro, and Family plans to find the right fit for your household',
+        description: 'Compare Free, Plus, and Family plans to find the right fit for your household',
         readTime: '4 min read',
         href: '#understanding-plans',
       },
@@ -56,7 +56,7 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Choosing a Plan',
-        description: 'Factors to consider when selecting between Pro and Family subscriptions',
+        description: 'Factors to consider when selecting between Plus and Family subscriptions',
         readTime: '5 min read',
         href: '#choosing-plan',
       },
@@ -75,7 +75,7 @@ const guideSections: GuideSection[] = [
     articles: [
       {
         title: 'What\'s Included in the Trial',
-        description: 'Full access to all Pro features for 14 days - no restrictions',
+        description: 'Full access to all Plus features for 14 days - no restrictions',
         readTime: '3 min read',
         href: '#trial-features',
       },
@@ -93,7 +93,7 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'What Happens When Trial Ends',
-        description: 'Your data stays safe - you just lose access to Pro features until you subscribe',
+        description: 'Your data stays safe - you just lose access to Plus features until you subscribe',
         readTime: '4 min read',
         href: '#trial-ends',
       },
@@ -143,7 +143,7 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Upgrading Your Plan',
-        description: 'Move from Free to Pro, or Pro to Family at any time',
+        description: 'Move from Free to Plus, or Plus to Family at any time',
         readTime: '4 min read',
         href: '#upgrading',
       },
@@ -173,14 +173,14 @@ const guideSections: GuideSection[] = [
         href: '#free-features',
       },
       {
-        title: 'Pro Plan Features',
-        description: 'Advanced features for individuals and couples - $18/month',
+        title: 'Plus Plan Features',
+        description: 'Advanced features for individuals and couples - $8/month',
         readTime: '5 min read',
         href: '#pro-features',
       },
       {
         title: 'Family Plan Features',
-        description: 'Everything in Pro plus family features for up to 6 members - $29/month',
+        description: 'Everything in Plus plus family features for up to 6 members - $12/month',
         readTime: '5 min read',
         href: '#family-features',
       },
@@ -268,7 +268,7 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
               </div>
 
-              {/* Pro Plan */}
+              {/* Plus Plan */}
               <div className="p-6 bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border-2 border-emerald-700 rounded-2xl relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-3 py-1 text-xs font-bold bg-emerald-500 text-white rounded-full">POPULAR</span>
@@ -276,8 +276,8 @@ export default function SubscriptionsDocumentationPage() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center mb-4">
                   <Crown className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
-                <p className="text-2xl font-bold text-white mb-2">$18<span className="text-sm font-normal text-gray-500">/month</span></p>
+                <h3 className="text-lg font-bold text-white mb-1">Plus</h3>
+                <p className="text-2xl font-bold text-white mb-2">$8<span className="text-sm font-normal text-gray-500">/month</span></p>
                 <p className="text-sm text-gray-400">
                   Advanced features for individuals and couples
                 </p>
@@ -289,9 +289,9 @@ export default function SubscriptionsDocumentationPage() {
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1">Family</h3>
-                <p className="text-2xl font-bold text-white mb-2">$29<span className="text-sm font-normal text-gray-500">/month</span></p>
+                <p className="text-2xl font-bold text-white mb-2">$12<span className="text-sm font-normal text-gray-500">/month</span></p>
                 <p className="text-sm text-gray-400">
-                  Everything in Pro + family features for up to 6 members
+                  Everything in Plus + family features for up to 6 members
                 </p>
               </div>
             </div>
@@ -307,7 +307,7 @@ export default function SubscriptionsDocumentationPage() {
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-1">14-Day Free Trial</h3>
                   <p className="text-white/90">
-                    Try all Pro features free for 14 days. No credit card required - just sign up and start organizing!
+                    Try all Plus features free for 14 days. No credit card required - just sign up and start organizing!
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/20 rounded-xl">
@@ -380,7 +380,7 @@ export default function SubscriptionsDocumentationPage() {
                     <tr className="border-b border-gray-700">
                       <th className="text-left py-4 px-4 font-semibold text-white">Feature</th>
                       <th className="text-center py-4 px-4 font-semibold text-gray-500">Free</th>
-                      <th className="text-center py-4 px-4 font-semibold text-emerald-400">Pro</th>
+                      <th className="text-center py-4 px-4 font-semibold text-emerald-400">Plus</th>
                       <th className="text-center py-4 px-4 font-semibold text-purple-400">Family</th>
                     </tr>
                   </thead>
@@ -453,7 +453,7 @@ export default function SubscriptionsDocumentationPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-gray-400">14 days of full Pro access</span>
+                      <span className="text-gray-400">14 days of full Plus access</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500" />
@@ -502,8 +502,8 @@ export default function SubscriptionsDocumentationPage() {
                   Annual Savings
                 </h4>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Save ~17% with annual billing! Pro is just $180/year (vs $216 monthly) and
-                  Family is $290/year (vs $348 monthly). That&apos;s 2 months free! Annual plans are charged once per year and
+                  Save over 30% with annual billing! Plus is just $60/year (vs $96 monthly) and
+                  Family is $96/year (vs $144 monthly). That&apos;s over 30%! Annual plans are charged once per year and
                   include all the same features.
                 </p>
               </div>
@@ -534,16 +534,16 @@ export default function SubscriptionsDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">The Three Plans</h3>
                 <ul className="list-disc list-inside space-y-3 text-gray-400">
                   <li><strong>Free ($0/month):</strong> Essential features for basic household organization. Tasks, shopping lists, calendar, and messaging for up to 2 people.</li>
-                  <li><strong>Pro ($18/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and advanced analytics.</li>
-                  <li><strong>Family ($29/month):</strong> Everything in Pro plus support for up to 6 household members, family-specific features, and additional storage.</li>
+                  <li><strong>Plus ($8/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and advanced analytics.</li>
+                  <li><strong>Family ($12/month):</strong> Everything in Plus plus support for up to 6 household members, family-specific features, and additional storage.</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Who Is Each Plan For?</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  <strong>Free</strong> is perfect for individuals or couples who need basic organization. <strong>Pro</strong> is ideal for couples or roommates who want advanced features like meal planning and budget tracking. <strong>Family</strong> is designed for households with children or extended family members living together.
+                  <strong>Free</strong> is perfect for individuals or couples who need basic organization. <strong>Plus</strong> is ideal for couples or roommates who want advanced features like meal planning and budget tracking. <strong>Family</strong> is designed for households with children or extended family members living together.
                 </p>
                 <div className="p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg mt-6">
                   <p className="text-emerald-200 text-sm">
-                    <strong>Try Before You Buy:</strong> Start with a 14-day free trial of Pro to experience all the advanced features before committing.
+                    <strong>Try Before You Buy:</strong> Start with a 14-day free trial of Plus to experience all the advanced features before committing.
                   </p>
                 </div>
               </div>
@@ -562,18 +562,18 @@ export default function SubscriptionsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Every new Rowan user gets a 14-day free trial of Pro features. No credit card required - just sign up and start organizing your household immediately.
+                  Every new Rowan user gets a 14-day free trial of Plus features. No credit card required - just sign up and start organizing your household immediately.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Start Your Trial</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Create a Rowan account with your email</li>
                   <li>Verify your email address</li>
                   <li>Your 14-day trial starts automatically</li>
-                  <li>Explore all Pro features at no cost</li>
+                  <li>Explore all Plus features at no cost</li>
                 </ol>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What You Get</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  During your trial, you have full access to every Pro feature: meal planning, goals and milestones, expense tracking, AI receipt scanning, and more. There are no restrictions - it&apos;s the complete Pro experience.
+                  During your trial, you have full access to every Plus feature: meal planning, goals and milestones, expense tracking, AI receipt scanning, and more. There are no restrictions - it&apos;s the complete Plus experience.
                 </p>
                 <div className="p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg mt-6">
                   <p className="text-emerald-200 text-sm">
@@ -600,18 +600,18 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Questions to Consider</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>How many people will use Rowan?</strong> 2 or fewer = Free/Pro works. 3-6 = Family recommended.</li>
-                  <li><strong>Do you need meal planning?</strong> Only available in Pro and Family.</li>
-                  <li><strong>Do you track expenses?</strong> Expense tracking and receipt scanning are Pro features.</li>
-                  <li><strong>Do you set goals together?</strong> Goals &amp; Milestones is a Pro feature.</li>
+                  <li><strong>How many people will use Rowan?</strong> 2 or fewer = Free/Plus works. 3-6 = Family recommended.</li>
+                  <li><strong>Do you need meal planning?</strong> Only available in Plus and Family.</li>
+                  <li><strong>Do you track expenses?</strong> Expense tracking and receipt scanning are Plus features.</li>
+                  <li><strong>Do you set goals together?</strong> Goals &amp; Milestones is a Plus feature.</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pro vs Family Decision</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Plus vs Family Decision</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The main difference between Pro and Family is the number of space members (2 vs 6) and family-oriented features. If you&apos;re a couple without kids, Pro is usually sufficient. If you have children or extended family sharing the household, Family provides the extra member slots and features designed for larger groups.
+                  The main difference between Plus and Family is the number of space members (2 vs 6) and family-oriented features. If you&apos;re a couple without kids, Plus is usually sufficient. If you have children or extended family sharing the household, Family provides the extra member slots and features designed for larger groups.
                 </p>
                 <div className="p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg mt-6">
                   <p className="text-emerald-200 text-sm">
-                    <strong>Easy Upgrades:</strong> You can upgrade at any time. Start with Pro and move to Family later if your household grows.
+                    <strong>Easy Upgrades:</strong> You can upgrade at any time. Start with Plus and move to Family later if your household grows.
                   </p>
                 </div>
               </div>
@@ -634,10 +634,10 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Price Comparison</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>Pro Monthly:</strong> $18/month ($216/year total)</li>
-                  <li><strong>Pro Annual:</strong> $180/year ($15/month equivalent) - Save ~17% (2 months free)</li>
-                  <li><strong>Family Monthly:</strong> $29/month ($348/year total)</li>
-                  <li><strong>Family Annual:</strong> $290/year ($24.17/month equivalent) - Save ~17% (2 months free)</li>
+                  <li><strong>Plus Monthly:</strong> $8/month ($96/year total)</li>
+                  <li><strong>Plus Annual:</strong> $60/year ($5/month equivalent) - Save over 30%</li>
+                  <li><strong>Family Monthly:</strong> $12/month ($144/year total)</li>
+                  <li><strong>Family Annual:</strong> $96/year ($8/month equivalent) - Save over 30%</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">When to Choose Each</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
@@ -668,7 +668,7 @@ export default function SubscriptionsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Your 14-day free trial gives you unrestricted access to every Pro feature. This isn&apos;t a limited demo - it&apos;s the full Pro experience so you can make an informed decision.
+                  Your 14-day free trial gives you unrestricted access to every Plus feature. This isn&apos;t a limited demo - it&apos;s the full Plus experience so you can make an informed decision.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Full Feature Access</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -686,7 +686,7 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <div className="p-4 bg-purple-900/30 border border-purple-800 rounded-lg mt-6">
                   <p className="text-purple-200 text-sm">
-                    <strong>Maximize Your Trial:</strong> Try to use each Pro feature at least once during your trial to see if it fits your lifestyle.
+                    <strong>Maximize Your Trial:</strong> Try to use each Plus feature at least once during your trial to see if it fits your lifestyle.
                   </p>
                 </div>
               </div>
@@ -716,11 +716,11 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">When You&apos;ll Need Payment Info</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  You&apos;ll only enter payment information if and when you decide to subscribe. After your trial, you can either subscribe to continue with Pro features or stay on the Free plan indefinitely.
+                  You&apos;ll only enter payment information if and when you decide to subscribe. After your trial, you can either subscribe to continue with Plus features or stay on the Free plan indefinitely.
                 </p>
                 <div className="p-4 bg-purple-900/30 border border-purple-800 rounded-lg mt-6">
                   <p className="text-purple-200 text-sm">
-                    <strong>No Gotchas:</strong> When your trial ends, you simply lose access to Pro features. Your data stays safe, and you keep Free features forever.
+                    <strong>No Gotchas:</strong> When your trial ends, you simply lose access to Plus features. Your data stays safe, and you keep Free features forever.
                   </p>
                 </div>
               </div>
@@ -750,11 +750,11 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What the Reminders Include</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Each reminder tells you exactly what will happen: your data stays safe, you keep Free features, and you can subscribe anytime to regain Pro features. We also highlight what you&apos;ll miss most based on your usage.
+                  Each reminder tells you exactly what will happen: your data stays safe, you keep Free features, and you can subscribe anytime to regain Plus features. We also highlight what you&apos;ll miss most based on your usage.
                 </p>
                 <div className="p-4 bg-purple-900/30 border border-purple-800 rounded-lg mt-6">
                   <p className="text-purple-200 text-sm">
-                    <strong>Your Timeline:</strong> Check Settings → Subscription to see your exact trial end date and a summary of your Pro feature usage.
+                    <strong>Your Timeline:</strong> Check Settings → Subscription to see your exact trial end date and a summary of your Plus feature usage.
                   </p>
                 </div>
               </div>
@@ -784,13 +784,13 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What Changes</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Pro-only features become locked (meal planning, goals, expenses, etc.)</li>
-                  <li>Data created in Pro features remains but is read-only until you subscribe</li>
+                  <li>Plus-only features become locked (meal planning, goals, expenses, etc.)</li>
+                  <li>Data created in Plus features remains but is read-only until you subscribe</li>
                   <li>You&apos;ll see upgrade prompts when trying to access locked features</li>
                 </ul>
                 <div className="p-4 bg-purple-900/30 border border-purple-800 rounded-lg mt-6">
                   <p className="text-purple-200 text-sm">
-                    <strong>Subscribe Anytime:</strong> Even months later, you can subscribe and immediately regain access to all Pro features and your existing data.
+                    <strong>Subscribe Anytime:</strong> Even months later, you can subscribe and immediately regain access to all Plus features and your existing data.
                   </p>
                 </div>
               </div>
@@ -1000,13 +1000,13 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Upgrade Paths</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>Free → Pro:</strong> Gain all premium features (meal planning, goals, expenses, etc.)</li>
-                  <li><strong>Free → Family:</strong> Skip Pro and go directly to Family features</li>
-                  <li><strong>Pro → Family:</strong> Add more member slots (6 vs 2) and family features</li>
+                  <li><strong>Free → Plus:</strong> Gain all premium features (meal planning, goals, expenses, etc.)</li>
+                  <li><strong>Free → Family:</strong> Skip Plus and go directly to Family features</li>
+                  <li><strong>Plus → Family:</strong> Add more member slots (6 vs 2) and family features</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How Proration Works</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  When you upgrade mid-cycle, you only pay the difference. For example, if you&apos;re halfway through a Pro month and upgrade to Family, you pay half the Family price for the remaining time. Your next full billing cycle adjusts to the new plan.
+                  When you upgrade mid-cycle, you only pay the difference. For example, if you&apos;re halfway through a Plus month and upgrade to Family, you pay half the Family price for the remaining time. Your next full billing cycle adjusts to the new plan.
                 </p>
                 <div className="p-4 bg-orange-900/30 border border-orange-800 rounded-lg mt-6">
                   <p className="text-orange-200 text-sm">
@@ -1033,8 +1033,8 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Downgrade Options</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>Family → Pro:</strong> Lose family features and extra member slots (6 → 2)</li>
-                  <li><strong>Pro → Free:</strong> Lose all premium features but keep basic functionality</li>
+                  <li><strong>Family → Plus:</strong> Lose family features and extra member slots (6 → 2)</li>
+                  <li><strong>Plus → Free:</strong> Lose all premium features but keep basic functionality</li>
                   <li><strong>Family → Free:</strong> Return to basic features only</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What Happens to Your Data</h3>
@@ -1115,7 +1115,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Limitations</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Free users don&apos;t have access to meal planning, goals, expense tracking, or AI features. These are reserved for Pro and Family subscribers.
+                  Free users don&apos;t have access to meal planning, goals, expense tracking, or AI features. These are reserved for Plus and Family subscribers.
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
@@ -1128,17 +1128,17 @@ export default function SubscriptionsDocumentationPage() {
               </a>
             </section>
 
-            {/* Pro Plan Features */}
+            {/* Plus Plan Features */}
             <section id="pro-features" className="scroll-mt-24">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                   <Crown className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white">Pro Plan Features</h2>
+                <h2 className="text-2xl font-bold text-white">Plus Plan Features</h2>
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Pro is our most popular plan, unlocking advanced features for individuals and couples who want comprehensive household management.
+                  Plus is our most popular plan, unlocking advanced features for individuals and couples who want comprehensive household management.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Everything in Free, Plus:</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -1150,11 +1150,11 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  $18/month or $180/year (save ~17% with annual — 2 months free). Both options include all Pro features with no restrictions.
+                  $8/month or $60/year (save over 30% with annual). Both options include all Plus features with no restrictions.
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
-                    <strong>Best Value:</strong> Pro is ideal for couples who want the full Rowan experience without needing extra member slots.
+                    <strong>Best Value:</strong> Plus is ideal for couples who want the full Rowan experience without needing extra member slots.
                   </p>
                 </div>
               </div>
@@ -1173,9 +1173,9 @@ export default function SubscriptionsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The Family plan is designed for larger households. Get everything in Pro plus additional member capacity and family-oriented features.
+                  The Family plan is designed for larger households. Get everything in Plus plus additional member capacity and family-oriented features.
                 </p>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Everything in Pro, Plus:</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Everything in Plus, Plus:</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Up to 6 Members:</strong> Invite children, extended family, or roommates</li>
                   <li><strong>Chore Rotation:</strong> Automatically rotate chore assignments among family members</li>
@@ -1186,7 +1186,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  $29/month or $290/year (save ~17% with annual — 2 months free). That&apos;s less than $5/month per member for a family of 6!
+                  $12/month or $96/year (save over 30% with annual). That&apos;s less than $5/month per member for a family of 6!
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
@@ -1361,7 +1361,7 @@ export default function SubscriptionsDocumentationPage() {
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Email:</strong> contact@steelmotionllc.com</li>
                   <li><strong>In-App:</strong> Settings → Support → Contact Us</li>
-                  <li><strong>Response Time:</strong> Usually within 24 hours (Pro/Family get priority)</li>
+                  <li><strong>Response Time:</strong> Usually within 24 hours (Plus/Family get priority)</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What to Include</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">

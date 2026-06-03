@@ -5,7 +5,7 @@ import { POST } from '@/app/api/polar/checkout/route';
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/lib/polar', () => ({
   getPolarClient: vi.fn(),
-  POLAR_PLANS: { pro: {}, family: {} },
+  POLAR_PLANS: { plus: {}, family: {} },
   getProductId: vi.fn(),
 }));
 vi.mock('@/lib/ratelimit', () => ({ checkGeneralRateLimit: vi.fn() }));
@@ -38,7 +38,7 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       expect(res.status).toBe(429);
     });
@@ -53,7 +53,7 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       expect(res.status).toBe(401);
     });
@@ -70,7 +70,7 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       expect(res.status).toBe(503);
     });
@@ -111,7 +111,7 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       const data = await res.json();
       expect(res.status).toBe(200);

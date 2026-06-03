@@ -147,7 +147,7 @@ describe('/api/admin/audit-trail', () => {
           user_id: '550e8400-e29b-41d4-a716-446655440001',
           event_type: 'upgrade',
           from_tier: 'free',
-          to_tier: 'pro',
+          to_tier: 'plus',
           trigger_source: 'stripe',
           metadata: null,
           created_at: '2024-02-01T11:00:00Z',

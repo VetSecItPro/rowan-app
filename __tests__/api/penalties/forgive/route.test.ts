@@ -75,7 +75,7 @@ describe('/api/penalties/forgive', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const res = await POST(new NextRequest('http://localhost/api/penalties/forgive', {
         method: 'POST',
@@ -97,7 +97,7 @@ describe('/api/penalties/forgive', () => {
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
         from: vi.fn(() => chain),
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const res = await POST(new NextRequest('http://localhost/api/penalties/forgive', {
         method: 'POST',

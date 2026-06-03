@@ -180,7 +180,7 @@ describe('/api/meals', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       const request = new NextRequest('http://localhost/api/meals', {
@@ -218,7 +218,7 @@ describe('/api/meals', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(verifySpaceAccess).mockRejectedValue(new Error('Access denied'));
@@ -259,7 +259,7 @@ describe('/api/meals', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
@@ -388,7 +388,7 @@ describe('/api/meals', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(createMealSchema.parse).mockImplementation(() => {
@@ -443,7 +443,7 @@ describe('/api/meals', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(createMealSchema.parse).mockReturnValue(undefined);
@@ -491,7 +491,7 @@ describe('/api/meals', () => {
 
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       vi.mocked(createMealSchema.parse).mockReturnValue(undefined);

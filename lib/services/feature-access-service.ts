@@ -205,12 +205,12 @@ export async function shouldPromptUpgrade(
 
   // Map features to required tiers
   const featureRequirements: Record<string, SubscriptionTier> = {
-    uploadPhotos: 'pro',
-    mealPlanning: 'pro',
-    goals: 'pro',
-    household: 'pro',
-    eventProposals: 'pro',
-    ai: 'pro',
+    uploadPhotos: 'plus',
+    mealPlanning: 'plus',
+    goals: 'plus',
+    household: 'plus',
+    eventProposals: 'plus',
+    ai: 'plus',
     integrations: 'family',
   };
 
@@ -223,7 +223,7 @@ export async function shouldPromptUpgrade(
   // Tier hierarchy check
   const tierHierarchy: Record<SubscriptionTier, number> = {
     free: 0,
-    pro: 1,
+    plus: 1,
     family: 2,
     owner: 3,
   };

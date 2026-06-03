@@ -80,7 +80,7 @@ describe('/api/polar/billing-info', () => {
       const { createClient } = await import('@/lib/supabase/server');
       vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
       const proChain = makeChainMock({
-        data: { tier: 'pro', status: 'active', current_period_end: '2025-01-01', cancel_at_period_end: false },
+        data: { tier: 'plus', status: 'active', current_period_end: '2025-01-01', cancel_at_period_end: false },
         error: null,
       });
       vi.mocked(createClient).mockResolvedValue({
@@ -92,7 +92,7 @@ describe('/api/polar/billing-info', () => {
       const data = await res.json();
       expect(res.status).toBe(200);
       expect(data.hasBillingInfo).toBe(true);
-      expect(data.tier).toBe('pro');
+      expect(data.tier).toBe('plus');
     });
   });
 });

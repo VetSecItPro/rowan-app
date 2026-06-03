@@ -116,7 +116,7 @@ export const LoginParamsSchema = z.object({
  * Schema for payment success page
  */
 export const PaymentSuccessParamsSchema = z.object({
-  tier: z.enum(['pro', 'family', 'free']).optional().default('pro'),
+  tier: z.enum(['plus', 'family', 'free']).optional().default('plus'),
   period: z.enum(['monthly', 'annual']).optional().default('monthly'),
   session_id: z.string().max(200).optional(),
 });
@@ -164,7 +164,7 @@ export const TabParamsSchema = z.object({
  * Schema for upgrade page
  */
 export const UpgradeParamsSchema = z.object({
-  plan: z.enum(['pro', 'family']).optional(),
+  plan: z.enum(['plus', 'family']).optional(),
   period: z.enum(['monthly', 'annual']).optional(),
   feature: z.string().max(100).optional(),
 });

@@ -222,3 +222,4 @@ household-balance-*.png
 .subagent-dev-reports/
 .worktrees/
 .investigate/
+.sec-ship-history.json

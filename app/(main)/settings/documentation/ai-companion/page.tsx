@@ -93,7 +93,7 @@ const guideSections: GuideSection[] = [
         href: '#free-plan',
       },
       {
-        title: 'Pro Plan',
+        title: 'Plus Plan',
         description: 'Extended limits, suggestions, and morning briefings to start your day.',
         readTime: '2 min read',
         href: '#pro-plan',

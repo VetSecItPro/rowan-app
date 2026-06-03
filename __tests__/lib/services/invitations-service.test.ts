@@ -198,6 +198,129 @@ describe('invitations-service', () => {
     });
   });
 
+  // Phase 11.1: the member cap is the SPACE OWNER's tier, resolved via the
+  // get_user_subscription_tier RPC. The gate counts current members + pending
+  // invitations. These tests drive the full gate path with a queue-based mock.
+  describe('createInvitation — maxUsers cap (Phase 11.1)', () => {
+    const SPACE = '123e4567-e89b-12d3-a456-426614174000';
+    const INVITER = '123e4567-e89b-12d3-a456-426614174001';
+
+    const mockInvitation = {
+      id: '123e4567-e89b-12d3-a456-426614174002',
+      space_id: SPACE,
+      email: 'new@example.com',
+      invited_by: INVITER,
+      token: 't',
+      status: 'pending',
+      role: 'member',
+      created_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+
+    // Queue-based mock: each terminal resolution (single() or an awaited count
+    // query) shifts the next response for that table, in call order.
+    function flexibleSupabase(opts: {
+      members: Array<Record<string, unknown>>;
+      invitations: Array<Record<string, unknown>>;
+      rpcTier: string;
+    }) {
+      const queues: Record<string, Array<Record<string, unknown>>> = {
+        space_members: [...opts.members],
+        space_invitations: [...opts.invitations],
+      };
+      const makeChain = (table: string) => {
+        const next = () => (queues[table].length ? queues[table].shift() : { data: null, error: null });
+        const chain: Record<string, unknown> = {};
+        chain.select = vi.fn(() => chain);
+        chain.eq = vi.fn(() => chain);
+        chain.order = vi.fn(() => chain);
+        chain.single = vi.fn(() => Promise.resolve(next()));
+        chain.insert = vi.fn(() => ({
+          select: vi.fn(() => ({ single: vi.fn(() => Promise.resolve(next())) })),
+        }));
+        // thenable so awaited count queries (await ...select(count).eq()) resolve
+        chain.then = (resolve: (v: unknown) => unknown) => resolve(next());
+        return chain;
+      };
+      return {
+        from: vi.fn((table: string) => makeChain(table)),
+        rpc: vi.fn(() => Promise.resolve({ data: opts.rpcTier, error: null })),
+      };
+    }
+
+    it('rejects an invite when a Plus household is at its 2-member cap', async () => {
+      mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
+        members: [
+          { data: { role: 'owner' } },          // inviter membership check
+          { data: { user_id: 'owner-1' } },      // owner lookup
+          { count: 2 },                          // member count
+        ],
+        invitations: [
+          { data: null, error: { code: 'PGRST116' } }, // no existing invite
+          { count: 0 },                                // pending count
+        ],
+        rpcTier: 'plus',
+      }) as never);
+
+      const result = await createInvitation(SPACE, 'new@example.com', INVITER);
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error).toContain('member limit');
+    });
+
+    it('rejects when a Family household is at its 6-member cap', async () => {
+      mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
+        members: [{ data: { role: 'owner' } }, { data: { user_id: 'owner-1' } }, { count: 6 }],
+        invitations: [{ data: null, error: { code: 'PGRST116' } }, { count: 0 }],
+        rpcTier: 'family',
+      }) as never);
+
+      const result = await createInvitation(SPACE, 'new@example.com', INVITER);
+      expect(result.success).toBe(false);
+    });
+
+    it('counts pending invitations toward the cap', async () => {
+      // Plus cap = 2. 1 member + 1 pending invite => projected 2 => rejected.
+      mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
+        members: [{ data: { role: 'owner' } }, { data: { user_id: 'owner-1' } }, { count: 1 }],
+        invitations: [{ data: null, error: { code: 'PGRST116' } }, { count: 1 }],
+        rpcTier: 'plus',
+      }) as never);
+
+      const result = await createInvitation(SPACE, 'new@example.com', INVITER);
+      expect(result.success).toBe(false);
+    });
+
+    it('allows an invite when a Family household is under the cap', async () => {
+      mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
+        members: [{ data: { role: 'owner' } }, { data: { user_id: 'owner-1' } }, { count: 3 }],
+        invitations: [
+          { data: null, error: { code: 'PGRST116' } }, // no existing
+          { count: 0 },                                // pending count
+          { data: mockInvitation, error: null },       // insert result
+        ],
+        rpcTier: 'family',
+      }) as never);
+
+      const result = await createInvitation(SPACE, 'new@example.com', INVITER);
+      expect(result.success).toBe(true);
+    });
+
+    it('allows owner-tier spaces without a cap (maxUsers = -1)', async () => {
+      // Owner tier skips the count queries entirely.
+      mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
+        members: [{ data: { role: 'owner' } }, { data: { user_id: 'owner-1' } }],
+        invitations: [
+          { data: null, error: { code: 'PGRST116' } },
+          { data: mockInvitation, error: null },
+        ],
+        rpcTier: 'owner',
+      }) as never);
+
+      const result = await createInvitation(SPACE, 'new@example.com', INVITER);
+      expect(result.success).toBe(true);
+    });
+  });
+
   describe('getInvitationByToken', () => {
     it('should return invitation when token is valid', async () => {
       const mockInvitation = {
