@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Copy, Check } from 'lucide-react';
+import { Mail, Copy, Check, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
+import { share, isShareSupported } from '@/lib/utils/share';
 
 interface InvitePartnerModalProps {
   isOpen: boolean;
@@ -98,6 +99,36 @@ export function InvitePartnerModal({ isOpen, onClose, onInviteSent, spaceId, spa
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error('Failed to copy link');
+    }
+  };
+
+  // Phase 15.5: a pre-populated, compelling share message so inviting is one
+  // tap (native share sheet -> WhatsApp/Messages/etc.) instead of pasting a bare
+  // URL. Every invite is a 2-5 person acquisition event; reduce its friction.
+  const shareMessage = `Join our household "${spaceName}" on Rowan - I'm using it to keep everything in sync: tasks, calendar, meals, and an AI assistant that actually does the work. Here's your invite:`;
+
+  const handleShareUrl = async () => {
+    if (!invitationUrl) return;
+    // No native share sheet (most desktops): copy the full message + link.
+    if (!isShareSupported()) {
+      try {
+        await navigator.clipboard.writeText(`${shareMessage} ${invitationUrl}`);
+        setCopied(true);
+        toast.success('Invite message copied - paste it anywhere');
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast.error('Failed to copy invite');
+      }
+      return;
+    }
+    const result = await share({
+      title: `Join ${spaceName} on Rowan`,
+      text: shareMessage,
+      url: invitationUrl,
+    });
+    // A user-cancelled share is not an error; only surface real failures.
+    if (!result.success && result.error && result.error !== 'Share cancelled') {
+      toast.error('Could not open the share sheet');
     }
   };
 
@@ -218,10 +249,22 @@ export function InvitePartnerModal({ isOpen, onClose, onInviteSent, spaceId, spa
             </p>
           </div>
 
+          {/* Phase 15.5: one-tap share (native sheet on mobile, copy on desktop)
+              with a pre-populated message — the lowest-friction way to invite. */}
+          <button
+            type="button"
+            onClick={handleShareUrl}
+            data-testid="invite-share-button"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-colors"
+          >
+            <Share2 className="w-5 h-5" />
+            Share invite
+          </button>
+
           {/* Invitation URL */}
           <div>
             <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
-              Invitation Link
+              Or copy the link
             </label>
             <div className="flex gap-2">
               <input
