@@ -31,6 +31,9 @@ vi.mock('@/lib/utils/session-crypto-edge', () => ({
   decryptSessionData: vi.fn(),
   validateSessionData: vi.fn(),
 }));
+vi.mock('@/lib/utils/admin-auth', () => ({
+  isAdminStillActive: vi.fn(() => Promise.resolve(true)),
+}));
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -130,6 +133,30 @@ describe('/api/admin/users/[userId]/[action]', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toContain('Invalid request parameters');
+    });
+
+    it('returns 401 when the admin account has been deactivated (sec-ship recheck)', async () => {
+      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+      const { safeCookiesAsync } = await import('@/lib/utils/safe-cookies');
+      const { decryptSessionData, validateSessionData } = await import('@/lib/utils/session-crypto-edge');
+      const { isAdminStillActive } = await import('@/lib/utils/admin-auth');
+
+      vi.mocked(checkGeneralRateLimit).mockResolvedValue({
+        success: true, limit: 60, remaining: 59, reset: Date.now() + 60000,
+      });
+      vi.mocked(safeCookiesAsync).mockResolvedValue({
+        get: vi.fn().mockReturnValue({ value: 'encrypted-data' }),
+      } as any);
+      // Valid, unexpired cookie...
+      vi.mocked(decryptSessionData).mockResolvedValue({ adminId: 'admin-1', expiresAt: Date.now() + 86400000 });
+      vi.mocked(validateSessionData).mockReturnValue(true);
+      // ...but the admin was deactivated since it was issued.
+      vi.mocked(isAdminStillActive).mockResolvedValueOnce(false);
+
+      const request = new NextRequest(`http://localhost/api/admin/users/${VALID_USER_ID}/ban`, { method: 'POST' });
+      const response = await POST(request, makeProps(VALID_USER_ID, 'ban'));
+
+      expect(response.status).toBe(401);
     });
 
     it('returns 400 for invalid UUID userId', async () => {

@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { isAdminStillActive } from '@/lib/utils/admin-auth';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
@@ -78,6 +79,13 @@ export async function POST(
         { error: 'Invalid session' },
         { status: 401 }
       );
+    }
+
+    // SECURITY (sec-ship 3 Jun): re-check the admin is still active. The session
+    // cookie alone is valid for 24h; without this a just-deactivated admin could
+    // ban/delete users within that window. Fails closed on DB error (cached 60s).
+    if (!sessionData.adminId || !(await isAdminStillActive(sessionData.adminId))) {
+      return NextResponse.json({ error: 'Admin account deactivated' }, { status: 401 });
     }
 
     const { userId, action } = AdminUserActionParamsSchema.parse(params);

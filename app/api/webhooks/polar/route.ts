@@ -615,6 +615,23 @@ export async function POST(request: NextRequest) {
 
         // If this is a subscription refund, cancel the subscription
         if (subscriptionId) {
+          // SECURITY (sec-ship 3 Jun): mirror the owner-tier guard the other
+          // billing branches enforce. Without it a refund silently downgrades a
+          // platform-owner account to free. Owners are never billing-managed.
+          const { data: currentSub } = await supabaseAdmin
+            .from('subscriptions')
+            .select('tier')
+            .eq('polar_customer_id', customerId)
+            .single();
+
+          if (currentSub?.tier === 'owner') {
+            logger.info('Skipping refund downgrade — user is on owner tier', {
+              component: 'PolarWebhook',
+              customerId,
+            });
+            break;
+          }
+
           const { error } = await supabaseAdmin
             .from('subscriptions')
             .update({

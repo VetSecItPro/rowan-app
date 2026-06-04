@@ -29,6 +29,9 @@ vi.mock('@/lib/utils/session-crypto-edge', () => ({
   decryptSessionData: vi.fn(),
   validateSessionData: vi.fn(),
 }));
+vi.mock('@/lib/utils/admin-auth', () => ({
+  isAdminStillActive: vi.fn(() => Promise.resolve(true)),
+}));
 
 vi.mock('@/lib/utils/admin-audit', () => ({
   logAdminAction: vi.fn(),

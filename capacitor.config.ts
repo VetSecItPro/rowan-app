@@ -75,9 +75,10 @@ const config: CapacitorConfig = {
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
     scheme: 'rowan',
-    // Background modes will be added in Info.plist:
-    // - location (for safe zone monitoring)
+    // Background modes in Info.plist:
     // - remote-notification (for push)
+    // NOTE: family-location tracking was removed 2026-04-26 (see CLAUDE.md).
+    // Do not re-add location background modes / NSLocation* keys.
   },
 
   // Android configuration
@@ -86,13 +87,14 @@ const config: CapacitorConfig = {
     allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false,
-    // Permissions will be added in AndroidManifest.xml:
-    // - ACCESS_FINE_LOCATION
-    // - ACCESS_COARSE_LOCATION
-    // - ACCESS_BACKGROUND_LOCATION
+    // Permissions in AndroidManifest.xml:
     // - CAMERA
     // - VIBRATE
-    // - RECEIVE_BOOT_COMPLETED
+    // NOTE: family-location tracking was removed 2026-04-26 (see CLAUDE.md).
+    // Do NOT re-add ACCESS_*_LOCATION / BACKGROUND_LOCATION / RECEIVE_BOOT_COMPLETED
+    // (the last was only for the location BootReceiver). Run `npx cap sync` after
+    // pulling this to regenerate clean native projects (the gitignored /android,
+    // /ios may hold stale location artifacts from before the removal).
   },
 };
 
