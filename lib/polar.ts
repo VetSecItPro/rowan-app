@@ -23,6 +23,14 @@ type PolarClient = {
     create: (params: { customerId: string }) => Promise<{ customerPortalUrl: string }>;
   };
   subscriptions: {
+    get: (params: { id: string }) => Promise<{
+      id: string;
+      // 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | ...
+      status: string;
+      currentPeriodEnd?: string | null;
+      endsAt?: string | null;
+      canceledAt?: string | null;
+    }>;
     update: (params: {
       id: string;
       revoke?: boolean;

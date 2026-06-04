@@ -48,14 +48,6 @@ if (isBrowser && isProduction && hasDSN) {
       }),
     ],
 
-    // Drop 10% of errors randomly for cost savings
-    beforeSend(event) {
-      if (Math.random() > 0.9) {
-        return null;
-      }
-      return event;
-    },
-
     // Filter non-useful transactions
     beforeSendTransaction(event) {
       // Next.js internal / static assets

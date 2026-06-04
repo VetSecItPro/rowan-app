@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { processReminderNotifications } from '@/lib/jobs/reminder-notifications-job';
 import { logger } from '@/lib/logger';
 import { verifyCronSecret } from '@/lib/security/verify-secret';
+import { withCronMonitor } from '@/lib/observability/cron-monitor';
 
 export const dynamic = 'force-dynamic';
 // PERF: Prevent serverless timeout — FIX-015
@@ -49,8 +50,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Process notifications
-    const result = await processReminderNotifications();
+    // Process notifications (wrapped in a Sentry cron monitor — schedule must
+    // match vercel.json: */15 * * * *).
+    const result = await withCronMonitor(
+      'reminder-notifications',
+      { schedule: '*/15 * * * *' },
+      () => processReminderNotifications(),
+    );
 
     // Log results
     logger.info('Reminder notification job completed', {
