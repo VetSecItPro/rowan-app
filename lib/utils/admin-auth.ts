@@ -36,7 +36,7 @@ export interface AdminAuthResult {
 const IS_ACTIVE_CACHE_TTL_MS = 60_000;
 const isActiveCache = new Map<string, { active: boolean; expiresAt: number }>();
 
-async function isAdminStillActive(adminId: string): Promise<boolean> {
+export async function isAdminStillActive(adminId: string): Promise<boolean> {
   const cached = isActiveCache.get(adminId);
   const now = Date.now();
   if (cached && cached.expiresAt > now) {

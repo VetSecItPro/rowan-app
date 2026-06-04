@@ -236,6 +236,25 @@ describe('POST /api/webhooks/polar - lifecycle events', () => {
     expect(supabaseAdmin.from).toHaveBeenCalledWith('subscriptions');
   });
 
+  it('order.refunded skips owner-tier user (sec-ship guard)', async () => {
+    const { supabaseAdmin } = await import('@/lib/supabase/admin');
+    const fromMock = vi.mocked(supabaseAdmin.from);
+    // First call = the new owner-tier lookup; return owner so the guard trips.
+    const lookupChain = chainFor({ data: { tier: 'owner' }, error: null });
+    const updateChain = chainFor({ data: null, error: null });
+    fromMock.mockReturnValueOnce(lookupChain as never).mockReturnValueOnce(updateChain as never);
+
+    const { POST } = await import('@/app/api/webhooks/polar/route');
+    const res = await POST(makeReq({
+      type: 'order.refunded',
+      data: { customerId: 'cus_owner', subscriptionId: 'sub_1', id: 'order_1' },
+    }));
+
+    expect(res.status).toBe(200);
+    // An owner must NOT be downgraded to free by a refund.
+    expect(updateChain.update).not.toHaveBeenCalled();
+  });
+
   it('order.refunded without subscriptionId is a no-op (still 200)', async () => {
     const { supabaseAdmin } = await import('@/lib/supabase/admin');
     vi.mocked(supabaseAdmin.from).mockReturnValue(chainFor({ data: null, error: null }) as never);
