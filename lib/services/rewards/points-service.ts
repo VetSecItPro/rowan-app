@@ -2,6 +2,7 @@
 // Handles all point-related operations: awarding, spending, tracking, levels
 
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import type {
   RewardPoints,
@@ -79,8 +80,8 @@ export const pointsService = {
   /**
    * Get full user stats including points, level, streaks
    */
-  async getUserStats(userId: string, spaceId: string): Promise<UserRewardsStats> {
-    const supabase = createClient();
+  async getUserStats(userId: string, spaceId: string, supabaseClient?: SupabaseClient): Promise<UserRewardsStats> {
+    const supabase = supabaseClient ?? createClient();
 
     // Get base record
     const record = await this.getOrCreatePointsRecord(userId, spaceId);
@@ -175,8 +176,8 @@ export const pointsService = {
   /**
    * Award points to a user (creates transaction and updates balance)
    */
-  async awardPoints(input: CreatePointTransactionInput): Promise<PointTransaction> {
-    const supabase = createClient();
+  async awardPoints(input: CreatePointTransactionInput, supabaseClient?: SupabaseClient): Promise<PointTransaction> {
+    const supabase = supabaseClient ?? createClient();
 
     // Ensure points record exists
     const record = await this.getOrCreatePointsRecord(input.user_id, input.space_id);
@@ -375,9 +376,10 @@ export const pointsService = {
   async getPointsHistory(
     userId: string,
     spaceId: string,
-    limit: number = 20
+    limit: number = 20,
+    supabaseClient?: SupabaseClient
   ): Promise<PointTransaction[]> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     const { data, error } = await supabase
       .from('point_transactions')
@@ -403,9 +405,10 @@ export const pointsService = {
    */
   async getLeaderboard(
     spaceId: string,
-    period: 'week' | 'month' | 'all' = 'week'
+    period: 'week' | 'month' | 'all' = 'week',
+    supabaseClient?: SupabaseClient
   ): Promise<LeaderboardEntry[]> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     // Get all space members with their points
     const { data: members, error: membersError } = await supabase

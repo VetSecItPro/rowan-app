@@ -92,6 +92,7 @@ vi.mock('@/lib/services/rewards/rewards-service', () => ({
 vi.mock('@/lib/services/rewards/points-service', () => ({
   pointsService: {
     getUserPoints: vi.fn().mockResolvedValue({ total_points: 100 }),
+    awardPoints: vi.fn().mockResolvedValue({ id: 'award-1', points: 10 }),
   },
 }));
 
@@ -277,6 +278,52 @@ describe('executeTool()', () => {
 
       const callArg = vi.mocked(tasksService.createTask).mock.calls[0]?.[0] as Record<string, unknown>;
       expect(callArg?.created_by).toBe(USER_ID);
+    });
+  });
+
+  describe('security: privileged-tool role gate (SEC-AI-05)', () => {
+    // Build a context whose authed client returns a given space_members role.
+    function contextWithRole(role: string | null): ToolExecutionContext {
+      const maybeSingle = () =>
+        Promise.resolve({ data: role ? { role } : null, error: null });
+       
+      const chain: any = { select: () => chain, eq: () => chain, maybeSingle };
+      return {
+        spaceId: SPACE_ID,
+        userId: USER_ID,
+        supabase: { from: () => chain } as unknown as ToolExecutionContext['supabase'],
+      };
+    }
+
+    it('blocks award_points for a non-owner/admin member', async () => {
+      const result = await executeTool(
+        'award_points',
+        { user_id: USER_ID, points: 1000, reason: 'self-mint' },
+        contextWithRole('member'),
+      );
+      expect(result.success).toBe(false);
+      expect(result.message).toMatch(/owner or admin/i);
+    });
+
+    it('blocks update_penalty_settings for a non-owner/admin member', async () => {
+      const result = await executeTool('update_penalty_settings', {}, contextWithRole('member'));
+      expect(result.success).toBe(false);
+      expect(result.message).toMatch(/owner or admin/i);
+    });
+
+    it('lets an owner past the role gate', async () => {
+      const result = await executeTool(
+        'award_points',
+        { user_id: USER_ID, points: 10, reason: 'chores' },
+        contextWithRole('owner'),
+      );
+      // Past the gate: not the owner/admin denial (the handler may validate further).
+      expect(result.message ?? '').not.toMatch(/owner or admin/i);
+    });
+
+    it('blocks privileged tools when the user has no membership row', async () => {
+      const result = await executeTool('award_points', { user_id: USER_ID, points: 5 }, contextWithRole(null));
+      expect(result.success).toBe(false);
     });
   });
 
