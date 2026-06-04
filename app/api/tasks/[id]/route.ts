@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import { notifyTaskAssigned, notifyTaskCompleted } from '@/lib/services/push-notification-service';
 import { fireAndForgetPush } from '@/lib/utils/fire-and-forget-push';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { maybeRewardInviterForFirstTask } from '@/lib/services/rewards/invite-reward-service';
 
 /**
  * GET /api/tasks/[id]
@@ -187,6 +188,16 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       assigned_to: validatedUpdates.assigned_to ?? undefined,
       due_date: validatedUpdates.due_date ?? undefined,
     }, supabase);
+
+    // Phase 15.5: invite reward loop. When a member completes their FIRST task,
+    // reward whoever invited them (fires once per accepted invitation via the
+    // service's idempotency flag). Fire-and-forget with the admin client so it
+    // never blocks or fails the task update.
+    if (validatedUpdates.status === 'completed' && existingTask.status !== 'completed') {
+      void maybeRewardInviterForFirstTask(user.id, existingTask.space_id, supabaseAdmin).catch((e) =>
+        logger.error('Invite reward check failed', e, { component: 'tasks-api', action: 'invite_reward' }),
+      );
+    }
 
     // Push notification: task reassigned to a different user
     if (
