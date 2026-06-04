@@ -233,7 +233,7 @@ export function Dropdown({
       {isOpen && isHydrated && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-[70]"
+          className="absolute bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-popover"
           style={{
             top: position.top,
             left: position.left,

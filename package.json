@@ -120,6 +120,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
     "@capacitor/cli": "^8.2.0",
     "@eslint/compat": "2.0.3",
     "@eslint/eslintrc": "^3.3.5",
