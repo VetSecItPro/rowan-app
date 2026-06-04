@@ -178,15 +178,29 @@ describe('Logger — log levels in production', () => {
     );
   });
 
-  it('error with non-Error sends to Sentry.captureMessage in production', () => {
+  it('error with non-Error captures a synthesized exception (Issue), not a message', () => {
+    // Phase 13.2: message-only errors (e.g. billing webhook failures) must reach
+    // Sentry Issues, not just low-signal captureMessage events.
     logger.error('prod error non-err', 'string error');
-    expect(mockCaptureMessage).toHaveBeenCalledWith(
-      'prod error non-err',
-      expect.objectContaining({ level: 'error' })
+    expect(mockCaptureException).toHaveBeenCalledTimes(1);
+    const [capturedError, options] = mockCaptureException.mock.calls[0];
+    expect(capturedError).toBeInstanceOf(Error);
+    expect((capturedError as Error).message).toBe('prod error non-err');
+    expect(options.extra).toEqual(
+      expect.objectContaining({ originalError: 'string error' })
     );
+    // No duplicate captureMessage for the same error event.
+    expect(mockCaptureMessage).not.toHaveBeenCalled();
   });
 
-  it('error with Error instance sends to Sentry.captureException in production', () => {
+  it('error with no error object still captures an exception in production', () => {
+    logger.error('prod error bare');
+    expect(mockCaptureException).toHaveBeenCalledTimes(1);
+    expect((mockCaptureException.mock.calls[0][0] as Error).message).toBe('prod error bare');
+    expect(mockCaptureMessage).not.toHaveBeenCalled();
+  });
+
+  it('error with Error instance sends to Sentry.captureException (no duplicate message)', () => {
     const err = new Error('prod failure');
     logger.error('prod error', err, { component: 'payments' });
     expect(mockCaptureException).toHaveBeenCalledWith(
@@ -195,6 +209,7 @@ describe('Logger — log levels in production', () => {
         tags: expect.objectContaining({ component: 'payments' }),
       })
     );
+    expect(mockCaptureMessage).not.toHaveBeenCalled();
   });
 });
 

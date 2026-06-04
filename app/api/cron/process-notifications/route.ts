@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { notificationQueueService } from '@/lib/services/notification-queue-service';
 import { logger } from '@/lib/logger';
 import { verifyCronSecret } from '@/lib/security/verify-secret';
+import { withCronMonitor } from '@/lib/observability/cron-monitor';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -36,15 +37,24 @@ export async function GET(request: NextRequest) {
 
     const supabase = supabaseAdmin;
 
+    // Wrap the actual processing in a Sentry cron monitor (dead-man's switch).
+    // Schedule must match vercel.json: */5 * * * *.
+    const summary = await withCronMonitor(
+      'process-notifications',
+      { schedule: '*/5 * * * *' },
+      async () => {
     // Get all pending notifications ready to send
     const pending = await notificationQueueService.getPendingNotifications(100, supabase);
 
     if (pending.length === 0) {
-      return NextResponse.json({
+      return {
         success: true,
         processed: 0,
+        sent: 0,
+        failed: 0,
+        cleaned: 0,
         message: 'No pending notifications',
-      });
+      };
     }
 
     // Group by user and delivery method
@@ -109,13 +119,17 @@ export async function GET(request: NextRequest) {
     // Cleanup old notifications
     const cleaned = await notificationQueueService.cleanup(supabase);
 
-    return NextResponse.json({
+    return {
       success: true,
       processed: sent + failed,
       sent,
       failed,
       cleaned,
-    });
+    };
+      },
+    );
+
+    return NextResponse.json(summary);
   } catch (error) {
     logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

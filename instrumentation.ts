@@ -3,9 +3,38 @@
 // Client initialization lives in instrumentation-client.ts.
 
 import * as Sentry from '@sentry/nextjs';
+import { checkProductionEnv } from '@/lib/config/required-env';
 
 // Required by @sentry/nextjs v10.x+ for React Server Component error instrumentation
 export const onRequestError = Sentry.captureRequestError;
+
+/**
+ * Validate required production env vars once at server startup and surface any
+ * gaps to Sentry (Phase 13.4). Call AFTER Sentry.init so captureMessage works.
+ */
+function reportProductionEnvGaps(sentry: typeof Sentry) {
+  const { ok, missingCritical, missingWarn } = checkProductionEnv();
+  if (ok && missingWarn.length === 0) return;
+
+  for (const v of missingCritical) {
+     
+    console.error(`[env] MISSING CRITICAL env ${v.name} - ${v.reason}`);
+    sentry.captureMessage(`Missing critical production env: ${v.name}`, {
+      level: 'error',
+      tags: { component: 'startup-env-check', envVar: v.name },
+      extra: { reason: v.reason },
+    });
+  }
+  for (const v of missingWarn) {
+    // eslint-disable-next-line no-console -- startup diagnostic, before request logging
+    console.warn(`[env] missing env ${v.name} - ${v.reason} (degraded)`);
+    sentry.captureMessage(`Missing production env: ${v.name}`, {
+      level: 'warning',
+      tags: { component: 'startup-env-check', envVar: v.name },
+      extra: { reason: v.reason },
+    });
+  }
+}
 
 export async function register() {
   if (process.env.NODE_ENV !== 'production' || !process.env.NEXT_PUBLIC_SENTRY_DSN) {
@@ -39,14 +68,6 @@ export async function register() {
           'Non-Error promise rejection captured',
         ],
 
-        // Drop 10% of errors randomly for cost savings
-        beforeSend(event) {
-          if (Math.random() > 0.9) {
-            return null;
-          }
-          return event;
-        },
-
         // Filter high-volume, low-value transactions
         beforeSendTransaction(event) {
           const tx = event.transaction || '';
@@ -75,6 +96,10 @@ export async function register() {
           return event;
         },
       });
+
+      // One-shot required-env validation (Phase 13.4). Node runtime only — the
+      // server-only vars (CRON_SECRET, RESEND_API_KEY, ...) don't exist on edge.
+      reportProductionEnvGaps(Sentry);
     }
 
     if (process.env.NEXT_RUNTIME === 'edge') {
@@ -100,14 +125,6 @@ export async function register() {
           // Non-actionable
           'Non-Error promise rejection captured',
         ],
-
-        // Drop 10% of errors randomly for cost savings
-        beforeSend(event) {
-          if (Math.random() > 0.9) {
-            return null;
-          }
-          return event;
-        },
 
         // Middleware runs on every request — aggressively filter noise
         beforeSendTransaction(event) {

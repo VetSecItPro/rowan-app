@@ -104,11 +104,14 @@ class Logger {
       }
     }
 
-    // Production: Sentry only
+    // Production: Sentry only.
+    // Only `warn` is captured as a message here. `error` is handled by error()
+    // below, which always sends a captureException (Issue) - routing errors
+    // through captureMessage too would double-report every error event.
     if (process.env.NODE_ENV === 'production') {
-      if (level === 'error' || level === 'warn') {
+      if (level === 'warn') {
         Sentry.captureMessage(message, {
-          level: level === 'error' ? 'error' : 'warning',
+          level: 'warning',
           tags: {
             component: context?.component,
             action: context?.action,
@@ -159,14 +162,27 @@ class Logger {
         }
       : error;
 
-    if (error instanceof Error && process.env.NODE_ENV === 'production') {
-      Sentry.captureException(error, {
-        tags: {
-          component: context?.component,
-          action: context?.action,
-        },
-        extra: this.sanitize(context) as Record<string, unknown> | undefined,
-      });
+    if (process.env.NODE_ENV === 'production') {
+      const tags = {
+        component: context?.component,
+        action: context?.action,
+      };
+      const extra = this.sanitize(context) as Record<string, unknown> | undefined;
+
+      if (error instanceof Error) {
+        Sentry.captureException(error, { tags, extra });
+      } else {
+        // Message-only or non-Error payload (e.g. billing webhook failures that
+        // log a string, or `logger.error(msg)` with no error object). Without
+        // this branch these never reached Sentry Issues - they were the one
+        // payment error you get all week, silently dropped. Synthesize an Error
+        // from the message so it groups as an Issue with a real call stack, and
+        // keep the original payload under extra.originalError.
+        Sentry.captureException(new Error(message), {
+          tags,
+          extra: { ...extra, originalError: error },
+        });
+      }
     }
 
     // Always log in all environments (not just else block)
