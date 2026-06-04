@@ -197,6 +197,7 @@ export async function executeTool(
     'forgive_penalty',
   ]);
   if (OWNER_ADMIN_ONLY_TOOLS.has(toolName)) {
+    // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
     const { data: membership } = await supabase
       .from('space_members')
       .select('role')
