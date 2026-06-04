@@ -44,13 +44,19 @@ for (const path of PUBLIC_PAGES) {
       `[a11y] ${path} - critical:${critical.length} serious:${serious.length} moderate:${moderate.length}`,
     );
     for (const v of [...critical, ...serious]) {
-       
       console.log(`[a11y]   ${v.impact}: ${v.id} (${v.nodes.length}) - ${v.help}`);
+      for (const node of v.nodes) {
+        console.log(`[a11y]     at ${node.target.join(' ')} :: ${node.html.slice(0, 160)}`);
+      }
     }
 
+    // Gate: critical + serious. The public-page baseline was driven to zero
+    // (PR5), so this ratcheted-up bar holds the line - any new critical/serious
+    // regression fails CI. Moderate/minor remain tracked-not-gated above.
+    const gated = [...critical, ...serious];
     expect(
-      critical,
-      `Critical a11y violations on ${path}: ${critical.map((v) => v.id).join(', ')}`,
+      gated,
+      `Critical/serious a11y violations on ${path}: ${gated.map((v) => `${v.impact}:${v.id}`).join(', ')}`,
     ).toEqual([]);
   });
 }
