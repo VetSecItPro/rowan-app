@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { randomBytes } from 'crypto';
 import type { SpaceInvitation } from '@/lib/types';
+import { getFeatureLimit } from '@/lib/config/feature-limits';
+import { normalizeTier } from '@/lib/types/subscription';
 import { logger } from '@/lib/logger';
 
 type InvitationWithSpace = SpaceInvitation & {
@@ -87,6 +89,55 @@ export async function createInvitation(
         success: false,
         error: 'An invitation has already been sent to this email'
       };
+    }
+
+    // BILLING (Phase 11.1): enforce the household member cap based on the SPACE
+    // OWNER's tier (not the inviter's - an admin must not bypass the owner's
+    // plan limit). We read the owner's tier via the SECURITY DEFINER RPC so the
+    // lookup works under the inviter's RLS scope, and count current members PLUS
+    // pending invitations so a burst of invites cannot overshoot the cap.
+    // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
+    const { data: ownerRow } = await supabase
+      .from('space_members')
+      .select('user_id')
+      .eq('space_id', spaceId)
+      .eq('role', 'owner')
+      .single();
+
+    if (ownerRow?.user_id) {
+      const { data: ownerTierRaw } = await supabase.rpc('get_user_subscription_tier', {
+        p_user_id: ownerRow.user_id,
+      });
+      const ownerTier = normalizeTier(ownerTierRaw as string | null);
+      const maxUsers = getFeatureLimit(ownerTier, 'maxUsers') as number;
+
+      // maxUsers <= 0 is treated as unlimited (e.g. the owner tier).
+      if (maxUsers > 0) {
+        const [{ count: memberCount }, { count: pendingCount }] = await Promise.all([
+          // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
+          supabase
+            .from('space_members')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId),
+          // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
+          supabase
+            .from('space_invitations')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .eq('status', 'pending'),
+        ]);
+
+        const projected = (memberCount || 0) + (pendingCount || 0);
+        if (projected >= maxUsers) {
+          return {
+            success: false,
+            error:
+              ownerTier === 'family'
+                ? `This household has reached its ${maxUsers}-member limit.`
+                : `This household has reached its ${maxUsers}-member limit. Upgrade to Family to add up to 6 members.`,
+          };
+        }
+      }
     }
 
     // Generate secure token

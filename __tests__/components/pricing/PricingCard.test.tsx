@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { PricingCard } from '@/components/pricing/PricingCard';
 
 const baseProps = {
-  tier: 'pro' as const,
+  tier: 'plus' as const,
   title: 'Pro Plan',
   description: 'For power users',
   monthlyPrice: 9,

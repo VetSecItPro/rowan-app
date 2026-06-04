@@ -71,7 +71,7 @@ describe('/api/upload/avatar', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const emptyFd = new FormData();
       const req = new NextRequest('http://localhost/api/upload/avatar', {
@@ -92,7 +92,7 @@ describe('/api/upload/avatar', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(validateImageMagicBytes).mockResolvedValue({ valid: false, format: null });
 
       const req = new NextRequest('http://localhost/api/upload/avatar', {
@@ -114,7 +114,7 @@ describe('/api/upload/avatar', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(validateImageMagicBytes).mockResolvedValue({ valid: true, format: 'png' });
       vi.mocked(isFormatAllowed).mockReturnValue(true);
       vi.mocked(uploadAvatar).mockResolvedValue({ success: true, url: 'https://cdn.example.com/avatar.png' } as any);

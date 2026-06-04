@@ -14,6 +14,7 @@
 
 import { createClient } from '../supabase/server';
 import type { SubscriptionTier, SubscriptionStatus, Subscription } from '../types';
+import { normalizeTier } from '../types/subscription';
 import { logger } from '@/lib/logger';
 import { getCache, setCache, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
 import * as Sentry from '@sentry/nextjs';
@@ -237,21 +238,39 @@ export async function getUserTier(
     return 'free';
   }
 
-  if (subscription.status !== 'active') {
-    logger.info('[Subscription] Subscription is not active', {
+  // Owner tier is never downgraded — no trial or payment required.
+  // Checked BEFORE status so an owner row in any state stays owner.
+  if (subscription.tier === 'owner') {
+    return 'owner';
+  }
+
+  // BILLING (Phase 11.3 / 11.4) entitlement model:
+  //  - 'active'   : entitled.
+  //  - 'past_due' : entitled. Polar is still retrying the card during its
+  //                 dunning window; access continues until Polar gives up and
+  //                 sends subscription.revoked (which flips us to 'canceled').
+  //  - 'canceled' : entitled ONLY until the paid-through date. A user who
+  //                 cancels keeps access to period end (subscription_ends_at);
+  //                 subscription.revoked at period end is what removes access.
+  const endsAtMs = subscription.subscription_ends_at
+    ? new Date(subscription.subscription_ends_at).getTime()
+    : null;
+  const entitledByStatus =
+    subscription.status === 'active' ||
+    subscription.status === 'past_due' ||
+    (subscription.status === 'canceled' && endsAtMs !== null && endsAtMs > Date.now());
+
+  if (!entitledByStatus) {
+    logger.info('[Subscription] Not entitled — resolving to free', {
       component: 'lib-subscription-service',
       action: 'tier_resolution',
       userId,
       tier: subscription.tier,
       status: subscription.status,
+      subscriptionEndsAt: subscription.subscription_ends_at,
       resolvedTier: 'free',
     });
     return 'free';
-  }
-
-  // Owner tier is never downgraded — no trial or payment required
-  if (subscription.tier === 'owner') {
-    return 'owner';
   }
 
   // Check if user is on an expired trial (no Polar subscription = trial-only user)
@@ -279,7 +298,10 @@ export async function getUserTier(
     status: subscription.status,
   });
 
-  return subscription.tier;
+  // Normalize legacy 'pro' -> 'plus' at the read boundary so any un-migrated row
+  // (or a row written during the deploy window) gates correctly. Keystone of the
+  // pro->plus rename: every gate ultimately flows through getUserTier.
+  return normalizeTier(subscription.tier);
 }
 
 /**
@@ -302,10 +324,10 @@ export async function hasTierAccess(
 ): Promise<boolean> {
   const userTier = await getUserTier(userId);
 
-  // Tier hierarchy: free < pro < family < owner
+  // Tier hierarchy: free < plus < family < owner
   const tierHierarchy: Record<SubscriptionTier, number> = {
     free: 0,
-    pro: 1,
+    plus: 1,
     family: 2,
     owner: 3,
   };

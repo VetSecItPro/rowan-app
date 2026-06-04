@@ -81,11 +81,22 @@ export function calculateCostUsd(
   return Math.round((inputCost + outputCost) * 1_000_000) / 1_000_000; // 6 decimal places
 }
 
-/** Per-user daily token budgets
- * Input budgets account for ~9K tokens of tool-definition overhead per request
- * (42 function declarations sent with every Gemini call). */
+/** Per-user daily token budgets.
+ * Post-Phase-10: a request no longer ships all ~145 tool declarations — intent
+ * subsetting sends only 1-3 domains (~3-8K real input tokens/message) and the
+ * static prefix is implicitly cached. Budgets are sized against that profile. */
 const TOKEN_BUDGETS: Record<string, AITokenBudget> = {
-  pro: {
+  // Phase 11.6: free-tier AI teaser. Tight daily cap because free users have $0
+  // revenue, so this is pure marketing spend — keep it to a few short exchanges.
+  // With prompt caching + tool subsetting (~6-8K real input tokens/message),
+  // ~40K input covers roughly 4-5 messages before the cap. Routed to flash-lite.
+  free: {
+    daily_input_tokens: 40_000,
+    daily_output_tokens: 5_000,
+    daily_voice_seconds: 0,
+    daily_conversations: 5,
+  },
+  plus: {
     daily_input_tokens: 300_000,
     daily_output_tokens: 80_000,
     daily_voice_seconds: 600,
@@ -97,6 +108,19 @@ const TOKEN_BUDGETS: Record<string, AITokenBudget> = {
     daily_voice_seconds: 1_800,
     daily_conversations: 100,
   },
+};
+
+/**
+ * Per-tier monthly COGS ceiling in USD (Phase 10.6). This is the hard backstop:
+ * even if a user stays under the daily caps every day, their AI cost for the
+ * month cannot exceed these. Sized to keep AI COGS well under 25-30% of the
+ * per-user revenue (Plus ~$5/mo effective, Family ~$8/mo). `owner` is unlimited.
+ */
+const MONTHLY_COGS_CAP_USD: Record<string, number> = {
+  free: 0.5,
+  plus: 1.5,
+  family: 2.4,
+  owner: Infinity,
 };
 
 /** Per-space daily token caps (hard limit shared across all users in a space) */
@@ -520,7 +544,7 @@ export async function checkBudget(
   tier: string,
   spaceId?: string
 ): Promise<AIBudgetCheckResult> {
-  const budget = TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.pro;
+  const budget = TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.plus;
   const today = new Date().toISOString().split('T')[0];
 
   // Reset at midnight UTC
@@ -529,19 +553,25 @@ export async function checkBudget(
   tomorrow.setUTCHours(0, 0, 0, 0);
   const resetAt = tomorrow.toISOString();
 
-  // 1. Check per-user budget
-  const { data: userUsage } = await supabase
+  // 1. Check per-user budget. SUM across ALL feature_source rows for the day —
+  //    ai_usage_daily is keyed (user_id, date, feature_source). Using .single()
+  //    here would ERROR the moment any source other than 'chat' (briefing, OCR,
+  //    suggestions...) records usage for the same day, and the caller swallows
+  //    that error -> userUsage null -> usage read as 0 -> the daily AND monthly
+  //    caps silently stop tripping (fail-open). Mirror the per-space sum below.
+  //    (SEC-AI-01)
+  // nosemgrep: supabase-missing-space-id-filter - ai_usage_daily is per-user (keyed user_id+date+feature_source), not space-scoped
+  const { data: userUsageRows } = await supabase
     .from('ai_usage_daily')
     .select('input_tokens, output_tokens, voice_seconds, conversation_count')
     .eq('user_id', userId)
-    .eq('date', today)
-    .single();
+    .eq('date', today);
 
   const userUsed = {
-    input_tokens: userUsage?.input_tokens ?? 0,
-    output_tokens: userUsage?.output_tokens ?? 0,
-    voice_seconds: userUsage?.voice_seconds ?? 0,
-    conversations: userUsage?.conversation_count ?? 0,
+    input_tokens: (userUsageRows ?? []).reduce((sum, r) => sum + (r.input_tokens ?? 0), 0),
+    output_tokens: (userUsageRows ?? []).reduce((sum, r) => sum + (r.output_tokens ?? 0), 0),
+    voice_seconds: (userUsageRows ?? []).reduce((sum, r) => sum + (r.voice_seconds ?? 0), 0),
+    conversations: (userUsageRows ?? []).reduce((sum, r) => sum + (r.conversation_count ?? 0), 0),
   };
 
   const userRemainingInput = Math.max(0, budget.daily_input_tokens - userUsed.input_tokens);
@@ -562,6 +592,42 @@ export async function checkBudget(
       reason: 'You\'ve reached your daily AI limit. Resets at midnight UTC.',
       remaining: { input_tokens: userRemainingInput, output_tokens: userRemainingOutput },
     };
+  }
+
+  // 1b. Monthly COGS ceiling (Phase 10.6) — the hard $/user/month backstop on
+  //     top of the daily caps. Sums the per-day estimated_cost_usd for the
+  //     calendar month and blocks once the tier's cap is reached.
+  const monthlyCap = MONTHLY_COGS_CAP_USD[tier] ?? MONTHLY_COGS_CAP_USD.plus;
+  if (Number.isFinite(monthlyCap)) {
+    const firstOfMonth = `${today.slice(0, 7)}-01`;
+    // nosemgrep: supabase-missing-space-id-filter - ai_usage_daily is per-user (keyed user_id+date+feature_source), not space-scoped
+    const { data: monthRows } = await supabase
+      .from('ai_usage_daily')
+      .select('estimated_cost_usd')
+      .eq('user_id', userId)
+      .gte('date', firstOfMonth);
+
+    const monthlySpend = (monthRows ?? []).reduce(
+      (sum, r) => sum + ((r.estimated_cost_usd as number | null) ?? 0),
+      0,
+    );
+
+    if (monthlySpend >= monthlyCap) {
+      // Reset at the first of next month (UTC).
+      const nextMonth = new Date();
+      nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1, 1);
+      nextMonth.setUTCHours(0, 0, 0, 0);
+      return {
+        allowed: false,
+        remaining_input_tokens: 0,
+        remaining_output_tokens: 0,
+        remaining_voice_seconds: 0,
+        remaining_conversations: 0,
+        reset_at: nextMonth.toISOString(),
+        reason: "You've reached this month's AI usage limit. Resets at the start of next month.",
+        remaining: { input_tokens: 0, output_tokens: 0 },
+      };
+    }
   }
 
   // 2. Check per-space budget (if spaceId provided)
@@ -623,9 +689,9 @@ export async function checkBudget(
   };
 }
 
-/** Get the token budget for a tier. Only pro/family have AI access; fallback to pro as safety net. */
+/** Get the token budget for a tier. Only plus/family have AI access; fallback to plus as safety net. */
 export function getTokenBudget(tier: string): AITokenBudget {
-  return TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.pro;
+  return TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.plus;
 }
 
 // ---------------------------------------------------------------------------

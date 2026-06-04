@@ -160,6 +160,11 @@ export async function POST(req: NextRequest) {
         // Stays undefined until the event lands — recordUsage and
         // calculateCostUsd default to primary if not provided.
         let modelUsed: string | undefined;
+        // COST (Phase 10.3): real billed tokens summed across all tool-call
+        // rounds, reported by the provider via `usage` events. Replaces the
+        // old message.length/4 estimate so the daily budget is a real ceiling.
+        let realPromptTokens = 0;
+        let realCompletionTokens = 0;
 
         try {
           // Send conversation ID as first event so client knows it
@@ -183,12 +188,13 @@ export async function POST(req: NextRequest) {
             conversationId: activeConversationId,
             context: { spaceId, userId: user.id, supabase },
             spaceContext,
+            tier: aiAccess.tier,
           });
 
           for await (const event of events) {
-            // Don't pipe the model_used event to the client — it's a
-            // server-side bookkeeping signal, not user-visible state.
-            if (event.type !== 'model_used') {
+            // Don't pipe the model_used / usage events to the client — they're
+            // server-side bookkeeping signals, not user-visible state.
+            if (event.type !== 'model_used' && event.type !== 'usage') {
               const sseData = `data: ${JSON.stringify(event)}\n\n`;
               controller.enqueue(encoder.encode(sseData));
             }
@@ -204,6 +210,10 @@ export async function POST(req: NextRequest) {
               toolResults.push({ id: tr.id, name: tr.toolName, success: tr.success, data: tr.data });
             } else if (event.type === 'model_used' && typeof event.data === 'string') {
               modelUsed = event.data;
+            } else if (event.type === 'usage' && typeof event.data === 'object') {
+              const u = event.data as { promptTokens: number; completionTokens: number };
+              realPromptTokens += u.promptTokens ?? 0;
+              realCompletionTokens += u.completionTokens ?? 0;
             }
           }
 
@@ -220,7 +230,9 @@ export async function POST(req: NextRequest) {
             toolResults,
             latencyMs,
             voiceDurationSeconds,
-            modelUsed
+            modelUsed,
+            realPromptTokens,
+            realCompletionTokens
           ).catch((err) => {
             logger.warn('[API] Failed to persist AI messages', {
               component: 'api-route',
@@ -288,6 +300,8 @@ async function persistMessages(
   latencyMs: number,
   voiceDurationSeconds?: number,
   modelUsed?: string,
+  realPromptTokens: number = 0,
+  realCompletionTokens: number = 0,
 ): Promise<void> {
   // Default to primary if the orchestrator didn't surface the model
   // (legacy code paths or test stubs). Cost rows then bill at primary
@@ -296,6 +310,14 @@ async function persistMessages(
   // Estimate tokens (~4 chars per token as rough approximation)
   const estimatedInputTokens = Math.ceil(userMessage.length / 4);
   const estimatedOutputTokens = Math.ceil(assistantText.length / 4);
+
+  // COST (Phase 10.3): prefer the provider's real token counts for the
+  // budget-critical usage row. The real prompt count includes the full
+  // system+tools prefix (the part that actually costs money), which the
+  // length estimate never captured. Fall back to estimates only if usage
+  // events never arrived (legacy paths / test stubs).
+  const billedInputTokens = realPromptTokens > 0 ? realPromptTokens : estimatedInputTokens;
+  const billedOutputTokens = realCompletionTokens > 0 ? realCompletionTokens : estimatedOutputTokens;
 
   // Persist user message
   await addMessage(supabase, {
@@ -314,7 +336,7 @@ async function persistMessages(
       content: assistantText,
       tool_calls_json: toolCalls.length > 0 ? toolCalls : null,
       tool_results_json: toolResults.length > 0 ? toolResults : null,
-      output_tokens: estimatedOutputTokens,
+      output_tokens: billedOutputTokens,
       model_used: resolvedModel,
       latency_ms: latencyMs,
     });
@@ -325,8 +347,8 @@ async function persistMessages(
     user_id: userId,
     space_id: spaceId,
     date: new Date().toISOString().split('T')[0],
-    input_tokens: estimatedInputTokens,
-    output_tokens: estimatedOutputTokens,
+    input_tokens: billedInputTokens,
+    output_tokens: billedOutputTokens,
     voice_seconds: voiceDurationSeconds ?? 0,
     conversation_count: 0, // Only count 1 for new conversations
     tool_calls_count: toolCalls.length,

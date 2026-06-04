@@ -54,7 +54,7 @@ export function getFeatureKey(feature: string): FeatureAccessKey | null {
  * Higher-order function to check subscription tier before allowing access
  *
  * @param handler - The API route handler to wrap
- * @param requiredTier - Minimum tier required ('pro' or 'family')
+ * @param requiredTier - Minimum tier required ('plus' or 'family')
  * @param feature - Feature name for upgrade messaging
  * @returns Wrapped handler with tier check
  *
@@ -65,7 +65,7 @@ export function getFeatureKey(feature: string): FeatureAccessKey | null {
  *     // Your handler logic
  *     return NextResponse.json({ success: true });
  *   },
- *   'pro',
+ *   'plus',
  *   'mealPlanning'
  * );
  * ```
@@ -156,27 +156,27 @@ export function withSubscriptionCheck(
 const UPGRADE_NUDGES: Record<string, { feature: string; requiredTier: SubscriptionTier; message: string }> = {
   canUseMealPlanning: {
     feature: 'meals',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     message: 'Unlock meal planning, recipes, and auto-generated shopping lists with Pro.',
   },
   canUseGoals: {
     feature: 'goals',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     message: 'Set family goals and track milestones together with Pro.',
   },
   canUseHousehold: {
     feature: 'household',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     message: 'Manage chores, penalties, and household tasks with Pro.',
   },
   canUploadPhotos: {
     feature: 'photos',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     message: 'Upload and share family photos with Pro.',
   },
   canUseAI: {
     feature: 'ai',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     message: 'Get smart suggestions and AI-powered insights with Pro.',
   },
   canUseIntegrations: {
@@ -186,7 +186,7 @@ const UPGRADE_NUDGES: Record<string, { feature: string; requiredTier: Subscripti
   },
   canUseEventProposals: {
     feature: 'calendar',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     message: 'Propose events and find times that work for everyone with Pro.',
   },
 };
@@ -201,7 +201,7 @@ const UPGRADE_NUDGES: Record<string, { feature: string; requiredTier: Subscripti
 export function buildUpgradeResponse(featureKey: string, currentTier: SubscriptionTier): NextResponse {
   const nudge = UPGRADE_NUDGES[featureKey] ?? {
     feature: 'unknown',
-    requiredTier: 'pro' as SubscriptionTier,
+    requiredTier: 'plus' as SubscriptionTier,
     message: 'This feature requires an upgraded subscription.',
   };
 

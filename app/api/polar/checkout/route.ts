@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 
 // Request body validation schema
 const CreateCheckoutSchema = z.object({
-  plan: z.enum(['pro', 'family']),
+  plan: z.enum(['plus', 'family']),
   billingInterval: z.enum(['monthly', 'annual']).default('monthly'),
 });
 

@@ -33,7 +33,7 @@ vi.mock('@/lib/logger', () => ({
 const USER_ID = '550e8400-e29b-41d4-a716-446655440001';
 
 const MOCK_SUBSCRIPTION_STATUS = {
-  tier: 'pro',
+  tier: 'plus',
   status: 'active',
   isActive: true,
   isPastDue: false,
@@ -133,7 +133,7 @@ describe('/api/subscriptions', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.tier).toBe('pro');
+    expect(data.tier).toBe('plus');
     expect(data.subscription).toBeDefined();
     expect(data.subscription.isActive).toBe(true);
     expect(data.features).toBeDefined();

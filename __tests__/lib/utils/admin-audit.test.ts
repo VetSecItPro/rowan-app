@@ -104,7 +104,7 @@ describe('logAdminAction', () => {
 
   it('should pass rich metadata objects through unchanged', async () => {
     const metadata = {
-      previousTier: 'pro',
+      previousTier: 'plus',
       newTier: 'free',
       effectiveDate: '2026-02-22',
       items: [1, 2, 3],

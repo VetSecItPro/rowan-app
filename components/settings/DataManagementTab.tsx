@@ -360,7 +360,7 @@ export function DataManagementTab() {
           Need More Space?
         </h3>
         <p className="text-sm text-blue-300 mb-4">
-          Upgrade to Pro for 2GB or Family for 5GB of storage space.
+          Upgrade to Plus for 2GB or Family for 5GB of storage space.
         </p>
         <button
           onClick={() => router.push('/pricing')}

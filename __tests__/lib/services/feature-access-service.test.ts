@@ -77,13 +77,13 @@ describe('feature-access-service', () => {
   // ── canAccessFeature ──────────────────────────────────────────────────────
   describe('canAccessFeature', () => {
     it('allows access when tier has the feature', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockGetFeatureLimits.mockReturnValue(PRO_LIMITS);
 
       const result = await canAccessFeature('user-1', 'canUseGoals');
 
       expect(result.allowed).toBe(true);
-      expect(result.tier).toBe('pro');
+      expect(result.tier).toBe('plus');
     });
 
     it('denies access for free tier feature', async () => {
@@ -97,7 +97,7 @@ describe('feature-access-service', () => {
     });
 
     it('returns family tier requirement for integrations', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockGetFeatureLimits.mockReturnValue({ ...PRO_LIMITS, canUseIntegrations: false });
 
       const result = await canAccessFeature('user-1', 'canUseIntegrations');
@@ -110,13 +110,13 @@ describe('feature-access-service', () => {
   // ── canPerformUsageAction ─────────────────────────────────────────────────
   describe('canPerformUsageAction', () => {
     it('returns allowed with tier when action is permitted', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockCanPerformAction.mockResolvedValue({ allowed: true, currentUsage: 5, limit: -1 });
 
       const result = await canPerformUsageAction('user-1', 'tasks_created');
 
       expect(result.allowed).toBe(true);
-      expect(result.tier).toBe('pro');
+      expect(result.tier).toBe('plus');
     });
 
     it('returns not allowed when usage is at limit', async () => {
@@ -152,7 +152,7 @@ describe('feature-access-service', () => {
     });
 
     it('always allows when limit is -1 (unlimited)', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockGetFeatureLimits.mockReturnValue(PRO_LIMITS);
 
       const result = await canUseNumericFeature('user-1', 'maxActiveTasks', 999);
@@ -164,13 +164,13 @@ describe('feature-access-service', () => {
   // ── getUserFeatureAccess ──────────────────────────────────────────────────
   describe('getUserFeatureAccess', () => {
     it('returns comprehensive feature access summary', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockGetFeatureLimits.mockReturnValue(PRO_LIMITS);
       mockGetTodayUsage.mockResolvedValue(5);
 
       const result = await getUserFeatureAccess('user-1');
 
-      expect(result.tier).toBe('pro');
+      expect(result.tier).toBe('plus');
       expect(result.features).toBeDefined();
       expect(result.limits).toBeDefined();
       expect(result.dailyUsage).toBeDefined();
@@ -179,7 +179,7 @@ describe('feature-access-service', () => {
     });
 
     it('shows unlimited remaining for -1 limits', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockGetFeatureLimits.mockReturnValue(PRO_LIMITS);
       mockGetTodayUsage.mockResolvedValue(10);
 
@@ -206,12 +206,12 @@ describe('feature-access-service', () => {
       const result = await shouldPromptUpgrade('user-1', 'goals');
 
       expect(result.shouldPrompt).toBe(true);
-      expect(result.requiredTier).toBe('pro');
+      expect(result.requiredTier).toBe('plus');
       expect(result.reason).toBeDefined();
     });
 
     it('returns shouldPrompt false for pro user with pro feature', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
 
       const result = await shouldPromptUpgrade('user-1', 'goals');
 
@@ -219,7 +219,7 @@ describe('feature-access-service', () => {
     });
 
     it('returns shouldPrompt true for pro user needing family feature', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
 
       const result = await shouldPromptUpgrade('user-1', 'integrations');
 
@@ -255,7 +255,7 @@ describe('feature-access-service', () => {
     });
 
     it('skips unlimited (-1) limits', async () => {
-      mockGetUserTier.mockResolvedValue('pro');
+      mockGetUserTier.mockResolvedValue('plus');
       mockGetFeatureLimits.mockReturnValue(PRO_LIMITS);
       mockGetTodayUsage.mockResolvedValue(1000);
 

@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     const spaceCount = currentSpaceCount || 0;
     if (spaceCount >= maxSpaces) {
-      const tierName = userTier === 'free' ? 'Free' : userTier === 'pro' ? 'Pro' : 'Family';
+      const tierName = userTier === 'free' ? 'Free' : userTier === 'plus' ? 'Plus' : 'Family';
       return NextResponse.json(
         {
           error: `You've reached the maximum of ${maxSpaces} space${maxSpaces === 1 ? '' : 's'} for the ${tierName} plan. Upgrade to create more spaces.`,

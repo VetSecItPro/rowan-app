@@ -67,7 +67,7 @@ describe('useCanAccessAI', () => {
     const mockPromptUpgrade = vi.fn();
     mockUseFeatureGateSafe.mockReturnValue({
       hasAccess: true,
-      tier: 'pro' as SubscriptionTier,
+      tier: 'plus' as SubscriptionTier,
       isLoading: false,
       promptUpgrade: mockPromptUpgrade,
     });
@@ -75,7 +75,7 @@ describe('useCanAccessAI', () => {
     const { result } = renderHook(() => useCanAccessAI());
 
     expect(result.current.canAccess).toBe(true);
-    expect(result.current.tier).toBe('pro');
+    expect(result.current.tier).toBe('plus');
   });
 
   it('should deny access to free tier users', () => {

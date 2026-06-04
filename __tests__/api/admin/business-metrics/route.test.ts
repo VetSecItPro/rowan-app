@@ -14,6 +14,13 @@ vi.mock('@/lib/supabase/admin', () => ({
   supabaseAdmin: {
     from: vi.fn(),
     rpc: vi.fn(),
+    // The route counts auth users via auth.admin.listUsers (paginated).
+    // Without this the route throws on `supabaseAdmin.auth` and returns 500.
+    auth: {
+      admin: {
+        listUsers: vi.fn().mockResolvedValue({ data: { users: [] }, error: null }),
+      },
+    },
   },
 }));
 
@@ -48,7 +55,7 @@ function createChainMock(resolvedValue: unknown) {
   const handler = () => mock;
   ['select', 'eq', 'order', 'insert', 'update', 'delete', 'single', 'limit',
    'maybeSingle', 'gte', 'lte', 'lt', 'in', 'neq', 'is', 'not', 'upsert',
-   'match', 'or', 'filter', 'ilike', 'range', 'textSearch', 'contains'].forEach(m => {
+   'match', 'or', 'filter', 'like', 'ilike', 'range', 'textSearch', 'contains'].forEach(m => {
     mock[m] = vi.fn(handler);
   });
   mock.then = vi.fn((resolve: (v: unknown) => unknown) => resolve(resolvedValue));
@@ -130,7 +137,7 @@ describe('/api/admin/business-metrics', () => {
         if (table === 'subscriptions') {
           return createChainMock({
             data: [
-              { user_id: '550e8400-e29b-41d4-a716-446655440001', tier: 'pro', period: 'monthly', status: 'active', subscription_started_at: '2024-01-01T00:00:00Z', created_at: '2024-01-01T00:00:00Z' },
+              { user_id: '550e8400-e29b-41d4-a716-446655440001', tier: 'plus', period: 'monthly', status: 'active', subscription_started_at: '2024-01-01T00:00:00Z', created_at: '2024-01-01T00:00:00Z' },
             ],
             error: null,
             count: null,

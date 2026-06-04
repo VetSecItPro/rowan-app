@@ -19,6 +19,21 @@ vi.mock('@/lib/utils/session-crypto-edge', () => ({
   validateSessionData: vi.fn(),
 }));
 
+// verifyAdminAuth calls isAdminStillActive(), which queries admin_users via
+// supabaseAdmin. Without this mock it hits a real (empty) query and fails
+// closed (inactive), so every "valid auth" assertion would be false.
+vi.mock('@/lib/supabase/admin', () => ({
+  supabaseAdmin: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: vi.fn().mockResolvedValue({ data: { is_active: true }, error: null }),
+        })),
+      })),
+    })),
+  },
+}));
+
 import { verifyAdminAuth, withAdminAuth } from '@/lib/utils/admin-auth';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';

@@ -80,7 +80,7 @@ function mockAuthAndTier(
     },
   } as any);
 
-  vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+  vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 }
 
 describe('/api/meals/[id]', () => {

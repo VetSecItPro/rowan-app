@@ -27,9 +27,10 @@
 
 import OpenAI from 'openai';
 import type { ChatCompletionMessageParam, ChatCompletionTool } from 'openai/resources/chat/completions';
+import type { FunctionDeclaration } from '@google/generative-ai';
 import { LRUCache } from 'lru-cache';
 import { logger } from '@/lib/logger';
-import { TOOL_DECLARATIONS } from './tool-definitions';
+import { getToolDeclarationsForMessage } from './tool-routing';
 import {
   executeTool,
   type ToolExecutionContext,
@@ -173,8 +174,8 @@ function convertSchema(schema: Record<string, unknown>): Record<string, unknown>
 }
 
 /** Convert Google FunctionDeclarations to OpenAI ChatCompletionTool format */
-function convertToolDeclarations(): ChatCompletionTool[] {
-  return TOOL_DECLARATIONS.map((decl) => ({
+function convertDeclarations(declarations: FunctionDeclaration[]): ChatCompletionTool[] {
+  return declarations.map((decl) => ({
     type: 'function' as const,
     function: {
       name: decl.name,
@@ -186,13 +187,14 @@ function convertToolDeclarations(): ChatCompletionTool[] {
   }));
 }
 
-/** Cached converted tools (computed once at startup) */
-let _openaiTools: ChatCompletionTool[] | null = null;
-function getOpenAITools(): ChatCompletionTool[] {
-  if (!_openaiTools) {
-    _openaiTools = convertToolDeclarations();
-  }
-  return _openaiTools;
+/**
+ * COST (Phase 10.2): return only the tool declarations relevant to this user
+ * message, converted to OpenAI format. Computed ONCE per message in
+ * processMessage and reused across every tool-call round so a list->act flow
+ * keeps its tools. Cuts the per-call tool payload ~70-85% vs sending all 145.
+ */
+function getOpenAIToolsForMessage(message: string): ChatCompletionTool[] {
+  return convertDeclarations(getToolDeclarationsForMessage(message));
 }
 
 // ---------------------------------------------------------------------------
@@ -387,6 +389,10 @@ export interface ProcessMessageParams {
   conversationId: string;
   context: ToolExecutionContext;
   spaceContext?: SpaceContext;
+  /** Subscription tier — free traffic is routed to the cheaper flash-lite
+   *  model (Phase 10.5 / 11.6), since $0-revenue users should run on the
+   *  lowest-cost model. Defaults to the primary model when omitted. */
+  tier?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -455,7 +461,11 @@ class ChatOrchestratorService {
   async *processMessage(
     params: ProcessMessageParams
   ): AsyncGenerator<ChatStreamEvent> {
-    const { message, conversationId, context, spaceContext } = params;
+    const { message, conversationId, context, spaceContext, tier } = params;
+
+    // COST (Phase 10.5 / 11.6): free traffic runs on flash-lite (~60-75% cheaper
+    // than flash). Paid tiers get the higher-quality primary model.
+    const primaryModel = tier === 'free' ? FALLBACK_MODEL : PRIMARY_MODEL;
 
     // -- Pending confirmation check (F-037) ----------------------------------
     const pending = pendingConfirmations.get(conversationId);
@@ -522,6 +532,10 @@ class ChatOrchestratorService {
         ? buildSystemPrompt(spaceContext)
         : buildMinimalSystemPrompt(context.userId, 'America/New_York');
 
+      // COST (Phase 10.2): pick the tool subset for THIS message once and reuse
+      // it across every tool-call round (so multi-step flows keep their tools).
+      const tools = getOpenAIToolsForMessage(message);
+
       const client = this.getClient();
       const history = this.getHistory(conversationId, context.userId);
 
@@ -529,11 +543,11 @@ class ChatOrchestratorService {
       history.push({ role: 'user', content: message });
 
       // Try primary model, fall back on error
-      let usedModel = PRIMARY_MODEL;
+      let usedModel = primaryModel;
       let result: { text: string; toolCalls: Array<{ id: string; name: string; args: Record<string, unknown> }> };
 
       try {
-        result = yield* this.streamModelResponse(client, history, systemPrompt, PRIMARY_MODEL);
+        result = yield* this.streamModelResponse(client, history, systemPrompt, primaryModel, tools);
       } catch (primaryError) {
         const errMsg = primaryError instanceof Error ? primaryError.message : String(primaryError);
         const isConfigError = errMsg.includes('API key') || errMsg.includes('authentication');
@@ -548,7 +562,7 @@ class ChatOrchestratorService {
         });
 
         usedModel = FALLBACK_MODEL;
-        result = yield* this.streamModelResponse(client, history, systemPrompt, FALLBACK_MODEL);
+        result = yield* this.streamModelResponse(client, history, systemPrompt, FALLBACK_MODEL, tools);
       }
 
       // Surface the resolved model id so the API route can pass it into
@@ -584,6 +598,7 @@ class ChatOrchestratorService {
           systemPrompt,
           context,
           usedModel,
+          tools,
           conversationId,
         );
       } else if (result.text) {
@@ -625,6 +640,7 @@ class ChatOrchestratorService {
     history: ChatCompletionMessageParam[],
     systemPrompt: string,
     model: string,
+    tools: ChatCompletionTool[],
   ): AsyncGenerator<ChatStreamEvent, { text: string; toolCalls: Array<{ id: string; name: string; args: Record<string, unknown> }> }> {
     const messages: ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt },
@@ -636,18 +652,28 @@ class ChatOrchestratorService {
       client.chat.completions.create({
         model,
         messages,
-        tools: getOpenAITools(),
+        tools,
         temperature: 0.7,
         top_p: 0.9,
-        max_tokens: 4096,
+        max_tokens: 1500,
         stream: true,
+        // COST (Phase 10.3): ask the provider to report real token usage in the
+        // final chunk so we record actual billed tokens, not a char estimate.
+        stream_options: { include_usage: true },
       })
     );
 
     let fullText = '';
+    let promptTokens = 0;
+    let completionTokens = 0;
     const rawToolCalls: Array<{ id: string; name: string; arguments: string }> = [];
 
     for await (const chunk of stream) {
+      // The usage chunk (include_usage) arrives last with empty choices.
+      if (chunk.usage) {
+        promptTokens = chunk.usage.prompt_tokens ?? 0;
+        completionTokens = chunk.usage.completion_tokens ?? 0;
+      }
       const delta = chunk.choices[0]?.delta;
       if (!delta) continue;
 
@@ -684,13 +710,23 @@ class ChatOrchestratorService {
         })(),
       }));
 
+    // COST (Phase 10.3): surface real token usage for this model call.
+    if (promptTokens > 0 || completionTokens > 0) {
+      yield { type: 'usage', data: { promptTokens, completionTokens } };
+    }
+
     return { text: fullText, toolCalls: parsedCalls };
   }
 
   // -- Function-call handler -----------------------------------------------
 
-  /** Max rounds of tool calls to prevent infinite loops */
-  private static readonly MAX_TOOL_ROUNDS = 5;
+  /** Max rounds of tool calls to prevent infinite loops.
+   *
+   * COST (Phase 10.4): lowered 5 -> 3. Each round re-sends the full
+   * system+tools prefix, so rounds multiply input-token cost. Legitimate
+   * household flows (list -> act) almost never need more than 2 rounds; 3
+   * is a safe ceiling that caps worst-case spend without truncating real work. */
+  private static readonly MAX_TOOL_ROUNDS = 3;
 
   /**
    * SECURITY (LLM-M-03): Cumulative token cap across all tool-call rounds for
@@ -732,6 +768,7 @@ class ChatOrchestratorService {
     systemPrompt: string,
     context: ToolExecutionContext,
     model: string = PRIMARY_MODEL,
+    tools: ChatCompletionTool[] = [],
     conversationId?: string,
   ): AsyncGenerator<ChatStreamEvent> {
     let currentCalls = calls;
@@ -861,15 +898,19 @@ class ChatOrchestratorService {
         client.chat.completions.create({
           model,
           messages,
-          tools: getOpenAITools(),
+          tools,
           temperature: 0.7,
           top_p: 0.9,
-          max_tokens: 4096,
+          max_tokens: 1500,
           stream: true,
+          // COST (Phase 10.3): real token usage for this follow-up round.
+          stream_options: { include_usage: true },
         })
       );
 
       let followUpText = '';
+      let roundPromptTokens = 0;
+      let roundCompletionTokens = 0;
       const nextToolCalls: Array<{
         id: string;
         name: string;
@@ -877,6 +918,10 @@ class ChatOrchestratorService {
       }> = [];
 
       for await (const chunk of followUp) {
+        if (chunk.usage) {
+          roundPromptTokens = chunk.usage.prompt_tokens ?? 0;
+          roundCompletionTokens = chunk.usage.completion_tokens ?? 0;
+        }
         const delta = chunk.choices[0]?.delta;
         if (!delta) continue;
 
@@ -900,6 +945,11 @@ class ChatOrchestratorService {
             }
           }
         }
+      }
+
+      // COST (Phase 10.3): emit this round's real token usage.
+      if (roundPromptTokens > 0 || roundCompletionTokens > 0) {
+        yield { type: 'usage', data: { promptTokens: roundPromptTokens, completionTokens: roundCompletionTokens } };
       }
 
       cumulativeTokens += Math.ceil(followUpText.length / 4);

@@ -126,7 +126,7 @@ function FeatureGateBlockedPage({
   requiredTier: string;
   onUpgrade: () => void;
 }) {
-  const tierDisplay = requiredTier === 'family' ? 'Family' : 'Pro';
+  const tierDisplay = requiredTier === 'family' ? 'Family' : 'Plus';
 
   return (
     <div data-testid="feature-locked-message" className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
@@ -184,7 +184,7 @@ function FeatureGateBlockedInline({
   requiredTier: string;
   onUpgrade: () => void;
 }) {
-  const tierDisplay = requiredTier === 'family' ? 'Family' : 'Pro';
+  const tierDisplay = requiredTier === 'family' ? 'Family' : 'Plus';
 
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/50">
@@ -216,7 +216,7 @@ function FeatureGateOverlay({
   requiredTier: string;
   onUpgrade: () => void;
 }) {
-  const tierDisplay = requiredTier === 'family' ? 'Family' : 'Pro';
+  const tierDisplay = requiredTier === 'family' ? 'Family' : 'Plus';
 
   return (
     <div className="absolute inset-0 flex items-center justify-center">

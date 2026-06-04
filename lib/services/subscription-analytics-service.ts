@@ -12,6 +12,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { POLAR_PLANS } from '@/lib/polar';
+import { normalizeTier } from '@/lib/types/subscription';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -125,9 +126,12 @@ interface SubscriptionEventRow {
  * POLAR_PLANS in `lib/polar.ts`.
  */
 export function calculateMRR(tier: string, period: string): number {
-  if (tier === 'free' || tier === 'owner' || !tier) return 0;
+  // Normalize legacy `pro` -> `plus` so historical subscription_events rows
+  // (which may still carry `pro`) map to a valid POLAR_PLANS key.
+  const normalized = normalizeTier(tier);
+  if (normalized === 'free' || normalized === 'owner') return 0;
 
-  const tierKey = tier as 'pro' | 'family';
+  const tierKey = normalized as 'plus' | 'family';
   if (!POLAR_PLANS[tierKey]) return 0;
 
   if (period === 'annual') {
@@ -215,7 +219,9 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
 
   // Calculate metrics — exclude free and owner tiers from paid subscriber counts
   const paidSubscriptions = activeSubscriptions.filter(s => s.tier !== 'free' && s.tier !== 'owner');
-  const proSubs = activeSubscriptions.filter(s => s.tier === 'pro');
+  // normalizeTier so a legacy 'pro' row counts as Plus (it's already counted in
+  // paidSubscriptions above — without this the Plus count would under-report).
+  const proSubs = activeSubscriptions.filter(s => normalizeTier(s.tier) === 'plus');
   const familySubs = activeSubscriptions.filter(s => s.tier === 'family');
 
   // Calculate MRR (calculateMRR already returns 0 for free/owner)

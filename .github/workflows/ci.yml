@@ -70,6 +70,24 @@ jobs:
       - name: Migration drift audit
         run: node scripts/ci/migration-drift-audit.mjs
 
+  # ─── Unit tests (vitest) ───
+  # Phase 12.1: behavioral correctness is now gated. Before this, vitest ran
+  # only locally, so 47 red tests (incl. the entire Polar webhook suite) sat
+  # undetected. This job makes the suite a required check.
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: pnpm/action-setup@cb9c4fdd700176d874d52d64ce3b7418842cf6d3 # v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run unit tests
+        run: pnpm test:unit
+
   # ─── Security scanning ───
   security:
     name: Security Audit
@@ -195,7 +213,7 @@ jobs:
   summary:
     name: CI Summary
     runs-on: ubuntu-latest
-    needs: [quality, security, build]
+    needs: [quality, unit-tests, security, build]
     if: always()
     steps:
       - name: Evaluate results
@@ -220,6 +238,7 @@ jobs:
           }
 
           check_job "Quality" "${{ needs.quality.result }}"
+          check_job "Unit Tests" "${{ needs.unit-tests.result }}"
           check_job "Security" "${{ needs.security.result }}"
           check_job "Build & Bundle" "${{ needs.build.result }}"
 

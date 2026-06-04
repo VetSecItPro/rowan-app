@@ -71,6 +71,20 @@ vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
+// Mock the SSRF/DNS validator deterministically — the real one resolves DNS at
+// runtime (non-deterministic in CI). Its own logic is covered by url-validator
+// tests; here we only need validateICSUrl's normalization + pass/block wiring.
+vi.mock('@/lib/security/url-validator', () => ({
+  validatePublicUrl: vi.fn(async (url: string) => {
+    let host = '';
+    try { host = new URL(url).hostname; } catch { return { ok: false, reason: 'Invalid URL' }; }
+    const isPrivate = /^(localhost|127\.|10\.|192\.168\.|169\.254\.)/.test(host) || /\.internal$/.test(host);
+    return isPrivate
+      ? { ok: false, reason: 'URL resolves to a private or internal address' }
+      : { ok: true };
+  }),
+}));
+
 import { validateICSUrl, icsImportService } from '@/lib/services/calendar/ics-import-service';
 
 // ---------------------------------------------------------------------------
@@ -88,59 +102,59 @@ function setNextEvent(evt: Record<string, unknown>) {
 // validateICSUrl
 // ---------------------------------------------------------------------------
 describe('validateICSUrl', () => {
-  it('returns valid for a normal https URL', () => {
-    const result = validateICSUrl('https://calendar.example.com/feed.ics');
+  it('returns valid for a normal https URL', async () => {
+    const result = await validateICSUrl('https://calendar.example.com/feed.ics');
     expect(result.valid).toBe(true);
     expect(result.normalizedUrl).toBe('https://calendar.example.com/feed.ics');
   });
 
-  it('normalizes webcal:// to https://', () => {
-    const result = validateICSUrl('webcal://calendar.example.com/feed.ics');
+  it('normalizes webcal:// to https://', async () => {
+    const result = await validateICSUrl('webcal://calendar.example.com/feed.ics');
     expect(result.valid).toBe(true);
     expect(result.normalizedUrl).toMatch(/^https:\/\//);
   });
 
-  it('rejects localhost addresses (SSRF protection)', () => {
-    const result = validateICSUrl('https://localhost/evil.ics');
+  it('rejects localhost addresses (SSRF protection)', async () => {
+    const result = await validateICSUrl('https://localhost/evil.ics');
     expect(result.valid).toBe(false);
     expect(result.error).toMatch(/private or internal/i);
   });
 
-  it('rejects 127.0.0.1 (loopback)', () => {
-    const result = validateICSUrl('https://127.0.0.1/evil.ics');
+  it('rejects 127.0.0.1 (loopback)', async () => {
+    const result = await validateICSUrl('https://127.0.0.1/evil.ics');
     expect(result.valid).toBe(false);
     expect(result.error).toMatch(/private or internal/i);
   });
 
-  it('rejects RFC1918 10.x.x.x range', () => {
-    const result = validateICSUrl('https://10.0.0.1/feed.ics');
+  it('rejects RFC1918 10.x.x.x range', async () => {
+    const result = await validateICSUrl('https://10.0.0.1/feed.ics');
     expect(result.valid).toBe(false);
     expect(result.error).toMatch(/private or internal/i);
   });
 
-  it('rejects RFC1918 192.168.x.x range', () => {
-    const result = validateICSUrl('https://192.168.1.100/feed.ics');
+  it('rejects RFC1918 192.168.x.x range', async () => {
+    const result = await validateICSUrl('https://192.168.1.100/feed.ics');
     expect(result.valid).toBe(false);
   });
 
-  it('rejects AWS metadata IP (169.254.169.254)', () => {
-    const result = validateICSUrl('https://169.254.169.254/latest/meta-data');
+  it('rejects AWS metadata IP (169.254.169.254)', async () => {
+    const result = await validateICSUrl('https://169.254.169.254/latest/meta-data');
     expect(result.valid).toBe(false);
   });
 
-  it('rejects .internal domain', () => {
-    const result = validateICSUrl('https://api.corp.internal/calendar.ics');
+  it('rejects .internal domain', async () => {
+    const result = await validateICSUrl('https://api.corp.internal/calendar.ics');
     expect(result.valid).toBe(false);
   });
 
-  it('rejects completely malformed URLs', () => {
-    const result = validateICSUrl('not-a-url-at-all');
+  it('rejects completely malformed URLs', async () => {
+    const result = await validateICSUrl('not-a-url-at-all');
     expect(result.valid).toBe(false);
     expect(result.error).toMatch(/Invalid URL/i);
   });
 
-  it('strips whitespace before validation', () => {
-    const result = validateICSUrl('  https://calendar.example.com/feed.ics  ');
+  it('strips whitespace before validation', async () => {
+    const result = await validateICSUrl('  https://calendar.example.com/feed.ics  ');
     expect(result.valid).toBe(true);
   });
 });

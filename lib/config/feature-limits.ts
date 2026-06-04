@@ -37,7 +37,11 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseReminders: true,
     canUseGoals: false,
     canUseHousehold: false,
-    canUseAI: false,
+    // Phase 11.6: free users get a small daily AI teaser so the differentiator
+    // touches the funnel that creates payers. The hard daily cap is enforced
+    // server-side by the `free` entry in TOKEN_BUDGETS (conversation-persistence)
+    // + flash-lite routing — NOT by this flag alone.
+    canUseAI: true,
     canUseIntegrations: false,
     canUseEventProposals: false,
 
@@ -52,7 +56,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     storageGB: 0.5,
   },
 
-  pro: {
+  plus: {
     // Task limits
     maxActiveTasks: -1, // unlimited
     dailyTaskCreation: -1, // unlimited

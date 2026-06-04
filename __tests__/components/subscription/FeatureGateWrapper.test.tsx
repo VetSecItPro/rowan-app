@@ -14,7 +14,7 @@ vi.mock('@/lib/hooks/useFeatureGate', () => ({
     hasAccess: true,
     isLoading: false,
     featureName: 'Meal Planning',
-    requiredTier: 'pro',
+    requiredTier: 'plus',
     promptUpgrade: vi.fn(),
     checkAndPrompt: vi.fn(() => true),
   })),
@@ -27,7 +27,7 @@ const defaultGateReturn = {
   hasAccess: true,
   isLoading: false,
   featureName: 'Meal Planning',
-  requiredTier: 'pro',
+  requiredTier: 'plus',
   promptUpgrade: vi.fn(),
   checkAndPrompt: vi.fn(() => true),
 } as ReturnType<typeof useFeatureGate>;
@@ -52,7 +52,7 @@ describe('FeatureGateWrapper', () => {
       hasAccess: false,
       isLoading: true,
       featureName: 'Meal Planning',
-      requiredTier: 'pro',
+      requiredTier: 'plus',
       promptUpgrade: vi.fn(),
       checkAndPrompt: vi.fn(() => false),
     });
@@ -71,7 +71,7 @@ describe('FeatureGateWrapper', () => {
       hasAccess: false,
       isLoading: true,
       featureName: 'Meal Planning',
-      requiredTier: 'pro',
+      requiredTier: 'plus',
       promptUpgrade: vi.fn(),
       checkAndPrompt: vi.fn(() => false),
     });
@@ -89,7 +89,7 @@ describe('FeatureGateWrapper', () => {
       hasAccess: false,
       isLoading: false,
       featureName: 'Meal Planning',
-      requiredTier: 'pro',
+      requiredTier: 'plus',
       promptUpgrade: vi.fn(),
       checkAndPrompt: vi.fn(() => false),
     });
@@ -108,7 +108,7 @@ describe('FeatureGateWrapper', () => {
       hasAccess: false,
       isLoading: false,
       featureName: 'Meal Planning',
-      requiredTier: 'pro',
+      requiredTier: 'plus',
       promptUpgrade: vi.fn(),
       checkAndPrompt: vi.fn(() => false),
     });
@@ -126,7 +126,7 @@ describe('FeatureGateWrapper', () => {
       hasAccess: false,
       isLoading: false,
       featureName: 'Meal Planning',
-      requiredTier: 'pro',
+      requiredTier: 'plus',
       promptUpgrade: vi.fn(),
       checkAndPrompt: vi.fn(() => false),
     });

@@ -138,7 +138,7 @@ describe('/api/ai/conversations', () => {
         },
       } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(listConversations).mockResolvedValue(mockConversations as any);
 
       const request = new NextRequest(`http://localhost/api/ai/conversations?spaceId=${SPACE_ID}`, { method: 'GET' });
@@ -163,7 +163,7 @@ describe('/api/ai/conversations', () => {
         },
       } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(listConversations).mockResolvedValue([]);
 
       const request = new NextRequest(

@@ -52,7 +52,7 @@ describe('validateAIAccess', () => {
       expect(result.allowed).toBe(false);
       expect(result.statusCode).toBe(403);
       expect(result.tier).toBe('free');
-      expect(result.reason).toMatch(/Pro or Family/);
+      expect(result.reason).toMatch(/Plus or Family/);
     });
 
     it('returns 500 when canAccessFeature throws (DB error)', async () => {
@@ -68,28 +68,34 @@ describe('validateAIAccess', () => {
     it('returns 200 when user has AI access and budget check is skipped', async () => {
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
 
       const result = await validateAIAccess(mockSupabase, 'user-1', undefined, false);
 
       expect(result.allowed).toBe(true);
       expect(result.statusCode).toBe(200);
-      expect(result.tier).toBe('pro');
+      expect(result.tier).toBe('plus');
     });
 
-    it('returns 200 when user has access and no spaceId provided', async () => {
+    it('still runs the budget check without a spaceId (per-user cap — Phase 11.6 fix)', async () => {
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
         tier: 'family',
       });
+      vi.mocked(checkBudget).mockResolvedValue({
+        allowed: true,
+        remaining: { input_tokens: 100, output_tokens: 100 },
+      } as never);
 
-      // checkBudgetToo=true but no spaceId — budget check should be skipped
+      // checkBudgetToo=true, no spaceId: the per-user daily + monthly COGS caps
+      // must STILL run (gating on spaceId would let a spaceId-less caller bypass
+      // the cap — a cost leak now that free users have AI).
       const result = await validateAIAccess(mockSupabase, 'user-1', undefined, true);
 
       expect(result.allowed).toBe(true);
       expect(result.statusCode).toBe(200);
-      expect(checkBudget).not.toHaveBeenCalled();
+      expect(checkBudget).toHaveBeenCalledWith(mockSupabase, 'user-1', 'family', undefined);
     });
   });
 
@@ -97,7 +103,7 @@ describe('validateAIAccess', () => {
     beforeEach(() => {
       vi.mocked(canAccessFeature).mockResolvedValue({
         allowed: true,
-        tier: 'pro',
+        tier: 'plus',
       });
     });
 
@@ -197,7 +203,7 @@ describe('buildAIAccessDeniedResponse', () => {
   it('returns a 429 Response with reset_at for rate limit denial', async () => {
     const accessResult: AIAccessResult = {
       allowed: false,
-      tier: 'pro',
+      tier: 'plus',
       reason: 'Daily AI limit reached.',
       statusCode: 429,
       resetAt: '2026-02-23T00:00:00.000Z',

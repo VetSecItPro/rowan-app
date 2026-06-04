@@ -38,7 +38,7 @@ export default function PricingPage() {
     setPeriod(newPeriod);
   };
 
-  const handleSelectPlan = async (tier: 'free' | 'pro' | 'family') => {
+  const handleSelectPlan = async (tier: 'free' | 'plus' | 'family') => {
     setError(null);
 
     if (tier === 'free') {
@@ -103,7 +103,7 @@ export default function PricingPage() {
               The family command center that works
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
-              Try Rowan Pro free for 14 days. Experience unlimited tasks, calendar, meal planning,
+              Try Rowan Plus free for 14 days. Experience unlimited tasks, calendar, meal planning,
               and more. No commitment - upgrade only if you love it.
             </p>
           </div>
@@ -126,12 +126,12 @@ export default function PricingPage() {
             <PricingCard
               tier="free"
               title="Free Trial"
-              description="14 days of Pro features, no credit card"
+              description="14 days of Plus features, no credit card"
               monthlyPrice={0}
               annualPrice={0}
               period={period}
               features={[
-                '14-day Pro trial included',
+                '14-day Plus trial included',
                 'Unlimited tasks & calendar',
                 'Unlimited messages',
                 'Photo uploads (trial)',
@@ -147,13 +147,13 @@ export default function PricingPage() {
               onSelect={() => handleSelectPlan('free')}
             />
 
-            {/* Pro Tier */}
+            {/* Plus Tier */}
             <PricingCard
-              tier="pro"
-              title="Pro"
+              tier="plus"
+              title="Plus"
               description="Everything you need for household collaboration"
-              monthlyPrice={18}
-              annualPrice={180}
+              monthlyPrice={8}
+              annualPrice={60}
               period={period}
               features={[
                 'Unlimited tasks & calendar',
@@ -168,12 +168,12 @@ export default function PricingPage() {
                 '2 spaces',
                 '2 household members',
               ]}
-              cta="Sign Up to Pro"
+              cta="Sign Up to Plus"
               popular={true}
-              loading={loading === 'pro'}
+              loading={loading === 'plus'}
               disabled={loading !== null}
               showFoundingMember={!foundingMemberSoldOut}
-              onSelect={() => handleSelectPlan('pro')}
+              onSelect={() => handleSelectPlan('plus')}
             />
 
             {/* Family Tier */}
@@ -181,11 +181,11 @@ export default function PricingPage() {
               tier="family"
               title="Family"
               description="Complete family organization for up to 6 members"
-              monthlyPrice={29}
-              annualPrice={290}
+              monthlyPrice={12}
+              annualPrice={96}
               period={period}
               features={[
-                'Everything in Pro, plus:',
+                'Everything in Plus, plus:',
                 '3 spaces (vs 2)',
                 '6 household members (vs 2)',
                 '5GB storage (vs 2GB)',

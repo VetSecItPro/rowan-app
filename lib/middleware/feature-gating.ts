@@ -13,7 +13,7 @@ import type { SubscriptionTier, UsageType } from '../types';
  * Combine subscription and usage checks into a single middleware
  *
  * This is useful when a feature:
- * 1. Requires a specific subscription tier (e.g., 'pro' or 'family')
+ * 1. Requires a specific subscription tier (e.g., 'plus' or 'family')
  * 2. Has daily usage limits that should be tracked
  *
  * @param handler - The API route handler to wrap
@@ -43,7 +43,7 @@ import type { SubscriptionTier, UsageType } from '../types';
  *     // Read-only feature
  *     return NextResponse.json({ data: [] });
  *   },
- *   'pro',
+ *   'plus',
  *   'mealPlanning'
  * );
  * ```
@@ -78,7 +78,7 @@ export function withProTierCheck(
   feature: string,
   usageType?: UsageType
 ): RouteHandler {
-  return withFeatureGating(handler, 'pro', feature, usageType);
+  return withFeatureGating(handler, 'plus', feature, usageType);
 }
 
 /**

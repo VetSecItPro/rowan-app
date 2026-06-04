@@ -30,13 +30,13 @@ describe('subscription-service', () => {
       mockSupabaseClient.select.mockReturnValueOnce(mockSupabaseClient);
       mockSupabaseClient.eq.mockReturnValueOnce(mockSupabaseClient);
       mockSupabaseClient.maybeSingle.mockResolvedValueOnce({
-        data: { user_id: 'user1', tier: 'pro', status: 'active' },
+        data: { user_id: 'user1', tier: 'plus', status: 'active' },
         error: null,
       });
 
       const result = await getUserSubscription('user1');
 
-      expect(result).toHaveProperty('tier', 'pro');
+      expect(result).toHaveProperty('tier', 'plus');
       expect(result).toHaveProperty('status', 'active');
     });
 
@@ -77,20 +77,20 @@ describe('subscription-service', () => {
       mockSupabaseClient.select.mockReturnValueOnce(mockSupabaseClient);
       mockSupabaseClient.eq.mockReturnValueOnce(mockSupabaseClient);
       mockSupabaseClient.maybeSingle.mockResolvedValueOnce({
-        data: { tier: 'pro', status: 'active' },
+        data: { tier: 'plus', status: 'active' },
         error: null,
       });
 
       const result = await getUserTier('user1');
 
-      expect(result).toBe('pro');
+      expect(result).toBe('plus');
     });
 
     it('should return free tier when subscription inactive', async () => {
       mockSupabaseClient.select.mockReturnValueOnce(mockSupabaseClient);
       mockSupabaseClient.eq.mockReturnValueOnce(mockSupabaseClient);
       mockSupabaseClient.maybeSingle.mockResolvedValueOnce({
-        data: { tier: 'pro', status: 'canceled' },
+        data: { tier: 'plus', status: 'canceled' },
         error: null,
       });
 

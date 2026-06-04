@@ -20,11 +20,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getPlanFromProductId, getPeriodFromProductId, getPolarWebhookSecret } from '@/lib/polar';
-import { sendSubscriptionWelcomeEmail, sendSubscriptionCancelledEmail } from '@/lib/services/email-service';
+import { sendSubscriptionWelcomeEmail, sendSubscriptionCancelledEmail, sendPaymentFailedEmail } from '@/lib/services/email-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
-import type { SubscriptionTier, SubscriptionPeriod } from '@/lib/types';
+import type { SubscriptionTier, SubscriptionPeriod, SubscriptionStatus } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 // PERF: Prevent serverless timeout — FIX-015
@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
         let isFoundingMember = subscription.is_founding_member || false;
 
         // Only try to claim founding member status for new paid subscriptions (pro or family)
-        if (!isFoundingMember && (plan === 'pro' || plan === 'family')) {
+        if (!isFoundingMember && (plan === 'plus' || plan === 'family')) {
           // Try to claim a founding member number atomically
           const { data: claimResult, error: claimError } = await supabaseAdmin
             .rpc('claim_founding_member_number');
@@ -365,7 +365,7 @@ export async function POST(request: NextRequest) {
           sendSubscriptionWelcomeEmail({
             recipientEmail: userData.email,
             recipientName: userData.full_name || 'there',
-            tier: plan as 'pro' | 'family',
+            tier: plan as 'plus' | 'family',
             period: getPeriodFromProductId(productId),
             dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
             isFoundingMember,
@@ -389,22 +389,61 @@ export async function POST(request: NextRequest) {
       }
 
       case 'subscription.updated': {
-        // Subscription was updated (e.g., plan change)
+        // Subscription was updated (plan change, renewal, or payment status change)
         const customerId = eventData.customerId as string;
         const productId = eventData.productId as string;
         const currentPeriodStart = eventData.currentPeriodStart as string | undefined;
         const currentPeriodEnd = eventData.currentPeriodEnd as string | undefined;
+        const polarStatus = (eventData.status as string | undefined) ?? 'active';
 
         const plan = getPlanFromProductId(productId);
 
+        // DUNNING (Phase 11.3): keep access during 'past_due' — Polar is still
+        // retrying the card. Any non-past_due status here maps to 'active';
+        // the cancel/revoke branches own the downgrade path explicitly.
+        const ourStatus: SubscriptionStatus = polarStatus === 'past_due' ? 'past_due' : 'active';
+
+        // Read existing row first: skip owner accounts, and detect the
+        // transition INTO past_due so the recovery email fires once (not on
+        // every retry webhook).
+        const { data: existing } = await supabaseAdmin
+          .from('subscriptions')
+          .select('user_id, tier, status')
+          .eq('polar_customer_id', customerId)
+          .single();
+
+        if (existing?.tier === 'owner') {
+          logger.info('Skipping subscription.updated — owner tier', {
+            component: 'PolarWebhook',
+            userId: existing.user_id,
+          });
+          break;
+        }
+
+        // GUARD: getPlanFromProductId returns 'free' for an unrecognized/missing
+        // productId (e.g. a metadata-only or dunning update event, or env drift).
+        // A real downgrade to free always arrives via cancel/revoke, never via
+        // 'updated' — so never let an unresolved product silently downgrade a
+        // paying customer. Keep their existing tier in that case.
+        const resolvedTier =
+          plan === 'free' && existing?.tier && existing.tier !== 'free'
+            ? (existing.tier as typeof plan)
+            : plan;
+
+        // Only overwrite the period fields when the event actually carries them.
+        // A past_due update without period data must NOT null subscription_ends_at,
+        // which the cancel-until-period-end entitlement (getUserTier) depends on.
+        const updatePayload: Record<string, unknown> = {
+          tier: resolvedTier,
+          status: ourStatus,
+          updated_at: new Date().toISOString(),
+        };
+        if (currentPeriodStart) updatePayload.subscription_started_at = currentPeriodStart;
+        if (currentPeriodEnd) updatePayload.subscription_ends_at = currentPeriodEnd;
+
         const { error } = await supabaseAdmin
           .from('subscriptions')
-          .update({
-            tier: plan,
-            subscription_started_at: currentPeriodStart,
-            subscription_ends_at: currentPeriodEnd,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq('polar_customer_id', customerId);
 
         if (error) {
@@ -412,29 +451,57 @@ export async function POST(request: NextRequest) {
             component: 'PolarWebhook',
             customerId,
           });
+          break;
+        }
+
+        // Newly past_due -> send the "update your card" recovery email once.
+        if (ourStatus === 'past_due' && existing?.status !== 'past_due' && existing?.user_id && resolvedTier !== 'free') {
+          const { data: userData } = await supabaseAdmin
+            .from('users')
+            .select('email, full_name')
+            .eq('id', existing.user_id)
+            .single();
+
+          if (userData?.email) {
+            sendPaymentFailedEmail({
+              recipientEmail: userData.email,
+              recipientName: userData.full_name || 'there',
+              tier: resolvedTier as 'plus' | 'family',
+              attemptCount: (eventData.paymentAttemptCount as number | undefined) ?? 1,
+              updatePaymentUrl: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+              gracePeriodDays: 7,
+            }).catch((err) => {
+              logger.error('Failed to send payment-failed email', err, {
+                component: 'PolarWebhook',
+              });
+            });
+          }
         }
 
         logger.info('Subscription updated', {
           component: 'PolarWebhook',
           customerId,
           plan,
+          status: ourStatus,
         });
         break;
       }
 
-      case 'subscription.canceled':
-      case 'subscription.revoked': {
-        // Subscription was canceled or revoked
+      case 'subscription.canceled': {
+        // CANCEL (Phase 11.4): the user turned off auto-renew. They KEEP access
+        // until the paid-through date — Polar leaves the subscription billable
+        // until then and sends subscription.revoked when it actually ends. We do
+        // NOT downgrade to free here (the old code did, losing paid-for access).
         const customerId = eventData.customerId as string;
+        const currentPeriodEnd = eventData.currentPeriodEnd as string | undefined;
 
-        // Get current subscription for email
         const { data: currentSub } = await supabaseAdmin
           .from('subscriptions')
           .select('user_id, tier, subscription_ends_at')
           .eq('polar_customer_id', customerId)
           .single();
 
-        // GUARD: Never downgrade owner tier
+        // GUARD: Never touch owner tier
         if (currentSub?.tier === 'owner') {
           logger.info('Skipping cancel — user is on owner tier', {
             component: 'PolarWebhook',
@@ -443,7 +510,79 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // Update to free tier
+        const accessUntil =
+          currentPeriodEnd ?? currentSub?.subscription_ends_at ?? new Date().toISOString();
+
+        // Mark canceled but KEEP the tier and the paid-through date. getUserTier
+        // honors a canceled subscription until subscription_ends_at. Keep
+        // polar_subscription_id so an un-cancel can reactivate it.
+        const { error } = await supabaseAdmin
+          .from('subscriptions')
+          .update({
+            status: 'canceled',
+            subscription_ends_at: accessUntil,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('polar_customer_id', customerId);
+
+        if (error) {
+          logger.error('Failed to mark subscription canceled', error, {
+            component: 'PolarWebhook',
+            customerId,
+          });
+          break;
+        }
+
+        // Send the cancellation email ("you have access until X").
+        if (currentSub?.user_id) {
+          const { data: userData } = await supabaseAdmin
+            .from('users')
+            .select('email, full_name')
+            .eq('id', currentSub.user_id)
+            .single();
+
+          if (userData?.email && currentSub.tier !== 'free' && currentSub.tier !== 'owner') {
+            sendSubscriptionCancelledEmail({
+              recipientEmail: userData.email,
+              recipientName: userData.full_name || 'there',
+              tier: currentSub.tier as 'plus' | 'family',
+              accessUntil,
+              resubscribeUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+            }).catch((err) => {
+              logger.error('Failed to send cancellation email', err, {
+                component: 'PolarWebhook',
+              });
+            });
+          }
+        }
+
+        logger.info('Subscription canceled — access retained until period end', {
+          component: 'PolarWebhook',
+          customerId,
+          accessUntil,
+        });
+        break;
+      }
+
+      case 'subscription.revoked': {
+        // REVOKE (Phase 11.4): access ends now (period elapsed, or an immediate
+        // revoke / dunning give-up). This is the real downgrade to free.
+        const customerId = eventData.customerId as string;
+
+        const { data: currentSub } = await supabaseAdmin
+          .from('subscriptions')
+          .select('user_id, tier')
+          .eq('polar_customer_id', customerId)
+          .single();
+
+        if (currentSub?.tier === 'owner') {
+          logger.info('Skipping revoke — user is on owner tier', {
+            component: 'PolarWebhook',
+            userId: currentSub.user_id,
+          });
+          break;
+        }
+
         const { error } = await supabaseAdmin
           .from('subscriptions')
           .update({
@@ -455,41 +594,16 @@ export async function POST(request: NextRequest) {
           .eq('polar_customer_id', customerId);
 
         if (error) {
-          logger.error('Failed to cancel subscription', error, {
+          logger.error('Failed to revoke subscription', error, {
             component: 'PolarWebhook',
             customerId,
           });
           break;
         }
 
-        // Get user info for email
-        if (currentSub?.user_id) {
-          const { data: userData } = await supabaseAdmin
-            .from('users')
-            .select('email, full_name')
-            .eq('id', currentSub.user_id)
-            .single();
-
-          if (userData?.email && currentSub.tier !== 'free') {
-            // Send cancellation email (non-blocking)
-            sendSubscriptionCancelledEmail({
-              recipientEmail: userData.email,
-              recipientName: userData.full_name || 'there',
-              tier: currentSub.tier as 'pro' | 'family',
-              accessUntil: currentSub.subscription_ends_at || new Date().toISOString(),
-              resubscribeUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
-            }).catch(err => {
-              logger.error('Failed to send cancellation email', err, {
-                component: 'PolarWebhook',
-              });
-            });
-          }
-        }
-
-        logger.info('Subscription canceled', {
+        logger.info('Subscription revoked — downgraded to free', {
           component: 'PolarWebhook',
           customerId,
-          eventType: event.type,
         });
         break;
       }

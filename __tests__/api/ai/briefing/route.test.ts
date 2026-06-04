@@ -144,7 +144,7 @@ describe('/api/ai/briefing', () => {
       } as any);
 
       vi.mocked(featureFlags.isAICompanionEnabled).mockReturnValue(true);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAIBriefingRateLimit).mockResolvedValue({ success: false } as any);
 
       const request = new NextRequest(`http://localhost/api/ai/briefing?spaceId=${SPACE_ID}`, { method: 'GET' });
@@ -169,7 +169,7 @@ describe('/api/ai/briefing', () => {
       } as any);
 
       vi.mocked(featureFlags.isAICompanionEnabled).mockReturnValue(true);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAIBriefingRateLimit).mockResolvedValue({ success: true } as any);
       vi.mocked(getSettings).mockResolvedValue({ morning_briefing: false } as any);
 

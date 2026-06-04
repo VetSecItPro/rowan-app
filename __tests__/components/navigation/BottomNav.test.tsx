@@ -90,7 +90,7 @@ describe('BottomNav', () => {
     mockChatContext.canAccessAI = false;
     const { BottomNav } = await import('@/components/navigation/BottomNav');
     render(<BottomNav />);
-    expect(screen.getByLabelText(/upgrade to pro for ai/i)).toBeTruthy();
+    expect(screen.getByLabelText(/upgrade to plus for ai/i)).toBeTruthy();
   });
 
   it('calls toggleChat when AI button is clicked', async () => {
@@ -106,7 +106,7 @@ describe('BottomNav', () => {
     mockChatContext.canAccessAI = false;
     const { BottomNav } = await import('@/components/navigation/BottomNav');
     render(<BottomNav />);
-    const lockedBtn = screen.getByLabelText(/upgrade to pro for ai/i);
+    const lockedBtn = screen.getByLabelText(/upgrade to plus for ai/i);
     fireEvent.click(lockedBtn);
     expect(mockPromptUpgrade).toHaveBeenCalled();
   });

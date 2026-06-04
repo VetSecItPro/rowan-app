@@ -10,14 +10,16 @@ test.describe('Authenticated Checkout Flow', () => {
   // Use pre-authenticated pro user session (any authenticated user works for checkout)
   test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
-  test('should redirect to Polar checkout when clicking Pro plan', async ({ page }) => {
+  test('should redirect to Polar checkout when clicking Plus plan', async ({ page }) => {
     await page.goto('/pricing');
     await page.waitForLoadState('networkidle');
 
-    // Click upgrade button for Pro tier using resilient selector
-    await resilientClick(page, 'upgrade-pro-button', {
+    // Click upgrade button for Plus tier using resilient selector.
+    // Tier renamed pro -> plus (3 June 2026): test-id is upgrade-plus-button and
+    // the pricing page CTA reads "Sign Up to Plus".
+    await resilientClick(page, 'upgrade-plus-button', {
       role: 'button',
-      text: /Get Pro|Choose Pro|Start Pro/i,
+      text: /Sign Up to Plus|Get Plus|Start Plus/i,
     });
 
     // Should redirect somewhere off /pricing — accept any of these:

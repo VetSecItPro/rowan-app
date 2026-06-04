@@ -171,7 +171,7 @@ describe('/api/recipes/parse', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const request = new NextRequest('http://localhost/api/recipes/parse', {
       method: 'POST',
@@ -203,7 +203,7 @@ describe('/api/recipes/parse', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     const request = new NextRequest('http://localhost/api/recipes/parse', {
       method: 'POST',
@@ -234,7 +234,7 @@ describe('/api/recipes/parse', () => {
       },
     } as any);
 
-    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+    vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 
     mockGenerateContent.mockResolvedValue({
       response: {

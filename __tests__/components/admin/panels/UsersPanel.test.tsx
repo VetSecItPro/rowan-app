@@ -24,7 +24,7 @@ const mockUsersData = {
       id: 'user-1',
       email: 'alice@example.com',
       name: 'Alice',
-      tier: 'pro',
+      tier: 'plus',
       status: 'active',
       created_at: '2024-01-01T00:00:00Z',
       last_sign_in_at: '2024-06-01T00:00:00Z',

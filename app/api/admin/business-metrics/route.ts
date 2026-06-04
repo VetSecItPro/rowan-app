@@ -439,7 +439,7 @@ function buildWaterfall(
         }
         // 'reactivate' treated as new MRR
         case 'reactivate': {
-          newMrr += getUserMrr(toTier || 'pro', period);
+          newMrr += getUserMrr(toTier || 'plus', period);
           break;
         }
       }
@@ -520,7 +520,7 @@ function computeNrr(
 
   for (const evt of cancelledFromExisting) {
     const metaPeriod = (evt.metadata as Record<string, unknown> | null)?.period as string | undefined;
-    const fromTier = evt.from_tier || 'pro';
+    const fromTier = evt.from_tier || 'plus';
     // They are no longer paying, so remove from currentMrrFromExisting
     // but they were counted in startingMrr
     currentMrrFromExisting -= getUserMrr(fromTier, metaPeriod || 'monthly');

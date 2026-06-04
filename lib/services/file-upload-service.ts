@@ -288,6 +288,19 @@ export const fileUploadService = {
       throw new Error(validation.error);
     }
 
+    // STORAGE QUOTA (Phase 11.2): server-side pre-check before uploading. This
+    // is the enforcement point for the per-space storage limit, since the upload
+    // itself goes directly browser -> Supabase Storage with no server hop.
+    const quotaRes = await fetch('/api/storage/check-quota', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spaceId, fileSizeBytes: file.size }),
+    });
+    if (!quotaRes.ok) {
+      const quotaBody = await quotaRes.json().catch(() => ({}));
+      throw new Error(quotaBody.error || 'Storage quota check failed. Please try again.');
+    }
+
     const fileType = this.getFileType(file.type);
     const timestamp = Date.now();
     const fileName = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;

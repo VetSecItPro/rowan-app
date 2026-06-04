@@ -28,13 +28,13 @@ export default function PaymentSuccessPage() {
 function PaymentSuccessContent() {
   const router = useRouter();
   const { params } = useValidatedSearchParams(PaymentSuccessParamsSchema);
-  const tier = params?.tier || 'pro';
+  const tier = params?.tier || 'plus';
   const period = params?.period || 'monthly';
   const [countdown, setCountdown] = useState(8);
   const [subscriptionActive, setSubscriptionActive] = useState(false);
   const [pollCount, setPollCount] = useState(0);
 
-  const tierName = tier === 'family' ? 'Family' : 'Pro';
+  const tierName = tier === 'family' ? 'Family' : 'Plus';
   const periodLabel = period === 'annual' ? 'annual' : 'monthly';
 
   // Poll subscription status until active

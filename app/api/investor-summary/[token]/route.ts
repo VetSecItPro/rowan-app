@@ -11,6 +11,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { normalizeTier } from '@/lib/types/subscription';
 import * as Sentry from '@sentry/nextjs';
 
 // Force dynamic rendering
@@ -139,15 +140,17 @@ async function fetchBusinessMetrics() {
   const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
   // Tier prices (monthly effective rate)
+  // Effective MRR per tier (post-3-June reprice; annual = annual price / 12).
   const TIER_PRICES = {
-    pro: { monthly: 18, annual: 16 },
-    family: { monthly: 29, annual: 27 },
+    plus: { monthly: 8, annual: 5 },
+    family: { monthly: 12, annual: 8 },
     free: { monthly: 0, annual: 0 },
     owner: { monthly: 0, annual: 0 },
   } as const;
 
   const getUserMrr = (tier: string, period: string): number => {
-    const prices = TIER_PRICES[tier as keyof typeof TIER_PRICES] || TIER_PRICES.free;
+    // Normalize legacy `pro` -> `plus` for historical events.
+    const prices = TIER_PRICES[normalizeTier(tier) as keyof typeof TIER_PRICES] || TIER_PRICES.free;
     return period === 'annual' ? prices.annual : prices.monthly;
   };
 
@@ -245,10 +248,10 @@ async function fetchBusinessMetrics() {
   for (const evt of eventsLast30) {
     if (evt.event_type === 'upgrade' || evt.event_type === 'reactivate') {
       const period = (evt.metadata as Record<string, unknown> | null)?.period as string || 'monthly';
-      mrrChange += getUserMrr(evt.to_tier || 'pro', period);
+      mrrChange += getUserMrr(evt.to_tier || 'plus', period);
     } else if (evt.event_type === 'cancel') {
       const period = (evt.metadata as Record<string, unknown> | null)?.period as string || 'monthly';
-      mrrChange -= getUserMrr(evt.from_tier || 'pro', period);
+      mrrChange -= getUserMrr(evt.from_tier || 'plus', period);
     }
   }
 
@@ -256,10 +259,10 @@ async function fetchBusinessMetrics() {
   for (const evt of eventsPrev30) {
     if (evt.event_type === 'upgrade' || evt.event_type === 'reactivate') {
       const period = (evt.metadata as Record<string, unknown> | null)?.period as string || 'monthly';
-      prevMrrChange += getUserMrr(evt.to_tier || 'pro', period);
+      prevMrrChange += getUserMrr(evt.to_tier || 'plus', period);
     } else if (evt.event_type === 'cancel') {
       const period = (evt.metadata as Record<string, unknown> | null)?.period as string || 'monthly';
-      prevMrrChange -= getUserMrr(evt.from_tier || 'pro', period);
+      prevMrrChange -= getUserMrr(evt.from_tier || 'plus', period);
     }
   }
 

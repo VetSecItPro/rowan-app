@@ -214,13 +214,13 @@ test.describe('Monetization Features', () => {
     test.use({ storageState: 'tests/e2e/.auth/free.json' });
 
     /**
-     * Test 4: User upgrades to Pro → payment success flow
+     * Test 4: User upgrades to Plus → payment success flow
      */
     test('checkout redirects to Polar', async ({ page }) => {
       await goToPricingPage(page);
 
-      // Click upgrade button for Pro tier using testid
-      const upgradeButton = page.getByTestId('upgrade-pro-button');
+      // Click upgrade button for Plus tier using testid (tier renamed pro -> plus)
+      const upgradeButton = page.getByTestId('upgrade-plus-button');
       await upgradeButton.click();
 
       // Should redirect somewhere off /pricing — accept any of:
@@ -303,7 +303,7 @@ test.describe('Monetization Features', () => {
       // The SubscriptionProvider retries up to 3 times with 20s timeout each (worst case ~60s).
       // Wait for the loading skeleton to disappear OR the plan name to appear.
       await expect(page.getByTestId('subscription-plan-name')).toBeVisible({ timeout: 75000 });
-      await expect(page.getByTestId('subscription-plan-name')).toContainText(/Pro Plan|Family Plan|Free Plan/i);
+      await expect(page.getByTestId('subscription-plan-name')).toContainText(/Plus Plan|Family Plan|Free Plan/i);
 
       // Should show billing management button or upgrade option
       const hasBilling = await page.locator('button:has-text("Manage Billing")').isVisible().catch(() => false);

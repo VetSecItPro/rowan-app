@@ -60,7 +60,7 @@ function mockAuth(
     },
   } as any);
 
-  vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' });
+  vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' });
 }
 
 describe('/api/recipes/external/apininjas/search', () => {

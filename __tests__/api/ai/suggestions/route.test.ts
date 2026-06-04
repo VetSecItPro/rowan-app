@@ -120,7 +120,7 @@ describe('/api/ai/suggestions', () => {
         },
       } as any);
       vi.mocked(featureFlags.isAICompanionEnabled).mockReturnValue(true);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAISuggestionsRateLimit).mockResolvedValue({ success: false } as any);
 
       const request = new NextRequest(`http://localhost/api/ai/suggestions?spaceId=${SPACE_ID}`, { method: 'GET' });
@@ -150,7 +150,7 @@ describe('/api/ai/suggestions', () => {
         },
       } as any);
       vi.mocked(featureFlags.isAICompanionEnabled).mockReturnValue(true);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAISuggestionsRateLimit).mockResolvedValue({ success: true } as any);
       vi.mocked(aiContextService.getSummaryContext).mockResolvedValue({} as any);
       vi.mocked(aiContextService.getRecentActivity).mockResolvedValue([] as any);

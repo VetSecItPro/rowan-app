@@ -61,7 +61,7 @@ describe('/api/penalties', () => {
       vi.mocked(createClient).mockResolvedValue({
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
 
       const res = await GET(new NextRequest('http://localhost/api/penalties'));
       expect(res.status).toBe(400);
@@ -78,7 +78,7 @@ describe('/api/penalties', () => {
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
         from: vi.fn(() => memberChain),
       } as any);
-      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getUserPenalties).mockResolvedValue([{ id: 'p-1', points_deducted: 10 }] as any);
 
       const res = await GET(new NextRequest('http://localhost/api/penalties?spaceId=space-1'));

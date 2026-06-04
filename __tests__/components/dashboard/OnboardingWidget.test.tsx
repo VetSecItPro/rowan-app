@@ -30,6 +30,12 @@ vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
   })),
 }));
 
+// The widget only shows for trial (free) users; mock the subscription context
+// so it renders without a SubscriptionProvider wrapper.
+vi.mock('@/lib/contexts/subscription-context', () => ({
+  useSubscription: () => ({ tier: 'free' }),
+}));
+
 vi.mock('next/link', () => ({
   default: ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) =>
     React.createElement('a', { href, onClick }, children),
@@ -79,9 +85,9 @@ describe('OnboardingWidget', () => {
     expect(screen.getByText('Quick Start')).toBeTruthy();
   });
 
-  it('shows 14-day Pro trial banner', () => {
+  it('shows 14-day Plus trial banner', () => {
     render(<OnboardingWidget />);
-    expect(screen.getByText(/14-day Pro trial/)).toBeTruthy();
+    expect(screen.getByText(/14-day Plus trial/)).toBeTruthy();
   });
 
   it('shows onboarding steps', () => {

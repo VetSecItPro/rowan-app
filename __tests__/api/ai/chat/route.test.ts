@@ -227,7 +227,7 @@ describe('/api/ai/chat', () => {
         conversationId: 'new',
       } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAIChatRateLimit).mockResolvedValue({ success: false } as any);
 
       const request = new NextRequest('http://localhost/api/ai/chat', {
@@ -265,7 +265,7 @@ describe('/api/ai/chat', () => {
         conversationId: 'new',
       } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAIChatRateLimit).mockResolvedValue({ success: true } as any);
       vi.mocked(createConversation).mockResolvedValue({ id: CONVERSATION_ID } as any);
       vi.mocked(sanitizeUserInput).mockReturnValue({
@@ -320,7 +320,7 @@ describe('/api/ai/chat', () => {
         voiceDurationSeconds: undefined,
       } as any);
       vi.mocked(verifySpaceAccess).mockResolvedValue(undefined);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(checkAIChatRateLimit).mockResolvedValue({ success: true } as any);
       vi.mocked(createConversation).mockResolvedValue({ id: CONVERSATION_ID } as any);
       vi.mocked(sanitizeUserInput).mockReturnValue({

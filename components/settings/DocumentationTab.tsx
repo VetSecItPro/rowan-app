@@ -40,7 +40,7 @@ const documentationSearchKeywords: Record<string, string[]> = {
   projects: ['project', 'budget', 'vendor', 'contractor', 'renovation', 'actual'],
   spaces: ['space', 'collaboration', 'team', 'invite', 'partner', 'share', 'family'],
   checkin: ['check-in', 'checkin', 'wellness', 'mood', 'emotion', 'feeling', 'daily'],
-  subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'pro', 'family', 'upgrade', 'cancel'],
+  subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'plus', 'pro', 'family', 'upgrade', 'cancel'],
   'ai-companion': ['ai', 'assistant', 'chat', 'rowan ai', 'companion', 'voice', 'briefing', 'suggestion', 'smart'],
 };
 

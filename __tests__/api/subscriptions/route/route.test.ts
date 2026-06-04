@@ -48,7 +48,7 @@ describe('/api/subscriptions', () => {
         auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
       } as any);
       vi.mocked(getSubscriptionStatus).mockResolvedValue({
-        tier: 'pro', status: 'active', isActive: true, isPastDue: false,
+        tier: 'plus', status: 'active', isActive: true, isPastDue: false,
         isCanceled: false, expiresAt: null, daysUntilExpiration: null,
         isInTrial: false, trialDaysRemaining: null, trialEndsAt: null,
       } as any);
@@ -59,7 +59,7 @@ describe('/api/subscriptions', () => {
       const res = await GET(new NextRequest('http://localhost/api/subscriptions'));
       const data = await res.json();
       expect(res.status).toBe(200);
-      expect(data.tier).toBe('pro');
+      expect(data.tier).toBe('plus');
       expect(data.subscription.isActive).toBe(true);
     });
 
@@ -69,10 +69,10 @@ describe('/api/subscriptions', () => {
       const originalEnv = process.env.NODE_ENV;
       (process.env as any).NODE_ENV = 'development';
 
-      const res = await GET(new NextRequest('http://localhost/api/subscriptions?mockTier=pro'));
+      const res = await GET(new NextRequest('http://localhost/api/subscriptions?mockTier=plus'));
       const data = await res.json();
       expect(data._mock).toBe(true);
-      expect(data.tier).toBe('pro');
+      expect(data.tier).toBe('plus');
       (process.env as any).NODE_ENV = originalEnv;
     });
   });

@@ -173,8 +173,8 @@ describe('/api/subscriptions/check-upgrade', () => {
 
       vi.mocked(shouldPromptUpgrade).mockResolvedValue({
         shouldPrompt: false,
-        currentTier: 'pro',
-        requiredTier: 'pro',
+        currentTier: 'plus',
+        requiredTier: 'plus',
         reason: 'User has access',
       });
 
@@ -188,7 +188,7 @@ describe('/api/subscriptions/check-upgrade', () => {
 
       expect(response.status).toBe(200);
       expect(data.shouldPrompt).toBe(false);
-      expect(data.currentTier).toBe('pro');
+      expect(data.currentTier).toBe('plus');
     });
 
     it('should return upgrade needed when user lacks access', async () => {
@@ -215,7 +215,7 @@ describe('/api/subscriptions/check-upgrade', () => {
       vi.mocked(shouldPromptUpgrade).mockResolvedValue({
         shouldPrompt: true,
         currentTier: 'free',
-        requiredTier: 'pro',
+        requiredTier: 'plus',
         reason: 'Feature requires Pro tier',
       });
 
@@ -230,7 +230,7 @@ describe('/api/subscriptions/check-upgrade', () => {
       expect(response.status).toBe(200);
       expect(data.shouldPrompt).toBe(true);
       expect(data.currentTier).toBe('free');
-      expect(data.requiredTier).toBe('pro');
+      expect(data.requiredTier).toBe('plus');
       expect(data.reason).toBe('Feature requires Pro tier');
     });
 
@@ -258,7 +258,7 @@ describe('/api/subscriptions/check-upgrade', () => {
       vi.mocked(shouldPromptUpgrade).mockResolvedValue({
         shouldPrompt: false,
         currentTier: 'family',
-        requiredTier: 'pro',
+        requiredTier: 'plus',
         reason: 'User has access',
       });
 

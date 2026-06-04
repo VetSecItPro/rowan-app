@@ -114,11 +114,15 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
       "Basic reminders",
     ],
   },
-  pro: {
-    name: "Pro",
+  plus: {
+    // Renamed from `pro` -> `plus` (3 June 2026). Display name "Plus"; the
+    // Polar products were repriced + renamed live via the API to match, and the
+    // env-var identifiers (POLAR_PRO_*_PRODUCT_ID) intentionally keep their
+    // names since they point at unchanged Polar product IDs.
+    name: "Plus",
     description: "For growing families",
-    price: 18,
-    annualPrice: 180, // 2 months free ($216 → $180)
+    price: 8,
+    annualPrice: 60, // annual ~$5/mo effective vs $8/mo monthly
     trialDays: 14,
     features: [
       "Unlimited tasks",
@@ -136,8 +140,8 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
   family: {
     name: "Family",
     description: "For large families",
-    price: 29,
-    annualPrice: 290, // 2 months free ($348 → $290)
+    price: 12,
+    annualPrice: 96, // annual ~$8/mo effective vs $12/mo monthly (Phase 11.5 reprice)
     trialDays: 14,
     features: [
       "Everything in Pro",
@@ -181,7 +185,7 @@ export function getPlanFromProductId(productId: string): SubscriptionTier {
   const familyMonthly = envProductId('FAMILY_MONTHLY');
   const familyAnnual = envProductId('FAMILY_ANNUAL');
 
-  if (productId === proMonthly || productId === proAnnual) return "pro";
+  if (productId === proMonthly || productId === proAnnual) return "plus";
   if (productId === familyMonthly || productId === familyAnnual) return "family";
   return "free";
 }
@@ -203,7 +207,7 @@ export function getPeriodFromProductId(productId: string): SubscriptionPeriod {
 export function getProductId(plan: SubscriptionTier, interval: SubscriptionPeriod): string | null {
   if (plan === "free" || plan === "owner") return null;
 
-  if (plan === "pro") {
+  if (plan === "plus") {
     return interval === "annual"
       ? envProductId('PRO_ANNUAL') || null
       : envProductId('PRO_MONTHLY') || null;

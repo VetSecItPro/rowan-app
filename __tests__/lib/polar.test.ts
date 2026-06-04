@@ -54,7 +54,7 @@ import {
 describe('POLAR_PLANS', () => {
   it('defines all four tiers: free, pro, family, owner', () => {
     expect(POLAR_PLANS).toHaveProperty('free');
-    expect(POLAR_PLANS).toHaveProperty('pro');
+    expect(POLAR_PLANS).toHaveProperty('plus');
     expect(POLAR_PLANS).toHaveProperty('family');
     expect(POLAR_PLANS).toHaveProperty('owner');
   });
@@ -65,15 +65,15 @@ describe('POLAR_PLANS', () => {
   });
 
   it('pro plan has a positive monthly price', () => {
-    expect(POLAR_PLANS.pro.price).toBeGreaterThan(0);
+    expect(POLAR_PLANS.plus.price).toBeGreaterThan(0);
   });
 
   it('family plan has a higher monthly price than pro', () => {
-    expect(POLAR_PLANS.family.price).toBeGreaterThan(POLAR_PLANS.pro.price);
+    expect(POLAR_PLANS.family.price).toBeGreaterThan(POLAR_PLANS.plus.price);
   });
 
   it('pro has 14 trial days', () => {
-    expect(POLAR_PLANS.pro.trialDays).toBe(14);
+    expect(POLAR_PLANS.plus.trialDays).toBe(14);
   });
 
   it('family has 14 trial days', () => {
@@ -111,11 +111,11 @@ describe('getPlanFromProductId', () => {
   });
 
   it('returns "pro" for pro monthly product ID', () => {
-    expect(getPlanFromProductId('prod_pro_monthly')).toBe('pro');
+    expect(getPlanFromProductId('prod_pro_monthly')).toBe('plus');
   });
 
   it('returns "pro" for pro annual product ID', () => {
-    expect(getPlanFromProductId('prod_pro_annual')).toBe('pro');
+    expect(getPlanFromProductId('prod_pro_annual')).toBe('plus');
   });
 
   it('returns "family" for family monthly product ID', () => {
@@ -154,11 +154,11 @@ describe('getProductId', () => {
   });
 
   it('returns pro monthly product ID', () => {
-    expect(getProductId('pro', 'monthly')).toBe('prod_pro_monthly');
+    expect(getProductId('plus', 'monthly')).toBe('prod_pro_monthly');
   });
 
   it('returns pro annual product ID', () => {
-    expect(getProductId('pro', 'annual')).toBe('prod_pro_annual');
+    expect(getProductId('plus', 'annual')).toBe('prod_pro_annual');
   });
 
   it('returns family monthly product ID', () => {
@@ -183,7 +183,7 @@ describe('getProductId', () => {
 // ---------------------------------------------------------------------------
 describe('getPolarTrialDays', () => {
   it('returns 14 for pro', () => {
-    expect(getPolarTrialDays('pro')).toBe(14);
+    expect(getPolarTrialDays('plus')).toBe(14);
   });
 
   it('returns 14 for family', () => {
@@ -214,22 +214,22 @@ describe('getPolarAnnualSavings', () => {
   });
 
   it('pro savings: amount = monthlyTotal - annualPrice', () => {
-    const { price, annualPrice } = POLAR_PLANS.pro;
-    const result = getPolarAnnualSavings('pro');
+    const { price, annualPrice } = POLAR_PLANS.plus;
+    const result = getPolarAnnualSavings('plus');
     expect(result.amount).toBe(price * 12 - annualPrice);
   });
 
   it('pro savings: percentage rounded correctly', () => {
-    const { price, annualPrice } = POLAR_PLANS.pro;
+    const { price, annualPrice } = POLAR_PLANS.plus;
     const expectedPct = Math.round(((price * 12 - annualPrice) / (price * 12)) * 100);
-    expect(getPolarAnnualSavings('pro').percentage).toBe(expectedPct);
+    expect(getPolarAnnualSavings('plus').percentage).toBe(expectedPct);
   });
 
   it('pro savings: months free matches savings / monthly price', () => {
-    const { price, annualPrice } = POLAR_PLANS.pro;
+    const { price, annualPrice } = POLAR_PLANS.plus;
     const savings = price * 12 - annualPrice;
     const expectedMonths = Math.round(savings / price);
-    expect(getPolarAnnualSavings('pro').monthsFree).toBe(expectedMonths);
+    expect(getPolarAnnualSavings('plus').monthsFree).toBe(expectedMonths);
   });
 
   it('family savings are positive', () => {

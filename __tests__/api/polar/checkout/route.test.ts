@@ -5,7 +5,7 @@ import { POST } from '@/app/api/polar/checkout/route';
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/lib/polar', () => ({
   getPolarClient: vi.fn(),
-  POLAR_PLANS: { pro: {}, family: {} },
+  POLAR_PLANS: { plus: {}, family: {} },
   getProductId: vi.fn(),
 }));
 vi.mock('@/lib/ratelimit', () => ({ checkGeneralRateLimit: vi.fn() }));
@@ -38,7 +38,7 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       expect(res.status).toBe(429);
     });
@@ -53,26 +53,62 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       expect(res.status).toBe(401);
     });
 
     it('returns 503 when Polar client is not configured', async () => {
-      const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
-      const { createClient } = await import('@/lib/supabase/server');
-      const { getPolarClient } = await import('@/lib/polar');
-      vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
-      vi.mocked(createClient).mockResolvedValue({
-        auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
-      } as any);
-      vi.mocked(getPolarClient).mockResolvedValue(null as any);
+      // The route stubs a 200 when CI===true (issue #352); force the production
+      // branch so this asserts the real not-configured behavior regardless of
+      // the ambient env this suite runs under.
+      const originalCI = process.env.CI;
+      delete process.env.CI;
+      try {
+        const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+        const { createClient } = await import('@/lib/supabase/server');
+        const { getPolarClient } = await import('@/lib/polar');
+        vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
+        vi.mocked(createClient).mockResolvedValue({
+          auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
+        } as any);
+        vi.mocked(getPolarClient).mockResolvedValue(null as any);
 
-      const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
-        method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
-      }));
-      expect(res.status).toBe(503);
+        const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
+          method: 'POST',
+          body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
+        }));
+        expect(res.status).toBe(503);
+      } finally {
+        if (originalCI === undefined) delete process.env.CI;
+        else process.env.CI = originalCI;
+      }
+    });
+
+    it('returns a 200 stub URL when Polar is unconfigured in CI mode (issue #352)', async () => {
+      const originalCI = process.env.CI;
+      process.env.CI = 'true';
+      try {
+        const { checkGeneralRateLimit } = await import('@/lib/ratelimit');
+        const { createClient } = await import('@/lib/supabase/server');
+        const { getPolarClient } = await import('@/lib/polar');
+        vi.mocked(checkGeneralRateLimit).mockResolvedValue(makeRateLimit(true));
+        vi.mocked(createClient).mockResolvedValue({
+          auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
+        } as any);
+        vi.mocked(getPolarClient).mockResolvedValue(null as any);
+
+        const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
+          method: 'POST',
+          body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
+        }));
+        expect(res.status).toBe(200);
+        const body = await res.json();
+        expect(body.url).toContain('checkout=stub');
+      } finally {
+        if (originalCI === undefined) delete process.env.CI;
+        else process.env.CI = originalCI;
+      }
     });
 
     it('returns 400 for invalid plan body', async () => {
@@ -111,7 +147,7 @@ describe('/api/polar/checkout', () => {
 
       const res = await POST(new NextRequest('http://localhost/api/polar/checkout', {
         method: 'POST',
-        body: JSON.stringify({ plan: 'pro', billingInterval: 'monthly' }),
+        body: JSON.stringify({ plan: 'plus', billingInterval: 'monthly' }),
       }));
       const data = await res.json();
       expect(res.status).toBe(200);

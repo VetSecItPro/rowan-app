@@ -122,7 +122,7 @@ export function ShoppingListPreviewModal({
         } catch (error) {
           if (error instanceof UsageLimitError) {
             toast.success('Shopping list created (task skipped)', {
-              description: `Daily task limit reached (${error.details.currentUsage}/${error.details.limit}). Upgrade to Pro for unlimited tasks.`,
+              description: `Daily task limit reached (${error.details.currentUsage}/${error.details.limit}). Upgrade to Plus for unlimited tasks.`,
             });
           } else {
             throw error;

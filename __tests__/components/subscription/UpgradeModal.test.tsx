@@ -61,7 +61,7 @@ describe('UpgradeModal', () => {
 
   it('displays default title when no feature specified', () => {
     render(<UpgradeModal {...defaultProps} />);
-    expect(screen.getByText('Upgrade to Pro')).toBeTruthy();
+    expect(screen.getByText('Upgrade to Plus')).toBeTruthy();
   });
 
   it('displays feature-specific title for mealPlanning', () => {
@@ -98,7 +98,7 @@ describe('UpgradeModal', () => {
 
   it('shows Pro Plan includes section by default', () => {
     render(<UpgradeModal {...defaultProps} />);
-    expect(screen.getByText('Pro Plan includes:')).toBeTruthy();
+    expect(screen.getByText('Plus Plan includes:')).toBeTruthy();
   });
 
   it('shows Family Plan includes for AI feature', () => {
@@ -114,12 +114,12 @@ describe('UpgradeModal', () => {
 
   it('shows pricing hint', () => {
     render(<UpgradeModal {...defaultProps} />);
-    expect(screen.getByText('Starting at $18/month')).toBeTruthy();
+    expect(screen.getByText('Starting at $8/month')).toBeTruthy();
   });
 
   it('shows higher pricing for Family tier features', () => {
     render(<UpgradeModal {...defaultProps} feature="ai" />);
-    expect(screen.getByText('Starting at $29/month')).toBeTruthy();
+    expect(screen.getByText('Starting at $12/month')).toBeTruthy();
   });
 
   it('View Plans link points to /pricing', () => {
@@ -136,7 +136,7 @@ describe('FeatureLockOverlay', () => {
 
   it('renders children when user has access', () => {
     vi.mocked(useSubscriptionSafe).mockReturnValue({
-      tier: 'pro',
+      tier: 'plus',
       canAccess: vi.fn(() => true),
       showUpgradeModal: vi.fn(),
       isLoading: false,

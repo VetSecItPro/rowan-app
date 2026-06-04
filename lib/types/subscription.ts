@@ -12,8 +12,34 @@
 
 /**
  * Subscription tier levels
+ *
+ * NOTE (3 June 2026): the paid entry tier was renamed `pro` -> `plus`. The DB
+ * CHECK constraint, existing rows, and tier-emitting functions were migrated in
+ * lockstep (see migration `*_rename_pro_to_plus.sql`). Any value arriving from
+ * an external source (Polar metadata, legacy cache) should be passed through
+ * `normalizeTier()` so a stale `'pro'` self-heals to `'plus'` instead of
+ * mis-gating a paying customer.
  */
-export type SubscriptionTier = 'free' | 'pro' | 'family' | 'owner';
+export type SubscriptionTier = 'free' | 'plus' | 'family' | 'owner';
+
+/**
+ * Legacy tier value that was renamed. Kept only for normalization of
+ * externally-sourced / historical values. Do NOT use in new code.
+ */
+export type LegacySubscriptionTier = 'pro';
+
+/**
+ * Coerce any tier-ish string into the canonical SubscriptionTier set.
+ * Maps the legacy `'pro'` to `'plus'`; passes through known tiers; defaults
+ * unknown values to `'free'` (safest - never grants paid access by accident).
+ */
+export function normalizeTier(value: string | null | undefined): SubscriptionTier {
+  if (value === 'pro') return 'plus';
+  if (value === 'free' || value === 'plus' || value === 'family' || value === 'owner') {
+    return value;
+  }
+  return 'free';
+}
 
 /**
  * Subscription status
@@ -218,7 +244,7 @@ export interface SubscriptionStatusResponse {
  * Request to create checkout session
  */
 export interface CreateCheckoutSessionRequest {
-  tier: Exclude<SubscriptionTier, 'free'>; // 'pro' | 'family'
+  tier: Exclude<SubscriptionTier, 'free'>; // 'plus' | 'family'
   period: SubscriptionPeriod;
 }
 

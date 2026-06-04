@@ -89,7 +89,7 @@ describe('/api/ai/conversations/[id]', () => {
           getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER_ID } }, error: null }),
         },
       } as any);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getConversation).mockResolvedValue(null);
 
       const request = new NextRequest(`http://localhost/api/ai/conversations/${CONVERSATION_ID}`, { method: 'GET' });
@@ -118,7 +118,7 @@ describe('/api/ai/conversations/[id]', () => {
           getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER_ID } }, error: null }),
         },
       } as any);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getConversation).mockResolvedValue(mockConversation as any);
       vi.mocked(getMessages).mockResolvedValue(mockMessages as any);
 
@@ -176,7 +176,7 @@ describe('/api/ai/conversations/[id]', () => {
           getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER_ID } }, error: null }),
         },
       } as any);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getConversation).mockResolvedValue(null);
 
       const request = new NextRequest(`http://localhost/api/ai/conversations/${CONVERSATION_ID}`, { method: 'DELETE' });
@@ -199,7 +199,7 @@ describe('/api/ai/conversations/[id]', () => {
           getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER_ID } }, error: null }),
         },
       } as any);
-      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'pro' } as any);
+      vi.mocked(validateAIAccess).mockResolvedValue({ allowed: true, tier: 'plus' } as any);
       vi.mocked(getConversation).mockResolvedValue({ id: CONVERSATION_ID } as any);
       vi.mocked(deleteConversation).mockResolvedValue(undefined);
 

@@ -167,7 +167,7 @@ const itemVariants = {
 // ─── OnboardingWidget Component ───────────────────────────────────────────────
 
 /**
- * Displays a Quick Start checklist for new users with a 14-day Pro trial banner.
+ * Displays a Quick Start checklist for new users with a 14-day Plus trial banner.
  * Shows a progress tracker and links to key features. Tracks completion state
  * in localStorage and can be dismissed permanently.
  */
@@ -185,8 +185,8 @@ export function OnboardingWidget() {
   const totalSteps = ONBOARDING_STEPS.length;
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
-  // The "14-day Pro trial" banner only makes sense for users who are actually
-  // on a trial. Owner/pro/family tiers should never see trial messaging —
+  // The "14-day Plus trial" banner only makes sense for users who are actually
+  // on a trial. Owner/plus/family tiers should never see trial messaging —
   // owner accounts are staff/internal (never expire, no Polar billing) and
   // paid accounts already have full access.
   const isOnTrial = tier === 'free';
@@ -236,7 +236,7 @@ export function OnboardingWidget() {
           <div className="flex items-center gap-2">
             <Wand2 className="w-5 h-5 text-yellow-300 flex-shrink-0" aria-hidden="true" />
             <p className="text-sm sm:text-base font-semibold text-white">
-              You&apos;re on your 14-day Pro trial! Explore all features.
+              You&apos;re on your 14-day Plus trial! Explore all features.
             </p>
           </div>
         </div>
