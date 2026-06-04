@@ -13,7 +13,6 @@ interface RecurringBillsCalendarProps {
 interface BillOccurrence {
   expense: RecurringExpenseSummary;
   date: Date;
-  isPaid: boolean;
   amount: number;
 }
 
@@ -81,10 +80,14 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
         }
 
         if (shouldInclude) {
+          // This is a projection of upcoming DUE DATES, not a payment ledger.
+          // Recurring expenses are stored as a single template row, so there is
+          // no per-occurrence paid status to surface here - showing one would be
+          // false (a bill paid this month would read "paid" every future month).
+          // The calendar honestly presents what is due and when.
           occurrences.push({
             expense,
             date: day,
-            isPaid: false, // TODO: Check if this bill instance has been paid
             amount: expense.amount,
           });
         }
