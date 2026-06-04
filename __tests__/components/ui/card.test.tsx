@@ -62,6 +62,26 @@ describe('CardFooter', () => {
   });
 });
 
+describe('Card surface contract (Phase 16.1)', () => {
+  it('renders Rowan canonical dark card classes (resolvable palette)', () => {
+    const { container } = render(<Card>x</Card>);
+    const cls = (container.firstChild as HTMLElement).className;
+    expect(cls).toContain('bg-gray-800');
+    expect(cls).toContain('border-gray-700');
+    expect(cls).toContain('rounded-xl');
+    // Guard against regressing to the non-resolving shadcn tokens that left
+    // this primitive invisible and unadopted.
+    expect(cls).not.toContain('bg-card');
+  });
+
+  it('CardDescription uses a resolvable muted color', () => {
+    const { container } = render(<CardDescription>d</CardDescription>);
+    const cls = (container.firstChild as HTMLElement).className;
+    expect(cls).toContain('text-gray-400');
+    expect(cls).not.toContain('text-muted-foreground');
+  });
+});
+
 describe('Card composition', () => {
   it('renders full card composition', () => {
     render(

@@ -2,12 +2,23 @@ import React from 'react';
 
 type CardProps = React.HTMLAttributes<HTMLDivElement>;
 
-/** Renders a styled card container with dark mode background and border. */
+/**
+ * Shared card surface (Phase 16.1).
+ *
+ * Encodes Rowan's canonical card style - `bg-gray-800 border border-gray-700
+ * rounded-xl` - which is the most common hand-rolled pattern across the app
+ * (53+ exact occurrences). Previously this primitive used shadcn `bg-card` /
+ * `text-card-foreground` tokens that DON'T resolve in Rowan's dark-only Tailwind
+ * setup, so it rendered nearly invisible - which is why it had zero adopters.
+ * Now it produces the real card look, so migrating a hand-rolled
+ * `bg-gray-800 border border-gray-700 rounded-xl` div to `<Card>` is a visual
+ * no-op. Use it for new cards; migrate existing ones opportunistically.
+ */
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className = '', ...props }, ref) => (
     <div
       ref={ref}
-      className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
+      className={`rounded-xl border border-gray-700 bg-gray-800 text-white shadow-sm ${className}`}
       {...props}
     />
   )
@@ -46,7 +57,7 @@ type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 /** Renders a description paragraph within a Card header. */
 export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   ({ className = '', ...props }, ref) => (
-    <p ref={ref} className={`text-sm text-muted-foreground ${className}`} {...props} />
+    <p ref={ref} className={`text-sm text-gray-400 ${className}`} {...props} />
   )
 );
 

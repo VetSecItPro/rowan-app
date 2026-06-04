@@ -437,6 +437,24 @@ select:focus,
   --animation-fade-in: fade-in 0.3s ease-in-out;
   --animation-slide-up: slide-up 0.3s ease-out;
   --animation-slide-down: slide-down 0.3s ease-out;
+
+  /*
+   * Named z-index scale (Phase 16.4). Tailwind 4's `--z-index-*` theme keys
+   * generate `z-<name>` utilities. Values are preserved from the ad-hoc ones
+   * already in use (z-10/20/40/50, z-[60], z-[70], z-[100]), so swapping an
+   * existing utility for its named equivalent is a visual no-op. Use the named
+   * utility for NEW overlay/portal code; migrate the rest opportunistically
+   * ("trend, don't gate"). NOTE: tailwind.config.ts is vestigial in this v4
+   * setup (theme lives here in @theme), so the scale MUST be defined here.
+   */
+  --z-index-raised: 10;    /* sticky headers, raised cards */
+  --z-index-sticky: 20;    /* sticky toolbars, day headers */
+  --z-index-dropdown: 30;  /* inline dropdowns */
+  --z-index-overlay: 40;   /* backdrops / scrims */
+  --z-index-modal: 50;     /* modal dialogs (the common case) */
+  --z-index-elevated: 60;  /* content layered just above a modal */
+  --z-index-popover: 70;   /* portal dropdowns above modals (PortalDropdown) */
+  --z-index-top: 100;      /* critical, must-be-on-top (cookie banner, skip link) */
 }
 
 @keyframes bounce-subtle {
