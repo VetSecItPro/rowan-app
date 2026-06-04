@@ -267,6 +267,20 @@ describe('invitations-service', () => {
       if (!result.success) expect(result.error).toContain('member limit');
     });
 
+    it('rejects an invite when a Free household is at its 2-member cap', async () => {
+      // Free tier (Phase 11.6 teaser) also enforces maxUsers=2. Without this the
+      // free plan would be an unlimited-seat household for $0.
+      mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
+        members: [{ data: { role: 'owner' } }, { data: { user_id: 'owner-1' } }, { count: 2 }],
+        invitations: [{ data: null, error: { code: 'PGRST116' } }, { count: 0 }],
+        rpcTier: 'free',
+      }) as never);
+
+      const result = await createInvitation(SPACE, 'new@example.com', INVITER);
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error).toContain('member limit');
+    });
+
     it('rejects when a Family household is at its 6-member cap', async () => {
       mockCreateClient.mockResolvedValueOnce(flexibleSupabase({
         members: [{ data: { role: 'owner' } }, { data: { user_id: 'owner-1' } }, { count: 6 }],
