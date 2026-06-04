@@ -297,10 +297,11 @@ export async function acceptInvitation(
       throw memberError;
     }
 
-    // Update invitation status
+    // Update invitation status + record WHO accepted it (Phase 15.5: needed to
+    // reward the inviter once this user completes their first task).
     const { error: updateError } = await supabase
       .from('space_invitations')
-      .update({ status: 'accepted' })
+      .update({ status: 'accepted', accepted_by_user_id: userId })
       .eq('id', invitation.id);
 
     if (updateError) {
