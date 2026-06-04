@@ -2,6 +2,7 @@
 // Handles reward catalog management and redemptions
 
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
   RewardCatalogItem,
   RewardRedemption,
@@ -24,8 +25,8 @@ export const rewardsService = {
   /**
    * Get all rewards for a space
    */
-  async getRewards(spaceId: string, activeOnly: boolean = true): Promise<RewardCatalogItem[]> {
-    const supabase = createClient();
+  async getRewards(spaceId: string, activeOnly: boolean = true, supabaseClient?: SupabaseClient): Promise<RewardCatalogItem[]> {
+    const supabase = supabaseClient ?? createClient();
 
     let query = supabase
       .from('rewards_catalog')
@@ -69,12 +70,12 @@ export const rewardsService = {
   /**
    * Create a new reward
    */
-  async createReward(input: CreateRewardInput): Promise<RewardCatalogItem> {
+  async createReward(input: CreateRewardInput, supabaseClient?: SupabaseClient): Promise<RewardCatalogItem> {
     if (input.cost_points < 0) {
       throw new Error('cost_points must be non-negative');
     }
 
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     const { data, error } = await supabase
       .from('rewards_catalog')
@@ -102,12 +103,12 @@ export const rewardsService = {
   /**
    * Update a reward
    */
-  async updateReward(rewardId: string, input: UpdateRewardInput): Promise<RewardCatalogItem> {
+  async updateReward(rewardId: string, input: UpdateRewardInput, supabaseClient?: SupabaseClient): Promise<RewardCatalogItem> {
     if (input.cost_points !== undefined && input.cost_points < 0) {
       throw new Error('cost_points must be non-negative');
     }
 
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     const { data, error } = await supabase
       .from('rewards_catalog')
@@ -129,8 +130,8 @@ export const rewardsService = {
   /**
    * Delete a reward (soft delete by deactivating)
    */
-  async deleteReward(rewardId: string): Promise<void> {
-    const supabase = createClient();
+  async deleteReward(rewardId: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = supabaseClient ?? createClient();
 
     const { error } = await supabase
       .from('rewards_catalog')
@@ -196,9 +197,10 @@ export const rewardsService = {
       userId?: string;
       status?: RedemptionStatus;
       limit?: number;
-    } = {}
+    } = {},
+    supabaseClient?: SupabaseClient
   ): Promise<RewardRedemption[]> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     let query = supabase
       .from('reward_redemptions')
@@ -258,9 +260,10 @@ export const rewardsService = {
   async redeemReward(
     userId: string,
     spaceId: string,
-    rewardId: string
+    rewardId: string,
+    supabaseClient?: SupabaseClient
   ): Promise<RewardRedemption> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     // Atomic redemption: checks balance, creates redemption, deducts points in one transaction
     const { data: result, error: rpcError } = await supabase.rpc('redeem_reward', {
@@ -301,9 +304,10 @@ export const rewardsService = {
    */
   async approveRedemption(
     redemptionId: string,
-    approvedBy: string
+    approvedBy: string,
+    supabaseClient?: SupabaseClient
   ): Promise<RewardRedemption> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     // Security: Verify approver is not the same user who requested the redemption
     const { data: redemption, error: fetchError } = await supabase
@@ -346,8 +350,8 @@ export const rewardsService = {
   /**
    * Mark redemption as fulfilled
    */
-  async fulfillRedemption(redemptionId: string): Promise<RewardRedemption> {
-    const supabase = createClient();
+  async fulfillRedemption(redemptionId: string, supabaseClient?: SupabaseClient): Promise<RewardRedemption> {
+    const supabase = supabaseClient ?? createClient();
 
     const { data, error } = await supabase
       .from('reward_redemptions')
@@ -376,9 +380,10 @@ export const rewardsService = {
   async denyRedemption(
     redemptionId: string,
     deniedBy: string,
-    reason?: string
+    reason?: string,
+    supabaseClient?: SupabaseClient
   ): Promise<RewardRedemption> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     // Get redemption details first
     const { data: existing, error: fetchError } = await supabase
@@ -434,9 +439,10 @@ export const rewardsService = {
    */
   async cancelRedemption(
     redemptionId: string,
-    userId: string
+    userId: string,
+    supabaseClient?: SupabaseClient
   ): Promise<RewardRedemption> {
-    const supabase = createClient();
+    const supabase = supabaseClient ?? createClient();
 
     // Get redemption details
     const { data: existing, error: fetchError } = await supabase

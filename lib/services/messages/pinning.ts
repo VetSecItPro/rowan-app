@@ -1,10 +1,15 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import type { Message, MessageWithAttachments } from './types';
 
 /** Pins a message to the top of the conversation. */
-export async function pinMessage(messageId: string, userId: string): Promise<Message> {
-  const supabase = createClient();
+export async function pinMessage(
+  messageId: string,
+  userId: string,
+  supabaseClient?: SupabaseClient,
+): Promise<Message> {
+  const supabase = supabaseClient ?? createClient();
 
   // nosemgrep: supabase-missing-space-id-filter — tenant isolation enforced via RLS or scoped by FK/PK on this query
   const { data, error } = await supabase
@@ -26,8 +31,11 @@ export async function pinMessage(messageId: string, userId: string): Promise<Mes
 }
 
 /** Unpins a message from the conversation. */
-export async function unpinMessage(messageId: string): Promise<Message> {
-  const supabase = createClient();
+export async function unpinMessage(
+  messageId: string,
+  supabaseClient?: SupabaseClient,
+): Promise<Message> {
+  const supabase = supabaseClient ?? createClient();
 
   // nosemgrep: supabase-missing-space-id-filter — tenant isolation enforced via RLS or scoped by FK/PK on this query
   const { data, error } = await supabase

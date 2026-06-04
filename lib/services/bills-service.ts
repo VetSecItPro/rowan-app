@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { projectsService } from './budgets-service';
 import { remindersService } from './reminders-service';
 import { calendarService } from './calendar-service';
@@ -92,8 +93,8 @@ export interface BillStats {
  * @returns Array of bill records
  * @throws Error if the database query fails
  */
-export async function getBills(spaceId: string): Promise<Bill[]> {
-  const supabase = createClient();
+export async function getBills(spaceId: string, supabaseClient?: SupabaseClient): Promise<Bill[]> {
+  const supabase = supabaseClient ?? createClient();
   const { data, error } = await supabase
     .from('bills')
     .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
@@ -110,8 +111,8 @@ export async function getBills(spaceId: string): Promise<Bill[]> {
  * @returns The bill record or null if not found
  * @throws Error if the database query fails
  */
-export async function getBillById(billId: string): Promise<Bill | null> {
-  const supabase = createClient();
+export async function getBillById(billId: string, supabaseClient?: SupabaseClient): Promise<Bill | null> {
+  const supabase = supabaseClient ?? createClient();
   const { data, error } = await supabase
     .from('bills')
     .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
@@ -131,9 +132,10 @@ export async function getBillById(billId: string): Promise<Bill | null> {
  */
 export async function getBillsByStatus(
   spaceId: string,
-  status: BillStatus
+  status: BillStatus,
+  supabaseClient?: SupabaseClient
 ): Promise<Bill[]> {
-  const supabase = createClient();
+  const supabase = supabaseClient ?? createClient();
   const { data, error } = await supabase
     .from('bills')
     .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
@@ -152,8 +154,8 @@ export async function getBillsByStatus(
  * @returns Array of upcoming bills ordered by due date
  * @throws Error if the database query fails
  */
-export async function getUpcomingBills(spaceId: string): Promise<Bill[]> {
-  const supabase = createClient();
+export async function getUpcomingBills(spaceId: string, supabaseClient?: SupabaseClient): Promise<Bill[]> {
+  const supabase = supabaseClient ?? createClient();
   const today = new Date().toISOString().split('T')[0];
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -183,9 +185,10 @@ export async function getUpcomingBills(spaceId: string): Promise<Bill[]> {
  */
 export async function createBill(
   input: CreateBillInput,
-  userId: string
+  userId: string,
+  supabaseClient?: SupabaseClient
 ): Promise<Bill> {
-  const supabase = createClient();
+  const supabase = supabaseClient ?? createClient();
 
   // Step 1: Create the bill record
   const { data: bill, error } = await supabase
@@ -278,9 +281,10 @@ export async function createBill(
  */
 export async function updateBill(
   billId: string,
-  updates: UpdateBillInput
+  updates: UpdateBillInput,
+  supabaseClient?: SupabaseClient
 ): Promise<Bill> {
-  const supabase = createClient();
+  const supabase = supabaseClient ?? createClient();
   const { data, error } = await supabase
     .from('bills')
     .update(updates)
@@ -298,8 +302,8 @@ export async function updateBill(
  * @param billId - The bill ID to delete
  * @throws Error if the delete operation fails
  */
-export async function deleteBill(billId: string): Promise<void> {
-  const supabase = createClient();
+export async function deleteBill(billId: string, supabaseClient?: SupabaseClient): Promise<void> {
+  const supabase = supabaseClient ?? createClient();
   const { error } = await supabase.from('bills').delete().eq('id', billId);
 
   if (error) throw error;
@@ -317,9 +321,10 @@ export async function deleteBill(billId: string): Promise<void> {
  */
 export async function markBillAsPaid(
   billId: string,
-  createExpense = true
+  createExpense = true,
+  supabaseClient?: SupabaseClient
 ): Promise<{ bill: Bill; expense?: Record<string, unknown> }> {
-  const supabase = createClient();
+  const supabase = supabaseClient ?? createClient();
 
   // Get the bill
   const bill = await getBillById(billId);
@@ -413,8 +418,8 @@ export async function markBillAsPaid(
  * @param spaceId - The space ID
  * @returns Statistics object with bill counts and totals
  */
-export async function getBillStats(spaceId: string): Promise<BillStats> {
-  const bills = await getBills(spaceId);
+export async function getBillStats(spaceId: string, supabaseClient?: SupabaseClient): Promise<BillStats> {
+  const bills = await getBills(spaceId, supabaseClient);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);

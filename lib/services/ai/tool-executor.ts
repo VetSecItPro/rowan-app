@@ -183,6 +183,36 @@ export async function executeTool(
 ): Promise<ToolExecutionResult> {
   const { spaceId, userId, supabase } = context;
 
+  // SECURITY (SEC-AI-05): tools that mint value or change household policy are
+  // owner/admin-only. Without this, any member could - via the AI - award
+  // themselves points, approve/deny redemptions, or rewrite penalty policy.
+  // Self-scoped actions (redeem_reward, cancel_redemption of one's own) are NOT
+  // gated here; they're scoped to the caller's own userId in the service.
+  const OWNER_ADMIN_ONLY_TOOLS = new Set<string>([
+    'award_points',
+    'approve_redemption',
+    'deny_redemption',
+    'fulfill_redemption',
+    'update_penalty_settings',
+    'forgive_penalty',
+  ]);
+  if (OWNER_ADMIN_ONLY_TOOLS.has(toolName)) {
+    // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
+    const { data: membership } = await supabase
+      .from('space_members')
+      .select('role')
+      .eq('space_id', spaceId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!membership || !['owner', 'admin'].includes((membership as { role?: string }).role ?? '')) {
+      return {
+        success: false,
+        message: 'This action can only be done by a household owner or admin.',
+        featureType: 'general',
+      };
+    }
+  }
+
   try {
     switch (toolName) {
       // ═══════════════════════════════════════
@@ -609,8 +639,7 @@ export async function executeTool(
         const itemUpdates = pickAllowedKeys(parameters, [
           'name', 'quantity', 'category', 'checked', 'notes', 'unit', 'price',
         ]);
-        // updateItem does not accept a supabase client param — RLS enforces access
-        await shoppingService.updateItem(itemId, itemUpdates);
+        await shoppingService.updateItem(itemId, itemUpdates, supabase);
         return {
           success: true,
           message: 'Shopping item updated',
@@ -624,8 +653,7 @@ export async function executeTool(
         if (!itemId) {
           return { success: false, message: 'Item ID is required', featureType: 'shopping' };
         }
-        // deleteItem does not accept a supabase client param — RLS enforces access
-        await shoppingService.deleteItem(itemId);
+        await shoppingService.deleteItem(itemId, supabase);
         return {
           success: true,
           message: 'Shopping item deleted',
@@ -643,8 +671,7 @@ export async function executeTool(
         if (checked === undefined) {
           return { success: false, message: 'Checked state is required', featureType: 'shopping' };
         }
-        // toggleItem does not accept a supabase client param — RLS enforces access
-        await shoppingService.toggleItem(itemId, checked);
+        await shoppingService.toggleItem(itemId, checked, supabase);
         return {
           success: true,
           message: checked ? 'Item checked off' : 'Item unchecked',
@@ -720,8 +747,7 @@ export async function executeTool(
           cuisine_type: parameters.cuisine_type as string | undefined,
           tags,
         };
-        // createRecipe does not accept a supabase client param — uses browser client
-        const recipe = await mealsService.createRecipe(recipeInput);
+        const recipe = await mealsService.createRecipe(recipeInput, supabase);
         return {
           success: true,
           message: `Created recipe "${recipe.name}"`,
@@ -914,8 +940,7 @@ export async function executeTool(
           current_value: parameters.current_value as number | undefined,
           target_date: parameters.target_date as string | undefined,
         };
-        // createMilestone does not accept a supabase client param — uses browser client
-        const milestone = await goalsService.createMilestone(milestoneInput);
+        const milestone = await goalsService.createMilestone(milestoneInput, supabase);
         return {
           success: true,
           message: `Created milestone "${milestone.title}"`,
@@ -930,8 +955,7 @@ export async function executeTool(
         if (!milestoneId) {
           return { success: false, message: 'Milestone ID is required', featureType: 'goal' };
         }
-        // toggleMilestone does not accept a supabase client param — uses browser client
-        await goalsService.toggleMilestone(milestoneId, completed);
+        await goalsService.toggleMilestone(milestoneId, completed, supabase);
         return {
           success: true,
           message: completed ? 'Milestone completed' : 'Milestone reopened',
@@ -1113,8 +1137,7 @@ export async function executeTool(
       }
 
       case 'list_conversations': {
-        // getConversations does not accept a supabase client param — uses browser client
-        const conversations = await messagesService.getConversations(spaceId);
+        const conversations = await messagesService.getConversations(spaceId, 50, supabase);
         return {
           success: true,
           message: `Found ${conversations.length} conversation${conversations.length === 1 ? '' : 's'}`,
@@ -1144,7 +1167,6 @@ export async function executeTool(
         if (!costPoints) {
           return { success: false, message: 'Cost in points is required', featureType: 'reward' };
         }
-        // createReward does not accept a supabase client param — uses browser client
         const reward = await rewardsService.createReward({
           space_id: spaceId,
           name,
@@ -1153,7 +1175,7 @@ export async function executeTool(
           category: (parameters.category as 'privileges' | 'treats' | 'activities' | 'screen_time' | 'money' | 'other') || 'other',
           emoji: parameters.emoji as string | undefined,
           created_by: userId,
-        });
+        }, supabase);
         return {
           success: true,
           message: `Created reward "${reward.name}" (${reward.cost_points} pts)`,
@@ -1163,7 +1185,7 @@ export async function executeTool(
       }
 
       case 'list_rewards': {
-        const rewards = await rewardsService.getRewards(spaceId);
+        const rewards = await rewardsService.getRewards(spaceId, true, supabase);
         return {
           success: true,
           message: `Found ${rewards.length} reward${rewards.length === 1 ? '' : 's'}`,
@@ -1186,7 +1208,7 @@ export async function executeTool(
         const rewardUpdates = pickAllowedKeys(parameters, [
           'name', 'description', 'cost_points', 'category', 'emoji', 'is_active',
         ]);
-        const updatedReward = await rewardsService.updateReward(rewardId, rewardUpdates as Parameters<typeof rewardsService.updateReward>[1]);
+        const updatedReward = await rewardsService.updateReward(rewardId, rewardUpdates as Parameters<typeof rewardsService.updateReward>[1], supabase);
         return {
           success: true,
           message: `Updated reward "${updatedReward.name}"`,
@@ -1200,7 +1222,7 @@ export async function executeTool(
         if (!rewardId) {
           return { success: false, message: 'Reward ID is required', featureType: 'reward' };
         }
-        await rewardsService.deleteReward(rewardId);
+        await rewardsService.deleteReward(rewardId, supabase);
         return {
           success: true,
           message: 'Reward deleted',
@@ -1211,7 +1233,7 @@ export async function executeTool(
 
       case 'get_points_balance': {
         const targetUserId = (parameters.user_id as string) || userId;
-        const stats = await pointsService.getUserStats(targetUserId, spaceId);
+        const stats = await pointsService.getUserStats(targetUserId, spaceId, supabase);
         return {
           success: true,
           message: `Points balance: ${stats.total_points}`,
@@ -1237,7 +1259,7 @@ export async function executeTool(
         if (!rewardId) {
           return { success: false, message: 'Reward ID is required', featureType: 'reward' };
         }
-        const redemption = await rewardsService.redeemReward(redeemingUserId, spaceId, rewardId);
+        const redemption = await rewardsService.redeemReward(redeemingUserId, spaceId, rewardId, supabase);
         return {
           success: true,
           message: `Reward redeemed! ${redemption.points_spent} points deducted.`,
@@ -1252,7 +1274,7 @@ export async function executeTool(
 
       case 'get_leaderboard': {
         const period = (parameters.period as 'week' | 'month' | 'all') || 'week';
-        const leaderboard = await pointsService.getLeaderboard(spaceId, period);
+        const leaderboard = await pointsService.getLeaderboard(spaceId, period, supabase);
         return {
           success: true,
           message: `${period === 'week' ? 'Weekly' : period === 'month' ? 'Monthly' : 'All-time'} leaderboard (${leaderboard.length} members)`,
@@ -1407,7 +1429,7 @@ export async function executeTool(
       // BILLS
       // ═══════════════════════════════════════
       case 'list_bills': {
-        const bills = await billsService.getBills(spaceId);
+        const bills = await billsService.getBills(spaceId, supabase);
         const filtered = parameters.status
           ? bills.filter(b => b.status === parameters.status)
           : bills;
@@ -1449,7 +1471,7 @@ export async function executeTool(
           payee: parameters.payee as string | undefined,
           auto_pay: parameters.auto_pay as boolean | undefined,
           notes: parameters.notes as string | undefined,
-        }, userId);
+        }, userId, supabase);
         return {
           success: true,
           message: `Created bill "${bill.name}" — $${bill.amount} due ${formatDateForPreview(bill.due_date)}`,
@@ -1466,7 +1488,7 @@ export async function executeTool(
         const billUpdates = pickAllowedKeys(parameters, [
           'name', 'amount', 'due_date', 'frequency', 'category', 'payee', 'auto_pay', 'notes', 'status',
         ]);
-        await billsService.updateBill(billId, billUpdates);
+        await billsService.updateBill(billId, billUpdates, supabase);
         return {
           success: true,
           message: 'Bill updated',
@@ -1480,7 +1502,7 @@ export async function executeTool(
         if (!billId) {
           return { success: false, message: 'Bill ID is required', featureType: 'expense' };
         }
-        await billsService.deleteBill(billId);
+        await billsService.deleteBill(billId, supabase);
         return {
           success: true,
           message: 'Bill deleted',
@@ -1494,7 +1516,7 @@ export async function executeTool(
         if (!billId) {
           return { success: false, message: 'Bill ID is required', featureType: 'expense' };
         }
-        const result = await billsService.markBillAsPaid(billId, true);
+        const result = await billsService.markBillAsPaid(billId, true, supabase);
         return {
           success: true,
           message: `Bill marked as paid${result.expense ? ' and expense recorded' : ''}`,
@@ -1571,7 +1593,7 @@ export async function executeTool(
       case 'list_redemptions': {
         const redemptions = await rewardsService.getRedemptions(spaceId, {
           status: parameters.status as 'pending' | 'approved' | 'fulfilled' | 'denied' | 'cancelled' | undefined,
-        });
+        }, supabase);
         return {
           success: true,
           message: `Found ${redemptions.length} redemption${redemptions.length === 1 ? '' : 's'}`,
@@ -1596,7 +1618,7 @@ export async function executeTool(
         if (!redemptionId) {
           return { success: false, message: 'Redemption ID is required', featureType: 'reward' };
         }
-        const approved = await rewardsService.approveRedemption(redemptionId, userId);
+        const approved = await rewardsService.approveRedemption(redemptionId, userId, supabase);
         return {
           success: true,
           message: `Redemption approved for "${approved.reward?.name || 'reward'}"`,
@@ -1613,7 +1635,8 @@ export async function executeTool(
         const denied = await rewardsService.denyRedemption(
           redemptionId,
           userId,
-          parameters.reason as string | undefined
+          parameters.reason as string | undefined,
+          supabase
         );
         return {
           success: true,
@@ -1642,7 +1665,7 @@ export async function executeTool(
           source_type: 'bonus',
           points,
           reason,
-        });
+        }, supabase);
         return {
           success: true,
           message: `Awarded ${points} bonus points: ${reason}`,
@@ -1662,7 +1685,7 @@ export async function executeTool(
         const milestoneUpdates = pickAllowedKeys(parameters, [
           'title', 'description', 'type', 'target_value', 'current_value', 'target_date',
         ]);
-        const updatedMilestone = await goalsService.updateMilestone(milestoneId, milestoneUpdates);
+        const updatedMilestone = await goalsService.updateMilestone(milestoneId, milestoneUpdates, supabase);
         return {
           success: true,
           message: `Updated milestone "${updatedMilestone.title}"`,
@@ -1676,7 +1699,7 @@ export async function executeTool(
         if (!milestoneId) {
           return { success: false, message: 'Milestone ID is required', featureType: 'goal' };
         }
-        await goalsService.deleteMilestone(milestoneId);
+        await goalsService.deleteMilestone(milestoneId, supabase);
         return {
           success: true,
           message: 'Milestone deleted',
@@ -2078,7 +2101,7 @@ export async function executeTool(
         if (!messageId) {
           return { success: false, message: 'Message ID is required', featureType: 'message' };
         }
-        await messagesService.pinMessage(messageId, userId);
+        await messagesService.pinMessage(messageId, userId, supabase);
         return {
           success: true,
           message: 'Message pinned',
@@ -2095,7 +2118,7 @@ export async function executeTool(
         if (!redemptionId) {
           return { success: false, message: 'Redemption ID is required', featureType: 'reward' };
         }
-        await rewardsService.fulfillRedemption(redemptionId);
+        await rewardsService.fulfillRedemption(redemptionId, supabase);
         return {
           success: true,
           message: 'Redemption fulfilled',
@@ -2109,7 +2132,7 @@ export async function executeTool(
         if (!redemptionId) {
           return { success: false, message: 'Redemption ID is required', featureType: 'reward' };
         }
-        await rewardsService.cancelRedemption(redemptionId, userId);
+        await rewardsService.cancelRedemption(redemptionId, userId, supabase);
         return {
           success: true,
           message: 'Redemption cancelled and points refunded',
@@ -2121,7 +2144,7 @@ export async function executeTool(
       case 'get_points_history': {
         const targetUserId = (parameters.user_id as string) || userId;
         const limit = (parameters.limit as number) || 20;
-        const history = await pointsService.getPointsHistory(targetUserId, spaceId, limit);
+        const history = await pointsService.getPointsHistory(targetUserId, spaceId, limit, supabase);
         return {
           success: true,
           message: `Found ${history.length} transaction${history.length === 1 ? '' : 's'}`,
@@ -2785,7 +2808,7 @@ export async function executeTool(
       case 'unpin_message': {
         const mid = requireString(parameters, 'message_id', 'message');
         if ('error' in mid) return mid.error;
-        await messagesService.unpinMessage(mid.value);
+        await messagesService.unpinMessage(mid.value, supabase);
         return { success: true, message: 'Message unpinned.', featureType: 'message' };
       }
 
@@ -2969,7 +2992,7 @@ export async function executeTool(
         let checked = 0;
         for (const id of itemIds) {
           try {
-            await shoppingService.toggleItem(String(id), true);
+            await shoppingService.toggleItem(String(id), true, supabase);
             checked++;
           } catch {
             // Skip individual failures
