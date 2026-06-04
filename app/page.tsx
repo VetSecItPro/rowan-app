@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { PublicHeaderLite } from '@/components/layout/PublicHeaderLite';
 import { MobileStickyBar } from '@/components/home/MobileStickyBar';
+import { LazyVisible } from '@/components/home/LazyVisible';
 
 // Loading placeholder to reserve space and prevent CLS
 const SectionSkeleton = () => <div className="py-20 px-4" aria-hidden="true" />;
@@ -79,21 +80,26 @@ export default function HomePage() {
 
         <PainPointsSection />
 
-        <HowItWorksSection />
+        {/* Phase 14: below-fold sections load (download + evaluate their Framer
+            JS) only as the user scrolls near them, instead of all-on-mount.
+            Cuts the homepage's initial main-thread work / TBT. */}
+        <LazyVisible><HowItWorksSection /></LazyVisible>
 
-        <FeatureShowcase />
+        <LazyVisible><FeatureShowcase /></LazyVisible>
 
-        <AICompanionTeaser />
+        <LazyVisible><AICompanionTeaser /></LazyVisible>
 
-        <TrustSecuritySection />
+        <LazyVisible><TrustSecuritySection /></LazyVisible>
 
-        <PricingPreviewSection
-          onSignupClick={() => router.push('/signup')}
-        />
+        <LazyVisible>
+          <PricingPreviewSection
+            onSignupClick={() => router.push('/signup')}
+          />
+        </LazyVisible>
 
-        <FAQSection />
+        <LazyVisible><FAQSection /></LazyVisible>
 
-        <FinalCTASection />
+        <LazyVisible><FinalCTASection /></LazyVisible>
       </main>
 
       <ScrollToTop />
