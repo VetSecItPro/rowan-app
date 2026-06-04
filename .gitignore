@@ -223,3 +223,4 @@ household-balance-*.png
 .worktrees/
 .investigate/
 .sec-ship-history.json
+.gh-ship-history.json

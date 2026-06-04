@@ -26,6 +26,13 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
   const dur = prefersReducedMotion ? 0.01 : 0.6;
   const durSlow = prefersReducedMotion ? 0.01 : 0.8;
 
+  // PERF-014 (LCP): the hero entrance slides (y) but deliberately does NOT fade
+  // (no opacity:0 initial). Framer renders `initial` into the SSR HTML, so an
+  // opacity:0 start would paint the headline + dashboard image (the LCP element)
+  // invisible until JS hydrates and runs the staggered animation - gating LCP on
+  // the bundle. A translateY start still paints visibly, so LCP fires on first
+  // paint. Do not add `opacity: 0` back to these above-fold `initial` states.
+
   return (
     <section ref={heroRef} className="relative pt-16 sm:pt-20 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -34,8 +41,8 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
             {/* Left — Text */}
             <div className="text-center lg:text-left">
               <motion.div
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ y: prefersReducedMotion ? 0 : 20 }}
+                animate={{ y: 0 }}
                 transition={{ duration: dur }}
                 className="flex items-center justify-center lg:justify-start gap-3 mb-6"
               >
@@ -54,8 +61,8 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ y: prefersReducedMotion ? 0 : 20 }}
+                animate={{ y: 0 }}
                 transition={{ duration: dur, delay: prefersReducedMotion ? 0 : 0.1 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight text-white mb-4"
               >
@@ -66,8 +73,8 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
               </motion.h1>
 
               <motion.p
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ y: prefersReducedMotion ? 0 : 20 }}
+                animate={{ y: 0 }}
                 transition={{ duration: dur, delay: prefersReducedMotion ? 0 : 0.2 }}
                 className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-lg mx-auto lg:mx-0 mb-8"
               >
@@ -76,8 +83,8 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
 
               {/* CTA buttons */}
               <motion.div
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ y: prefersReducedMotion ? 0 : 20 }}
+                animate={{ y: 0 }}
                 transition={{ duration: dur, delay: prefersReducedMotion ? 0 : 0.3 }}
                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-6"
               >
@@ -108,8 +115,8 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
 
             {/* Right — Product Demo */}
             <motion.div
-              initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: prefersReducedMotion ? 0 : 30 }}
+              animate={{ y: 0 }}
               transition={{ duration: durSlow, delay: prefersReducedMotion ? 0 : 0.3 }}
               className="flex justify-center lg:justify-end"
             >
@@ -120,6 +127,12 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
                   width={1440}
                   height={900}
                   priority
+                  // PERF-014 (LCP): the hero image is the LCP element. It never
+                  // renders wider than the 680px container (full-width on mobile).
+                  // Without `sizes`, next/image assumes 100vw and serves a 1920w/
+                  // 3840w upscale of the 1440px source - a multi-MB LCP download on
+                  // high-DPR phones. This caps the served variant to the real size.
+                  sizes="(min-width: 1024px) 680px, 100vw"
                   className="w-full h-auto"
                 />
               </div>

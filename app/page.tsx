@@ -5,12 +5,18 @@ import dynamic from 'next/dynamic';
 import { PublicHeaderLite } from '@/components/layout/PublicHeaderLite';
 import { MobileStickyBar } from '@/components/home/MobileStickyBar';
 import { LazyVisible } from '@/components/home/LazyVisible';
+// PERF-014 (LCP): static, top-level import so the hero server-renders into the
+// initial HTML. This page is 'use client' but still SSRs to HTML; dynamic({
+// ssr: false }) was the one thing opting the hero OUT of that server pass, so
+// the browser painted a skeleton and only swapped in the hero (the LCP element:
+// headline + dashboard image) after the JS bundle hydrated, pushing LCP to
+// ~4.9s. HeroSection pulls only lucide + next/image + framer-motion (NO
+// @remotion/player - that lives in FeatureShowcase, which stays lazy below), so
+// eager-importing it adds no heavy player JS to the critical path.
+import { HeroSection } from '@/components/home/HeroSection';
 
 // Loading placeholder to reserve space and prevent CLS
 const SectionSkeleton = () => <div className="py-20 px-4" aria-hidden="true" />;
-
-// PERF-001: Lazy-load HeroSection — pulls in @remotion/player (~100-200KB)
-const HeroSection = dynamic(() => import('@/components/home/HeroSection').then(m => ({ default: m.HeroSection })), { ssr: false, loading: SectionSkeleton });
 
 // Dynamic imports for below-fold sections (reduces initial bundle)
 const PainPointsSection = dynamic(() => import('@/components/home/PainPointsSection').then(m => ({ default: m.PainPointsSection })), { ssr: false, loading: SectionSkeleton });
