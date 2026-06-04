@@ -299,6 +299,7 @@ export async function acceptInvitation(
 
     // Update invitation status + record WHO accepted it (Phase 15.5: needed to
     // reward the inviter once this user completes their first task).
+    // nosemgrep: supabase-missing-space-id-filter - keyed by invitation id (PK), not space-scoped
     const { error: updateError } = await supabase
       .from('space_invitations')
       .update({ status: 'accepted', accepted_by_user_id: userId })
