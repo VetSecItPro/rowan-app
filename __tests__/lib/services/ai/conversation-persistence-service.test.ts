@@ -512,4 +512,175 @@ describe('checkBudget', () => {
     expect(result.allowed).toBe(false);
     expect(result.reason).toMatch(/month/i);
   });
+
+  // Monthly COGS cap is a `>=` boundary (Phase 10.6, line ~615). These pin the
+  // exact edge: a user EXACTLY at the cap is blocked; one cent under is allowed.
+  // Off-by-one here is real money — too loose overspends COGS, too tight cuts off
+  // a paying user early. (Daily rows carry no token fields, so the daily check
+  // passes and the monthly check is what decides.)
+  it('blocks at EXACTLY the monthly cap ($1.50 Plus, >= boundary)', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ data: [{ estimated_cost_usd: 1.5 }], error: null })),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'plus');
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toMatch(/month/i);
+  });
+
+  it('allows one cent UNDER the monthly cap ($1.49 Plus)', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ data: [{ estimated_cost_usd: 1.49 }], error: null })),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'plus');
+    expect(result.allowed).toBe(true);
+  });
+
+  // Owner tier's monthly cap is Infinity, so the COGS check is skipped entirely
+  // (Number.isFinite guard). An owner with a huge month must still be allowed.
+  it('never blocks an owner on the monthly cap (Infinity skips the check)', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ data: [{ estimated_cost_usd: 999 }], error: null })),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'owner');
+    expect(result.allowed).toBe(true);
+  });
+
+  // Only input-token exhaustion was previously covered. Output tokens are the
+  // pricier half ($2.50/M vs $0.30/M), so blocking on the output ceiling matters.
+  it('blocks when the daily OUTPUT token budget is exhausted', async () => {
+    const supabase = {
+      from: vi.fn(() =>
+        createChainMock({
+          data: [{ input_tokens: 0, output_tokens: 80_001, voice_seconds: 0, conversation_count: 0 }],
+          error: null,
+        })
+      ),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'plus');
+    expect(result.allowed).toBe(false);
+    expect(result.remaining_output_tokens).toBe(0);
+    expect(result.reason).toMatch(/daily AI limit/);
+  });
+
+  // Free-tier teaser budget (Phase 11.6): a fresh free user gets exactly the
+  // tight 40K/5K daily allowance, not the Plus fallback.
+  it('surfaces the tight free-tier teaser budget for a fresh free user', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ data: null, error: null })),
+    } as unknown as Parameters<typeof checkBudget>[0];
+
+    const result = await checkBudget(supabase, 'user-1', 'free');
+    expect(result.allowed).toBe(true);
+    expect(result.remaining_input_tokens).toBe(40_000);
+    expect(result.remaining_output_tokens).toBe(5_000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// recordUsage — real-token accounting persistence (Phase 10.3)
+// ---------------------------------------------------------------------------
+
+describe('recordUsage', () => {
+  // recordUsage first SELECTs the existing (user_id, date, feature_source) row,
+  // then either INSERTs a new row or UPDATEs (increments) the existing one. This
+  // mock returns `existingRow` from .single() and captures the insert/update
+  // payloads so we can assert the persisted cost + counters.
+  function makeUsageMock(existingRow: unknown) {
+    const insert = vi.fn(() => createChainMock({ error: null }));
+    const update = vi.fn(() => createChainMock({ error: null }));
+    const chain = createChainMock({ data: [], error: null });
+    chain.single = vi.fn(() => Promise.resolve({ data: existingRow, error: null }));
+    chain.insert = insert;
+    chain.update = update;
+    const supabase = { from: vi.fn(() => chain) } as unknown as Parameters<typeof recordUsage>[0];
+    return { supabase, insert, update };
+  }
+
+  it('INSERTs a new row with the provider-billed cost when none exists today', async () => {
+    const { supabase, insert, update } = makeUsageMock(null);
+
+    // 1M input + 1M output on the primary Flash model:
+    // 1M * $0.30/M + 1M * $2.50/M = $2.80
+    await recordUsage(supabase, {
+      user_id: 'user-1',
+      space_id: 'space-1',
+      input_tokens: 1_000_000,
+      output_tokens: 1_000_000,
+      model_used: 'google/gemini-2.5-flash',
+      conversation_count: 1,
+    });
+
+    expect(update).not.toHaveBeenCalled();
+    expect(insert).toHaveBeenCalledTimes(1);
+    const row = insert.mock.calls[0][0] as Record<string, number | string>;
+    expect(row.user_id).toBe('user-1');
+    expect(row.input_tokens).toBe(1_000_000);
+    expect(row.output_tokens).toBe(1_000_000);
+    expect(row.estimated_cost_usd).toBeCloseTo(2.8, 6);
+  });
+
+  it('bills the fallback Flash-Lite model at its cheaper rate', async () => {
+    const { supabase, insert } = makeUsageMock(null);
+
+    // 1M input + 1M output on Flash Lite:
+    // 1M * $0.10/M + 1M * $0.40/M = $0.50
+    await recordUsage(supabase, {
+      user_id: 'user-1',
+      input_tokens: 1_000_000,
+      output_tokens: 1_000_000,
+      model_used: 'google/gemini-2.5-flash-lite',
+    });
+
+    const row = insert.mock.calls[0][0] as Record<string, number>;
+    expect(row.estimated_cost_usd).toBeCloseTo(0.5, 6);
+  });
+
+  it('INCREMENTS counters and cost onto an existing row (multi-round accumulation)', async () => {
+    const { supabase, insert, update } = makeUsageMock({
+      id: 'row-1',
+      input_tokens: 100,
+      output_tokens: 50,
+      voice_seconds: 0,
+      conversation_count: 1,
+      tool_calls_count: 2,
+      estimated_cost_usd: 0.001,
+    });
+
+    // New turn: 200 in + 100 out on primary Flash =
+    // 200 * 0.30/M + 100 * 2.50/M = 0.00006 + 0.00025 = 0.00031
+    await recordUsage(supabase, {
+      user_id: 'user-1',
+      input_tokens: 200,
+      output_tokens: 100,
+      model_used: 'google/gemini-2.5-flash',
+      tool_calls_count: 3,
+    });
+
+    expect(insert).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledTimes(1);
+    const patch = update.mock.calls[0][0] as Record<string, number>;
+    expect(patch.input_tokens).toBe(300); // 100 + 200
+    expect(patch.output_tokens).toBe(150); // 50 + 100
+    expect(patch.tool_calls_count).toBe(5); // 2 + 3
+    expect(patch.estimated_cost_usd).toBeCloseTo(0.00131, 6); // 0.001 + 0.00031
+  });
+
+  it('defaults an unknown model to primary pricing (never bills $0)', async () => {
+    const { supabase, insert } = makeUsageMock(null);
+
+    await recordUsage(supabase, {
+      user_id: 'user-1',
+      input_tokens: 1_000_000,
+      output_tokens: 0,
+      model_used: 'some/unmapped-model',
+    });
+
+    // Unknown model falls back to primary Flash input rate ($0.30/M).
+    const row = insert.mock.calls[0][0] as Record<string, number>;
+    expect(row.estimated_cost_usd).toBeCloseTo(0.3, 6);
+  });
 });

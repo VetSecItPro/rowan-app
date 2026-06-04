@@ -196,6 +196,33 @@ describe('POST /api/webhooks/polar - lifecycle events', () => {
     expect(sendPaymentFailedEmail).toHaveBeenCalled();
   });
 
+  it('subscription.updated does NOT re-send the dunning email when already past_due (Phase 11.3 transition guard)', async () => {
+    const { supabaseAdmin } = await import('@/lib/supabase/admin');
+    const { sendPaymentFailedEmail } = await import('@/lib/services/email-service');
+    const fromMock = vi.mocked(supabaseAdmin.from);
+    // Existing row is ALREADY past_due (Polar's 2nd/3rd retry webhook). The
+    // recovery email must fire only on the active->past_due TRANSITION, not on
+    // every subsequent retry, or the user gets spammed during the dunning window.
+    const existingChain = chainFor({ data: { user_id: 'u1', tier: 'plus', status: 'past_due' }, error: null });
+    const updateChain = chainFor({ data: null, error: null });
+    fromMock
+      .mockReturnValueOnce(existingChain as never)
+      .mockReturnValueOnce(updateChain as never);
+
+    const { POST } = await import('@/app/api/webhooks/polar/route');
+    const res = await POST(makeReq({
+      type: 'subscription.updated',
+      data: { customerId: 'cus_1', productId: 'prod_1', status: 'past_due' },
+    }));
+
+    expect(res.status).toBe(200);
+    // Access still kept (status stays past_due) ...
+    expect(updateChain.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'past_due' }));
+    // ... but NO second dunning email.
+    await new Promise(r => setTimeout(r, 0));
+    expect(sendPaymentFailedEmail).not.toHaveBeenCalled();
+  });
+
   it('subscription.updated does NOT downgrade a paying customer on an unresolved productId (review fix)', async () => {
     const { supabaseAdmin } = await import('@/lib/supabase/admin');
     const { getPlanFromProductId } = await import('@/lib/polar');
