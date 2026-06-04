@@ -18,6 +18,19 @@ describe('NAVIGATION_GROUPS', () => {
     expect(NAVIGATION_GROUPS.length).toBeGreaterThan(0);
   });
 
+  it('hides secondary-domain items by default (Phase 15.2: Year in Review)', () => {
+    // NEXT_PUBLIC_SHOW_SECONDARY_NAV is unset in tests -> secondary items filtered out.
+    const allItems = NAVIGATION_ITEMS.map((i) => i.name);
+    expect(allItems).not.toContain('Year in Review');
+    // Core domains remain.
+    expect(allItems).toContain('Tasks & Chores');
+    expect(allItems).toContain('Calendar');
+    // No empty groups leak through after filtering.
+    for (const group of NAVIGATION_GROUPS) {
+      expect(group.items.length).toBeGreaterThan(0);
+    }
+  });
+
   it('each group has a label and items array', () => {
     for (const group of NAVIGATION_GROUPS) {
       expect(typeof group.label).toBe('string');
