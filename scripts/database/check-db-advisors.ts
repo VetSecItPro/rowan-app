@@ -139,6 +139,32 @@ async function checkUserFeedbackRestrictive(client: Client): Promise<void> {
   });
 }
 
+async function checkTierCheckExcludesPro(client: Client): Promise<void> {
+  // Contract migration 20260604140000 dropped legacy 'pro' from the
+  // subscriptions tier CHECK. If 'pro' reappears in the constraint definition,
+  // the expand migration was re-applied or someone widened it by hand — drift.
+  const { rows } = await client.query(
+    `SELECT pg_get_constraintdef(oid) AS def
+       FROM pg_constraint WHERE conname = 'subscriptions_tier_check'`
+  );
+
+  if (rows.length === 0) {
+    findings.push({
+      invariant: 'subscriptions_tier_check exists',
+      ok: false,
+      detail: 'constraint not found — tier values are unconstrained',
+    });
+    return;
+  }
+
+  const def: string = rows[0].def ?? '';
+  findings.push({
+    invariant: "subscriptions_tier_check excludes legacy 'pro'",
+    ok: !/'pro'/.test(def),
+    detail: def,
+  });
+}
+
 async function main() {
   const client = new Client({ connectionString: databaseUrl });
   await client.connect();
@@ -148,6 +174,7 @@ async function main() {
     await checkServiceRoleSubselect(client);
     await checkPostgisRemoved(client);
     await checkUserFeedbackRestrictive(client);
+    await checkTierCheckExcludesPro(client);
   } finally {
     await client.end();
   }
