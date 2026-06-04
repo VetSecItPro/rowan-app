@@ -34,7 +34,7 @@ export function PricingToggle({ value, onChange }: PricingToggleProps) {
         <div className="relative">
           {/* "2 months free" badge - positioned on top */}
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+            <span className="rounded-full bg-emerald-800 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
               2 months free
             </span>
           </div>

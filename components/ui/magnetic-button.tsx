@@ -49,18 +49,26 @@ export function MagneticButton({
         }
     };
 
+    // a11y (nested-interactive): only become a real button when THIS component
+    // is the control (an onClick was passed). When it merely wraps an inner
+    // interactive (a <Link>/<button> child, e.g. the final CTA), stay a purely
+    // presentational motion wrapper - otherwise role="button" nests an <a>
+    // inside a button, which axe flags and screen readers mis-announce. The
+    // inner control then carries its own semantics + focus ring.
+    const isControl = typeof onClick === 'function';
+
     return (
         <motion.div
             ref={ref}
-            role="button"
-            tabIndex={0}
+            role={isControl ? 'button' : undefined}
+            tabIndex={isControl ? 0 : undefined}
             data-testid={testId}
             onMouseMove={handleMouseMove}
             onMouseLeave={reset}
             onClick={onClick}
-            onKeyDown={handleKeyDown}
+            onKeyDown={isControl ? handleKeyDown : undefined}
             style={{ x: springX, y: springY }}
-            className={`inline-block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-full ${className}`}
+            className={`inline-block cursor-pointer rounded-full ${isControl ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900' : ''} ${className}`}
         >
             {children}
         </motion.div>

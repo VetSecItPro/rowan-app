@@ -33,9 +33,21 @@ describe('MagneticButton', () => {
     expect(screen.getByText('Child')).toBeDefined();
   });
 
-  it('has role button', () => {
-    render(<MagneticButton>Button</MagneticButton>);
+  it('has role button when it is the control (onClick provided)', () => {
+    render(<MagneticButton onClick={vi.fn()}>Button</MagneticButton>);
     expect(screen.getByRole('button')).toBeDefined();
+  });
+
+  it('is presentational (no button role) when wrapping an inner interactive', () => {
+    // a11y (nested-interactive): without onClick, MagneticButton must NOT be a
+    // button - it wraps an inner <Link>/<button> which carries the semantics.
+    const { container } = render(
+      <MagneticButton><a href="/x">Inner link</a></MagneticButton>,
+    );
+    expect(screen.queryByRole('button')).toBeNull();
+    expect((container.firstChild as HTMLElement).getAttribute('tabindex')).toBeNull();
+    // The inner interactive is still present + reachable.
+    expect(screen.getByRole('link')).toBeDefined();
   });
 
   it('calls onClick when clicked', () => {
@@ -46,7 +58,7 @@ describe('MagneticButton', () => {
   });
 
   it('applies custom className', () => {
-    render(<MagneticButton className="custom-magnetic">Label</MagneticButton>);
+    render(<MagneticButton onClick={vi.fn()} className="custom-magnetic">Label</MagneticButton>);
     const button = screen.getByRole('button');
     expect(button.className).toContain('custom-magnetic');
   });

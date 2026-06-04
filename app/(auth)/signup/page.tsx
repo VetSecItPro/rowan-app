@@ -272,7 +272,7 @@ export default function SignUpPage() {
                 <span className="font-bold">I am 13 years of age or older</span>
                 <p className="text-gray-400 mt-1.5">
                   Rowan is intended for users 13+. Parents and guardians may create child sub-profiles within their household. See our{' '}
-                  <Link href="/privacy#childrens-privacy" className="text-emerald-400 hover:underline">
+                  <Link href="/privacy#childrens-privacy" className="text-emerald-400 underline">
                     Privacy Policy
                   </Link>{' '}
                   for details.
@@ -299,11 +299,11 @@ export default function SignUpPage() {
                 <span className="font-bold">I agree to the Terms and Privacy Policy</span>
                 <p className="text-gray-400 mt-1.5">
                   By creating an account you accept our{' '}
-                  <Link href="/terms" className="text-emerald-400 hover:underline">
+                  <Link href="/terms" className="text-emerald-400 underline">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" className="text-emerald-400 hover:underline">
+                  <Link href="/privacy" className="text-emerald-400 underline">
                     Privacy Policy
                   </Link>
                   .

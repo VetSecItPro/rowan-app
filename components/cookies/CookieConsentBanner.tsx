@@ -82,7 +82,7 @@ export function CookieConsentBanner() {
                 data-testid="cookie-consent-accept"
                 size="sm"
                 onClick={handleAcknowledge}
-                className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+                className="w-full sm:w-auto bg-green-700 hover:bg-green-800"
               >
                 <Shield className="h-4 w-4 mr-2" />
                 Got it
