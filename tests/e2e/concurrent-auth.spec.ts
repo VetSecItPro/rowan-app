@@ -34,7 +34,7 @@ interface TestUser {
   email: string;
   password: string;
   name: string;
-  tier: 'free' | 'pro' | 'family';
+  tier: 'free' | 'plus' | 'family';
   supabaseId?: string;
 }
 
@@ -59,7 +59,7 @@ function generateTestUsers(count: number): TestUser[] {
     email: `concurrent-test-${timestamp}-user${i + 1}@test.rowan.test`,
     password: 'ConcurrentTest$2026!SecurePassword#123',
     name: `Test User ${i + 1}`,
-    tier: (i % 3 === 0 ? 'family' : i % 2 === 0 ? 'pro' : 'free') as 'free' | 'pro' | 'family',
+    tier: (i % 3 === 0 ? 'family' : i % 2 === 0 ? 'plus' : 'free') as 'free' | 'plus' | 'family',
   }));
 }
 
@@ -245,7 +245,7 @@ async function testConcurrentLogin(
 
     // Verify correct tier is displayed
     const expectedTierText = user.tier === 'free' ? 'Free Plan' :
-                            user.tier === 'pro' ? 'Pro Plan' : 'Family Plan';
+                            user.tier === 'plus' ? 'Plus Plan' : 'Family Plan';
 
     const isCorrect = displayedTier?.includes(expectedTierText.split(' ')[0]) || false;
 
