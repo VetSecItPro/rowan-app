@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Stop being your family's memory.</strong><br/>
-  Tasks, calendars, budgets, meals & more — in one app that actually keeps your household in sync.
+  Rowan's AI assistant actually does the work - it plans the week, builds the shopping list, and keeps everyone in sync. Tasks, calendar, meals, and budget included.
 </p>
 
 <p align="center">

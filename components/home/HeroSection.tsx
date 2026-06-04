@@ -71,7 +71,7 @@ export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: 
                 transition={{ duration: dur, delay: prefersReducedMotion ? 0 : 0.2 }}
                 className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-lg mx-auto lg:mx-0 mb-8"
               >
-                Tasks, calendars, budgets, meals, and more in one app that actually keeps your household in sync.
+                Rowan&apos;s AI assistant actually does the work - it plans the week, builds the shopping list, and keeps everyone in sync. It also manages your tasks, calendar, meals, and budget, all in one place.
               </motion.p>
 
               {/* CTA buttons */}
