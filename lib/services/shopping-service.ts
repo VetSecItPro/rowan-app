@@ -264,8 +264,8 @@ export const shoppingService = {
    * @returns The updated shopping item
    * @throws Error if database update fails
    */
-  async updateItem(id: string, updates: Partial<CreateItemInput>): Promise<ShoppingItem> {
-    const supabase = createClient();
+  async updateItem(id: string, updates: Partial<CreateItemInput>, supabaseClient?: SupabaseClient): Promise<ShoppingItem> {
+    const supabase = supabaseClient ?? createClient();
     const { data, error } = await supabase
       .from('shopping_items')
       .update(updates)
@@ -283,8 +283,8 @@ export const shoppingService = {
    * @param checked - The new checked state
    * @returns The updated shopping item
    */
-  async toggleItem(id: string, checked: boolean): Promise<ShoppingItem> {
-    return this.updateItem(id, { checked } as Partial<CreateItemInput>);
+  async toggleItem(id: string, checked: boolean, supabaseClient?: SupabaseClient): Promise<ShoppingItem> {
+    return this.updateItem(id, { checked } as Partial<CreateItemInput>, supabaseClient);
   },
 
   /**
@@ -292,8 +292,8 @@ export const shoppingService = {
    * @param id - The shopping item identifier
    * @throws Error if database delete fails
    */
-  async deleteItem(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteItem(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = supabaseClient ?? createClient();
     const { error } = await supabase
       .from('shopping_items')
       .delete()

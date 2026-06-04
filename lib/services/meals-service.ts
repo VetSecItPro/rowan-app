@@ -226,8 +226,8 @@ export const mealsService = {
    * @returns The newly created recipe
    * @throws Error if database insert fails
    */
-  async createRecipe(input: CreateRecipeInput): Promise<Recipe> {
-    const supabase = createClient();
+  async createRecipe(input: CreateRecipeInput, supabaseClient?: SupabaseClient): Promise<Recipe> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('recipes')
       .insert([input])

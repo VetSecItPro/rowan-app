@@ -5,6 +5,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { checkAndAwardBadges } from '../achievement-service';
 import { enhancedNotificationService } from '../enhanced-notification-service';
 import { logger } from '@/lib/logger';
@@ -23,8 +24,8 @@ export const milestoneService = {
    * @returns The newly created milestone
    * @throws Error if the database insert fails
    */
-  async createMilestone(input: CreateMilestoneInput): Promise<Milestone> {
-    const supabase = createClient();
+  async createMilestone(input: CreateMilestoneInput, supabaseClient?: SupabaseClient): Promise<Milestone> {
+    const supabase = supabaseClient ?? createClient();
     const { data, error } = await supabase
       .from('goal_milestones')
       .insert([{
@@ -45,8 +46,8 @@ export const milestoneService = {
    * @returns The updated milestone
    * @throws Error if the database update fails
    */
-  async updateMilestone(id: string, updates: Partial<CreateMilestoneInput>): Promise<Milestone> {
-    const supabase = createClient();
+  async updateMilestone(id: string, updates: Partial<CreateMilestoneInput>, supabaseClient?: SupabaseClient): Promise<Milestone> {
+    const supabase = supabaseClient ?? createClient();
     const { data, error } = await supabase
       .from('goal_milestones')
       .update(updates)
@@ -67,8 +68,8 @@ export const milestoneService = {
    * @returns The updated milestone
    * @throws Error if the database update fails
    */
-  async toggleMilestone(id: string, completed: boolean): Promise<Milestone> {
-    const supabase = createClient();
+  async toggleMilestone(id: string, completed: boolean, supabaseClient?: SupabaseClient): Promise<Milestone> {
+    const supabase = supabaseClient ?? createClient();
     const finalUpdates: MilestoneUpdatePayload = { completed };
 
     // Check if milestone is being completed
@@ -140,8 +141,8 @@ export const milestoneService = {
    * @param id - The milestone ID to delete
    * @throws Error if the database delete fails
    */
-  async deleteMilestone(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteMilestone(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = supabaseClient ?? createClient();
     const { error } = await supabase
       .from('goal_milestones')
       .delete()

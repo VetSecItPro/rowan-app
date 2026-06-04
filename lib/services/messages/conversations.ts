@@ -1,11 +1,16 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { cacheAside, cacheKeys, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
 import type { Conversation, CreateConversationInput } from './types';
 
 /** Retrieves all conversations for a space (sorted by most recently updated). */
-export async function getConversations(spaceId: string, limit = 50): Promise<Conversation[]> {
-  const supabase = createClient();
+export async function getConversations(
+  spaceId: string,
+  limit = 50,
+  supabaseClient?: SupabaseClient,
+): Promise<Conversation[]> {
+  const supabase = supabaseClient ?? createClient();
   // nosemgrep: supabase-missing-space-id-filter — tenant isolation enforced via RLS or scoped by FK/PK on this query
   const { data, error } = await supabase
     .from('conversations')
