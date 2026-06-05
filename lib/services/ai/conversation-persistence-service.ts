@@ -147,6 +147,9 @@ export async function countTodaysUserMessages(
   todayStart.setUTCHours(0, 0, 0, 0);
 
   const { count, error } = await supabase
+    // nosemgrep: supabase-missing-space-id-filter - the free AI daily cap is
+    // per-USER across all their spaces (3 messages/day total, not 3 per space),
+    // so this intentionally filters by user (via the ai_conversations FK), not space_id.
     .from('ai_messages')
     .select('id, ai_conversations!inner(user_id)', { count: 'exact', head: true })
     .eq('ai_conversations.user_id', userId)
