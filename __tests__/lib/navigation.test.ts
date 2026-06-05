@@ -59,6 +59,26 @@ describe('NAVIGATION_GROUPS', () => {
     expect(growth).toBeDefined();
   });
 
+  // PR14 (15.2): Budget is promoted to a core nav item; Projects is demoted to
+  // a secondary (flag-gated) item. These guard the IA decision against regression.
+  it('exposes Budget as a CORE nav item (visible by default, points at /budget)', () => {
+    const budget = NAVIGATION_ITEMS.find((i) => i.href === '/budget');
+    expect(budget).toBeDefined();
+    expect(budget?.name).toBe('Budget');
+    // Core = not secondary, so it survives the default filter.
+    expect(budget?.secondary).toBeFalsy();
+  });
+
+  it('hides Projects by default (secondary) but keeps the /projects route name', () => {
+    // With NEXT_PUBLIC_SHOW_SECONDARY_NAV unset, Projects is filtered out of nav.
+    const visibleProjects = NAVIGATION_ITEMS.find((i) => i.href === '/projects');
+    expect(visibleProjects).toBeUndefined();
+  });
+
+  it('no longer surfaces the conflated "Projects & Budget" item', () => {
+    expect(NAVIGATION_ITEMS.find((i) => i.name === 'Projects & Budget')).toBeUndefined();
+  });
+
   it('each NavItem has required fields with correct types', () => {
     for (const group of NAVIGATION_GROUPS) {
       for (const item of group.items) {

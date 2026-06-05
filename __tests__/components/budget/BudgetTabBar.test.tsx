@@ -34,9 +34,12 @@ describe('BudgetTabBar', () => {
 
   it('renders all budget tabs', () => {
     render(<BudgetTabBar />);
+    // PR14: Expenses + Receipts added to the hub.
     expect(screen.getByText('Overview')).toBeInTheDocument();
+    expect(screen.getByText('Expenses')).toBeInTheDocument();
     expect(screen.getByText('Bills')).toBeInTheDocument();
     expect(screen.getByText('Recurring')).toBeInTheDocument();
+    expect(screen.getByText('Receipts')).toBeInTheDocument();
     expect(screen.getByText('Goals')).toBeInTheDocument();
     expect(screen.getByText('Vendors')).toBeInTheDocument();
   });
@@ -65,10 +68,10 @@ describe('BudgetTabBar', () => {
     expect(mockPush).toHaveBeenCalledWith('/budget/goals');
   });
 
-  it('renders 5 tab buttons', () => {
+  it('renders 7 tab buttons', () => {
     render(<BudgetTabBar />);
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.length).toBe(5);
+    expect(tabs.length).toBe(7);
   });
 
   it('marks bills tab active when on /budget/bills path', () => {
