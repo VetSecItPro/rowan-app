@@ -24,10 +24,12 @@ vi.mock('@/lib/services/feature-access-service', () => ({
 
 vi.mock('@/lib/services/ai/conversation-persistence-service', () => ({
   checkBudget: vi.fn(),
+  countTodaysUserMessages: vi.fn(),
+  FREE_DAILY_AI_MESSAGES: 3,
 }));
 
 import { canAccessFeature } from '@/lib/services/feature-access-service';
-import { checkBudget } from '@/lib/services/ai/conversation-persistence-service';
+import { checkBudget, countTodaysUserMessages } from '@/lib/services/ai/conversation-persistence-service';
 
 const mockSupabase = {} as Parameters<typeof validateAIAccess>[0];
 
@@ -175,6 +177,59 @@ describe('validateAIAccess', () => {
       expect(result.statusCode).toBe(200);
     });
   });
+
+  // Phase 10.7: free-tier teaser hard cap (3 messages/day) + subscribe nudge.
+  describe('free-tier message cap (10.7)', () => {
+    beforeEach(() => {
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'free' } as never);
+      vi.mocked(checkBudget).mockResolvedValue({
+        allowed: true,
+        remaining: { input_tokens: 100, output_tokens: 100 },
+      } as never);
+    });
+
+    it('blocks a free user who has used all 3 messages, with an upgrade nudge', async () => {
+      vi.mocked(countTodaysUserMessages).mockResolvedValue(3);
+
+      const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
+
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(429);
+      expect(result.upgrade).toBe(true);
+      expect(result.reason).toMatch(/3 free Rowan AI messages/);
+      // The token budget check must NOT run once the message cap blocks.
+      expect(checkBudget).not.toHaveBeenCalled();
+    });
+
+    it('lets a free user with 2 prior messages through to the budget check', async () => {
+      vi.mocked(countTodaysUserMessages).mockResolvedValue(2);
+
+      const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
+
+      expect(result.allowed).toBe(true);
+      expect(result.statusCode).toBe(200);
+      expect(checkBudget).toHaveBeenCalled();
+    });
+
+    it('fails CLOSED (503) for free when the message count errors', async () => {
+      vi.mocked(countTodaysUserMessages).mockRejectedValue(new Error('count failed'));
+
+      const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
+
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(503);
+    });
+
+    it('does NOT message-cap paid tiers (count not even queried)', async () => {
+      vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as never);
+      vi.mocked(countTodaysUserMessages).mockResolvedValue(99);
+
+      const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
+
+      expect(result.allowed).toBe(true);
+      expect(countTodaysUserMessages).not.toHaveBeenCalled();
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -198,6 +253,24 @@ describe('buildAIAccessDeniedResponse', () => {
     expect(body.tier).toBe('free');
     expect(body.upgrade_url).toBe('/settings/subscription');
     expect(body.reset_at).toBeUndefined();
+  });
+
+  it('returns a 429 Response with upgrade_url + upgrade flag for the free teaser nudge (10.7)', async () => {
+    const accessResult: AIAccessResult = {
+      allowed: false,
+      tier: 'free',
+      reason: "You've used your 3 free Rowan AI messages for today. Upgrade to Plus for 50 messages a day (and Family for 100).",
+      statusCode: 429,
+      upgrade: true,
+    };
+
+    const response = buildAIAccessDeniedResponse(accessResult);
+    expect(response.status).toBe(429);
+
+    const body = await response.json();
+    expect(body.upgrade).toBe(true);
+    expect(body.upgrade_url).toBe('/pricing');
+    expect(body.error).toMatch(/3 free Rowan AI messages/);
   });
 
   it('returns a 429 Response with reset_at for rate limit denial', async () => {

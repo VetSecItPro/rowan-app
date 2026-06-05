@@ -47,6 +47,9 @@ export interface ResultEvent {
 export interface ErrorEvent {
   message: string;
   retryable: boolean;
+  /** Set when the error is a subscribe-nudge (free AI teaser used up, Phase
+   *  10.7) - the UI renders an "Upgrade" CTA pointing here. */
+  upgradeUrl?: string;
 }
 
 // Feature types for color-coding and routing
@@ -121,6 +124,8 @@ export interface ChatState {
   isLoading: boolean;
   isStreaming: boolean;
   error: string | null;
+  /** When the current error is a subscribe-nudge (Phase 10.7), the upgrade CTA target. */
+  errorUpgradeUrl: string | null;
   /** Timestamp updated whenever an AI tool action completes (for dashboard auto-refresh). */
   lastToolAction: number;
 }

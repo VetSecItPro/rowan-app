@@ -17,6 +17,7 @@ import {
   getSettings,
   updateSettings,
   recordUsage,
+  countTodaysUserMessages,
   getUsageSummary,
   checkBudget,
 } from '@/lib/services/ai/conversation-persistence-service';
@@ -577,6 +578,37 @@ describe('checkBudget', () => {
     expect(result.allowed).toBe(true);
     expect(result.remaining_input_tokens).toBe(40_000);
     expect(result.remaining_output_tokens).toBe(5_000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// countTodaysUserMessages — free-tier daily cap counter (Phase 10.7)
+// ---------------------------------------------------------------------------
+
+describe('countTodaysUserMessages', () => {
+  it('returns the count of the user\'s messages today', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ count: 2, error: null })),
+    } as unknown as Parameters<typeof countTodaysUserMessages>[0];
+
+    const n = await countTodaysUserMessages(supabase, 'user-1');
+    expect(n).toBe(2);
+  });
+
+  it('returns 0 when count is null', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ count: null, error: null })),
+    } as unknown as Parameters<typeof countTodaysUserMessages>[0];
+
+    expect(await countTodaysUserMessages(supabase, 'user-1')).toBe(0);
+  });
+
+  it('throws on a query error (so the access guard fails CLOSED for free)', async () => {
+    const supabase = {
+      from: vi.fn(() => createChainMock({ count: null, error: { message: 'boom' } })),
+    } as unknown as Parameters<typeof countTodaysUserMessages>[0];
+
+    await expect(countTodaysUserMessages(supabase, 'user-1')).rejects.toBeTruthy();
   });
 });
 

@@ -123,6 +123,46 @@ const MONTHLY_COGS_CAP_USD: Record<string, number> = {
   owner: Infinity,
 };
 
+/**
+ * Phase 10.7: free-tier AI teaser hard cap. A free user gets exactly this many
+ * AI messages per day, counted precisely from `ai_messages` (not approximated by
+ * tokens), then is nudged to subscribe. Paid tiers are NOT message-capped (their
+ * token + monthly-COGS budgets bound cost). Sized as a taste of the value: enough
+ * to feel the differentiator, few enough to convert.
+ */
+export const FREE_DAILY_AI_MESSAGES = 3;
+
+/**
+ * Count the user's own AI messages (role='user') sent today (UTC). Used to
+ * enforce the free-tier daily message cap. Counts PRIOR messages, so a check of
+ * `count >= FREE_DAILY_AI_MESSAGES` before persisting the new message lets exactly
+ * FREE_DAILY_AI_MESSAGES through. ai_messages has no user_id, so we filter through
+ * the ai_conversations FK (inner join) on user_id.
+ */
+export async function countTodaysUserMessages(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<number> {
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
+
+  const { count, error } = await supabase
+    .from('ai_messages')
+    .select('id, ai_conversations!inner(user_id)', { count: 'exact', head: true })
+    .eq('ai_conversations.user_id', userId)
+    .eq('role', 'user')
+    .gte('created_at', todayStart.toISOString());
+
+  if (error) {
+    logger.error('[AI Persistence] Failed to count daily messages', error, {
+      component: 'ai-persistence',
+      action: 'count_todays_messages',
+    });
+    throw error; // caller (access guard) fails CLOSED for free tier on errors
+  }
+  return count ?? 0;
+}
+
 /** Per-space daily token caps (hard limit shared across all users in a space) */
 const SPACE_TOKEN_BUDGETS: AITokenBudget = {
   daily_input_tokens: 800_000,
