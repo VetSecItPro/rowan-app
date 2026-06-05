@@ -24,12 +24,16 @@ vi.mock('@/lib/services/feature-access-service', () => ({
 
 vi.mock('@/lib/services/ai/conversation-persistence-service', () => ({
   checkBudget: vi.fn(),
-  countTodaysUserMessages: vi.fn(),
   FREE_DAILY_AI_MESSAGES: 3,
 }));
 
+vi.mock('@/lib/ratelimit', () => ({
+  checkFreeAIDailyLimit: vi.fn(),
+}));
+
 import { canAccessFeature } from '@/lib/services/feature-access-service';
-import { checkBudget, countTodaysUserMessages } from '@/lib/services/ai/conversation-persistence-service';
+import { checkBudget } from '@/lib/services/ai/conversation-persistence-service';
+import { checkFreeAIDailyLimit } from '@/lib/ratelimit';
 
 const mockSupabase = {} as Parameters<typeof validateAIAccess>[0];
 
@@ -178,18 +182,20 @@ describe('validateAIAccess', () => {
     });
   });
 
-  // Phase 10.7: free-tier teaser hard cap (3 messages/day) + subscribe nudge.
-  describe('free-tier message cap (10.7)', () => {
+  // Phase 10.7: free-tier teaser hard cap (3/day) via the ATOMIC Redis limiter
+  // (race-proof; replaced the TOCTOU-racy SELECT-count per sec-ship 2026-06-05).
+  describe('free-tier message cap (10.7, atomic)', () => {
     beforeEach(() => {
       vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'free' } as never);
       vi.mocked(checkBudget).mockResolvedValue({
         allowed: true,
         remaining: { input_tokens: 100, output_tokens: 100 },
       } as never);
+      vi.mocked(checkFreeAIDailyLimit).mockResolvedValue({ success: true });
     });
 
-    it('blocks a free user who has used all 3 messages, with an upgrade nudge', async () => {
-      vi.mocked(countTodaysUserMessages).mockResolvedValue(3);
+    it('blocks a free user once the atomic daily limiter is exhausted, with an upgrade nudge', async () => {
+      vi.mocked(checkFreeAIDailyLimit).mockResolvedValue({ success: false });
 
       const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
 
@@ -201,8 +207,8 @@ describe('validateAIAccess', () => {
       expect(checkBudget).not.toHaveBeenCalled();
     });
 
-    it('lets a free user with 2 prior messages through to the budget check', async () => {
-      vi.mocked(countTodaysUserMessages).mockResolvedValue(2);
+    it('lets a free user under the cap through to the budget check', async () => {
+      vi.mocked(checkFreeAIDailyLimit).mockResolvedValue({ success: true });
 
       const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
 
@@ -211,23 +217,22 @@ describe('validateAIAccess', () => {
       expect(checkBudget).toHaveBeenCalled();
     });
 
-    it('fails CLOSED (503) for free when the message count errors', async () => {
-      vi.mocked(countTodaysUserMessages).mockRejectedValue(new Error('count failed'));
+    it('does NOT consume free quota on display/metadata reads (checkBudgetToo=false)', async () => {
+      // usage / conversations / suggestions pass checkBudgetToo=false — they must
+      // not burn one of the user's 3 daily messages.
+      const result = await validateAIAccess(mockSupabase, 'user-1', undefined, false);
 
-      const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
-
-      expect(result.allowed).toBe(false);
-      expect(result.statusCode).toBe(503);
+      expect(result.allowed).toBe(true);
+      expect(checkFreeAIDailyLimit).not.toHaveBeenCalled();
     });
 
-    it('does NOT message-cap paid tiers (count not even queried)', async () => {
+    it('does NOT message-cap paid tiers (limiter not even called)', async () => {
       vi.mocked(canAccessFeature).mockResolvedValue({ allowed: true, tier: 'plus' } as never);
-      vi.mocked(countTodaysUserMessages).mockResolvedValue(99);
 
       const result = await validateAIAccess(mockSupabase, 'user-1', 'space-1', true);
 
       expect(result.allowed).toBe(true);
-      expect(countTodaysUserMessages).not.toHaveBeenCalled();
+      expect(checkFreeAIDailyLimit).not.toHaveBeenCalled();
     });
   });
 });
