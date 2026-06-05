@@ -46,7 +46,7 @@ const DESIGN_USER = {
   password: 'DesignAudit2026!',
   name: 'Alex Rivera',
   subscription: {
-    tier: 'pro',
+    tier: 'plus',
     status: 'active',
     period: 'monthly',
     polar_customer_id: 'cus_design_audit_001',

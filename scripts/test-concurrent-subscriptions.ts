@@ -132,7 +132,7 @@ async function runConcurrentTest() {
     const { error: updateError } = await supabaseAdmin
       .from('subscriptions')
       .update({
-        tier: 'pro',
+        tier: 'plus',
         status: 'active',
       })
       .eq('user_id', testUserId);

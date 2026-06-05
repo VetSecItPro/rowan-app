@@ -49,10 +49,13 @@ export const TEST_USERS = {
     tier: 'free' as const,
     storageState: 'tests/e2e/.auth/free.json',
   },
+  // Profile key 'pro' + pro.json storage-state name kept as a stable fixture
+  // identity; the actual subscription tier is 'plus' (pro->plus rename + the
+  // PR #417 contract migration dropped 'pro' from the tier CHECK).
   pro: {
     email: 'test-pro@rowan-test.app',
     password: testPassword,
-    tier: 'pro' as const,
+    tier: 'plus' as const,
     storageState: 'tests/e2e/.auth/pro.json',
   },
 };
