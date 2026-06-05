@@ -19,7 +19,10 @@ import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export default function PricingPage() {
   const router = useRouter();
-  const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly');
+  // Default to annual (11.5): leads with the best per-month value ("2 months
+  // free") and nudges toward the lower-churn annual commitment. Users can still
+  // toggle to monthly.
+  const [period, setPeriod] = useState<'monthly' | 'annual'>('annual');
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [foundingMemberSoldOut, setFoundingMemberSoldOut] = useState(false);
