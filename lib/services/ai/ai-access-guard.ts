@@ -34,7 +34,8 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
-import { checkBudget, countTodaysUserMessages, FREE_DAILY_AI_MESSAGES } from '@/lib/services/ai/conversation-persistence-service';
+import { checkBudget, FREE_DAILY_AI_MESSAGES } from '@/lib/services/ai/conversation-persistence-service';
+import { checkFreeAIDailyLimit } from '@/lib/ratelimit';
 import type { SubscriptionTier } from '@/lib/types';
 
 export interface AIAccessResult {
@@ -98,24 +99,17 @@ export async function validateAIAccess(
 
   const tier = featureAccess.tier ?? 'free';
 
-  // 1.5 Free-tier teaser cap (Phase 10.7): free users get exactly
-  //     FREE_DAILY_AI_MESSAGES AI messages/day, counted precisely, then a
-  //     subscribe nudge. Paid tiers skip this (bounded by token/COGS budgets).
-  //     Fails CLOSED on a count error — free AI is $0-revenue marketing spend
-  //     and must never silently uncap.
-  if (tier === 'free') {
-    let usedToday: number;
-    try {
-      usedToday = await countTodaysUserMessages(supabase, userId);
-    } catch {
-      return {
-        allowed: false,
-        tier,
-        reason: 'AI is briefly unavailable. Please try again in a moment.',
-        statusCode: 503,
-      };
-    }
-    if (usedToday >= FREE_DAILY_AI_MESSAGES) {
+  // 1.5 Free-tier teaser cap (Phase 10.7): free users get FREE_DAILY_AI_MESSAGES
+  //     AI messages/day, then a subscribe nudge. ATOMICALLY reserved via Redis
+  //     (checkFreeAIDailyLimit). The original SELECT-count had a TOCTOU race
+  //     where N concurrent requests each read fewer-than-cap prior messages and
+  //     all passed (found by sec-ship 2026-06-05); Redis INCR can't be raced.
+  //     Gated on `checkBudgetToo` so this only consumes quota on real
+  //     AI-consuming requests (chat/briefing pass true), never on display reads
+  //     (usage/conversations/suggestions pass false). Paid tiers skip it.
+  if (tier === 'free' && checkBudgetToo) {
+    const { success } = await checkFreeAIDailyLimit(userId);
+    if (!success) {
       return {
         allowed: false,
         tier,

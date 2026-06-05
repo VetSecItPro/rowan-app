@@ -90,6 +90,27 @@ export const aiChatRateLimitFamily = redis ? new Ratelimit({
   prefix: 'rowan:ai:chat:family',
 }) : null;
 
+// Free-tier teaser daily cap (Phase 10.7). MUST stay an ATOMIC limiter rather
+// than a SELECT-count: the count-then-act version had a TOCTOU race where N
+// concurrent requests each read <3 prior messages and all passed (sec-ship
+// 2026-06-05). Redis INCR can't be raced. Keep `3` in sync with
+// FREE_DAILY_AI_MESSAGES (conversation-persistence-service.ts).
+export const aiChatRateLimitFree = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(3, '1 d'),
+  analytics: true,
+  prefix: 'rowan:ai:chat:free-daily',
+}) : null;
+
+/**
+ * Atomically reserve one of a free user's 3 daily AI messages. Returns
+ * { success:false } once the cap is hit. Consumed only on actual AI-consuming
+ * requests (chat/briefing), never on display/metadata reads.
+ */
+export async function checkFreeAIDailyLimit(userId: string): Promise<{ success: boolean }> {
+  return checkRateLimit(userId, aiChatRateLimitFree, 3, 24 * 60 * 60 * 1000);
+}
+
 // AI briefing: 1 per hour per user (across all tiers)
 export const aiBriefingRateLimit = redis ? new Ratelimit({
   redis,
