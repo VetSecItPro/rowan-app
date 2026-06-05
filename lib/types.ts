@@ -181,17 +181,6 @@ export interface Space {
   auto_created?: boolean;
 }
 
-export interface WorkspaceMigration {
-  id: string;
-  user_id: string;
-  from_space_id: string;
-  to_space_id: string;
-  item_type: string;
-  item_id: string;
-  migrated_at: string;
-  created_at: string;
-}
-
 export interface SpaceMember {
   space_id: string;
   user_id: string;
