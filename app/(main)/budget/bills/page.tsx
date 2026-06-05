@@ -127,7 +127,7 @@ export default function BillsManagementPage() {
     <FeatureLayout
       breadcrumbItems={[
         { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Budget', href: '/projects?tab=budgets' },
+        { label: 'Budget', href: '/budget' },
         { label: 'Bills' },
       ]}
     >

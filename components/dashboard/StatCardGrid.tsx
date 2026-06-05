@@ -8,7 +8,7 @@ import {
   MessageCircle,
   ShoppingCart,
   UtensilsCrossed,
-  Home,
+  Wallet,
   Target,
 } from 'lucide-react';
 import { formatTimestamp } from '@/lib/utils/date-utils';
@@ -207,26 +207,26 @@ function buildCardConfigs(stats: EnhancedDashboardStats): StatCardConfig[] {
         : undefined,
     },
 
-    // ── Projects & Budget (custom content) ──
+    // ── Budget (custom content) — PR14: Budget is the core household-finance
+    // card and links to the consolidated /budget hub. The former mixed
+    // "Projects & Budget" card led with a project count; this leads with the
+    // money figure families actually check. (Projects is now secondary; its
+    // own dashboard surfacing is a separate follow-up.)
     {
-      href: '/projects',
-      title: 'Projects & Budget',
+      href: '/budget',
+      title: 'Budget',
       linkClass: 'hover:border-yellow-500 hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)]',
       titleClass: 'text-amber-400',
       footerClass: 'text-amber-400',
-      icon: Home,
+      icon: Wallet,
       iconGradient: 'from-amber-500 to-amber-600',
-      mainValue: stats.projects.inProgress,
-      mainLabel: 'active',
-      trend: stats.projects.trend,
-      trendLabel: 'this week',
+      mainValue: `$${stats.household.spent.toLocaleString()}`,
+      mainLabel: 'spent this month',
+      trend: 0, // no trend indicator on the budget card (gated by trend !== 0)
+      trendLabel: '',
       details: [
-        { left: `${stats.projects.inProgress} in progress`, right: `${stats.projects.completed} completed` },
+        { left: `$${stats.household.monthlyBudget.toLocaleString()} budget`, right: `$${Math.max(0, stats.household.monthlyBudget - stats.household.spent).toLocaleString()} left` },
       ],
-      extraText:
-        stats.projects.planning > 0 || stats.projects.onHold > 0
-          ? `${stats.projects.planning} planning • ${stats.projects.onHold} on hold`
-          : undefined,
       customContent: (
         <div className="p-3 bg-amber-900/20 rounded-lg mb-3">
           <p className="text-xs text-amber-300 font-medium mb-1">Monthly Budget:</p>

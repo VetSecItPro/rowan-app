@@ -188,7 +188,7 @@ export default function BudgetAnalyticsPage() {
               Start using Budget to see analytics here
             </p>
             <Link
-              href="/projects?tab=budgets"
+              href="/budget"
               className="inline-flex items-center px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
             >
               Go to Budget

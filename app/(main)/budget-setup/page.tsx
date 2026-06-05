@@ -91,7 +91,7 @@ export default function BudgetSetupPage() {
 
       // Redirect to projects page after short delay
       setTimeout(() => {
-        router.push('/projects?tab=budgets');
+        router.push('/budget');
       }, 2000);
     } catch (err) {
       logger.error('Failed to apply template:', err, { component: 'page', action: 'execution' });

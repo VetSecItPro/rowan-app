@@ -1,4 +1,3 @@
-import { serverAuth } from '@/lib/supabase/server-auth';
 import BudgetOverviewClient from '@/components/budget/BudgetOverviewClient';
 
 export const metadata = {
@@ -6,7 +5,8 @@ export const metadata = {
   description: 'Track your household spending and manage budgets',
 };
 
-export default async function BudgetOverviewPage() {
-  const { spaceId } = await serverAuth();
-  return <BudgetOverviewClient spaceId={spaceId} />;
+// BudgetOverviewClient self-authenticates via useBudgetData (PR14), so this
+// server page just sets metadata and renders it - no serverAuth prop threading.
+export default function BudgetOverviewPage() {
+  return <BudgetOverviewClient />;
 }

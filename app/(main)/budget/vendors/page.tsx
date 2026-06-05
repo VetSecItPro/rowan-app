@@ -197,7 +197,7 @@ export default function VendorManagementPage() {
     <FeatureLayout
       breadcrumbItems={[
         { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Budget', href: '/projects?tab=budgets' },
+        { label: 'Budget', href: '/budget' },
         { label: 'Vendors' },
       ]}
     >
