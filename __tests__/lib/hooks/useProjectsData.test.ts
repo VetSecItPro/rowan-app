@@ -1,7 +1,7 @@
 /**
- * Unit tests for lib/hooks/useProjectsData.ts
- *
- * Tests initial state, tab management, and search/filter state.
+ * Unit tests for lib/hooks/useProjectsData.ts (PR14: projects-only).
+ * Budget/expense data moved to useBudgetData; this hook now manages
+ * home-renovation projects + search/filter.
  */
 
 // @vitest-environment jsdom
@@ -10,14 +10,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useProjectsData } from '@/lib/hooks/useProjectsData';
 
-const mockSearchParams = { get: vi.fn().mockReturnValue(null) };
-const mockRouterPush = vi.fn();
-
-vi.mock('next/navigation', () => ({
-  useSearchParams: () => mockSearchParams,
-  useRouter: () => ({ push: mockRouterPush, replace: vi.fn() }),
-}));
-
 vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
   useAuthWithSpaces: vi.fn(() => ({
     currentSpace: { id: 'space-1', name: 'Test Space' },
@@ -25,107 +17,66 @@ vi.mock('@/lib/hooks/useAuthWithSpaces', () => ({
   })),
 }));
 
+const getProjects = vi.fn().mockResolvedValue([]);
 vi.mock('@/lib/services/projects-service', () => ({
-  projectsOnlyService: {
-    getProjects: vi.fn().mockResolvedValue([]),
-  },
-}));
-
-vi.mock('@/lib/services/budgets-service', () => ({
-  projectsService: {
-    getExpenses: vi.fn().mockResolvedValue([]),
-    getBudget: vi.fn().mockResolvedValue(0),
-    getBudgetStats: vi.fn().mockResolvedValue({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 }),
-  },
-  Expense: {},
-}));
-
-vi.mock('@/lib/services/bills-service', () => ({
-  billsService: {
-    getBills: vi.fn().mockResolvedValue([]),
-  },
-  Bill: {},
-}));
-
-vi.mock('@/lib/services/budget-templates-service', () => ({
-  budgetTemplatesService: {
-    getTemplates: vi.fn().mockResolvedValue([]),
-    getTemplateCategories: vi.fn().mockResolvedValue({}),
-  },
+  projectsOnlyService: { getProjects: (...args: unknown[]) => getProjects(...args) },
 }));
 
 vi.mock('@/lib/supabase/client', () => ({
   createClient: vi.fn(() => ({
-    channel: vi.fn(() => ({
-      on: vi.fn().mockReturnThis(),
-      subscribe: vi.fn().mockReturnThis(),
-      unsubscribe: vi.fn(),
-    })),
+    channel: vi.fn(() => ({ on: vi.fn().mockReturnThis(), subscribe: vi.fn().mockReturnThis(), unsubscribe: vi.fn() })),
     removeChannel: vi.fn(),
   })),
 }));
 
-vi.mock('@/lib/logger', () => ({
-  logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
-}));
+vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 
-describe('useProjectsData', () => {
+describe('useProjectsData (projects-only)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSearchParams.get.mockReturnValue(null);
+    getProjects.mockResolvedValue([]);
   });
 
-  it('should return initial state with empty data', async () => {
+  it('returns initial state with empty projects', async () => {
     const { result } = renderHook(() => useProjectsData());
-
     await waitFor(() => expect(result.current.loading).toBe(false));
-
     expect(result.current.projects).toEqual([]);
-    expect(result.current.expenses).toEqual([]);
-    expect(result.current.bills).toEqual([]);
-  });
-
-  it('should default to projects tab', () => {
-    const { result } = renderHook(() => useProjectsData());
-
-    expect(result.current.activeTab).toBe('projects');
-  });
-
-  it('handleTabChange should update active tab', async () => {
-    const { result } = renderHook(() => useProjectsData());
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    act(() => result.current.handleTabChange('budgets'));
-
-    expect(result.current.activeTab).toBe('budgets');
-  });
-
-  it('should use tab from URL search params', () => {
-    mockSearchParams.get.mockReturnValue('bills');
-
-    const { result } = renderHook(() => useProjectsData());
-
-    expect(result.current.activeTab).toBe('bills');
-  });
-
-  it('should expose setSearchQuery and update search state', async () => {
-    const { result } = renderHook(() => useProjectsData());
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    act(() => result.current.setSearchQuery('office'));
-
-    expect(result.current.searchQuery).toBe('office');
-  });
-
-  it('should expose filteredProjects, filteredExpenses, filteredBills', async () => {
-    const { result } = renderHook(() => useProjectsData());
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
     expect(Array.isArray(result.current.filteredProjects)).toBe(true);
-    expect(Array.isArray(result.current.filteredExpenses)).toBe(true);
-    expect(Array.isArray(result.current.filteredBills)).toBe(true);
+  });
+
+  it('defaults the project filter to "all"', () => {
+    const { result } = renderHook(() => useProjectsData());
+    expect(result.current.projectFilter).toBe('all');
+  });
+
+  it('updates search state via setSearchQuery', async () => {
+    const { result } = renderHook(() => useProjectsData());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    act(() => result.current.setSearchQuery('kitchen'));
+    expect(result.current.searchQuery).toBe('kitchen');
+  });
+
+  it('filters projects by search query (title match)', async () => {
+    getProjects.mockResolvedValue([
+      { id: '1', name: 'Kitchen remodel', status: 'in_progress' },
+      { id: '2', name: 'Garage cleanup', status: 'completed' },
+    ]);
+    const { result } = renderHook(() => useProjectsData());
+    await waitFor(() => expect(result.current.projects.length).toBe(2));
+    act(() => result.current.setSearchQuery('kitchen'));
+    expect(result.current.filteredProjects.map((p) => p.id)).toEqual(['1']);
+  });
+
+  it('filters by status (active excludes completed)', async () => {
+    getProjects.mockResolvedValue([
+      { id: '1', name: 'A', status: 'in_progress' },
+      { id: '2', name: 'B', status: 'completed' },
+    ]);
+    const { result } = renderHook(() => useProjectsData());
+    await waitFor(() => expect(result.current.projects.length).toBe(2));
+    act(() => result.current.setProjectFilter('active'));
+    expect(result.current.filteredProjects.map((p) => p.id)).toEqual(['1']);
+    act(() => result.current.setProjectFilter('completed'));
+    expect(result.current.filteredProjects.map((p) => p.id)).toEqual(['2']);
   });
 });

@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   Receipt,
+  FileText,
   RefreshCw,
+  ScanLine,
   Target,
   Users,
 } from 'lucide-react';
@@ -18,10 +20,16 @@ const budgetTabs = [
     icon: LayoutDashboard,
   },
   {
+    id: 'expenses',
+    label: 'Expenses',
+    href: '/budget/expenses',
+    icon: Receipt,
+  },
+  {
     id: 'bills',
     label: 'Bills',
     href: '/budget/bills',
-    icon: Receipt,
+    icon: FileText,
   },
   {
     id: 'recurring',
@@ -30,16 +38,22 @@ const budgetTabs = [
     icon: RefreshCw,
   },
   {
-    id: 'goals',
-    label: 'Goals',
-    href: '/budget/goals',
-    icon: Target,
+    id: 'receipts',
+    label: 'Receipts',
+    href: '/budget/receipts',
+    icon: ScanLine,
   },
   {
     id: 'vendors',
     label: 'Vendors',
     href: '/budget/vendors',
     icon: Users,
+  },
+  {
+    id: 'goals',
+    label: 'Goals',
+    href: '/budget/goals',
+    icon: Target,
   },
 ] as const;
 
@@ -52,8 +66,10 @@ export function BudgetTabBar() {
   const activeTab = (() => {
     if (!pathname) return 'overview';
     if (pathname === '/budget') return 'overview';
+    if (pathname.startsWith('/budget/expenses')) return 'expenses';
     if (pathname.startsWith('/budget/bills')) return 'bills';
     if (pathname.startsWith('/budget/recurring')) return 'recurring';
+    if (pathname.startsWith('/budget/receipts')) return 'receipts';
     if (pathname.startsWith('/budget/goals')) return 'goals';
     if (pathname.startsWith('/budget/vendors')) return 'vendors';
     if (pathname.startsWith('/budget/projects')) return 'overview';

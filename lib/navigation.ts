@@ -6,9 +6,10 @@ import {
   ShoppingCart,
   UtensilsCrossed,
   Home,
+  Wallet,
   Target,
   Heart,
-  Sparkles,
+  Wand2,
   Gift,
   type LucideIcon,
 } from 'lucide-react';
@@ -58,7 +59,11 @@ const ALL_NAVIGATION_GROUPS: NavGroup[] = [
     items: [
       { name: 'Meal Planning', href: '/meals', icon: UtensilsCrossed, gradient: 'bg-gradient-meals', description: 'Plan meals' },
       { name: 'Shopping Lists', href: '/shopping', icon: ShoppingCart, gradient: 'bg-gradient-shopping', description: 'Shop together' },
-      { name: 'Projects & Budget', href: '/projects', icon: Home, gradient: 'bg-gradient-projects', description: 'Track & manage' },
+      // Phase 15.2 (PR14): Budget is a CORE household domain - its own prominent
+      // nav item pointing at the consolidated /budget hub. Projects (home-reno/
+      // vendors) is SECONDARY and flag-gated, same as Year in Review.
+      { name: 'Budget', href: '/budget', icon: Wallet, gradient: 'bg-gradient-projects', description: 'Money & spending' },
+      { name: 'Projects', href: '/projects', icon: Home, gradient: 'bg-gradient-projects', description: 'Home projects', secondary: true },
     ],
   },
   {
@@ -66,7 +71,7 @@ const ALL_NAVIGATION_GROUPS: NavGroup[] = [
     items: [
       { name: 'Goals & Milestones', href: '/goals', icon: Target, gradient: 'bg-gradient-goals', description: 'Track progress' },
       { name: 'Rewards Shop', href: '/rewards', icon: Gift, gradient: 'bg-gradient-to-r from-amber-500 to-orange-500', description: 'Redeem points' },
-      { name: 'Year in Review', href: '/year-in-review', icon: Sparkles, gradient: 'bg-gradient-to-r from-yellow-500 to-amber-500', description: 'Annual insights', secondary: true },
+      { name: 'Year in Review', href: '/year-in-review', icon: Wand2, gradient: 'bg-gradient-to-r from-yellow-500 to-amber-500', description: 'Annual insights', secondary: true },
     ],
   },
 ];

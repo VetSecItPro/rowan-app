@@ -26,7 +26,7 @@ interface TestUser {
   email: string;
   password: string;
   name: string;
-  tier: 'free' | 'pro' | 'family';
+  tier: 'free' | 'plus' | 'family';
 }
 
 const TEST_USERS: TestUser[] = [
@@ -37,10 +37,13 @@ const TEST_USERS: TestUser[] = [
     tier: 'free',
   },
   {
+    // Email kept as test-pro@ (a stable identifier referenced by specs); the
+    // TIER is 'plus' since the pro->plus rename + contract migration (PR #417)
+    // dropped 'pro' from subscriptions_tier_check.
     email: 'test-pro@rowan-test.app',
     password: process.env.E2E_TEST_PASSWORD || '',
-    name: 'Pro Test User',
-    tier: 'pro',
+    name: 'Plus Test User',
+    tier: 'plus',
   },
 ];
 
@@ -273,7 +276,7 @@ async function seedTestUsers() {
       // smoke test fails on the admin segment. Test-free is intentionally
       // NOT given admin access — admin verification on a non-admin user
       // is itself a security path worth testing in future.
-      if (testUser.tier === 'pro') {
+      if (testUser.tier === 'plus') {
         const { error: adminUpsertError } = await supabase
           .from('admin_users')
           .upsert(

@@ -1,72 +1,34 @@
 /**
- * Unit tests for lib/hooks/useProjectsHandlers.ts
- *
- * Tests CRUD handler function existence and basic delete confirmation flow.
+ * Unit tests for lib/hooks/useProjectsHandlers.ts (PR14: project-only).
+ * Expense/bill/budget handlers moved to useBudgetData; this covers project
+ * create/update + the delete-confirm flow.
  */
 
 // @vitest-environment jsdom
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useProjectsHandlers } from '@/lib/hooks/useProjectsHandlers';
-import type { UseProjectsHandlersDeps } from '@/lib/hooks/useProjectsHandlers';
+import { useProjectsHandlers, type UseProjectsHandlersDeps } from '@/lib/hooks/useProjectsHandlers';
+import type { Project } from '@/lib/services/project-tracking-service';
+
+const createProject = vi.fn().mockResolvedValue({ id: 'proj-1', name: 'New Project' });
+const updateProject = vi.fn().mockResolvedValue({ id: 'proj-1', name: 'Updated' });
+const deleteProject = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('@/lib/services/projects-service', () => ({
   projectsOnlyService: {
-    createProject: vi.fn().mockResolvedValue({ id: 'proj-1', title: 'New Project' }),
-    updateProject: vi.fn().mockResolvedValue({ id: 'proj-1', title: 'Updated' }),
-    deleteProject: vi.fn().mockResolvedValue(undefined),
+    createProject: (...a: unknown[]) => createProject(...a),
+    updateProject: (...a: unknown[]) => updateProject(...a),
+    deleteProject: (...a: unknown[]) => deleteProject(...a),
   },
 }));
 
-vi.mock('@/lib/services/budgets-service', () => ({
-  projectsService: {
-    createExpense: vi.fn().mockResolvedValue({ id: 'exp-1' }),
-    updateExpense: vi.fn().mockResolvedValue(undefined),
-    deleteExpense: vi.fn().mockResolvedValue(undefined),
-    setBudget: vi.fn().mockResolvedValue(undefined),
-  },
-  Expense: {},
-  CreateExpenseInput: {},
-}));
-
-vi.mock('@/lib/services/budget-alerts-service', () => ({
-  budgetAlertsService: {
-    checkBudgetAlerts: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-vi.mock('@/lib/services/bills-service', () => ({
-  billsService: {
-    createBill: vi.fn().mockResolvedValue({ id: 'bill-1' }),
-    updateBill: vi.fn().mockResolvedValue(undefined),
-    deleteBill: vi.fn().mockResolvedValue(undefined),
-    markPaid: vi.fn().mockResolvedValue(undefined),
-  },
-  Bill: {},
-  CreateBillInput: {},
-}));
-
-vi.mock('@/lib/services/budget-templates-service', () => ({
-  budgetTemplatesService: {
-    applyTemplate: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-vi.mock('@/lib/logger', () => ({
-  logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
-}));
+vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 
 function buildDeps(overrides: Partial<UseProjectsHandlersDeps> = {}): UseProjectsHandlersDeps {
   return {
-    user: { id: 'user-1' },
-    currentSpace: { id: 'space-1' },
     editingProject: null,
     setEditingProject: vi.fn(),
-    editingExpense: null,
-    setEditingExpense: vi.fn(),
-    editingBill: null,
-    setEditingBill: vi.fn(),
     confirmDialog: { isOpen: false, action: 'delete-project', id: '' },
     setConfirmDialog: vi.fn(),
     loadData: vi.fn().mockResolvedValue(undefined),
@@ -74,32 +36,54 @@ function buildDeps(overrides: Partial<UseProjectsHandlersDeps> = {}): UseProject
   };
 }
 
-describe('useProjectsHandlers', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+describe('useProjectsHandlers (project-only)', () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it('should return all expected handler functions', () => {
+  it('exposes only the project handlers', () => {
     const { result } = renderHook(() => useProjectsHandlers(buildDeps()));
-
     expect(typeof result.current.handleCreateProject).toBe('function');
     expect(typeof result.current.handleDeleteProject).toBe('function');
-    expect(typeof result.current.handleCreateExpense).toBe('function');
-    expect(typeof result.current.handleDeleteExpense).toBe('function');
     expect(typeof result.current.handleConfirmDelete).toBe('function');
-    expect(typeof result.current.handleStatusChange).toBe('function');
-    expect(typeof result.current.handleSetBudget).toBe('function');
-    expect(typeof result.current.handleCreateBill).toBe('function');
-    expect(typeof result.current.handleDeleteBill).toBe('function');
-    expect(typeof result.current.handleMarkBillPaid).toBe('function');
-    expect(typeof result.current.handleApplyTemplate).toBe('function');
   });
 
-  it('handleConfirmDelete should not throw when confirmDialog is closed', async () => {
-    const { result } = renderHook(() => useProjectsHandlers(buildDeps()));
+  it('handleCreateProject creates when not editing', async () => {
+    const deps = buildDeps();
+    const { result } = renderHook(() => useProjectsHandlers(deps));
+    await act(async () => {
+      await result.current.handleCreateProject({ space_id: 's1', name: 'Deck' } as never);
+    });
+    expect(createProject).toHaveBeenCalled();
+    expect(updateProject).not.toHaveBeenCalled();
+    expect(deps.loadData).toHaveBeenCalled();
+  });
 
-    await expect(
-      act(async () => result.current.handleConfirmDelete())
-    ).resolves.not.toThrow();
+  it('handleCreateProject updates when editing', async () => {
+    const deps = buildDeps({ editingProject: { id: 'proj-9' } as Project });
+    const { result } = renderHook(() => useProjectsHandlers(deps));
+    await act(async () => {
+      await result.current.handleCreateProject({ space_id: 's1', name: 'Deck v2' } as never);
+    });
+    expect(updateProject).toHaveBeenCalledWith('proj-9', expect.anything());
+    expect(createProject).not.toHaveBeenCalled();
+  });
+
+  it('handleDeleteProject opens the confirm dialog (does not delete yet)', async () => {
+    const deps = buildDeps();
+    const { result } = renderHook(() => useProjectsHandlers(deps));
+    await act(async () => {
+      await result.current.handleDeleteProject('proj-1');
+    });
+    expect(deps.setConfirmDialog).toHaveBeenCalledWith({ isOpen: true, action: 'delete-project', id: 'proj-1' });
+    expect(deleteProject).not.toHaveBeenCalled();
+  });
+
+  it('handleConfirmDelete deletes the confirmed project', async () => {
+    const deps = buildDeps({ confirmDialog: { isOpen: true, action: 'delete-project', id: 'proj-7' } });
+    const { result } = renderHook(() => useProjectsHandlers(deps));
+    await act(async () => {
+      await result.current.handleConfirmDelete();
+    });
+    expect(deleteProject).toHaveBeenCalledWith('proj-7');
+    expect(deps.loadData).toHaveBeenCalled();
   });
 });

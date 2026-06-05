@@ -71,9 +71,11 @@ describe('StatCardGrid', () => {
     expect(screen.getByText('Meals')).toBeTruthy();
   });
 
-  it('shows Projects & Budget and Goals cards', () => {
+  it('shows Budget and Goals cards', () => {
+    // PR14: the former conflated "Projects & Budget" card is now a core "Budget"
+    // card linking to the /budget hub.
     render(<StatCardGrid stats={mockStats} loading={false} />);
-    expect(screen.getByText('Projects & Budget')).toBeTruthy();
+    expect(screen.getByText('Budget')).toBeTruthy();
     expect(screen.getByText('Goals')).toBeTruthy();
   });
 

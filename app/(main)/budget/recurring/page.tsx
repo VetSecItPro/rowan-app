@@ -140,7 +140,7 @@ export default function RecurringExpensesPage() {
     <FeatureLayout
       breadcrumbItems={[
         { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Budget', href: '/projects?tab=budgets' },
+        { label: 'Budget', href: '/budget' },
         { label: 'Recurring Expenses' },
       ]}
     >
