@@ -111,6 +111,7 @@ function createInitialState(conversationId: string): ChatState {
     isLoading: false,
     isStreaming: false,
     error: null,
+    errorUpgradeUrl: null,
     lastToolAction: 0,
   };
 }
@@ -183,6 +184,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return {
         ...state,
         error: action.event.message,
+        errorUpgradeUrl: action.event.upgradeUrl ?? null,
         isLoading: false,
         isStreaming: false,
       };
@@ -208,7 +210,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     }
 
     case 'CLEAR_ERROR':
-      return { ...state, error: null };
+      return { ...state, error: null, errorUpgradeUrl: null };
 
     case 'CLEAR_CHAT':
       return createInitialState(action.conversationId);
@@ -375,6 +377,10 @@ export function useChat(spaceId: string) {
           // Surface specific error types for 403 (tier) and 429 (budget)
           let errorMessage = errorData?.error ?? 'Failed to send message';
           let retryable = response.status >= 500;
+          // Phase 10.7: a free-teaser-used-up nudge arrives as a 429 with
+          // `upgrade: true` + `upgrade_url`. Keep the server's nudge copy verbatim
+          // and surface the upgrade CTA.
+          let upgradeUrl: string | undefined = errorData?.upgrade ? errorData?.upgrade_url : undefined;
 
           if (response.status === 403) {
             errorMessage = errorData?.upgrade_url
@@ -382,16 +388,23 @@ export function useChat(spaceId: string) {
               : errorMessage;
             retryable = false;
           } else if (response.status === 429) {
-            const resetAt = errorData?.reset_at;
-            errorMessage = resetAt
-              ? `Daily AI limit reached. Resets at ${new Date(resetAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}.`
-              : errorData?.error ?? 'Daily AI limit reached. Please try again tomorrow.';
+            if (upgradeUrl) {
+              // Free teaser used up - use the server's nudge message as-is.
+              errorMessage = errorData?.error ?? 'You\'ve used your free AI messages for today.';
+            } else {
+              const resetAt = errorData?.reset_at;
+              errorMessage = resetAt
+                ? `Daily AI limit reached. Resets at ${new Date(resetAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}.`
+                : errorData?.error ?? 'Daily AI limit reached. Please try again tomorrow.';
+            }
             retryable = false;
+          } else {
+            upgradeUrl = undefined; // only nudge on 429
           }
 
           dispatch({
             type: 'ERROR',
-            event: { message: errorMessage, retryable },
+            event: { message: errorMessage, retryable, upgradeUrl },
           });
           dispatch({ type: 'DONE' });
           return;
@@ -442,6 +455,7 @@ export function useChat(spaceId: string) {
     isLoading: state.isLoading,
     isStreaming: state.isStreaming,
     error: state.error,
+    errorUpgradeUrl: state.errorUpgradeUrl,
     lastToolAction: state.lastToolAction,
 
     // Actions

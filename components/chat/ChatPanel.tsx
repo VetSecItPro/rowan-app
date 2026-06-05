@@ -51,6 +51,7 @@ export default function ChatPanel({
     isLoading,
     isStreaming,
     error,
+    errorUpgradeUrl,
     sendMessage,
     clearChat,
     stopStreaming,
@@ -193,8 +194,10 @@ export default function ChatPanel({
         {error && (
           <ErrorBanner
             message={error}
+            upgradeUrl={errorUpgradeUrl ?? undefined}
             onDismiss={clearError}
-            onRetry={hasLastUserMessage ? handleRetry : undefined}
+            // No Retry on the teaser-cap nudge - retrying just re-hits the cap.
+            onRetry={!errorUpgradeUrl && hasLastUserMessage ? handleRetry : undefined}
           />
         )}
       </AnimatePresence>

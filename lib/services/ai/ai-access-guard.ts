@@ -34,7 +34,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
-import { checkBudget } from '@/lib/services/ai/conversation-persistence-service';
+import { checkBudget, countTodaysUserMessages, FREE_DAILY_AI_MESSAGES } from '@/lib/services/ai/conversation-persistence-service';
 import type { SubscriptionTier } from '@/lib/types';
 
 export interface AIAccessResult {
@@ -47,6 +47,9 @@ export interface AIAccessResult {
     output_tokens: number;
   };
   resetAt?: string;
+  /** When true, the denial is a subscribe-nudge (free teaser used up) — the
+   *  client shows an upgrade CTA rather than a plain "limit reached" message. */
+  upgrade?: boolean;
 }
 
 /**
@@ -94,6 +97,34 @@ export async function validateAIAccess(
   }
 
   const tier = featureAccess.tier ?? 'free';
+
+  // 1.5 Free-tier teaser cap (Phase 10.7): free users get exactly
+  //     FREE_DAILY_AI_MESSAGES AI messages/day, counted precisely, then a
+  //     subscribe nudge. Paid tiers skip this (bounded by token/COGS budgets).
+  //     Fails CLOSED on a count error — free AI is $0-revenue marketing spend
+  //     and must never silently uncap.
+  if (tier === 'free') {
+    let usedToday: number;
+    try {
+      usedToday = await countTodaysUserMessages(supabase, userId);
+    } catch {
+      return {
+        allowed: false,
+        tier,
+        reason: 'AI is briefly unavailable. Please try again in a moment.',
+        statusCode: 503,
+      };
+    }
+    if (usedToday >= FREE_DAILY_AI_MESSAGES) {
+      return {
+        allowed: false,
+        tier,
+        reason: `You've used your ${FREE_DAILY_AI_MESSAGES} free Rowan AI messages for today. Upgrade to Plus for 50 messages a day (and Family for 100).`,
+        statusCode: 429,
+        upgrade: true,
+      };
+    }
+  }
 
   // 2. Check token budget. Keyed on userId (NOT gated on spaceId): the per-user
   //    daily + monthly COGS caps must always run, especially now that free users
@@ -171,6 +202,13 @@ export function buildAIAccessDeniedResponse(result: AIAccessResult): Response {
 
   if (result.statusCode === 403) {
     body.upgrade_url = '/settings/subscription';
+  }
+
+  // Free teaser used up (Phase 10.7): a 429 with an upgrade nudge. Point at the
+  // pricing page (where a free user chooses a plan), not subscription settings.
+  if (result.upgrade) {
+    body.upgrade_url = '/pricing';
+    body.upgrade = true;
   }
 
   return new Response(JSON.stringify(body), {

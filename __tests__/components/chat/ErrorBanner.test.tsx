@@ -74,4 +74,23 @@ describe('ErrorBanner', () => {
     render(<ErrorBanner message={longMessage} onDismiss={onDismiss} />);
     expect(screen.getByText(longMessage)).toBeInTheDocument();
   });
+
+  // Phase 10.7: the free-AI-teaser cap nudge variant.
+  it('renders an Upgrade CTA linking to the upgrade target when upgradeUrl is set', () => {
+    render(
+      <ErrorBanner
+        message="You've used your 3 free Rowan AI messages for today."
+        onDismiss={onDismiss}
+        upgradeUrl="/pricing"
+      />
+    );
+    const cta = screen.getByText('Upgrade');
+    expect(cta).toBeInTheDocument();
+    expect(cta.closest('a')).toHaveAttribute('href', '/pricing');
+  });
+
+  it('does not render an Upgrade CTA on a normal error', () => {
+    render(<ErrorBanner message="Network timeout" onDismiss={onDismiss} />);
+    expect(screen.queryByText('Upgrade')).not.toBeInTheDocument();
+  });
 });
