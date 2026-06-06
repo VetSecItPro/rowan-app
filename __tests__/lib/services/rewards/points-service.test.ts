@@ -136,6 +136,39 @@ describe('pointsService.getOrCreatePointsRecord', () => {
 
     await expect(pointsService.getOrCreatePointsRecord('u1', 's1')).rejects.toThrow('Failed to create points record');
   });
+
+  it('is race-safe: upserts (not inserts) then re-fetches, so a concurrent create never 409s', async () => {
+    // Regression for the load-time `reward_points` 409: dashboard + tasks both
+    // call getUserStats on mount, racing the get-or-create. The record returned
+    // by the refetch may be the one a CONCURRENT caller created — we must return
+    // it, not throw, and never overwrite its points.
+    const concurrentRecord = {
+      id: 'rp-race', user_id: 'u1', space_id: 's1', points: 250,
+      level: 4, current_streak: 5, longest_streak: 9,
+      last_activity_at: null, created_at: '', updated_at: '',
+    };
+    let callIndex = 0;
+    const upsertSpy = vi.fn().mockReturnThis();
+    mockFrom.mockImplementation(() => {
+      callIndex++;
+      if (callIndex === 1) return createChainMock({ data: null, error: null }); // initial select: empty
+      if (callIndex === 2) {
+        // upsert path: assert ignoreDuplicates is used, return no error
+        const chain = createChainMock({ data: null, error: null });
+        chain.upsert = upsertSpy;
+        return chain;
+      }
+      return createChainMock({ data: concurrentRecord, error: null }); // refetch wins the race row
+    });
+
+    const result = await pointsService.getOrCreatePointsRecord('u1', 's1');
+    expect(upsertSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'u1', space_id: 's1' }),
+      expect.objectContaining({ onConflict: 'user_id,space_id', ignoreDuplicates: true })
+    );
+    // returns the concurrently-created row unchanged (points NOT reset to 0)
+    expect(result.points).toBe(250);
+  });
 });
 
 // ---------------------------------------------------------------------------

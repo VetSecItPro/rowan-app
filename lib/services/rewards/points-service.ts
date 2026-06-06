@@ -48,22 +48,42 @@ export const pointsService = {
       logger.warn('Error fetching points record: ' + fetchError.message, { component: 'points-service', action: 'service_call' });
     }
 
-    // Create new record if not exists
-    const { data: created, error: createError } = await supabase
+    // Create new record if not exists. Use an idempotent upsert (ON CONFLICT
+    // DO NOTHING on the user_id+space_id unique key) instead of a plain insert:
+    // this getOrCreate runs from multiple components on page load (dashboard +
+    // tasks both call getUserStats), so two concurrent callers can both read 0
+    // rows and both insert — the second one 409'd (unique violation) and surfaced
+    // a console error. `ignoreDuplicates: true` makes the concurrent insert a
+    // no-op rather than a conflict, and never overwrites an existing balance.
+    const { error: upsertError } = await supabase
       .from('reward_points')
-      .insert({
-        user_id: userId,
-        space_id: spaceId,
-        points: 0,
-        level: 1,
-        current_streak: 0,
-        longest_streak: 0,
-      })
-      .select()
+      .upsert(
+        {
+          user_id: userId,
+          space_id: spaceId,
+          points: 0,
+          level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+        },
+        { onConflict: 'user_id,space_id', ignoreDuplicates: true }
+      );
+
+    if (upsertError) {
+      throw new Error(`Failed to create points record: ${upsertError.message}`);
+    }
+
+    // Re-fetch: returns the row whether THIS call created it or a concurrent
+    // call won the race. single() is safe — the unique key guarantees one row.
+    const { data: created, error: refetchError } = await supabase
+      .from('reward_points')
+      .select('id, user_id, space_id, points, level, current_streak, longest_streak, last_activity_at, created_at, updated_at')
+      .eq('user_id', userId)
+      .eq('space_id', spaceId)
       .single();
 
-    if (createError) {
-      throw new Error(`Failed to create points record: ${createError.message}`);
+    if (refetchError) {
+      throw new Error(`Failed to load points record: ${refetchError.message}`);
     }
 
     return created;
