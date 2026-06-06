@@ -5,24 +5,21 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
-import DOMPurify from 'isomorphic-dompurify';
+import { sanitizePlainText } from '@/lib/sanitize';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 import { z } from 'zod';
 
 /**
  * Strip HTML tags from text — same defence used in /api/user/profile.
  * Welcome flow accepts plain-text display name + household name only.
+ *
+ * Routed through lib/sanitize's `sanitizePlainText` (pure regex, no jsdom)
+ * instead of importing isomorphic-dompurify at module top: that direct import
+ * crashes the whole route at load in the Vercel runtime (ERR_REQUIRE_ESM via
+ * jsdom -> html-encoding-sniffer -> ESM @exodus/bytes), 500-ing onboarding.
  */
 function stripHtml(input: string): string {
-  const sanitized = DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
-  return sanitized
-    .replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .trim();
+  return sanitizePlainText(input);
 }
 
 /**

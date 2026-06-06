@@ -107,6 +107,48 @@ export async function sanitizeHtml(input: string | null | undefined): Promise<st
 }
 
 /**
+ * Sanitize rich HTML (e.g. outbound email bodies) against a BROAD allowlist
+ * that preserves layout tags - tables, img, div/span - which email templates
+ * rely on. Like sanitizeHtml, this lazy-loads DOMPurify and degrades to the
+ * regex fallback (which strips <script>/<style>/on*=/javascript:/data: but
+ * keeps layout tags) when DOMPurify can't load in the serverless runtime.
+ *
+ * Why this exists separately from sanitizeHtml: sanitizeHtml's allowlist is
+ * deliberately narrow (no img/table/div) for user-authored rich text. Email
+ * HTML needs the wider set, so it gets its own entry point rather than widening
+ * the shared one.
+ */
+const EMAIL_ALLOWED_TAGS = [
+  'p', 'br', 'b', 'i', 'em', 'strong', 'a', 'ul', 'ol', 'li',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'img',
+  'table', 'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'blockquote', 'pre', 'code',
+];
+const EMAIL_ALLOWED_ATTR = [
+  'href', 'src', 'alt', 'style', 'class', 'target', 'rel',
+  'width', 'height', 'align', 'valign', 'colspan', 'rowspan',
+];
+
+export async function sanitizeRichHtml(input: string | null | undefined): Promise<string> {
+  if (!input || typeof input !== 'string') {
+    return '';
+  }
+
+  const purify = await getDOMPurify();
+
+  if (purify) {
+    return purify.sanitize(input, {
+      ALLOWED_TAGS: EMAIL_ALLOWED_TAGS,
+      ALLOWED_ATTR: EMAIL_ALLOWED_ATTR,
+      ALLOW_DATA_ATTR: false,
+    });
+  }
+
+  // DOMPurify unavailable (serverless jsdom load failure) - regex fallback keeps
+  // layout tags while stripping script/style/event-handler/js: vectors.
+  return fallbackSanitizeHtml(input);
+}
+
+/**
  * Sanitize a URL to prevent javascript: and data: URI XSS
  * Use for any user-provided URLs
  *
