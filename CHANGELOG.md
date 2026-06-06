@@ -30,6 +30,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Settings tabs decomposed: AnalyticsTab, DocumentationTab, ProfileTab, SecurityTab
 
 ### Added
+- `scripts/database/check-db-advisors.ts` — new **orphan-trigger invariant**: scans every active trigger's function body for writes to non-existent tables and fails the deploy drift-check if any exist. Closes the class behind the June task/shopping 500s (drop a table, leave a trigger writing to it). Strips SQL comments before matching to avoid prose false positives.
 - `scripts/ci/schema-check.ts` — CI gate that probes 8 high-traffic tables for column drift between application code and migrations. Catches "I edited the dashboard but forgot the migration" in 5 seconds instead of months.
 
 ### Security

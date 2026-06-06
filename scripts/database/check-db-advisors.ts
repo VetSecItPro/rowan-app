@@ -165,6 +165,51 @@ async function checkTierCheckExcludesPro(client: Client): Promise<void> {
   });
 }
 
+async function checkNoOrphanTriggers(client: Client): Promise<void> {
+  // Catch the "dropped a table but left a trigger that writes to it" class.
+  // June 2026: PR #344's orphan-table cleanup dropped task_activity_log /
+  // task_handoffs / task_assignments / shopping_item_history based on zero
+  // *code* references, but trigger functions still INSERT/UPDATE/DELETE those
+  // tables — so every write to the parent table 500'd in prod (42P01) while CI
+  // stayed green (fresh CI DBs had the orphans removed via the squash baseline).
+  // This invariant scans every ACTIVE trigger's function body for table writes
+  // to relations that no longer exist, so the class can never silently ship.
+  const { rows } = await client.query(
+    `SELECT DISTINCT c.relname AS on_table, t.tgname AS trigger,
+            p.proname AS function, m.arr[1] AS missing_table
+       FROM pg_trigger t
+       JOIN pg_class c ON c.oid = t.tgrelid
+       JOIN pg_proc p ON p.oid = t.tgfoid
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       -- Strip SQL comments first so prose like "-- Handle UPDATE operations"
+       -- isn't misread as a write to a table named "operations" (false positive).
+       CROSS JOIN LATERAL regexp_matches(
+         regexp_replace(regexp_replace(p.prosrc, '--[^\n]*', '', 'g'), '/\\*.*?\\*/', '', 'g'),
+         '(?:INSERT INTO|DELETE FROM|UPDATE)\\s+(?:public\\.)?([a-z_]+)', 'g'
+       ) AS m(arr)
+      WHERE NOT t.tgisinternal
+        AND n.nspname = 'public'
+        AND m.arr[1] NOT IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public')`
+  );
+
+  if (rows.length === 0) {
+    findings.push({
+      invariant: 'No trigger writes to a non-existent table (orphan-trigger guard)',
+      ok: true,
+      detail: 'every active trigger function targets a live table',
+    });
+    return;
+  }
+
+  for (const r of rows) {
+    findings.push({
+      invariant: `trigger ${r.trigger} on ${r.on_table} targets a live table`,
+      ok: false,
+      detail: `${r.function}() writes to missing table "${r.missing_table}" — drop the orphan trigger/function or recreate the table`,
+    });
+  }
+}
+
 async function main() {
   const client = new Client({ connectionString: databaseUrl });
   await client.connect();
@@ -175,6 +220,7 @@ async function main() {
     await checkPostgisRemoved(client);
     await checkUserFeedbackRestrictive(client);
     await checkTierCheckExcludesPro(client);
+    await checkNoOrphanTriggers(client);
   } finally {
     await client.end();
   }
