@@ -28,6 +28,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - `scripts/ci/schema-check.ts` — CI gate that probes 8 high-traffic tables for column drift between application code and migrations. Catches "I edited the dashboard but forgot the migration" in 5 seconds instead of months.
 
+### Security
+- **Patched 5 moderate transitive advisories** (SEC-DEP-01, surfaced by the 5 June `/sec-ship --comprehensive` deferral) via three `pnpm.overrides` edits — `brace-expansion` (GHSA-jxxr-4gwj-5jf2, DoS), `ws` (GHSA-58qx-3vcg-4xpx, uninitialized memory disclosure), `qs` (GHSA-q8mj-m7cp-5q26, DoS). The pre-existing `qs`/`brace-expansion` pins had gone stale (`>=6.14.2`, `<5.0.5`) against the newer advisories; tightened to `>=6.15.2` and `>=5.0.6`, added a `ws@>=8.20.1` pin. `pnpm audit` now reports zero vulnerabilities. Also **constrained `undici` to `>=7.24.0 <8`**: a broad `pnpm update` had drifted it to 8.3.0 (via a jsdom bump), which breaks the production build — the externalized `isomorphic-dompurify → jsdom@28` path requires undici 7's `wrap-handler.js`. The `<8` ceiling makes that drift impossible. Fix is override-only (no app-code change); build + 8702 unit tests green. Deferred to a future `/migrate`: 12 major bumps (typescript 6, eslint 10, lucide-react 1, `@polar-sh/sdk` 0.48, `@supabase/ssr` 0.10, isomorphic-dompurify 3) — each needs its own branch + verification.
+
 ---
 
 ## February 2026
