@@ -55,6 +55,7 @@ export const pointsService = {
     // rows and both insert — the second one 409'd (unique violation) and surfaced
     // a console error. `ignoreDuplicates: true` makes the concurrent insert a
     // no-op rather than a conflict, and never overwrites an existing balance.
+    // nosemgrep: supabase-missing-space-id-filter - space-scoped write; space_id is in the upsert payload + the user_id,space_id unique key, and RLS enforces the boundary
     const { error: upsertError } = await supabase
       .from('reward_points')
       .upsert(
@@ -75,6 +76,7 @@ export const pointsService = {
 
     // Re-fetch: returns the row whether THIS call created it or a concurrent
     // call won the race. single() is safe — the unique key guarantees one row.
+    // nosemgrep: supabase-missing-space-id-filter - this select IS filtered by .eq('space_id', spaceId) below; the rule doesn't recognize the chained filter
     const { data: created, error: refetchError } = await supabase
       .from('reward_points')
       .select('id, user_id, space_id, points, level, current_streak, longest_streak, last_activity_at, created_at, updated_at')
