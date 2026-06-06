@@ -8,7 +8,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { sanitizePlainText, sanitizeHtml, sanitizeUrl } from '@/lib/sanitize';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { sanitizePlainText, sanitizeHtml, sanitizeRichHtml, sanitizeUrl } from '@/lib/sanitize';
 
 describe('sanitizePlainText', () => {
   it('should return empty string for null/undefined/empty', () => {
@@ -171,4 +173,56 @@ describe('sanitizeUrl', () => {
   it('should trim whitespace', () => {
     expect(sanitizeUrl('  https://example.com  ')).toBe('https://example.com');
   });
+});
+
+// sanitizeRichHtml powers outbound email bodies. Its whole reason to exist is to
+// avoid a module-top isomorphic-dompurify import (which crashes the route at load
+// in the serverless runtime via the jsdom -> ESM @exodus/bytes chain). Whether the
+// DOMPurify lazy-load succeeds or falls back to regex, these invariants must hold.
+describe('sanitizeRichHtml', () => {
+  it('returns empty string for nullish / non-string input', async () => {
+    expect(await sanitizeRichHtml(null)).toBe('');
+    expect(await sanitizeRichHtml(undefined)).toBe('');
+    expect(await sanitizeRichHtml('')).toBe('');
+    // @ts-expect-error - exercising the runtime type guard
+    expect(await sanitizeRichHtml(123)).toBe('');
+  });
+
+  it('preserves email layout tags (tables, img, div) - the reason it differs from sanitizeHtml', async () => {
+    const out = await sanitizeRichHtml('<table><tr><td>cell</td></tr></table>');
+    expect(out).toContain('<td');
+    expect(out).toContain('cell');
+    const img = await sanitizeRichHtml('<img src="https://x.test/a.png" alt="a">');
+    expect(img).toContain('<img');
+  });
+
+  it('strips <script> and its contents', async () => {
+    const out = await sanitizeRichHtml('<p>hi</p><script>steal(document.cookie)</script>');
+    expect(out).not.toMatch(/<script/i);
+    expect(out).not.toContain('steal(document.cookie)');
+    expect(out).toContain('hi');
+  });
+
+  it('strips inline event handlers and javascript: URLs', async () => {
+    const out = await sanitizeRichHtml('<a href="javascript:alert(1)" onclick="alert(2)">x</a>');
+    expect(out).not.toMatch(/onclick/i);
+    expect(out.toLowerCase()).not.toContain('javascript:alert(1)');
+  });
+});
+
+describe('sanitize entrypoints never import isomorphic-dompurify at module top', () => {
+  // Regression guard for the prod 500: the three routes that 500'd all imported
+  // `isomorphic-dompurify` directly at module scope, crashing at load. They must
+  // only ever reach it through lib/sanitize's lazy getDOMPurify() try/catch.
+  const routes = [
+    'app/api/welcome/route.ts',
+    'app/api/user/profile/route.ts',
+    'app/api/notifications/email/route.ts',
+  ];
+  for (const rel of routes) {
+    it(`${rel} has no top-level isomorphic-dompurify import`, () => {
+      const src = readFileSync(join(process.cwd(), rel), 'utf8');
+      expect(src).not.toMatch(/^\s*import\s+.*from\s+['"]isomorphic-dompurify['"]/m);
+    });
+  }
 });

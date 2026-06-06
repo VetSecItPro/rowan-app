@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { Resend } from 'resend';
-import DOMPurify from 'isomorphic-dompurify';
+import { sanitizeRichHtml } from '@/lib/sanitize';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -102,11 +102,11 @@ export async function POST(req: NextRequest) {
     // Sanitize HTML to prevent phishing/XSS via email injection
     let html = typeof data?.html === 'string' ? data.html : undefined;
     if (html) {
-      html = DOMPurify.sanitize(html, {
-        ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'em', 'strong', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'hr', 'blockquote', 'pre', 'code'],
-        ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'target', 'rel', 'width', 'height', 'align', 'valign', 'colspan', 'rowspan'],
-        ALLOW_DATA_ATTR: false,
-      });
+      // sanitizeRichHtml lazy-loads DOMPurify with this same broad email
+      // allowlist and degrades to a regex fallback when jsdom can't load in the
+      // serverless runtime (a module-top `import DOMPurify from 'isomorphic-dompurify'`
+      // here crashes the whole route at load: ERR_REQUIRE_ESM via the jsdom chain).
+      html = await sanitizeRichHtml(html);
     }
     const text = typeof data?.text === 'string' ? data.text : undefined;
 

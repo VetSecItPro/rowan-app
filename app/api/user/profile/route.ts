@@ -5,23 +5,17 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
-import DOMPurify from 'isomorphic-dompurify';
+import { sanitizePlainText } from '@/lib/sanitize';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
 
-// SECURITY: Strip all HTML tags from text input - only allow plain text for names
+// SECURITY: Strip all HTML tags from text input - only allow plain text for names.
+// Routed through lib/sanitize's `sanitizePlainText` (pure regex, no jsdom) rather
+// than a module-top `import DOMPurify from 'isomorphic-dompurify'`: that direct
+// import crashes the route at load in the Vercel runtime (ERR_REQUIRE_ESM via
+// jsdom -> html-encoding-sniffer -> ESM @exodus/bytes), 500-ing profile reads/writes.
 function stripHtml(input: string): string {
-  // First use DOMPurify to sanitize, then strip any remaining tags
-  const sanitized = DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
-  // Also remove any script/style blocks and decode HTML entities
-  return sanitized
-    .replace(/<[^>]*>/g, '') // Remove any remaining tags
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .trim();
+  return sanitizePlainText(input);
 }
 
 /**
