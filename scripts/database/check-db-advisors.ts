@@ -210,6 +210,98 @@ async function checkNoOrphanTriggers(client: Client): Promise<void> {
   }
 }
 
+async function checkNoOrphanTriggerFunctionCalls(client: Client): Promise<void> {
+  // Sibling of checkNoOrphanTriggers for the "calls a missing FUNCTION" class.
+  // June 2026: the `activity_feed` table was dropped (2026-03-16) along with its
+  // writer function create_activity_feed_entry(), but four AFTER-INSERT trigger
+  // functions still `PERFORM create_activity_feed_entry(...)` — so every INSERT
+  // into goals / goal_check_ins / habit_entries 500'd in prod with "function ...
+  // does not exist". checkNoOrphanTriggers only catches writes to missing
+  // *tables*, so this slipped through. This invariant scans active trigger
+  // function bodies for PERFORM calls to functions that don't exist in pg_proc.
+  //
+  // Filtering against pg_proc.proname (ALL schemas, incl. pg_catalog) means
+  // built-ins and every real function are excluded — only genuinely-missing
+  // callees are flagged. PERFORM is the plpgsql side-effect call, which is
+  // exactly how trigger functions invoke helpers, so false positives are nil.
+  const { rows } = await client.query(
+    `SELECT DISTINCT c.relname AS on_table, t.tgname AS trigger,
+            p.proname AS function, m.arr[1] AS missing_function
+       FROM pg_trigger t
+       JOIN pg_class c ON c.oid = t.tgrelid
+       JOIN pg_proc p ON p.oid = t.tgfoid
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       CROSS JOIN LATERAL regexp_matches(
+         regexp_replace(regexp_replace(p.prosrc, '--[^\n]*', '', 'g'), '/\\*.*?\\*/', '', 'g'),
+         'PERFORM\\s+(?:public\\.)?([a-z_][a-z0-9_]*)\\s*\\(', 'g'
+       ) AS m(arr)
+      WHERE NOT t.tgisinternal
+        AND n.nspname = 'public'
+        AND m.arr[1] NOT IN (SELECT proname FROM pg_proc)`
+  );
+
+  if (rows.length === 0) {
+    findings.push({
+      invariant: 'No trigger calls a non-existent function (orphan-function guard)',
+      ok: true,
+      detail: 'every active trigger function PERFORMs only functions that exist',
+    });
+    return;
+  }
+
+  for (const r of rows) {
+    findings.push({
+      invariant: `trigger ${r.trigger} on ${r.on_table} calls a live function`,
+      ok: false,
+      detail: `${r.function}() PERFORMs missing function "${r.missing_function}()" — drop the orphan trigger/function or recreate the callee`,
+    });
+  }
+}
+
+async function checkUserDeletionNotBlocked(client: Client): Promise<void> {
+  // Catch the "account deletion is impossible" class. supabase.auth.admin
+  // .deleteUser() deletes the auth.users row; any FK referencing auth.users
+  // that can't tolerate that delete aborts the whole operation, so the
+  // account-deletion cron + admin delete path silently fail forever.
+  //
+  // June 2026: 19 such FKs existed — 18 ON DELETE NO ACTION (blocks: "still
+  // referenced") + reminder_activities SET NULL on a NOT NULL column (blocks:
+  // "null value violates not-null"). Fixed in 20260606220000. This invariant
+  // asserts every FK to auth.users is delete-safe: CASCADE, or SET NULL on a
+  // nullable column. (SET DEFAULT is flagged too — a default user id is never
+  // what we want here.)
+  const { rows } = await client.query(
+    `SELECT c.conrelid::regclass::text AS on_table, a.attname AS col,
+            CASE c.confdeltype WHEN 'a' THEN 'NO ACTION' WHEN 'r' THEN 'RESTRICT'
+                 WHEN 'n' THEN 'SET NULL on NOT NULL' WHEN 'd' THEN 'SET DEFAULT' END AS problem
+       FROM pg_constraint c
+       JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY(c.conkey)
+      WHERE c.contype = 'f'
+        AND c.confrelid = 'auth.users'::regclass
+        AND ( c.confdeltype IN ('a','r')
+           OR (c.confdeltype = 'n' AND a.attnotnull)
+           OR c.confdeltype = 'd' )
+      ORDER BY 1`
+  );
+
+  if (rows.length === 0) {
+    findings.push({
+      invariant: 'No FK to auth.users blocks account deletion (deletion guard)',
+      ok: true,
+      detail: 'every auth.users FK is CASCADE or SET NULL on a nullable column',
+    });
+    return;
+  }
+
+  for (const r of rows) {
+    findings.push({
+      invariant: `${r.on_table}.${r.col} FK to auth.users is delete-safe`,
+      ok: false,
+      detail: `ON DELETE ${r.problem} aborts user deletion — make it CASCADE (NOT NULL / owned) or SET NULL (nullable attribution)`,
+    });
+  }
+}
+
 async function main() {
   const client = new Client({ connectionString: databaseUrl });
   await client.connect();
@@ -221,6 +313,8 @@ async function main() {
     await checkUserFeedbackRestrictive(client);
     await checkTierCheckExcludesPro(client);
     await checkNoOrphanTriggers(client);
+    await checkNoOrphanTriggerFunctionCalls(client);
+    await checkUserDeletionNotBlocked(client);
   } finally {
     await client.end();
   }

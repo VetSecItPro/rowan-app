@@ -96,9 +96,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fetch meals with their recipes
+    // Fetch planned meals with their recipes.
+    // NOTE: the canonical planned-meals table is `meals` (createMeal/getMeals
+    // both use it). `meal_plans` is a vestigial orphan table with zero writers
+    // and zero rows — reading it here made this endpoint always 404 ("No meals
+    // found"), silently breaking Generate-Shopping-List-from-meals. The
+    // `recipes(*)` embed resolves via meals.recipe_id → recipes.id (single FK).
     const { data: meals, error: mealsError } = await supabase
-      .from('meal_plans')
+      .from('meals')
       .select('*, recipes(*)')
       .in('id', mealIds)
       .eq('space_id', spaceId);

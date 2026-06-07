@@ -89,7 +89,7 @@ async function seedTestUsers() {
         userId = existingAuthUser.id;
         console.log(`  Found existing user ${testUser.email} (${userId})`);
 
-        // Update password to ensure it matches (in case env changed)
+        // Update password to ensure it matches (in case env changed).
         const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
           password: testUser.password,
           email_confirm: true,
@@ -97,9 +97,28 @@ async function seedTestUsers() {
         });
 
         if (updateError) {
-          throw new Error(`Failed to update user password: ${updateError.message}`);
+          // Supabase's leaked/weak-password protection rejects SETTING a
+          // flagged password, but an account created before the policy was
+          // enabled keeps authenticating with it. For an EXISTING user the
+          // reset is redundant — swallow this specific error and keep the
+          // working credential rather than crashing the whole e2e run.
+          // (Any other update error is still fatal; fresh-user createUser
+          // below still surfaces weak passwords loudly.)
+          const isWeakPassword = /weak|known to be|pwned|leaked/i.test(updateError.message);
+          if (!isWeakPassword) {
+            throw new Error(`Failed to update user password: ${updateError.message}`);
+          }
+          console.warn(
+            `  ⚠ Password reset skipped (provider flagged value as weak/leaked); ` +
+            `existing credential retained. Refresh metadata only.`
+          );
+          await supabase.auth.admin.updateUserById(userId, {
+            email_confirm: true,
+            user_metadata: { name: testUser.name },
+          });
+        } else {
+          console.log(`  ✓ Password and metadata updated`);
         }
-        console.log(`  ✓ Password and metadata updated`);
       } else {
         // ── User doesn't exist: create fresh ──
         console.log(`  Creating ${testUser.email}...`);

@@ -134,6 +134,11 @@ export const projectsService = {
         ...input,
         status: input.status || 'pending',
         recurring: input.recurring || false,
+        // `expenses.date` is NOT NULL with no DB default, but the Zod schema
+        // marks `date` optional — so an omitted date would 500 on the insert.
+        // Default to today (YYYY-MM-DD) to keep the schema's optionality honest,
+        // matching how status/recurring are defaulted here.
+        date: input.date || new Date().toISOString().split('T')[0],
       }])
       .select()
       .single();
