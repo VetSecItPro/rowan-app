@@ -187,8 +187,12 @@ describe('getDaysOverdue', () => {
   });
 
   it('returns correct days for multi-day overdue chore', () => {
-    // 50 hours past due date with 2h grace = 48h past grace = exactly 2 days
-    const pastDue = new Date(Date.now() - 50 * 60 * 60 * 1000);
+    // 38h past due with 2h grace = 36h past grace → Math.ceil(36/24) = 2 days.
+    // Use a MID-bucket value (36h, not exactly 48h): getDaysOverdue reads its
+    // own `new Date()` a few ms after this Date.now(), so an exact-boundary
+    // value (48h = 2.0 days) ceils to 3 under any sub-millisecond drift — a
+    // flake that surfaces on loaded CI runners. 36h has 12h margin either side.
+    const pastDue = new Date(Date.now() - 38 * 60 * 60 * 1000);
     const days = getDaysOverdue(pastDue, 2);
     expect(days).toBe(2);
   });
