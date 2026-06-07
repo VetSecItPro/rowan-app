@@ -204,13 +204,20 @@ export async function POST(req: NextRequest) {
         .eq('id', user.id)
         .single();
 
+      // Canonical prefs table is `user_notification_preferences` (was the dropped
+      // `notification_preferences`; the old read always errored → prefs null → the
+      // email was sent regardless of opt-out). There's no per-feature
+      // `email_shopping_lists` toggle anymore — gate on the master `email_enabled`,
+      // scoped to this space.
+      // nosemgrep: supabase-missing-space-id-filter — explicit .eq('space_id', spaceId)
       const { data: prefs } = await supabase
-        .from('notification_preferences')
-        .select('email_enabled, email_shopping_lists')
+        .from('user_notification_preferences')
+        .select('email_enabled')
         .eq('user_id', user.id)
+        .eq('space_id', spaceId)
         .maybeSingle();
 
-      const shouldSendEmail = !prefs || (prefs.email_enabled && prefs.email_shopping_lists);
+      const shouldSendEmail = !prefs || prefs.email_enabled;
 
       if (userData?.email && shouldSendEmail) {
         await sendShoppingListEmail({

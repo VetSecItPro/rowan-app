@@ -225,3 +225,8 @@ household-balance-*.png
 .sec-ship-history.json
 .gh-ship-history.json
 .sec-ship-reports/
+*-backlog.md
+*-plan.md
+*-research.md
+*-todo.md
+*-strategy.md
