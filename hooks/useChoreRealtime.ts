@@ -19,13 +19,6 @@ interface UseChoreRealtimeOptions {
   onChoreDeleted?: (choreId: string) => void;
 }
 
-type ChoreCompletion = {
-  id: string;
-  chore_id: string;
-  completed_at?: string;
-  [key: string]: unknown;
-};
-
 // Optimized filter function
 function chorePassesFilters(chore: Chore, filters?: UseChoreRealtimeOptions['filters']): boolean {
   if (!filters) return true;
@@ -316,55 +309,4 @@ export function useChoreRealtime({
     refreshChores,
     setChores, // Expose for optimistic updates
   };
-}
-
-/** Subscribes to real-time chore completion history updates for a specific chore */
-export function useChoreCompletionRealtime(choreId: string) {
-  const [completions, setCompletions] = useState<ChoreCompletion[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    async function loadCompletions() {
-      try {
-        const { data, error } = await supabase
-          .from('chore_completions')
-          .select('*')
-          .eq('chore_id', choreId)
-          .order('completed_at', { ascending: false });
-
-        if (error) throw error;
-        setCompletions(data || []);
-      } catch (err) {
-        logger.error('Error loading chore completions:', err, { component: 'hook-useChoreRealtime', action: 'hook_execution' });
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    const channel = supabase
-      .channel(`chore_completions:${choreId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'chore_completions',
-          filter: `chore_id=eq.${choreId}`,
-        },
-        () => {
-          loadCompletions();
-        }
-      )
-      .subscribe();
-
-    loadCompletions();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [choreId]);
-
-  return { completions, loading, setCompletions };
 }

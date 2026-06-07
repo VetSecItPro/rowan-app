@@ -447,7 +447,7 @@ export async function verifyFeatureAccess(
     meals: '/meals',
     reminders: '/reminders',
     goals: '/goals',
-    household: '/expenses',
+    household: '/budget', // canonical budget hub (legacy /expenses now redirects here)
     calendar: '/calendar',
   };
 
