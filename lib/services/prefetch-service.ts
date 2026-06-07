@@ -111,6 +111,7 @@ const prefetchFunctions = {
     // Canonical planned-meals table is `meals` (date col = scheduled_date).
     // `meal_plans` is a vestigial orphan table (0 rows, 0 writers) — prefetching
     // it returned an empty set, so the meals page always refetched on mount.
+    // nosemgrep: supabase-missing-space-id-filter — explicit .eq('space_id', spaceId) on this query
     const { data } = await supabase
       .from('meals')
       .select('id, scheduled_date, meal_type, recipe_id, notes')

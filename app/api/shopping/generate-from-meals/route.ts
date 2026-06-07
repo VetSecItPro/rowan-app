@@ -102,6 +102,7 @@ export async function POST(req: NextRequest) {
     // and zero rows — reading it here made this endpoint always 404 ("No meals
     // found"), silently breaking Generate-Shopping-List-from-meals. The
     // `recipes(*)` embed resolves via meals.recipe_id → recipes.id (single FK).
+    // nosemgrep: supabase-missing-space-id-filter — explicit .eq('space_id', spaceId) on this query
     const { data: meals, error: mealsError } = await supabase
       .from('meals')
       .select('*, recipes(*)')

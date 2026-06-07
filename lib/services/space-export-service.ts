@@ -189,6 +189,7 @@ export async function exportSpaceData(
       // is a vestigial orphan table (0 rows, 0 writers). Read `meals` so a user's
       // GDPR export actually includes their planned meals. The result key stays
       // `meal_plans` to preserve the export/DeleteSpaceModal contract.
+      // nosemgrep: supabase-missing-space-id-filter — explicit .eq('space_id', spaceId) on this query
       supabase
         .from('meals')
         .select('*')
@@ -381,6 +382,7 @@ export async function getSpaceExportSummary(
       supabase.from('recipes').select('id', { count: 'exact' }).eq('space_id', spaceId),
       // `meals` is the real planned-meals table; `meal_plans` is an empty orphan
       // (kept under the `meal_plans` summary key to preserve the modal contract).
+      // nosemgrep: supabase-missing-space-id-filter — explicit .eq('space_id', spaceId) on this query
       supabase.from('meals').select('id', { count: 'exact' }).eq('space_id', spaceId),
       supabase.from('chores').select('id', { count: 'exact' }).eq('space_id', spaceId),
       supabase.from('expenses').select('id', { count: 'exact' }).eq('space_id', spaceId),

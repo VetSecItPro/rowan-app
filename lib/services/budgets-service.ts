@@ -128,6 +128,7 @@ export const projectsService = {
    */
   async createExpense(input: CreateExpenseInput, supabaseClient?: SupabaseClient): Promise<Expense> {
     const supabase = getSupabaseClient(supabaseClient);
+    // nosemgrep: supabase-missing-space-id-filter — insert scoped by input.space_id; caller verifies space access + RLS enforces tenant
     const { data, error } = await supabase
       .from('expenses')
       .insert([{
