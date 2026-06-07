@@ -112,7 +112,9 @@ export async function POST(
       }
 
       case 'delete': {
-        // Delete user from auth.users (cascades to related tables via FK ON DELETE CASCADE)
+        // Delete user from auth.users. Every FK to auth.users is ON DELETE
+        // CASCADE/SET NULL (see migration 20260606220000), so this fully erases
+        // the user's spaces and all space-scoped household data.
         const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
         if (deleteError) {

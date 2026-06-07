@@ -44,7 +44,7 @@ export const expenseBaseSchema = z.object({
   // that break downstream date-arithmetic / reminder logic.
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
-    .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format')
+    .refine(val => val === null || val === undefined || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format')
     .refine(val => {
       if (val === null || val === undefined) return true;
       const d = new Date(val);

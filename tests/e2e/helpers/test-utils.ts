@@ -40,6 +40,35 @@ export async function dismissCookieBanner(page: Page): Promise<void> {
   }
 }
 
+/**
+ * Dismiss the "Meet Rowan AI" onboarding tour (AIWelcomeModal, mounted by
+ * AIOnboardingGate in the main layout). It auto-opens on EVERY main page for a
+ * user who hasn't seen it yet — which is every freshly-seeded e2e user — and
+ * its full-screen z-[70] backdrop intercepts pointer events, so any spec that
+ * clicks a page control on first visit must dismiss it first. Clicking Skip
+ * marks it seen (localStorage), so one dismissal per browser context is enough.
+ *
+ * This is why the older smoke specs are flaky on fresh-user runs and lean on
+ * `if (visible)` bailouts; durable specs should call this instead.
+ */
+export async function dismissAIWelcome(page: Page): Promise<void> {
+  try {
+    const dialog = page.getByRole('dialog', { name: /Meet Rowan AI/i });
+    if (!(await dialog.isVisible({ timeout: 2500 }).catch(() => false))) {
+      return; // Already seen / not present
+    }
+    const skip = dialog.getByRole('button', { name: /^Skip$/i });
+    if (await skip.isVisible().catch(() => false)) {
+      await skip.click();
+    } else {
+      await dialog.getByRole('button', { name: /close/i }).click();
+    }
+    await dialog.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  } catch {
+    // Tour not present (already dismissed) — nothing to do.
+  }
+}
+
 // Test user credentials — passwords from env vars (never hardcode for public repos)
 const testPassword = process.env.E2E_TEST_PASSWORD || '';
 export const TEST_USERS = {

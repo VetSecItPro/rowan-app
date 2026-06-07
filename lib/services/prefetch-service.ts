@@ -108,13 +108,17 @@ const prefetchFunctions = {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 7);
 
+    // Canonical planned-meals table is `meals` (date col = scheduled_date).
+    // `meal_plans` is a vestigial orphan table (0 rows, 0 writers) — prefetching
+    // it returned an empty set, so the meals page always refetched on mount.
+    // nosemgrep: supabase-missing-space-id-filter — explicit .eq('space_id', spaceId) on this query
     const { data } = await supabase
-      .from('meal_plans')
-      .select('id, meal_date, meal_type, recipe_id, notes')
+      .from('meals')
+      .select('id, scheduled_date, meal_type, recipe_id, notes')
       .eq('space_id', spaceId)
-      .gte('meal_date', startOfWeek.toISOString().split('T')[0])
-      .lte('meal_date', endOfWeek.toISOString().split('T')[0])
-      .order('meal_date');
+      .gte('scheduled_date', startOfWeek.toISOString().split('T')[0])
+      .lte('scheduled_date', endOfWeek.toISOString().split('T')[0])
+      .order('scheduled_date');
     return data || [];
   },
 
