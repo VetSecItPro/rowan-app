@@ -145,18 +145,23 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSaving) return;
+
+    // BUG-2 fix: reminder_time maps to `remind_at`, which is NOT NULL in the DB.
+    // Previously an empty date skipped validation and submitted null → silent 400
+    // → modal closed with no error and no reminder created. Require it up front.
+    if (!formData.reminder_time) {
+      setDateError('Please select a date and time');
+      return;
+    }
+
     setIsSaving(true);
 
     try {
       // Validate reminder time is not in the past
-      if (formData.reminder_time) {
-        const reminderDate = new Date(formData.reminder_time);
-        const now = new Date();
-
-        if (reminderDate < now) {
-          setDateError('Reminder time cannot be in the past');
-          return;
-        }
+      const reminderDate = new Date(formData.reminder_time);
+      if (reminderDate < new Date()) {
+        setDateError('Reminder time cannot be in the past');
+        return;
       }
 
       // Clear any previous errors
@@ -166,7 +171,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       const submissionData: CreateReminderInput = {
         ...formData,
         // Convert datetime-local format to ISO string for database
-        reminder_time: formData.reminder_time ? new Date(formData.reminder_time).toISOString() : undefined,
+        reminder_time: new Date(formData.reminder_time).toISOString(),
       };
 
       // Add repeat_days if applicable
@@ -182,6 +187,9 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
       await onSave(submissionData);
       onClose();
+    } catch (err) {
+      // BUG-2 fix: surface save failures instead of silently closing the modal.
+      setDateError(err instanceof Error ? err.message : 'Failed to save reminder. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -397,12 +405,19 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     setDateError('');
                   }
                 } else {
-                  setDateError('');
+                  // BUG-2 fix: clearing the date must flag the requirement (was
+                  // setDateError('')), so submit stays disabled + the message shows.
+                  setDateError('Please select a date and time');
                 }
               }}
               label="Reminder Time"
               placeholder="Click to select date and time..."
             />
+            {dateError && (
+              <p className="mt-1.5 text-sm text-red-400" role="alert">
+                {dateError}
+              </p>
+            )}
           </div>
 
           {/* Priority & Status Row */}

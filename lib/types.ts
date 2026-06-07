@@ -438,14 +438,6 @@ export interface Chore {
   penalty_points_deducted?: number;
 }
 
-export interface ChoreCompletion {
-  id: string;
-  chore_id: string;
-  completed_by?: string;
-  completed_at: string;
-  notes?: string;
-}
-
 // =============================================
 // FINANCIAL TYPES (Budget & Expenses)
 // =============================================

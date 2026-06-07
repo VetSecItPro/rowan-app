@@ -179,6 +179,25 @@ describe('NewReminderModal', () => {
     expect(screen.queryByTestId('modal')).toBeNull();
   });
 
+  // Regression for BUG-2 (June 2026 QA sweep): submitting with an empty date
+  // used to send remind_at=null → silent 400 → modal closed with no error and
+  // no reminder created. The form must now block submit + show the requirement.
+  it('BUG-2: blocks submit and shows an error when the date is empty', () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const { container } = render(<NewReminderModal {...defaultProps} onSave={onSave} />);
+
+    // Submit the form without selecting a date. (Submit the <form> directly: the
+    // Modal mock renders the footer submit button outside the form, and jsdom's
+    // form-attribute association doesn't reliably fire requestSubmit on click.)
+    const form = container.querySelector('#new-reminder-form') as HTMLFormElement;
+    fireEvent.submit(form);
+
+    // onSave must NOT be called (no null remind_at sent to the DB)...
+    expect(onSave).not.toHaveBeenCalled();
+    // ...and the user must see why.
+    expect(screen.getByText('Please select a date and time')).toBeTruthy();
+  });
+
   it('renders "Edit Reminder" title when editing', () => {
     const editReminder = {
       id: 'r-1',

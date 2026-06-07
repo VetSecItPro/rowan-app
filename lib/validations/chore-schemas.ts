@@ -137,16 +137,6 @@ export function validateAndSanitizeChore(data: unknown): z.infer<typeof createCh
   };
 }
 
-// Validation for chore completion with required fields
-export const validateChoreCompletion = (data: unknown) => {
-  const schema = z.object({
-    chore_id: z.string().uuid(),
-    completed_by: z.string().uuid(),
-  });
-
-  return schema.parse(data);
-};
-
 // Type exports
 export type CreateChoreInput = z.infer<typeof createChoreSchema>;
 export type UpdateChoreInput = z.infer<typeof updateChoreSchema>;
