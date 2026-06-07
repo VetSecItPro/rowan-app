@@ -296,31 +296,48 @@ async function sendEmailNotifications(supabase: SupabaseClient, batch: CheckInNo
 
 interface NotificationPreferencesRow {
   email_enabled: boolean;
-  email_reminders: boolean;
+  email_due_reminders: boolean;
   quiet_hours_enabled: boolean;
   quiet_hours_start: string | null;
   quiet_hours_end: string | null;
   timezone: string | null;
 }
 
-async function shouldSendGoalCheckinEmail(supabase: SupabaseClient, userId: string): Promise<boolean> {
-  const { data: prefs, error } = await supabase
-    .from('notification_preferences')
-    .select('email_enabled, email_reminders, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone')
-    .eq('user_id', userId)
-    .maybeSingle();
+export async function shouldSendGoalCheckinEmail(supabase: SupabaseClient, userId: string): Promise<boolean> {
+  // Canonical prefs table is `user_notification_preferences` (was the dropped
+  // `notification_preferences` with a non-existent `email_reminders` column — the
+  // query always errored and this function defaulted to "allow", so opted-out users
+  // still got check-in emails). The reminder toggle is `email_due_reminders`, and
+  // `timezone` is not on this table — it lives on `users`.
+  const [prefsResult, userResult] = await Promise.all([
+    // nosemgrep: supabase-missing-space-id-filter — per-user notification prefs, keyed by user_id
+    supabase
+      .from('user_notification_preferences')
+      .select('email_enabled, email_due_reminders, quiet_hours_enabled, quiet_hours_start, quiet_hours_end')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    // nosemgrep: supabase-missing-space-id-filter — users is a global table (no space_id); scoped by PK id
+    supabase
+      .from('users')
+      .select('timezone')
+      .eq('id', userId)
+      .maybeSingle(),
+  ]);
 
-  if (error) {
-    logger.warn('Failed to fetch notification preferences, defaulting to allow', { component: 'goal-checkin-notifications-job', error: error.message });
+  if (prefsResult.error) {
+    logger.warn('Failed to fetch notification preferences, defaulting to allow', { component: 'goal-checkin-notifications-job', error: prefsResult.error.message });
     return true;
   }
 
-  if (!prefs) {
+  if (!prefsResult.data) {
     return true;
   }
 
-  const typedPrefs = prefs as NotificationPreferencesRow;
-  if (!typedPrefs.email_enabled || !typedPrefs.email_reminders) {
+  const typedPrefs: NotificationPreferencesRow = {
+    ...(prefsResult.data as Omit<NotificationPreferencesRow, 'timezone'>),
+    timezone: (userResult.data as { timezone: string | null } | null)?.timezone ?? null,
+  };
+  if (!typedPrefs.email_enabled || !typedPrefs.email_due_reminders) {
     return false;
   }
 

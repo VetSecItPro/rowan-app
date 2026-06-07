@@ -307,11 +307,15 @@ class AIContextService {
         this.getStaticContext(supabase, spaceId),
         this.getSummaryContext(supabase, spaceId),
         this.getRecentActivity(supabase, spaceId),
-        // Fetch the user's display name from their profile — never use email
+        // Fetch the user's display name from the `users` table — never use email.
+        // (Was `.from('user_profiles').eq('user_id', ...)`, a table that doesn't
+        // exist — the query always errored and silently fell back to a generic
+        // greeting. The real profile table is `users`, keyed by `id`.)
+        // nosemgrep: supabase-missing-space-id-filter — users is a global table (no space_id); scoped by PK id
         supabase
-          .from('user_profiles')
+          .from('users')
           .select('name')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single(),
       ]);
 

@@ -114,7 +114,11 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
     // Notifications & push
     await supabase.from('in_app_notifications').delete().eq('user_id', userId);
     await supabase.from('push_tokens').delete().eq('user_id', userId);
-    await supabase.from('notification_preferences').delete().eq('user_id', userId);
+    // Canonical table is `user_notification_preferences` (was the dropped
+    // `notification_preferences`). It also FK-cascades on auth-user deletion, so
+    // this explicit delete is belt-and-suspenders, consistent with the rest of Phase 1.
+    // nosemgrep: supabase-missing-space-id-filter — account-deletion purge of the user's own rows, keyed by user_id
+    await supabase.from('user_notification_preferences').delete().eq('user_id', userId);
 
     // User preferences & presence
     await supabase.from('user_feedback').delete().eq('user_id', userId);
