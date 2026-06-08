@@ -428,7 +428,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
             channel = supabase
                 .channel(`dashboard:${spaceId}`)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `space_id=eq.${spaceId}` }, reload)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_events', filter: `space_id=eq.${spaceId}` }, reload)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'events', filter: `space_id=eq.${spaceId}` }, reload)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'reminders', filter: `space_id=eq.${spaceId}` }, reload)
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `space_id=eq.${spaceId}` }, reload)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'shopping_lists', filter: `space_id=eq.${spaceId}` }, reload)

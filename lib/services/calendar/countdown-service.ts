@@ -246,11 +246,14 @@ export const countdownService = {
       const now = new Date().toISOString();
 
       // Fetch calendar events with show_countdown enabled
+      // (canonical table is `events`; the old `calendar_events` is an empty orphan)
+      // nosemgrep: supabase-missing-space-id-filter — filtered by .eq('space_id', spaceId) below
       const eventsPromise = supabase
-        .from('calendar_events')
+        .from('events')
         .select('id, space_id, title, description, start_time, end_time, all_day, location, created_by, show_countdown, countdown_label, important_date_id, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
+        .is('deleted_at', null)
         .gte('start_time', now)
         .order('start_time', { ascending: true })
         .limit(limit * 2); // Fetch more, we'll merge and limit later
@@ -323,11 +326,13 @@ export const countdownService = {
       const todayEnd = new Date();
       todayEnd.setHours(23, 59, 59, 999);
 
+      // nosemgrep: supabase-missing-space-id-filter — filtered by .eq('space_id', spaceId) below
       const { data: events, error } = await supabase
-        .from('calendar_events')
+        .from('events')
         .select('id, space_id, title, description, start_time, end_time, all_day, location, created_by, show_countdown, countdown_label, important_date_id, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
+        .is('deleted_at', null)
         .gte('start_time', todayStart.toISOString())
         .lte('start_time', todayEnd.toISOString())
         .order('start_time', { ascending: true });
@@ -365,8 +370,9 @@ export const countdownService = {
         updateData.countdown_label = countdownLabel || null;
       }
 
+      // nosemgrep: supabase-missing-space-id-filter — targets a single event by PK (.eq('id', eventId)); RLS enforces space-boundary access on events
       const { error } = await supabase
-        .from('calendar_events')
+        .from('events')
         .update(updateData)
         .eq('id', eventId);
 
@@ -389,8 +395,9 @@ export const countdownService = {
     try {
       const supabase = createClient();
 
+      // nosemgrep: supabase-missing-space-id-filter — fetches a single event by PK (.eq('id', eventId)); RLS enforces space-boundary access on events
       const { data: event, error } = await supabase
-        .from('calendar_events')
+        .from('events')
         .select('id, space_id, title, description, start_time, end_time, all_day, location, created_by, show_countdown, countdown_label, important_date_id, created_at, updated_at')
         .eq('id', eventId)
         .single();

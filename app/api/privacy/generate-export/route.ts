@@ -222,8 +222,9 @@ async function gatherUserData(userId: string) {
     .eq('assigned_to', userId) : { data: [] };
 
   // Get user's calendar events
+  // nosemgrep: supabase-missing-space-id-filter — scoped via .in('space_id', spaceIds) + .eq('created_by', userId); table is `events` (orphan `calendar_events` is empty)
   const { data: calendarEvents } = spaceIds.length > 0 ? await supabase
-    .from('calendar_events')
+    .from('events')
     .select('*')
     .in('space_id', spaceIds)
     .eq('created_by', userId) : { data: [] };

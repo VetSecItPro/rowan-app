@@ -45,6 +45,7 @@ describe('countdown-service', () => {
       const eventsQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         limit: vi.fn().mockResolvedValue({ data: mockEvents, error: null }),
@@ -53,11 +54,12 @@ describe('countdown-service', () => {
       const datesQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockImportantDates, error: null }),
       };
 
       mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'calendar_events') return eventsQuery;
+        if (table === 'events') return eventsQuery;
         if (table === 'important_dates') return datesQuery;
         return eventsQuery;
       });
@@ -66,7 +68,7 @@ describe('countdown-service', () => {
 
       expect(result.countdowns).toBeDefined();
       expect(Array.isArray(result.countdowns)).toBe(true);
-      expect(mockSupabase.from).toHaveBeenCalledWith('calendar_events');
+      expect(mockSupabase.from).toHaveBeenCalledWith('events');
       expect(mockSupabase.from).toHaveBeenCalledWith('important_dates');
     });
 
@@ -84,6 +86,7 @@ describe('countdown-service', () => {
       const eventsQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         limit: vi.fn().mockResolvedValue({ data: mockEvents, error: null }),
@@ -92,11 +95,12 @@ describe('countdown-service', () => {
       const datesQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
 
       mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'calendar_events') return eventsQuery;
+        if (table === 'events') return eventsQuery;
         if (table === 'important_dates') return datesQuery;
         return eventsQuery;
       });
@@ -110,6 +114,7 @@ describe('countdown-service', () => {
       const query = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         limit: vi.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } }),
@@ -144,6 +149,7 @@ describe('countdown-service', () => {
       const query = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         lte: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockEvents, error: null }),
@@ -206,6 +212,7 @@ describe('countdown-service', () => {
       const query = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockEvent, error: null }),
       };
 
@@ -222,6 +229,7 @@ describe('countdown-service', () => {
       const query = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } }),
       };
 

@@ -351,8 +351,9 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
 
     // Calendar events
     if (includeData?.calendar !== false) {
+      // nosemgrep: supabase-missing-space-id-filter — GDPR export scoped to the requesting user via .eq('created_by', userId); table is `events` (the orphan `calendar_events` is empty)
       const { data: events } = await supabase
-        .from('calendar_events')
+        .from('events')
         .select('*')
         .eq('created_by', userId);
       data.calendar = events || [];

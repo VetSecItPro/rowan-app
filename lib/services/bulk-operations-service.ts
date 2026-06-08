@@ -205,7 +205,7 @@ export async function bulkExportByDateRange(
     const tableConfig: Record<string, { table: string; dateColumn: string }> = {
       expenses: { table: 'expenses', dateColumn: 'date' },
       tasks: { table: 'tasks', dateColumn: 'created_at' },
-      calendar_events: { table: 'calendar_events', dateColumn: 'start_time' },
+      calendar_events: { table: 'events', dateColumn: 'start_time' }, // UI key stays 'calendar_events'; real table is `events`
       messages: { table: 'messages', dateColumn: 'created_at' },
       reminders: { table: 'reminders', dateColumn: 'reminder_time' },
     };
@@ -331,11 +331,17 @@ export async function archiveOldCalendarEvents(
   try {
     const supabase = getSupabaseClient(supabaseClient);
 
+    // Archive = soft-delete on the canonical `events` table (the old `calendar_events`
+    // is an empty orphan). Soft-delete (set deleted_at) matches the events table's
+    // model and keeps "archive" reversible rather than permanently destroying data.
+    // Only touch rows not already archived.
+    // nosemgrep: supabase-missing-space-id-filter — filtered by .eq('space_id', spaceId)
     const { data, error } = await supabase
-      .from('calendar_events')
-      .delete()
+      .from('events')
+      .update({ deleted_at: new Date().toISOString() })
       .eq('space_id', spaceId)
       .lt('start_time', olderThanDate)
+      .is('deleted_at', null)
       .select('id');
 
     if (error) {
