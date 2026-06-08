@@ -183,10 +183,12 @@ class AIContextService {
       supabase.from('chores').select('id', { count: 'exact', head: true }).eq('space_id', spaceId),
       supabase.from('chores').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).in('status', ['pending', 'in_progress']),
       supabase.from('shopping_lists').select('title, id').eq('space_id', spaceId).limit(5),
+      // nosemgrep: supabase-missing-space-id-filter — filtered by .eq('space_id', spaceId)
       supabase
-        .from('calendar_events')
+        .from('events')
         .select('title, start_time')
         .eq('space_id', spaceId)
+        .is('deleted_at', null)
         .gte('start_time', new Date().toISOString())
         .lte('start_time', nextWeek)
         .order('start_time', { ascending: true })
@@ -260,10 +262,12 @@ class AIContextService {
         .gte('created_at', since)
         .order('created_at', { ascending: false })
         .limit(10),
+      // nosemgrep: supabase-missing-space-id-filter — filtered by .eq('space_id', spaceId)
       supabase
-        .from('calendar_events')
+        .from('events')
         .select('title, start_time')
         .eq('space_id', spaceId)
+        .is('deleted_at', null)
         .gte('start_time', new Date().toISOString())
         .lte('start_time', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString())
         .order('start_time', { ascending: true })
