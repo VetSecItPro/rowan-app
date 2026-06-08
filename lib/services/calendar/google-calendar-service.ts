@@ -34,6 +34,18 @@ const WEBHOOK_TTL_DAYS = 7;
 // OAUTH CLIENT FACTORY
 // =============================================================================
 
+/**
+ * Whether this server has the Google OAuth credentials needed to run the
+ * Google Calendar connect flow. Connect routes check this BEFORE creating any
+ * DB rows so an unconfigured server returns a clean 503 instead of leaking an
+ * orphan `disconnected` connection row and a cryptic 500 (createOAuth2Client
+ * throws when the credentials are missing). Requires a Google Cloud OAuth
+ * client; see docs/decisions/0022-external-calendar-integration-and-config-guards.md.
+ */
+export function isConfigured(): boolean {
+  return Boolean(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_REDIRECT_URI);
+}
+
 function createOAuth2Client() {
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REDIRECT_URI) {
     throw new Error('Google Calendar credentials not configured');
@@ -570,6 +582,7 @@ function mapGoogleEvent(event: calendar_v3.Schema$Event): GoogleCalendarEvent {
 /** Aggregated Google Calendar service for OAuth, event CRUD, and webhook management. */
 export const googleCalendarService = {
   // OAuth
+  isConfigured,
   generateAuthUrl,
   exchangeCodeForTokens,
   refreshAccessToken,

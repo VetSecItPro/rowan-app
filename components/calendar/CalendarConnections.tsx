@@ -92,6 +92,10 @@ const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle; color: string; l
 export const CalendarConnections = memo(function CalendarConnections() {
   const { currentSpace } = useAuthWithSpaces();
   const [connections, setConnections] = useState<CalendarConnection[]>([]);
+  // Which providers this server can actually service. null = not yet loaded
+  // (treat all as available until we know). Google/Outlook can come back false
+  // when their OAuth credentials aren't configured on this deployment.
+  const [capabilities, setCapabilities] = useState<Record<string, boolean> | null>(null);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
   const [syncing, setSyncing] = useState<string | null>(null);
@@ -142,6 +146,27 @@ export const CalendarConnections = memo(function CalendarConnections() {
   useEffect(() => {
     fetchConnections();
   }, [fetchConnections]);
+
+  // Fetch which providers this server can actually service, so we can disable
+  // OAuth providers (Google/Outlook) that aren't configured rather than letting
+  // the user click Connect and hit a 503. Best-effort: on failure we leave all
+  // providers enabled and rely on the connect route's own 503 guard as backstop.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/calendar/capabilities')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.capabilities) {
+          setCapabilities(data.capabilities as Record<string, boolean>);
+        }
+      })
+      .catch(() => {
+        /* best-effort; connect-route 503 guard is the backstop */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Check URL params for OAuth callback results
   useEffect(() => {
@@ -658,6 +683,10 @@ export const CalendarConnections = memo(function CalendarConnections() {
           const isConnected = connection && connection.sync_status !== 'disconnected';
           const statusConfig = connection ? STATUS_CONFIG[connection.sync_status] : null;
           const StatusIcon = statusConfig?.icon;
+          // Server hasn't configured this provider's OAuth credentials. Only
+          // Google/Outlook can be unavailable; capabilities=null means not yet
+          // loaded, so default to available to avoid a flash of "Unavailable".
+          const isUnavailable = capabilities ? capabilities[provider] === false : false;
 
           return (
             <div
@@ -759,6 +788,13 @@ export const CalendarConnections = memo(function CalendarConnections() {
                         )}
                       </button>
                     </>
+                  ) : isUnavailable ? (
+                    <span
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-gray-500 bg-gray-800/60 cursor-not-allowed select-none"
+                      title="This calendar provider isn't configured on this server yet."
+                    >
+                      Unavailable
+                    </span>
                   ) : (
                     <button
                       onClick={() => handleConnectClick(provider)}

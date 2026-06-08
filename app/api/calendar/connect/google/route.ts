@@ -36,6 +36,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Config guard: bail BEFORE any DB write if this server has no Google OAuth
+    // credentials. Without it, the route would insert a `disconnected`
+    // connection row, then throw deeper when createOAuth2Client() can't build
+    // the client, leaving an orphan row behind plus a cryptic 500. 503 is the
+    // honest signal: the capability is intentionally unavailable, not a request error.
+    if (!googleCalendarService.isConfigured()) {
+      return NextResponse.json(
+        { error: 'Google Calendar sync is not available on this server.' },
+        { status: 503 }
+      );
+    }
+
     // Parse and validate request body
     const body = await request.json();
     const validatedData = ConnectCalendarRequestSchema.parse({
