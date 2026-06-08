@@ -1,7 +1,8 @@
 // Microsoft Outlook Calendar Service
 // Phase 4: OAuth flow, Microsoft Graph API wrapper, and sync operations
-// NOTE: Token storage (get_oauth_token/store_oauth_token RPCs and calendar_oauth_tokens table)
-// was removed in the 2026-03-18 cleanup. OAuth flows will fail until token storage is rebuilt.
+// Token storage: access/refresh tokens are stored in Supabase Vault (AES) via the
+// store_oauth_token/get_oauth_token RPCs (rebuilt 2026-06-08, migration
+// 20260608190000) with an internal space-membership ownership check.
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
