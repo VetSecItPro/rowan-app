@@ -468,6 +468,7 @@ async function syncICSFeed(
 
       if (existingMapping) {
         // Update existing event
+        // nosemgrep: supabase-missing-space-id-filter - event targeted by primary key from a space-scoped feed mapping; ICS-import internal write
         const { error: updateError } = await supabase
           .from('events')
           .update({
@@ -486,6 +487,7 @@ async function syncICSFeed(
         }
       } else {
         // Create new event
+        // nosemgrep: supabase-missing-space-id-filter - insert sets space_id from the space-scoped connection; ICS-import internal write
         const { data: newEvent, error: createError } = await supabase
           .from('events')
           .insert({
@@ -523,6 +525,7 @@ async function syncICSFeed(
     for (const [externalId, mapping] of existingMap) {
       if (!seenExternalIds.has(externalId)) {
         // Soft-delete the Rowan event
+        // nosemgrep: supabase-missing-space-id-filter - event targeted by primary key from a space-scoped feed mapping; ICS-import internal write
         const { error: deleteError } = await supabase
           .from('events')
           .update({ deleted_at: new Date().toISOString() })
@@ -662,6 +665,7 @@ async function importICSFile(
 
     // Import each event
     for (const event of events) {
+      // nosemgrep: supabase-missing-space-id-filter - insert sets space_id from the validated spaceId on the next line; ICS file-import internal write
       const { error } = await supabase.from('events').insert({
         space_id: spaceId,
         title: event.summary,

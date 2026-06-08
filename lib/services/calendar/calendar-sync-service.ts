@@ -524,6 +524,7 @@ async function processOutboundCreate(
   // (processOutboundUpdate already guards this way; create did not.) The check is
   // per-connection, so a genuine cross-connection sync to a different provider
   // still proceeds.
+  // nosemgrep: supabase-missing-space-id-filter - internal sync mapping keyed by connection_id (connection is space-scoped); row has no space_id column
   const { data: existingMapping } = await supabase
     .from('calendar_event_mappings')
     .select('id')
@@ -888,6 +889,7 @@ async function syncAppleCalendar(
           .map((e) => e.calendarData?.uid)
           .filter((uid): uid is string => Boolean(uid))
       );
+      // nosemgrep: supabase-missing-space-id-filter - internal sync mapping keyed by connection_id (connection is space-scoped); row has no space_id column
       const { data: appleMappings } = await supabase
         .from('calendar_event_mappings')
         .select('id, rowan_event_id, external_event_id')
@@ -985,11 +987,13 @@ async function processAppleInboundEvent(
       }
 
       // No local enhancements - safe to soft delete
+      // nosemgrep: supabase-missing-space-id-filter - event targeted by primary key from a space-scoped mapping; calendar-sync internal write
       await supabase
         .from('events')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', mapping.rowan_event_id);
 
+      // nosemgrep: supabase-missing-space-id-filter - mapping deleted by primary key (id); row has no space_id column
       await supabase
         .from('calendar_event_mappings')
         .delete()
@@ -1191,6 +1195,7 @@ async function processAppleOutboundCreate(
 
   // Echo guard (see processOutboundCreate): skip if this event is already mapped
   // on this connection, so an inbound-synced event isn't pushed back as a duplicate.
+  // nosemgrep: supabase-missing-space-id-filter - internal sync mapping keyed by connection_id (connection is space-scoped); row has no space_id column
   const { data: existingMapping } = await supabase
     .from('calendar_event_mappings')
     .select('id')
