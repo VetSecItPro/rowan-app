@@ -51,6 +51,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get the chore
+    // nosemgrep: supabase-missing-space-id-filter — fetched by chore PK (.eq id); the caller's space membership is authorized separately below via space_members before any mutation
     const { data: chore, error: choreError } = await supabase
       .from('chores')
       .select('id, title, space_id, status, due_date, point_value')

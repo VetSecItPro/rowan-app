@@ -74,6 +74,7 @@ export const choresService = {
     const supabase = getSupabaseClient(supabaseClient);
 
     try {
+      // nosemgrep: supabase-missing-space-id-filter — filtered by space_id via .eq('space_id', spaceId) below
       let query = supabase
         .from('chores')
         .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
@@ -130,6 +131,7 @@ export const choresService = {
   async getChoreById(id: string, supabaseClient?: SupabaseClient): Promise<Chore | null> {
     const supabase = supabaseClient ?? createClient();
     try {
+      // nosemgrep: supabase-missing-space-id-filter — fetched by chore PK (.eq id); RLS enforces space-boundary access on chores
       const { data, error } = await supabase
         .from('chores')
         .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
@@ -263,6 +265,7 @@ export const choresService = {
         if (error.code === '42703') {
           logger.warn('sort_order column does not exist, skipping order update', { component: 'lib-chores-service' });
           // Return the chore without updating order
+          // nosemgrep: supabase-missing-space-id-filter — fetched by chore PK (.eq id); RLS enforces space-boundary access on chores
           const { data: choreData, error: fetchError } = await supabase
             .from('chores')
             .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
@@ -326,6 +329,7 @@ export const choresService = {
   async getChoresByUser(spaceId: string, userId: string): Promise<Chore[]> {
     const supabase = createClient();
     try {
+      // nosemgrep: supabase-missing-space-id-filter — filtered by space_id via .eq('space_id', spaceId) below
       const { data, error } = await supabase
         .from('chores')
         .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
@@ -354,6 +358,7 @@ export const choresService = {
   async getChoresByFrequency(spaceId: string, frequency: string): Promise<Chore[]> {
     const supabase = createClient();
     try {
+      // nosemgrep: supabase-missing-space-id-filter — filtered by space_id via .eq('space_id', spaceId) below
       const { data, error } = await supabase
         .from('chores')
         .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
