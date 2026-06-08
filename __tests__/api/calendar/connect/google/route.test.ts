@@ -5,6 +5,7 @@ import { POST, GET } from '@/app/api/calendar/connect/google/route';
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/lib/services/calendar', () => ({
   googleCalendarService: {
+    isConfigured: vi.fn(() => true),
     generateAuthUrl: vi.fn(() => 'https://accounts.google.com/o/oauth2/auth?...'),
     exchangeCodeForTokens: vi.fn(),
   },

@@ -5,6 +5,7 @@ import { POST, GET } from '@/app/api/calendar/connect/outlook/route';
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/lib/services/calendar', () => ({
   outlookCalendarService: {
+    isConfigured: vi.fn(() => true),
     generateAuthUrl: vi.fn(() => 'https://login.microsoftonline.com/auth?...'),
     exchangeCodeForTokens: vi.fn(),
     storeTokens: vi.fn(),
