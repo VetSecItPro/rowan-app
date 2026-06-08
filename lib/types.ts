@@ -430,12 +430,6 @@ export interface Chore {
   calendar_sync?: boolean;
   category?: string;
   point_value?: number;
-  // Late penalty settings (per-chore override)
-  late_penalty_enabled?: boolean;
-  late_penalty_points?: number;
-  grace_period_hours?: number;
-  penalty_applied_at?: string;
-  penalty_points_deducted?: number;
 }
 
 // =============================================

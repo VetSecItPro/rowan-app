@@ -74,9 +74,10 @@ export const choresService = {
     const supabase = getSupabaseClient(supabaseClient);
 
     try {
+      // nosemgrep: supabase-missing-space-id-filter — filtered by space_id via .eq('space_id', spaceId) below
       let query = supabase
         .from('chores')
-        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
         .eq('space_id', spaceId);
 
       // Apply filters if provided
@@ -130,9 +131,10 @@ export const choresService = {
   async getChoreById(id: string, supabaseClient?: SupabaseClient): Promise<Chore | null> {
     const supabase = supabaseClient ?? createClient();
     try {
+      // nosemgrep: supabase-missing-space-id-filter — fetched by chore PK (.eq id); RLS enforces space-boundary access on chores
       const { data, error } = await supabase
         .from('chores')
-        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
         .eq('id', id)
         .single();
 
@@ -263,9 +265,10 @@ export const choresService = {
         if (error.code === '42703') {
           logger.warn('sort_order column does not exist, skipping order update', { component: 'lib-chores-service' });
           // Return the chore without updating order
+          // nosemgrep: supabase-missing-space-id-filter — fetched by chore PK (.eq id); RLS enforces space-boundary access on chores
           const { data: choreData, error: fetchError } = await supabase
             .from('chores')
-            .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
+            .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
             .eq('id', id)
             .single();
 
@@ -326,9 +329,10 @@ export const choresService = {
   async getChoresByUser(spaceId: string, userId: string): Promise<Chore[]> {
     const supabase = createClient();
     try {
+      // nosemgrep: supabase-missing-space-id-filter — filtered by space_id via .eq('space_id', spaceId) below
       const { data, error } = await supabase
         .from('chores')
-        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
         .eq('space_id', spaceId)
         .eq('assigned_to', userId)
         .order('created_at', { ascending: false });
@@ -354,9 +358,10 @@ export const choresService = {
   async getChoresByFrequency(spaceId: string, frequency: string): Promise<Chore[]> {
     const supabase = createClient();
     try {
+      // nosemgrep: supabase-missing-space-id-filter — filtered by space_id via .eq('space_id', spaceId) below
       const { data, error } = await supabase
         .from('chores')
-        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value')
         .eq('space_id', spaceId)
         .eq('frequency', frequency)
         .order('created_at', { ascending: false });
@@ -518,10 +523,9 @@ export const choresService = {
   },
 
   /**
-   * Completes a chore via API with full rewards and late penalty support.
-   * Preferred method as it handles server-side penalty calculations.
+   * Completes a chore via API with server-side rewards (points + streak).
    * @param choreId - The chore identifier
-   * @returns Object with success flag, chore, rewards, penalty info, and net points
+   * @returns Object with success flag, chore, rewards, and net points
    */
   async completeChoreViaAPI(
     choreId: string
@@ -532,11 +536,6 @@ export const choresService = {
       pointsAwarded: number;
       streakBonus: number;
       newStreak: number;
-    };
-    penalty?: {
-      applied: boolean;
-      pointsDeducted: number;
-      daysLate: number;
     };
     netPoints?: number;
     error?: string;
@@ -562,7 +561,6 @@ export const choresService = {
         success: true,
         chore: data.chore,
         rewards: data.rewards,
-        penalty: data.penalty,
         netPoints: data.netPoints,
       };
     } catch (error) {

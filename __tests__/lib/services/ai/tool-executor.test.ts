@@ -168,13 +168,6 @@ vi.mock('@/lib/services/expense-splitting-service', () => ({
   createSettlement: vi.fn().mockResolvedValue({ id: 'settlement-1' }),
 }));
 
-vi.mock('@/lib/services/rewards/late-penalty-service', () => ({
-  getUserPenalties: vi.fn().mockResolvedValue([]),
-  forgivePenalty: vi.fn().mockResolvedValue(undefined),
-  getSpacePenaltySettings: vi.fn().mockResolvedValue({}),
-  updateSpacePenaltySettings: vi.fn().mockResolvedValue(undefined),
-}));
-
 vi.mock('@/lib/validations/task-schemas', () => ({
   createTaskSchema: {
     parse: vi.fn((data) => data),
@@ -301,12 +294,6 @@ describe('executeTool()', () => {
         { user_id: USER_ID, points: 1000, reason: 'self-mint' },
         contextWithRole('member'),
       );
-      expect(result.success).toBe(false);
-      expect(result.message).toMatch(/owner or admin/i);
-    });
-
-    it('blocks update_penalty_settings for a non-owner/admin member', async () => {
-      const result = await executeTool('update_penalty_settings', {}, contextWithRole('member'));
       expect(result.success).toBe(false);
       expect(result.message).toMatch(/owner or admin/i);
     });

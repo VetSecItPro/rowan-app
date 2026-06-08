@@ -8,11 +8,6 @@ vi.mock('@/lib/ratelimit-fallback', () => ({ extractIP: vi.fn(() => '127.0.0.1')
 vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
-vi.mock('@/lib/services/rewards/late-penalty-service', () => ({
-  applyLatePenalty: vi.fn(),
-  calculatePenalty: vi.fn(() => ({ isLate: false, penaltyPoints: 0, daysLate: 0 })),
-  getSpacePenaltySettings: vi.fn(() => Promise.resolve({ enabled: false })),
-}));
 vi.mock('@/lib/services/feature-access-service', () => ({
   canAccessFeature: vi.fn(),
 }));
@@ -48,9 +43,6 @@ const mockChore = {
   status: 'pending',
   due_date: null,
   point_value: 10,
-  late_penalty_enabled: false,
-  late_penalty_points: 0,
-  grace_period_hours: 0,
 };
 
 function makeMockSupabase(options?: {
@@ -226,7 +218,6 @@ describe('/api/chores/[choreId]/complete', () => {
       expect(res.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.rewards).toBeDefined();
-      expect(data.penalty).toBeDefined();
       expect(typeof data.netPoints).toBe('number');
     });
 

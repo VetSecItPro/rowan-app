@@ -1,6 +1,6 @@
 /**
  * Chore Completion API
- * POST /api/chores/[choreId]/complete - Complete a chore with rewards and late penalties
+ * POST /api/chores/[choreId]/complete - Complete a chore and award points
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
-import { applyLatePenalty, calculatePenalty, getSpacePenaltySettings } from '@/lib/services/rewards/late-penalty-service';
 import type { Chore } from '@/lib/types';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
@@ -19,7 +18,7 @@ interface RouteParams {
 
 /**
  * POST /api/chores/[choreId]/complete
- * Complete a chore, award points, and apply late penalties if applicable
+ * Complete a chore and award points
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
@@ -52,9 +51,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get the chore
+    // nosemgrep: supabase-missing-space-id-filter — fetched by chore PK (.eq id); the caller's space membership is authorized separately below via space_members before any mutation
     const { data: chore, error: choreError } = await supabase
       .from('chores')
-      .select('id, title, space_id, status, due_date, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours')
+      .select('id, title, space_id, status, due_date, point_value')
       .eq('id', choreId)
       .single();
 
@@ -161,53 +161,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Continue even if points fail - chore is still completed
     }
 
-    // Apply late penalty if applicable
-    let penaltyApplied = false;
-    let penaltyPoints = 0;
-    let daysLate = 0;
-
-    if (chore.late_penalty_enabled && chore.due_date) {
-      const settings = await getSpacePenaltySettings(chore.space_id);
-
-      if (settings.enabled) {
-        const penalty = calculatePenalty(
-          new Date(chore.due_date),
-          completionDate,
-          settings,
-          {
-            penaltyPoints: chore.late_penalty_points,
-            gracePeriodHours: chore.grace_period_hours,
-          }
-        );
-
-        if (penalty.isLate && penalty.penaltyPoints > 0) {
-          const penaltyResult = await applyLatePenalty({
-            choreId,
-            userId: user.id,
-            spaceId: chore.space_id,
-            completionDate: completionDateISO,
-          });
-
-          if (penaltyResult.success) {
-            penaltyApplied = true;
-            penaltyPoints = penaltyResult.pointsDeducted;
-            daysLate = penalty.daysLate;
-          }
-        }
-      }
-    }
-
-    // Calculate net points
-    const netPoints = pointsAwarded - penaltyPoints;
-
     logger.info('Chore completed with rewards', {
       choreId,
       userId: user.id,
       pointsAwarded,
       streakBonus,
-      penaltyApplied,
-      penaltyPoints,
-      netPoints,
     });
 
     return NextResponse.json({
@@ -218,16 +176,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         streakBonus,
         newStreak,
       },
-      penalty: penaltyApplied ? {
-        applied: true,
-        pointsDeducted: penaltyPoints,
-        daysLate,
-      } : {
-        applied: false,
-        pointsDeducted: 0,
-        daysLate: 0,
-      },
-      netPoints,
+      netPoints: pointsAwarded,
     });
   } catch (error) {
     logger.error('Chore completion error', error instanceof Error ? error : undefined);
