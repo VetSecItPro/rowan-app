@@ -187,11 +187,6 @@ export const TOOL_NAMES = {
   UNPIN_MESSAGE: 'unpin_message',
   ARCHIVE_CONVERSATION: 'archive_conversation',
   DELETE_CONVERSATION: 'delete_conversation',
-  // Reward Penalties
-  GET_USER_PENALTIES: 'get_user_penalties',
-  FORGIVE_PENALTY: 'forgive_penalty',
-  GET_PENALTY_SETTINGS: 'get_penalty_settings',
-  UPDATE_PENALTY_SETTINGS: 'update_penalty_settings',
   // Household Summary
   GET_HOUSEHOLD_SUMMARY: 'get_household_summary',
   // Batch / Bulk Completion

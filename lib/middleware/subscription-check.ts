@@ -167,7 +167,7 @@ const UPGRADE_NUDGES: Record<string, { feature: string; requiredTier: Subscripti
   canUseHousehold: {
     feature: 'household',
     requiredTier: 'plus',
-    message: 'Manage chores, penalties, and household tasks with Pro.',
+    message: 'Manage chores and household tasks with Pro.',
   },
   canUploadPhotos: {
     feature: 'photos',

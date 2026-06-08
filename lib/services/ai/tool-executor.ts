@@ -147,7 +147,6 @@ import {
 } from '@/lib/services/project-tracking-service';
 import { getRecurringPatterns, confirmPattern, ignorePattern } from '@/lib/services/recurring-expenses-service';
 import { getPartnershipBalance, createSettlement as createSettlementFn } from '@/lib/services/expense-splitting-service';
-import { getUserPenalties, forgivePenalty, getSpacePenaltySettings, updateSpacePenaltySettings } from '@/lib/services/rewards/late-penalty-service';
 
 import type { FeatureType } from '@/lib/types/chat';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -183,18 +182,16 @@ export async function executeTool(
 ): Promise<ToolExecutionResult> {
   const { spaceId, userId, supabase } = context;
 
-  // SECURITY (SEC-AI-05): tools that mint value or change household policy are
-  // owner/admin-only. Without this, any member could - via the AI - award
-  // themselves points, approve/deny redemptions, or rewrite penalty policy.
-  // Self-scoped actions (redeem_reward, cancel_redemption of one's own) are NOT
-  // gated here; they're scoped to the caller's own userId in the service.
+  // SECURITY (SEC-AI-05): tools that mint value are owner/admin-only. Without
+  // this, any member could - via the AI - award themselves points or approve/
+  // deny redemptions. Self-scoped actions (redeem_reward, cancel_redemption of
+  // one's own) are NOT gated here; they're scoped to the caller's own userId in
+  // the service.
   const OWNER_ADMIN_ONLY_TOOLS = new Set<string>([
     'award_points',
     'approve_redemption',
     'deny_redemption',
     'fulfill_redemption',
-    'update_penalty_settings',
-    'forgive_penalty',
   ]);
   if (OWNER_ADMIN_ONLY_TOOLS.has(toolName)) {
     // nosemgrep: supabase-missing-space-id-filter - space-scoped via .eq('space_id', spaceId) below
@@ -2826,94 +2823,6 @@ export async function executeTool(
         return { success: true, message: 'Conversation deleted.', featureType: 'message' };
       }
 
-      // ---------------------------------------------------------------
-      // Reward Penalties
-      // ---------------------------------------------------------------
-
-      case 'get_user_penalties': {
-        const targetUserId = (parameters.user_id as string) || userId;
-        const penalties = await getUserPenalties(targetUserId, spaceId, {
-          limit: (parameters.limit as number) || 20,
-          includeForgiven: (parameters.include_forgiven as boolean) || false,
-        });
-        return {
-          success: true,
-          message: penalties.length
-            ? `Found ${penalties.length} penalty record(s).`
-            : 'No penalties found.',
-          data: {
-            penalties: penalties.map(p => ({
-              id: p.id,
-              chore_id: p.chore_id,
-              points_deducted: p.points_deducted,
-              days_late: p.days_late,
-              due_date: p.due_date,
-              is_forgiven: p.is_forgiven,
-              created_at: p.created_at,
-            })),
-          },
-          featureType: 'reward',
-        };
-      }
-
-      case 'forgive_penalty': {
-        const pid = requireString(parameters, 'penalty_id', 'reward');
-        if ('error' in pid) return pid.error;
-        const result = await forgivePenalty({
-          penaltyId: pid.value,
-          forgivenBy: userId,
-          reason: safeText(parameters.reason, 500) || undefined,
-        });
-        if (!result.success) {
-          return {
-            success: false,
-            message: result.error || 'Failed to forgive penalty.',
-            featureType: 'reward',
-          };
-        }
-        return {
-          success: true,
-          message: `Penalty forgiven — ${result.pointsRefunded} points refunded.`,
-          data: { points_refunded: result.pointsRefunded },
-          featureType: 'reward',
-        };
-      }
-
-      case 'get_penalty_settings': {
-        const settings = await getSpacePenaltySettings(spaceId);
-        return {
-          success: true,
-          message: settings.enabled
-            ? `Penalties enabled: ${settings.default_penalty_points} points per late chore, ${settings.default_grace_period_hours}h grace period.`
-            : 'Late penalties are currently disabled.',
-          data: settings as unknown as Record<string, unknown>,
-          featureType: 'reward',
-        };
-      }
-
-      case 'update_penalty_settings': {
-        const updates: Record<string, unknown> = {};
-        if (parameters.enabled !== undefined) updates.enabled = parameters.enabled;
-        if (parameters.default_penalty_points !== undefined) updates.default_penalty_points = parameters.default_penalty_points;
-        if (parameters.default_grace_period_hours !== undefined) updates.default_grace_period_hours = parameters.default_grace_period_hours;
-        if (parameters.max_penalty_per_chore !== undefined) updates.max_penalty_per_chore = parameters.max_penalty_per_chore;
-        if (parameters.progressive_penalty !== undefined) updates.progressive_penalty = parameters.progressive_penalty;
-        if (parameters.exclude_weekends !== undefined) updates.exclude_weekends = parameters.exclude_weekends;
-        const result = await updateSpacePenaltySettings(spaceId, updates);
-        if (!result.success) {
-          return {
-            success: false,
-            message: result.error || 'Failed to update penalty settings.',
-            featureType: 'reward',
-          };
-        }
-        return {
-          success: true,
-          message: 'Penalty settings updated.',
-          featureType: 'reward',
-        };
-      }
-
       // ═══════════════════════════════════════
       // BATCH / BULK COMPLETION
       // ═══════════════════════════════════════
@@ -3105,7 +3014,7 @@ function getFeatureTypeFromTool(toolName: string): FeatureType {
   if (toolName.includes('expense') || toolName.includes('bill') || toolName.includes('recurring') || toolName.includes('settlement') || toolName.includes('partner_balance')) return 'expense';
   if (toolName.includes('budget') || toolName.includes('variance')) return 'budget';
   if (toolName.includes('project') || toolName.includes('vendor') || toolName.includes('line_item')) return 'project';
-  if (toolName.includes('reward') || toolName.includes('penalty') || toolName.includes('points')) return 'reward';
+  if (toolName.includes('reward') || toolName.includes('points')) return 'reward';
   if (toolName.includes('message') || toolName.includes('conversation') || toolName.includes('reaction')) return 'message';
   return 'general';
 }
@@ -3480,16 +3389,6 @@ export function getToolCallPreview(toolName: string, parameters: Record<string, 
       return 'Archive conversation';
     case 'delete_conversation':
       return 'Delete conversation';
-
-    // Reward Penalties
-    case 'get_user_penalties':
-      return 'Get penalty history';
-    case 'forgive_penalty':
-      return 'Forgive penalty';
-    case 'get_penalty_settings':
-      return 'Get penalty settings';
-    case 'update_penalty_settings':
-      return 'Update penalty settings';
 
     // Household Summary
     case 'get_household_summary':

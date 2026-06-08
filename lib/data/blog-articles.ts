@@ -1644,7 +1644,7 @@ const householdArticles: BlogArticle[] = [
 <h2>How Does Rowan Track Chore Accountability?</h2>
 <p>Assigning a chore is not the same as ensuring it gets done. The fridge chart has no mechanism for tracking completion, handling overdue tasks, or dealing with tasks that consistently get skipped. It is a declaration of intention, not a system of accountability.</p>
 
-<p>In Rowan, chore assignment includes due dates, completion tracking, and a full completion history log. When a chore is done, it is checked off and everyone can see it. When it is overdue, Rowan's late penalty system activates with progressive scaling, applying gentle consequences that escalate gradually rather than punishing immediately. This is not about policing family members. It is about creating clarity around shared work with a system that handles enforcement so people do not have to.</p>
+<p>In Rowan, chore assignment includes due dates, completion tracking, and a full completion history log. When a chore is done, it is checked off and everyone can see it. When it is overdue, it stays visible in the completion history until someone picks it up. This is not about policing family members. It is about creating clarity around shared work so everyone can see what still needs doing.</p>
 
 <h2>Rotating Fairly</h2>
 <p>Nobody wants to clean the bathrooms every week forever. Fair chore distribution requires rotation, and rotation requires tracking. Who did what last week? Whose turn is it this week? A paper chart cannot answer these questions without manual effort.</p>
@@ -1670,7 +1670,7 @@ const householdArticles: BlogArticle[] = [
 <p>Yes. Rowan's chore tracking system captures all types of household work, not just physical tasks. You can create and assign chores for cognitive labor like meal planning, appointment scheduling, and school communications. Every completed task is logged in your completion history, making invisible labor visible in the fairness dashboard.</p>
 
 <h3>What happens when someone misses a chore in Rowan?</h3>
-<p>Rowan's late penalty system activates automatically when a chore passes its due time. Penalties use progressive scaling, starting with a gentle reminder and escalating gradually. The system also includes forgiveness mechanisms for legitimate conflicts, so accountability stays fair rather than rigid.</p>
+<p>Rowan flags the chore as overdue and keeps it visible in the completion history until it is done, so everyone can see what still needs doing. The focus is on clarity rather than punishment. Recurring chores simply roll forward to their next scheduled occurrence.</p>
 
 <h3>Does Rowan work for families with young children?</h3>
 <p>Rowan's chore assignment interface is designed to be accessible across age groups. Kids can see their assigned chores, check them off when done, and track their own progress. Parents can set age-appropriate tasks with clear due dates, and the completion history shows each family member's contributions over time.</p>
@@ -1726,8 +1726,6 @@ const householdArticles: BlogArticle[] = [
 <h3>Does gamifying chores work for teenagers?</h3>
 <p>Gamification is effective across age groups because it leverages fundamental psychology, not childish gimmicks. Teenagers respond to progress tracking, streaks, and tangible rewards just as strongly as younger children. Rowan's chore tracking interface is clean and straightforward, avoiding the cartoonish designs that turn older kids off while still providing the motivational feedback loops that drive engagement.</p>
 
-<h3>What happens to points when a chore is completed late?</h3>
-<p>Rowan's late penalty system can deduct points when chores are not completed by their due time. The progressive scaling means small delays incur minor deductions while longer delays escalate. Combined with the forgiveness mechanism, this creates fair accountability without harsh punishment for occasional oversights.</p>
 </div>`,
   },
   {
@@ -1764,8 +1762,6 @@ const householdArticles: BlogArticle[] = [
 <h2>Accountability Without Nagging</h2>
 <p>Nobody enjoys nagging, and nobody enjoys being nagged. Recurring schedules replace nagging with visibility. When a chore is overdue, the system shows it. The parent does not have to say "you haven't done your chores." The system says it for them. This small shift reduces conflict because the message comes from a neutral source rather than a frustrated family member.</p>
 
-<p>Rowan's late penalty system adds gentle accountability without requiring anyone to play the role of enforcer. When a recurring chore goes past its due time, progressive scaling applies incremental consequences rather than immediate punishment. The forgiveness mechanism allows penalties to be waived for legitimate conflicts. The system handles accountability so the people can focus on relationships.</p>
-
 <h2>Frequently Asked Questions</h2>
 
 <h3>How do recurring chores work in Rowan?</h3>
@@ -1774,62 +1770,8 @@ const householdArticles: BlogArticle[] = [
 <h3>Can Rowan track who actually completed a chore versus who was assigned it?</h3>
 <p>Yes. Rowan's completion history logs both the assigned family member and the person who checked off the chore. This household labor data is visible to all family members, providing transparency and an objective record that replaces subjective memory with verifiable facts.</p>
 
-<h3>What is progressive scaling in Rowan's late penalty system?</h3>
-<p>Progressive scaling means that penalties increase gradually based on how overdue a chore is. A chore that is one hour late triggers a gentle reminder. A chore that is a full day late may incur a small point deduction. This approach gives family members reasonable time to catch up before consequences escalate, and the forgiveness mechanism allows exceptions for legitimate scheduling conflicts.</p>
-
 <h3>Does Rowan work for households with non-traditional schedules?</h3>
 <p>Rowan's chore assignment and recurring chores features are fully flexible. You can set custom intervals, assign chores on specific days, and adjust rotation patterns to match shift work, travel schedules, or alternating custody arrangements. The system adapts to your household's reality rather than forcing a one-size-fits-all schedule.</p>
-</div>`,
-  },
-  {
-    slug: 'late-penalty-system-household-chores',
-    title: 'Gentle Accountability: How a Late Penalty System Keeps Household Chores on Track',
-    description: 'Rowan\'s late penalty system uses progressive scaling and forgiveness mechanisms to keep household chores on track without nagging, confrontation, or one person playing enforcer.',
-    categoryName: 'Household',
-    categoryColor: 'amber',
-    categoryIcon: 'FileText',
-    readTime: '5 min read',
-    featured: false,
-    publishedDate: '2026-01-15',
-    htmlContent: `
-<div class="prose prose-invert prose-lg max-w-none">
-<p>In every household with shared chores, there is a tension between wanting things done and not wanting to nag. The person who notices the undone chore faces a choice: say something and risk conflict, or say nothing and do it themselves. Neither option is healthy long-term.</p>
-
-<p>A late penalty system offers a third option: let the system handle accountability. When a chore is overdue, consequences happen automatically. No confrontation needed. No passive-aggressive sighs. Just a clear, fair, pre-agreed mechanism.</p>
-
-<h2>How Does Rowan's Late Penalty System Work?</h2>
-<p>In Rowan, the late penalty system activates automatically when a chore is not completed by its due time. The system applies progressive scaling: a missed chore might start with a gentle notification, then escalate to a point deduction from the rewards system, then further escalation if the chore remains undone. Each stage is proportional to the delay, not a single harsh punishment.</p>
-
-<p>The key is that the rules are established before they are needed. Everyone agrees on the penalty structure when the system is set up. When a penalty is applied, it is not personal. It is the system functioning as designed, with full transparency in the completion history so everyone can see exactly what triggered the consequence.</p>
-
-<h2>Why Is Progressive Scaling Better Than Immediate Punishment?</h2>
-<p>The best penalty systems escalate gradually. A chore that is one hour late gets a gentle reminder. One that is a day late might incur a small point penalty. The progression gives people time to catch up without feeling immediately punished for an honest oversight. Rowan's progressive scaling is calibrated to distinguish between a busy afternoon and genuine neglect.</p>
-
-<p>Rowan's penalty system includes forgiveness mechanisms as well. If something legitimate came up, a family member or parent can waive the penalty. The household labor data remains in the completion history even when a penalty is forgiven, maintaining transparency. The system is a tool for accountability, not an inflexible disciplinarian.</p>
-
-<h2>Removing the Enforcement Role</h2>
-<p>The most valuable aspect of an automated penalty system is that it removes the enforcement role from family members. Nobody has to be the bad guy. Nobody has to track who did what and confront the person who did not. The system does this neutrally and consistently.</p>
-
-<p>This is especially important in households with kids. When a parent is constantly reminding and enforcing chores, the relationship becomes transactional. When a system handles the reminding and accountability, the parent can focus on being a parent rather than a manager.</p>
-
-<h2>Building Intrinsic Motivation</h2>
-<p>Penalties are an extrinsic motivator, and extrinsic motivators have limits. The real goal is to build intrinsic motivation: the desire to contribute because it is the right thing to do. Penalties bridge the gap. They create a structure within which habits can form, and habits are the foundation of intrinsic motivation.</p>
-
-<p>Over time, as family members develop the habit of completing their chores on time, the penalties become irrelevant. They are still there as a safety net, but they rarely trigger because the behavior has become automatic. Rowan's completion history will show this progression clearly: early weeks with occasional late penalties giving way to consistent on-time completions. That is the goal: use the system to build the habit, and then the habit sustains itself.</p>
-
-<h2>Frequently Asked Questions</h2>
-
-<h3>Can parents adjust the severity of late penalties in Rowan?</h3>
-<p>Yes. Rowan's late penalty system is fully configurable. Parents can set the escalation timeline, define point deduction amounts at each stage, and control how quickly progressive scaling ramps up. This ensures the penalty structure matches your family's expectations and the ages of your children.</p>
-
-<h3>How does the forgiveness mechanism work in Rowan?</h3>
-<p>When a late penalty is applied, a family member or parent can waive it through Rowan's forgiveness mechanism. The original overdue chore remains visible in the completion history for transparency, but the point deduction is reversed. This allows families to handle legitimate conflicts like illness, schedule changes, or emergencies without undermining the accountability structure.</p>
-
-<h3>Does Rowan's late penalty system work with recurring chores?</h3>
-<p>Rowan's late penalty system integrates directly with recurring chores. Each instance of a recurring chore has its own due time, and the progressive scaling applies independently to each occurrence. If a family member misses one instance but completes the next on time, only the missed instance incurs a penalty. The chore rotation continues unaffected.</p>
-
-<h3>Will a late penalty system cause stress for younger children?</h3>
-<p>Rowan's progressive scaling is designed to start gently. The first stage is a simple reminder, not a punishment. Parents can configure the system so that younger children face only reminders with minimal or no point deductions, while older family members have fuller accountability. The forgiveness mechanism provides an additional safety valve so that the system supports development rather than creating anxiety.</p>
 </div>`,
   },
   {
