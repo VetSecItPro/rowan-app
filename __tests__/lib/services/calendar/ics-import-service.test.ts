@@ -337,6 +337,17 @@ describe('icsImportService.importICSFile', () => {
 
     expect(result.success).toBe(true);
     expect(result.eventsImported).toBe(1);
+
+    // Regression: the events insert must use the REAL columns all_day /
+    // external_source. It previously wrote is_all_day / source / metadata —
+    // columns that don't exist — so every ICS import silently threw and
+    // imported nothing.
+    const insertedEvent = (insertChain.insert as ReturnType<typeof vi.fn>).mock.calls[0][0] as Record<string, unknown>;
+    expect(insertedEvent).toHaveProperty('all_day');
+    expect(insertedEvent).toHaveProperty('external_source', 'ics_file_import');
+    expect(insertedEvent).not.toHaveProperty('is_all_day');
+    expect(insertedEvent).not.toHaveProperty('source');
+    expect(insertedEvent).not.toHaveProperty('metadata');
   });
 });
 

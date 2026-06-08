@@ -4,6 +4,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { googleCalendarService } from './google-calendar-service';
 import { appleCalDAVService } from './apple-caldav-service';
+import { outlookCalendarService } from './outlook-calendar-service';
 import { eventMapper } from './event-mapper';
 import { logger } from '@/lib/logger';
 import type {
@@ -88,6 +89,16 @@ export async function performSync(
         break;
       case 'apple':
         result = await syncAppleCalendar(connection, syncType);
+        break;
+      case 'outlook':
+        // Outlook has its own Microsoft Graph delta-sync implementation; route to
+        // it. (Previously unreachable — the switch never handled 'outlook', so
+        // connected Outlook accounts never synced.) Its signature only accepts
+        // full|incremental, so collapse manual/webhook_triggered to incremental.
+        result = await outlookCalendarService.syncCalendar(
+          connection.id,
+          syncType === 'full' ? 'full' : 'incremental'
+        );
         break;
       case 'cozi':
         result = await syncCoziCalendar(connection, syncType);
@@ -507,6 +518,20 @@ async function processOutboundCreate(
 
   if (!event) return;
 
+  // Echo guard: if a mapping already exists for this event on THIS connection,
+  // the event is already synced here (e.g. it arrived via this connection's
+  // inbound sync). Creating again would push a duplicate back to the provider.
+  // (processOutboundUpdate already guards this way; create did not.) The check is
+  // per-connection, so a genuine cross-connection sync to a different provider
+  // still proceeds.
+  const { data: existingMapping } = await supabase
+    .from('calendar_event_mappings')
+    .select('id')
+    .eq('rowan_event_id', event.id)
+    .eq('connection_id', connection.id)
+    .maybeSingle();
+  if (existingMapping) return;
+
   // Lock event
   await supabase.rpc('lock_event_for_sync', { p_event_id: event.id });
 
@@ -847,6 +872,41 @@ async function syncAppleCalendar(
       logger.info('[Sync] Skipping inbound - direction is outbound_only', { component: 'lib-calendar-sync-service' });
     }
 
+    // 1b. INBOUND DELETIONS: iCloud HARD-deletes events (the .ics vanishes from
+    // the feed) rather than emitting a CANCELLED VEVENT, so processAppleInboundEvent's
+    // CANCELLED path never fired and externally-deleted Apple events lingered in
+    // Rowan forever. Detect them here: any mapping whose external_event_id is no
+    // longer present in the feed was deleted on Apple → soft-delete the Rowan event.
+    // ONLY safe on a FULL fetch (calDavEvents is the complete current set); an
+    // incremental fetch returns a partial delta, so skip then to avoid wrongly
+    // deleting events that simply weren't in the delta window.
+    const wasFullAppleFetch = syncType === 'full' || !connection.sync_token;
+    if (wasFullAppleFetch && connection.sync_direction !== 'outbound_only') {
+      const supabase = await createClient();
+      const seenUids = new Set(
+        calDavEvents
+          .map((e) => e.calendarData?.uid)
+          .filter((uid): uid is string => Boolean(uid))
+      );
+      const { data: appleMappings } = await supabase
+        .from('calendar_event_mappings')
+        .select('id, rowan_event_id, external_event_id')
+        .eq('connection_id', connection.id);
+      for (const m of appleMappings || []) {
+        if (!seenUids.has(m.external_event_id)) {
+          await supabase
+            .from('events')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', m.rowan_event_id);
+          await supabase
+            .from('calendar_event_mappings')
+            .delete()
+            .eq('id', m.id);
+          eventsDeleted++;
+        }
+      }
+    }
+
     // 2. OUTBOUND: Process pending queue items (Rowan → Apple)
     if (connection.sync_direction !== 'inbound_only') {
       const queueResult = await processAppleOutboundQueue(connection);
@@ -1129,6 +1189,16 @@ async function processAppleOutboundCreate(
 
   if (!event) return;
 
+  // Echo guard (see processOutboundCreate): skip if this event is already mapped
+  // on this connection, so an inbound-synced event isn't pushed back as a duplicate.
+  const { data: existingMapping } = await supabase
+    .from('calendar_event_mappings')
+    .select('id')
+    .eq('rowan_event_id', event.id)
+    .eq('connection_id', connection.id)
+    .maybeSingle();
+  if (existingMapping) return;
+
   // Lock event
   await supabase.rpc('lock_event_for_sync', { p_event_id: event.id });
 
@@ -1265,10 +1335,15 @@ async function checkForAppleConflict(
   parsedEvent: ParsedICalEvent
 ): Promise<{ hasConflict: boolean; rowanModified: boolean; externalModified: boolean }> {
   const rowanUpdated = new Date(mapping.rowan_event.updated_at);
-  const externalUpdated = parsedEvent.lastModified
-    ? new Date(eventMapper.mapICalendarToRowan(parsedEvent, '').updated_at || new Date().toISOString())
-    : new Date();
+  // Use the real iCal LAST-MODIFIED. (Previously routed through
+  // mapICalendarToRowan().updated_at, which is never set, so externalUpdated was
+  // always "now" → external was always flagged modified → conflicts over-reported.)
+  // When the feed omits LAST-MODIFIED, fall back to last_synced_at so we DON'T
+  // falsely treat the external side as changed.
   const lastSynced = new Date(mapping.last_synced_at);
+  const externalUpdated = parsedEvent.lastModified
+    ? new Date(parsedEvent.lastModified)
+    : lastSynced;
 
   const rowanModifiedSinceSync = rowanUpdated > lastSynced;
   const externalModifiedSinceSync = externalUpdated > lastSynced;
