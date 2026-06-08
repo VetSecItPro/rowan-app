@@ -756,12 +756,26 @@ export async function syncCalendar(
         const isDeleted = (event as unknown as { '@removed'?: { reason: string } })['@removed'];
 
         if (isDeleted) {
-          // Handle deleted event
-          await supabase
+          // Soft-delete the mapped Rowan event first (the delete-mapping-only path
+          // left orphaned events on every external deletion), then drop the mapping.
+          // nosemgrep: supabase-missing-space-id-filter - internal sync mapping keyed by connection_id (connection is space-scoped); row has no space_id column
+          const { data: removedMapping } = await supabase
             .from('calendar_event_mappings')
-            .delete()
+            .select('id, rowan_event_id')
             .eq('connection_id', connectionId)
-            .eq('external_event_id', event.id);
+            .eq('external_event_id', event.id)
+            .single();
+          if (removedMapping) {
+            // nosemgrep: supabase-missing-space-id-filter - event targeted by primary key from a space-scoped mapping; calendar-sync internal write
+            await supabase
+              .from('events')
+              .update({ deleted_at: new Date().toISOString() })
+              .eq('id', removedMapping.rowan_event_id);
+            await supabase
+              .from('calendar_event_mappings')
+              .delete()
+              .eq('id', removedMapping.id);
+          }
           eventsDeleted++;
         } else {
           // Check if event already exists

@@ -8,6 +8,7 @@ const {
   mockCreateClient,
   mockGoogleCalendarService,
   mockAppleCalDAVService,
+  mockOutlookCalendarService,
   mockEventMapper,
 } = vi.hoisted(() => {
   function createChainMock(resolvedValue: unknown) {
@@ -36,6 +37,20 @@ const {
     deleteEvent: vi.fn(),
   };
 
+  const mockOutlookCalendarService = {
+    syncCalendar: vi.fn(async () => ({
+      success: true,
+      connection_id: 'conn-1',
+      sync_type: 'incremental',
+      events_created: 3,
+      events_updated: 0,
+      events_deleted: 0,
+      conflicts_detected: 0,
+      errors: [],
+      duration_ms: 1,
+    })),
+  };
+
   const mockEventMapper = {
     mapGoogleToRowan: vi.fn(() => ({ title: 'Mapped Event', space_id: 'space-1' })),
     mapICalendarToRowan: vi.fn(() => ({ title: 'Apple Event', space_id: 'space-1', updated_at: new Date().toISOString() })),
@@ -55,6 +70,7 @@ const {
     mockCreateClient,
     mockGoogleCalendarService,
     mockAppleCalDAVService,
+    mockOutlookCalendarService,
     mockEventMapper,
   };
 });
@@ -65,6 +81,9 @@ vi.mock('@/lib/services/calendar/google-calendar-service', () => ({
 }));
 vi.mock('@/lib/services/calendar/apple-caldav-service', () => ({
   appleCalDAVService: mockAppleCalDAVService,
+}));
+vi.mock('@/lib/services/calendar/outlook-calendar-service', () => ({
+  outlookCalendarService: mockOutlookCalendarService,
 }));
 vi.mock('@/lib/services/calendar/event-mapper', () => ({
   eventMapper: mockEventMapper,
@@ -214,6 +233,35 @@ describe('performSync', () => {
 
     expect(result.success).toBe(false);
     expect(result.errors[0].error_code).toBe('NOT_IMPLEMENTED');
+  });
+
+  // Regression: Outlook was missing from the provider switch, so connected
+  // Outlook accounts never synced (fell through to "Unknown provider").
+  it('routes outlook provider to outlookCalendarService.syncCalendar', async () => {
+    const connection = makeConnection({ provider: 'outlook' });
+
+    mockSupabase.from.mockImplementation((table: string) => {
+      const chain: Record<string, unknown> = {};
+      const handler = () => chain;
+      ['select', 'eq', 'order', 'insert', 'update', 'delete', 'limit',
+       'maybeSingle', 'gte', 'lte', 'in', 'neq', 'is', 'not', 'upsert', 'match',
+       'or', 'filter', 'ilike', 'range', 'textSearch', 'contains'].forEach(m => {
+        chain[m] = vi.fn(handler);
+      });
+      if (table === 'calendar_connections') {
+        chain.single = vi.fn(async () => ({ data: connection, error: null }));
+      } else {
+        chain.single = vi.fn(async () => ({ data: { id: 'log-1' }, error: null }));
+      }
+      chain.then = vi.fn((resolve: (v: unknown) => unknown) => resolve({ data: null, error: null }));
+      return chain;
+    });
+
+    const result = await performSync('conn-1', 'incremental');
+
+    expect(mockOutlookCalendarService.syncCalendar).toHaveBeenCalledWith('conn-1', 'incremental');
+    expect(result.success).toBe(true);
+    expect(result.events_created).toBe(3);
   });
 
   it('returns sync_type passed in', async () => {

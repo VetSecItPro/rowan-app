@@ -468,6 +468,7 @@ async function syncICSFeed(
 
       if (existingMapping) {
         // Update existing event
+        // nosemgrep: supabase-missing-space-id-filter - event targeted by primary key from a space-scoped feed mapping; ICS-import internal write
         const { error: updateError } = await supabase
           .from('events')
           .update({
@@ -476,7 +477,7 @@ async function syncICSFeed(
             location: icsEvent.location || null,
             start_time: icsEvent.start.toISOString(),
             end_time: icsEvent.end.toISOString(),
-            is_all_day: icsEvent.isAllDay,
+            all_day: icsEvent.isAllDay,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existingMapping.rowan_event_id);
@@ -486,6 +487,7 @@ async function syncICSFeed(
         }
       } else {
         // Create new event
+        // nosemgrep: supabase-missing-space-id-filter - insert sets space_id from the space-scoped connection; ICS-import internal write
         const { data: newEvent, error: createError } = await supabase
           .from('events')
           .insert({
@@ -495,8 +497,8 @@ async function syncICSFeed(
             location: icsEvent.location || null,
             start_time: icsEvent.start.toISOString(),
             end_time: icsEvent.end.toISOString(),
-            is_all_day: icsEvent.isAllDay,
-            source: 'ics_import',
+            all_day: icsEvent.isAllDay,
+            external_source: 'ics_import',
             created_by: connection.user_id,
           })
           .select('id')
@@ -517,13 +519,16 @@ async function syncICSFeed(
       }
     }
 
-    // Delete events that are no longer in the feed
+    // Soft-delete events that are no longer in the feed (matches the Google/Apple
+    // sync paths). A hard delete here meant a transient short feed or the
+    // MAX_ICS_EVENT_COUNT truncation permanently destroyed user events.
     for (const [externalId, mapping] of existingMap) {
       if (!seenExternalIds.has(externalId)) {
-        // Delete the Rowan event
+        // Soft-delete the Rowan event
+        // nosemgrep: supabase-missing-space-id-filter - event targeted by primary key from a space-scoped feed mapping; ICS-import internal write
         const { error: deleteError } = await supabase
           .from('events')
-          .delete()
+          .update({ deleted_at: new Date().toISOString() })
           .eq('id', mapping.rowan_event_id);
 
         if (!deleteError) {
@@ -660,6 +665,7 @@ async function importICSFile(
 
     // Import each event
     for (const event of events) {
+      // nosemgrep: supabase-missing-space-id-filter - insert sets space_id from the validated spaceId on the next line; ICS file-import internal write
       const { error } = await supabase.from('events').insert({
         space_id: spaceId,
         title: event.summary,
@@ -667,11 +673,9 @@ async function importICSFile(
         location: event.location || null,
         start_time: event.start.toISOString(),
         end_time: event.end.toISOString(),
-        is_all_day: event.isAllDay,
-        source: 'ics_file_import',
+        all_day: event.isAllDay,
+        external_source: 'ics_file_import',
         created_by: userId,
-        // Store file name in metadata for reference
-        metadata: fileName ? { imported_from: fileName } : null,
       });
 
       if (!error) {
