@@ -44,6 +44,18 @@ const WEBHOOK_TTL_MINUTES = 4230;
 // =============================================================================
 
 /**
+ * Whether this server has the Microsoft OAuth credentials needed to run the
+ * Outlook connect flow. Connect routes check this BEFORE creating any DB rows
+ * so an unconfigured server returns a clean 503 instead of leaking an orphan
+ * `disconnected` connection row and a cryptic 500 (generateAuthUrl throws when
+ * the credentials are missing). Requires an Azure AD app registration; see
+ * docs/decisions/0022-external-calendar-integration-and-config-guards.md.
+ */
+export function isConfigured(): boolean {
+  return Boolean(MICROSOFT_CLIENT_ID && MICROSOFT_CLIENT_SECRET && MICROSOFT_REDIRECT_URI);
+}
+
+/**
  * Generate the Microsoft OAuth authorization URL
  */
 export function generateAuthUrl(state: string, loginHint?: string): string {
@@ -922,6 +934,7 @@ export async function syncCalendar(
 
 /** Aggregated Outlook Calendar service for OAuth, event CRUD, and webhook subscriptions. */
 export const outlookCalendarService = {
+  isConfigured,
   generateAuthUrl,
   exchangeCodeForTokens,
   storeTokens,

@@ -36,6 +36,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Config guard: bail BEFORE any DB write if this server has no Microsoft
+    // OAuth credentials. Without it, the route would insert a `disconnected`
+    // connection row, then throw deeper when generateAuthUrl() can't build the
+    // URL, leaving an orphan row behind plus a cryptic 500. 503 is the honest
+    // signal: the capability is intentionally unavailable, not a request error.
+    if (!outlookCalendarService.isConfigured()) {
+      return NextResponse.json(
+        { error: 'Microsoft Outlook calendar sync is not available on this server.' },
+        { status: 503 }
+      );
+    }
+
     // Parse and validate request body
     const body = await request.json();
     const validatedData = ConnectCalendarRequestSchema.parse({
